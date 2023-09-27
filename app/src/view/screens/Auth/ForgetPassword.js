@@ -66,13 +66,11 @@ const ForgetPassword = ({navigation}) => {
       <StatusBar barStyle={'dark-content'} backgroundColor={'#FACA4E'} />
       <View style={styles.mainv}>
 
-        <TouchableOpacity  style={{marginTop: '9%', marginLeft: '8%', alignSelf: 'flex-start'}} onPress={()=>navigation.goBack()}>
-
-        <Back
-          width={20}
-          height={20}
-        />
-
+        
+        <TouchableOpacity
+          style={{marginTop: '9%', marginLeft: '8%', alignSelf: 'flex-start'}}
+          onPress={() => navigation.goBack()}>
+          <Back width={20} height={20} />
         </TouchableOpacity>
 
         <View style={styles.passwordImg}>

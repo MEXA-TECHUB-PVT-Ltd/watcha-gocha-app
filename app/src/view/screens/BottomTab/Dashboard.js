@@ -1,7 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import Headers from '../../../assets/Custom/Headers'
-
+import {StyleSheet, Text, View} from 'react-native';
+import React from 'react';
+import Headers from '../../../assets/Custom/Headers';
 
 import {
   heightPercentageToDP as hp,
@@ -12,17 +11,15 @@ import {
 export default function Dashboard() {
   return (
     <View style={styles.container}>
-      <Headers showIcon={true}/>
-
-
+      <Headers showIcon={true} />
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
-  container:{
-    flex:1,
-    marginHorizontal:wp(3),
-    backgroundColor:'white'
-  }
-})
+  container: {
+    flex: 1,
+    marginHorizontal: wp(3),
+    backgroundColor: 'white',
+  },
+});
