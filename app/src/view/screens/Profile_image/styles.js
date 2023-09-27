@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native'
-import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 const STYLES = StyleSheet.create({
     bg: {
         // height:800,
@@ -33,8 +33,19 @@ const STYLES = StyleSheet.create({
         backgroundColor: '#FACA4E',
         borderRadius: 25,
         width: 150,
+        marginTop:hp(2),
         marginBottom: '5%',
     },
+    circleBox: {
+        width: wp(28),
+        height: hp(14),
+        borderWidth: 1,
+        overflow:'hidden',
+        borderColor: '#0000001F',
+        borderRadius: wp(50),
+        justifyContent: 'center',
+        alignItems: 'center',
+      }
 })
 
 export default STYLES; 
