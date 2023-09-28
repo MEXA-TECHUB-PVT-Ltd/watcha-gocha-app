@@ -33,6 +33,12 @@ import ResetPassword from './app/src/view/screens/Auth/ResetPassword';
 import BottomtabNavigation from './app/src/Navigation/BottomtabNavigation';
 import Dashboard from './app/src/view/screens/BottomTab/Dashboard';
 import PhoneBase from './app/src/view/screens/PhoneBase';
+import SearchApps from './app/src/view/screens/SearchApps';
+import ViewVideo from './app/src/view/screens/VideoView/ViewVideo';
+import UploadVideo from './app/src/view/screens/UploadAVideo/UploadVideo';
+import UploadScreen from './app/src/view/screens/UploadAVideo/UploadScreen';
+import PicDetails from './app/src/view/screens/PicDetails';
+import SearchScreen from './app/src/view/screens/SearchScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -41,6 +47,43 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
+
+      <Stack.Screen
+          name="SearchScreen"
+          component={SearchScreen}
+          options={{headerShown: false}}
+        />
+
+      <Stack.Screen
+          name="PicDetails"
+          component={PicDetails}
+          options={{headerShown: false}}
+        />
+
+      <Stack.Screen
+          name="UploadScreen"
+          component={UploadScreen}
+          options={{headerShown: false}}
+        />
+
+      <Stack.Screen
+          name="UploadVideo"
+          component={UploadVideo}
+          options={{headerShown: false}}
+        />
+
+      <Stack.Screen
+          name="ViewVideo"
+          component={ViewVideo}
+          options={{headerShown: false}}
+        />
+
+      <Stack.Screen
+          name="SearchApps"
+          component={SearchApps}
+          options={{headerShown: false}}
+        />
+
 
       <Stack.Screen
           name="PhoneBase"
