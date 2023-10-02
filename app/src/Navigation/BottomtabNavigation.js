@@ -10,30 +10,40 @@ import HomeActive from '../assets/svg/HomeActive.svg';
 
 import HomeInActive from '../assets/svg/HomeInactive.svg';
 
-import Dashboard from '../view/screens/BottomTab/Dashboard';
+import MailActive from '../assets/svg/MailActive.svg';
+
+import MailInActive from '../assets/svg/MailInActive.svg';
+
+import CategoryActive from '../assets/svg/CategoryActive.svg';
+
+import CategoryInActive from '../assets/svg/CategoryInactive.svg';
+
+import VideoActive from '../assets/svg/VideoActive.svg';
+
+import VideoInActive from '../assets/svg/VideoInactive.svg';
+
+import ProfileActive from '../assets/svg/ProfileActive.svg';
+
+import ProfileInActive from '../assets/svg/ProfileInactive.svg';
+
+
+
+import {appImages} from '../assets/utilities';
+import Dashboard from './../view/screens/BottomTab/Dashboard';
 
 const BottomtabNavigation = () => {
   const Bottom = createBottomTabNavigator();
   return (
     <Bottom.Navigator
       initialRouteName="Dashboard"
-      tabBarOptions={{
-        activeTintColor: '#24A59E', // Color of the active tab icon and label
-        inactiveTintColor: '#CACACA', // Color of inactive tab icons and labels
-        style: {
-          backgroundColor: '#FFFFFF', // Background color of the tab bar
-        },
-        labelStyle: {
-          color: '#CACACA',
-          fontSize: wp(1.5), // Font size of the tab labels
-          FontFamily: 'Inter-Medium',
-          marginTop: hp(-1), // Font weight of the tab labels
-        },
-
-        tabBarShowLabel: true, // Show all tab bar labels
-      }}
+      tabBarOptions={
+        {
+          // ... (other tabBarOptions)
+        }
+      }
       screenOptions={{
         headerShown: false,
+        tabBarShowLabel:false,
         tabBarActiveBackgroundColor: '#FFFFFF',
         tabBarInactiveBackgroundColor: '#FFFFFF',
         activeTintColor: '#24A59E', // Color of the active tab icon and label
@@ -42,20 +52,20 @@ const BottomtabNavigation = () => {
       }}>
       <Bottom.Screen
         options={({focused}) => ({
-          tabBarIcon: () =>
+          tabBarIcon: ({focused}) =>
             focused ? (
-              <HomeActive width={21} height={21} />
+              <HomeActive width={23} height={23} />
+
+
             ) : (
-              <HomeInActive
-                width={21}
-                height={21}
-                style={{
-                  width: wp(6.1),
-                  height: hp(6.1),
-                  tintColor: '#CACACA', // Color for the inactive state
-                }}
-              />
+              <HomeInActive width={23} height={23} />
+
             ),
+          tabBarLabel: ({focused}) => (
+            <Text style={focused ? styles.focusedLabel : styles.inactiveLabel}>
+              Home
+            </Text>
+          ),
         })}
         name="Dashboard"
         component={Dashboard}
@@ -63,20 +73,17 @@ const BottomtabNavigation = () => {
 
       <Bottom.Screen
         options={({focused}) => ({
-          tabBarIcon: () =>
+          tabBarIcon: ({focused}) =>
             focused ? (
-              <HomeActive width={21} height={21} />
+              <CategoryActive width={23} height={23} />
             ) : (
-              <HomeInActive
-                width={21}
-                height={21}
-                style={{
-                  width: wp(6.1),
-                  height: hp(6.1),
-                  tintColor: '#CACACA', // Color for the inactive state
-                }}
-              />
+              <CategoryInActive  style={{resizeMode:'contain'}} />
             ),
+          tabBarLabel: ({focused}) => (
+            <Text style={focused ? styles.focusedLabel : styles.inactiveLabel}>
+              Home
+            </Text>
+          ),
         })}
         name="Category"
         component={Dashboard}
@@ -84,20 +91,19 @@ const BottomtabNavigation = () => {
 
       <Bottom.Screen
         options={({focused}) => ({
-          tabBarIcon: () =>
+          tabBarIcon: ({focused}) =>
             focused ? (
-              <HomeActive width={21} height={21} />
+              <VideoActive width={23} height={23} />
+
             ) : (
-              <HomeInActive
-                width={21}
-                height={21}
-                style={{
-                  width: wp(6.1),
-                  height: hp(6.1),
-                  tintColor: '#CACACA', // Color for the inactive state
-                }}
-              />
+              <VideoInActive width={23} height={23} />
+
             ),
+          tabBarLabel: ({focused}) => (
+            <Text style={focused ? styles.focusedLabel : styles.inactiveLabel}>
+              Home
+            </Text>
+          ),
         })}
         name="Video"
         component={Dashboard}
@@ -105,20 +111,18 @@ const BottomtabNavigation = () => {
 
       <Bottom.Screen
         options={({focused}) => ({
-          tabBarIcon: () =>
+          tabBarIcon: ({focused}) =>
             focused ? (
-              <HomeActive width={21} height={21} />
+              <MailActive width={23} height={23} />
+
             ) : (
-              <HomeInActive
-                width={21}
-                height={21}
-                style={{
-                  width: wp(6.1),
-                  height: hp(6.1),
-                  tintColor: '#CACACA', // Color for the inactive state
-                }}
-              />
+              <MailInActive width={23} height={23} />
             ),
+          tabBarLabel: ({focused}) => (
+            <Text style={focused ? styles.focusedLabel : styles.inactiveLabel}>
+              Home
+            </Text>
+          ),
         })}
         name="Mail"
         component={Dashboard}
@@ -126,22 +130,19 @@ const BottomtabNavigation = () => {
 
       <Bottom.Screen
         options={({focused}) => ({
-          tabBarIcon: () =>
+          tabBarIcon: ({focused}) =>
             focused ? (
-              <HomeActive width={21} height={21} />
+              <ProfileActive width={23} height={23} />
             ) : (
-              <HomeInActive
-                width={21}
-                height={21}
-                style={{
-                  width: wp(6.1),
-                  height: hp(6.1),
-                  tintColor: '#CACACA', // Color for the inactive state
-                }}
-              />
+              <ProfileInActive width={23} height={23} />
             ),
+          tabBarLabel: ({focused}) => (
+            <Text style={focused ? styles.focusedLabel : styles.inactiveLabel}>
+              Home
+            </Text>
+          ),
         })}
-        name="Gallery"
+        name="Profile"
         component={Dashboard}
       />
     </Bottom.Navigator>

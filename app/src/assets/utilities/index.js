@@ -18,7 +18,9 @@ const appImages = {
   topSearches1:require(IMAGES_DIR + 'TopSearches1.png'),
   topSearches2:require(IMAGES_DIR + 'TopSearches2.png'),
   topSearches3:require(IMAGES_DIR + 'TopSearches3.png'),
-  topSearches4:require(IMAGES_DIR + 'TopSearches4.png')
+  topSearches4:require(IMAGES_DIR + 'TopSearches4.png'),
+  alert:require(IMAGES_DIR + 'Alert.png'), 
+  updatePics:require(IMAGES_DIR + 'UpdatePics.png'),
 
 
 

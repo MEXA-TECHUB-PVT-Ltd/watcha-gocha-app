@@ -39,6 +39,16 @@ import UploadVideo from './app/src/view/screens/UploadAVideo/UploadVideo';
 import UploadScreen from './app/src/view/screens/UploadAVideo/UploadScreen';
 import PicDetails from './app/src/view/screens/PicDetails';
 import SearchScreen from './app/src/view/screens/SearchScreen';
+import VerifyAccount from './app/src/view/screens/Auth/VerifyAccount';
+import PrivacyPolicy from './app/src/view/screens/PrivacyPolicy';
+import TermsAndCondition from './app/src/view/screens/TermsAndCondition';
+import ContactUs from './app/src/view/screens/ContactUs';
+import SubscriptionPayment from './app/src/view/screens/SubscriptionPayment';
+import UploadUpdateScreen from './app/src/view/screens/UpdateAVideo/UploadUpdateScreen';
+import UploadUpdatePicScreen from './app/src/view/screens/UpdateAPic/UploadUpdatePicScreen';
+import UploadUpdateVideo from './app/src/view/screens/UpdateAVideo/UploadUpdateVideo';
+import UploadUpdatePic from './app/src/view/screens/UpdateAPic/UploadUpdatePic';
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -48,55 +58,112 @@ const App = () => {
     <NavigationContainer>
       <Stack.Navigator>
 
+        
+        <Stack.Screen
+          name="UploadUpdatePicScreen"
+          component={UploadUpdatePicScreen}
+          options={{headerShown: false}}
+        />
+
       <Stack.Screen
+          name="BottomTabNavigation"
+          component={BottomtabNavigation}
+          options={{headerShown: false}}
+        />
+
+        
+
+        <Stack.Screen
+          name="UploadUpdatePic"
+          component={UploadUpdatePic}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="UploadUpdateVideo"
+          component={UploadUpdateVideo}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="UploadUpdateScreen"
+          component={UploadUpdateScreen}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="SubscriptionPayment"
+          component={SubscriptionPayment}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ContactUs"
+          component={ContactUs}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="TermsAndCondition"
+          component={TermsAndCondition}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="PrivacyPolicy"
+          component={PrivacyPolicy}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="VerifyAccount"
+          component={VerifyAccount}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
           name="SearchScreen"
           component={SearchScreen}
           options={{headerShown: false}}
         />
 
-      <Stack.Screen
+        <Stack.Screen
           name="PicDetails"
           component={PicDetails}
           options={{headerShown: false}}
         />
 
-      <Stack.Screen
+        <Stack.Screen
           name="UploadScreen"
           component={UploadScreen}
           options={{headerShown: false}}
         />
 
-      <Stack.Screen
+        <Stack.Screen
           name="UploadVideo"
           component={UploadVideo}
           options={{headerShown: false}}
         />
 
-      <Stack.Screen
+        <Stack.Screen
           name="ViewVideo"
           component={ViewVideo}
           options={{headerShown: false}}
         />
 
-      <Stack.Screen
+        <Stack.Screen
           name="SearchApps"
           component={SearchApps}
           options={{headerShown: false}}
         />
 
-
-      <Stack.Screen
+        <Stack.Screen
           name="PhoneBase"
           component={PhoneBase}
           options={{headerShown: false}}
         />
 
-
-        <Stack.Screen
-          name="BottomTabNavigation"
-          component={BottomtabNavigation}
-          options={{headerShown: false}}
-        />
+       
         <Stack.Screen
           name="ResetPassword"
           component={ResetPassword}
