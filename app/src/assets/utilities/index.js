@@ -21,6 +21,17 @@ const appImages = {
   topSearches4:require(IMAGES_DIR + 'TopSearches4.png'),
   alert:require(IMAGES_DIR + 'Alert.png'), 
   updatePics:require(IMAGES_DIR + 'UpdatePics.png'),
+  lense:require(IMAGES_DIR + 'Camera.png'),
+  headPhone:require(IMAGES_DIR + 'HeadPhones.png'),
+  holder:require(IMAGES_DIR + 'Holder.png'),
+  shoes:require(IMAGES_DIR + 'Shoes.png'),
+  printer:require(IMAGES_DIR + 'Printer.png'),
+  itemDetails:require(IMAGES_DIR + 'ItemDetails1.png'),
+  gallery:require(IMAGES_DIR + 'gallery.png')
+
+
+
+
 
 
 

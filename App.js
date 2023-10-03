@@ -48,7 +48,10 @@ import UploadUpdateScreen from './app/src/view/screens/UpdateAVideo/UploadUpdate
 import UploadUpdatePicScreen from './app/src/view/screens/UpdateAPic/UploadUpdatePicScreen';
 import UploadUpdateVideo from './app/src/view/screens/UpdateAVideo/UploadUpdateVideo';
 import UploadUpdatePic from './app/src/view/screens/UpdateAPic/UploadUpdatePic';
-
+import SearchProducts from './app/src/view/screens/SearchProducts';
+import ProductDetails from './app/src/view/screens/ProductDetails';
+import Sell from './app/src/view/screens/Sell';
+import UpdateSellProduct from './app/src/view/screens/UpdateSellProduct';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -58,20 +61,41 @@ const App = () => {
     <NavigationContainer>
       <Stack.Navigator>
 
-        
+        <Stack.Screen
+          name="UpdateSellProduct"
+          component={UpdateSellProduct}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="Sell"
+          component={Sell}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ProductDetails"
+          component={ProductDetails}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="SearchProducts"
+          component={SearchProducts}
+          options={{headerShown: false}}
+        />
+
         <Stack.Screen
           name="UploadUpdatePicScreen"
           component={UploadUpdatePicScreen}
           options={{headerShown: false}}
         />
 
-      <Stack.Screen
+        <Stack.Screen
           name="BottomTabNavigation"
           component={BottomtabNavigation}
           options={{headerShown: false}}
         />
-
-        
 
         <Stack.Screen
           name="UploadUpdatePic"
@@ -163,7 +187,6 @@ const App = () => {
           options={{headerShown: false}}
         />
 
-       
         <Stack.Screen
           name="ResetPassword"
           component={ResetPassword}
