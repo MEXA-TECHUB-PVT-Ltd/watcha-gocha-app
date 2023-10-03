@@ -7,18 +7,15 @@ import {
   View,
 } from 'react-native';
 import React, {useState} from 'react';
-
 import {
-  heightPercentageToDP as hp,
-  widthPercentageToDP,
   widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import Fontiso from 'react-native-vector-icons/Fontisto';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import {Header} from '@react-navigation/stack';
-import { appImages } from '../../assets/utilities/index'
+import Feater from 'react-native-vector-icons/Feather';
 
 const Headers = ({
   showBackIcon,
@@ -27,84 +24,68 @@ const Headers = ({
   onPressSearch,
   onPressListings,
   onPressGridView,
+  onPressSettings,
+  onPressfavourite,
   onPressAdd,
   text,
   showHeart,
-  showProfile,
-  showIcon,
   showSettings,
   showAdd,
   showListings,
   showGridView,
   style,
   onPress,
+  isFavorite,
   navigation,
 }) => {
   return (
     <View style={styles.header}>
       {showBackIcon && (
         <TouchableOpacity style={styles.backArrow} onPress={onPress}>
-          <Ionicons name="chevron-back-sharp" size={30} color="#282828" />
+          <Ionicons name="chevron-back-sharp" size={25} color="#282828" />
         </TouchableOpacity>
       )}
 
       {showText && <Text style={[styles.headerText, style]}>{text}</Text>}
 
-      {showIcon && (
-        <Image
-          source={appImages.logo}
-          style={{
-            width: wp(50),
-            height: hp(50),
-            marginTop: '5%',
-            alignSelf: 'center',
-          }}
-          resizeMode="contain"
-        />
-      )}
-
       {showHeart && (
-        <TouchableOpacity style={styles.heartIcon}>
-          <Fontiso name="heart-alt" size={20} color="#2B2B2B" />
-        </TouchableOpacity>
-      )}
-
-      {/* {showProfile && (
-       <Image
-       source={appImages.profile} // Replace with your image source
-       style={styles.img}
-     />
-      )} */}
-
-      {showSettings && (
-        <TouchableOpacity style={styles.heartIcon}>
-          <AntDesign name="setting" size={20} color="#2B2B2B" />
-        </TouchableOpacity>
-      )}
-
-      {showAdd && (
-        <TouchableOpacity onPress={onPressAdd} style={styles.heartIcon}>
-          <AddButton style={styles.imgAdd} width={25} height={25} />
-        </TouchableOpacity>
-      )}
-
-      {showListings && (
-        <TouchableOpacity onPress={onPressListings} style={styles.heartIcon}>
-          <Image style={styles.imgAdd} source={Images.listView} />
+        <TouchableOpacity onPress={onPressfavourite} style={styles.heartIcon}>
+          {isFavorite ? (
+            <Fontiso name="heart" size={20} color={Colors.secondary}/>
+          ) : (
+            <Fontiso name="heart-alt" size={20} color="#2B2B2B"/>
+          )}
         </TouchableOpacity>
       )}
 
       {showSearch && (
         <TouchableOpacity onPress={onPressSearch} style={styles.heartIcon}>
-          <Ionicons name="search-outline" size={25} color="#24A59E" />
+          <Feater name="search" size={20} color="#2B2B2B"/>
+        </TouchableOpacity>)}
+
+      {showSettings && (
+        <TouchableOpacity onPress={onPressSettings} style={styles.heartIcon}>
+          <AntDesign name="setting" size={20} color="#2B2B2B" />
         </TouchableOpacity>
       )}
 
-      {showGridView && (
+     {/*  {showAdd && (
+        <TouchableOpacity onPress={onPressAdd} style={styles.heartIcon}>
+          <Image style={styles.imgAdd} source={Images.add} />
+        </TouchableOpacity>
+      )} */}
+
+      {/* {showListings && (
+        <TouchableOpacity onPress={onPressListings} style={styles.heartIcon}>
+          <Image style={styles.imgAdd} source={Images.listView} />
+        </TouchableOpacity>
+      )} */}
+
+      {/* {showGridView && (
         <TouchableOpacity onPress={onPressGridView} style={styles.heartIcon}>
           <Image style={styles.imgAdd} source={Images.gridView} />
         </TouchableOpacity>
-      )}
+      )} */}
     </View>
   );
 };
@@ -122,33 +103,26 @@ const styles = StyleSheet.create({
     marginTop: StatusBar.currentHeight - 20,
   },
   headerText: {
-    //color: AppColors.dark,
-    //fontFamily: FontFamily.Heading,
-    fontWeight: '500',
-    //fontWeight: '500',
-    fontSize: wp(2.8),
+    color: '#333333',
+    fontFamily: 'Inter',
+    fontWeight: '800',
+    fontSize: hp(2.8),
     alignSelf: 'center',
   },
   backArrow: {
     position: 'absolute',
-    left: wp(5),
+    left: 20,
+    justifyContent: 'center', // Vertically align the arrow within the touchable area
+    paddingVertical: 10, // Add padding to increase the touchable area
+    paddingRight: 10, // Add some space on the right side if needed
   },
   heartIcon: {
     position: 'absolute',
-    right: wp(5),
+    right: 15,
   },
   imgAdd: {
     resizeMode: 'contain',
     height: hp(3),
   },
-  img:{
-    position: 'absolute',
-    right: wp(5),
-    width: wp(25),
-    height: wp(25),
-    borderWidth: 1,
-    overflow:'hidden',
-    borderColor: '#00000020',
-    borderRadius: wp(50),
-  }
+  
 });

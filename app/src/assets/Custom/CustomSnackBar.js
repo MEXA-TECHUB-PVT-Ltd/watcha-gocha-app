@@ -2,6 +2,8 @@ import React, {useState, useEffect} from 'react';
 import {View, Text, StyleSheet, Animated, TouchableOpacity} from 'react-native';
 import { heightPercentageToDP } from 'react-native-responsive-screen';
 
+import CheckSnackBar from '../svg/CheckSnackBar.svg'
+
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 import {
@@ -50,13 +52,8 @@ const CustomSnackbar = ({visible, message, messageDescription, onDismiss}) => {
           ],
         },
       ]}>
-      <View style={{marginTop:hp(1), marginLeft:wp(3)}}>
-        <FontAwesome5
-          name={'check-circle'}
-          size={23}
-          //backgroundColor={'#FACA4E'}
-          color={'#FACA4E'}
-        />
+      <View style={{ marginLeft:wp(3)}}>
+        <CheckSnackBar width={wp(5)} height={hp(5)}/>
       </View>
 
       <View>
@@ -83,10 +80,10 @@ const CustomSnackbar = ({visible, message, messageDescription, onDismiss}) => {
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    top: 1, // Display at the top of the screen
+    top: 5, // Display at the top of the screen
     left: 15,
     right: 15,
-    height:hp(7),
+    height:hp(7.5),
     borderRadius: 10,
     backgroundColor: 'white',
     //padding: 14,
