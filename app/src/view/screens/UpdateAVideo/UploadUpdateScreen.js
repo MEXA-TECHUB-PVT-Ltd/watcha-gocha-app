@@ -52,8 +52,7 @@ const Category = [
   {label: 'Item 3', value: '3'},
 ];
 
-export default function UploadUpdateScreen() {
-
+export default function UploadUpdateScreen({navigation}) {
   const [selectedItem, setSelectedItem] = useState('');
 
   const [profileName, setProfileName] = useState('');
@@ -99,19 +98,33 @@ export default function UploadUpdateScreen() {
       .catch(error => console.log(error));
   };
 
-  const takePhotoFromCamera = async () => {
-    launchCamera({mediaType: 'photo'}, response => {
-      console.log('image here', response);
-      if (!response.didCancel && response.assets.length > 0) {
-        setImageUri(response.assets[0].uri);
-        console.log('response', imageUri);
-      }
-      ref_RBSheetCamera.current.close();
-    });
+  const takePhotoFromCamera = async value => {
+    setSelectedItem(value);
+    launchCamera(
+      {
+        mediaType: 'video',
+        videoQuality: 'medium',
+      },
+      response => {
+        console.log('image here', response);
+        if (!response.didCancel) {
+          if (response.assets && response.assets.length > 0) {
+            setImageUri(response.assets[0].uri);
+            console.log('response', response.assets[0].uri);
+          } else if (response.uri) {
+            // Handle the case when no assets are present (e.g., for videos)
+            setImageUri(response.uri);
+            console.log('response', response.uri);
+          }
+        }
+        ref_RBSheetCamera.current.close();
+      },
+    );
   };
 
-  const choosePhotoFromLibrary = () => {
-    launchImageLibrary({mediaType: 'photo'}, response => {
+  const choosePhotoFromLibrary = value => {
+    setSelectedItem(value);
+    launchImageLibrary({mediaType: 'video'}, response => {
       console.log('image here', response);
       if (!response.didCancel && response.assets.length > 0) {
         setImageUri(response.assets[0].uri);
@@ -129,7 +142,11 @@ export default function UploadUpdateScreen() {
       behavior="height" // You can use ‘height’ as well, depending on your preference
       enabled>
       <View style={styles.header}>
+        <TouchableOpacity onPress={()=>navigation.goBack()}>
+
         <IonIcons name={'chevron-back'} color={'#282828'} size={25} />
+
+        </TouchableOpacity>
 
         <Text style={styles.headerText}>Update Video</Text>
       </View>
@@ -142,10 +159,25 @@ export default function UploadUpdateScreen() {
           style={{
             marginTop: hp(5),
             height: hp(30),
-            borderWidth: 3,
             borderRadius: wp(8),
             marginHorizontal: wp(23),
           }}>
+          {imageUri !== null && (
+            <Image
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                zIndex: 1, // Ensure it's on top of other elements
+                flex: 1,
+                width: '100%',
+                height: '100%',
+                borderRadius: wp(8),
+                resizeMode: 'contain',
+              }}
+              source={{uri: imageUri}}
+            />
+          )}
           <View
             style={{
               position: 'absolute',
@@ -157,6 +189,7 @@ export default function UploadUpdateScreen() {
               backgroundColor: '#FACA4E',
               justifyContent: 'center',
               alignItems: 'center',
+              zIndex: 2, // Ensure it's on top
             }}>
             <Text
               style={{
@@ -165,27 +198,27 @@ export default function UploadUpdateScreen() {
                 color: '#232323',
                 fontWeight: '700',
               }}>
-              Change Video
+              Change Pic
             </Text>
           </View>
-
-          {imageUri == null ? null : (
+          {imageUri == null && (
             <Image
               style={{
                 flex: 1,
                 width: '100%',
                 height: '100%',
                 borderRadius: wp(8),
-                resizeMode: 'contain',
+                resizeMode: 'stretch',
+                zIndex: 0, // Ensure it's below other elements when no image
               }}
-              source={{uri: imageUri}}
+              source={appImages.updatePics}
             />
           )}
         </View>
 
         <TextInput
           mode="outlined"
-          label="Video Name"
+          label="Pic Name"
           onChangeText={text => setProfileName(text)}
           style={styles.ti}
           outlineColor="#0000001F"
@@ -327,17 +360,33 @@ export default function UploadUpdateScreen() {
             marginTop: hp(3),
           }}>
           <TouchableOpacity
-            onPress={() => setSelectedItem('camera')}
-            style={selectedItem==='camera'?styles.selectedItems:styles.nonselectedItems}>
-            <Ionicons color={selectedItem==='camera'?'#FACA4E':'#888888'} name="camera" size={25} />
+            onPress={() => takePhotoFromCamera('camera')}
+            style={
+              selectedItem === 'camera'
+                ? styles.selectedItems
+                : styles.nonselectedItems
+            }>
+            <Ionicons
+              color={selectedItem === 'camera' ? '#FACA4E' : '#888888'}
+              name="camera"
+              size={25}
+            />
 
             <Text style={{color: '#333333'}}>From camera</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => setSelectedItem('gallery')}
-            style={selectedItem==='gallery'?styles.selectedItems:styles.nonselectedItems}>
-            <MaterialCommunityIcons color={selectedItem==='gallery'?'#FACA4E':'#888888'} name="image" size={25} />
+            onPress={() => choosePhotoFromLibrary('gallery')}
+            style={
+              selectedItem === 'gallery'
+                ? styles.selectedItems
+                : styles.nonselectedItems
+            }>
+            <MaterialCommunityIcons
+              color={selectedItem === 'gallery' ? '#FACA4E' : '#888888'}
+              name="image"
+              size={25}
+            />
 
             <Text style={{color: '#333333'}}>From gallery</Text>
           </TouchableOpacity>
@@ -355,7 +404,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     height: hp(6.2),
-    marginTop: hp(3),
+    marginTop: hp(5),
     alignItems: 'center',
     marginHorizontal: wp(8),
   },

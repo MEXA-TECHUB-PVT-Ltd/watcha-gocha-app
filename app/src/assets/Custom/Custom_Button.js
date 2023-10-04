@@ -8,7 +8,7 @@ export default function Custom_Button(props) {
         <Button
             disabled={props.checkdisable}
             mode="contained" onPress={props.customClick}
-            style={styles.button}
+            style={[styles.button, props.style]}
             contentStyle={{
                 padding: '1.2%',
 

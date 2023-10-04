@@ -55,11 +55,14 @@ const App = ({navigation}) => {
     <ScrollView style={styles.bg} contentContainerStyle={{flexGrow: 1}}>
       <StatusBar barStyle={'dark-content'} backgroundColor={'#FACA4E'} />
       <View style={styles.mainv}>
+        <TouchableOpacity onPress={()=>navigation.goBack()}>
         <Back
           width={20}
           height={20}
           style={{marginTop: '9%', marginLeft: '8%'}}
         />
+
+        </TouchableOpacity>
 
         <Text style={styles.txt}>Profile Image</Text>
         <Text style={styles.txt1}>Add your profile image below</Text>
@@ -102,7 +105,8 @@ const App = ({navigation}) => {
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-              navigation.navigate('');
+              navigation.navigate('BottomTabNavigation')
+
             }}
           />
         </View>

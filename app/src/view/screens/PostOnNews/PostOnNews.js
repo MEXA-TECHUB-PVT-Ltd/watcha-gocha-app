@@ -2,57 +2,69 @@ import {
   StyleSheet,
   FlatList,
   Text,
-  StatusBar,
-  KeyboardAvoidingView,
   Image,
+  KeyboardAvoidingView,
+  ScrollView,
+  StatusBar,
+  ImageBackground,
   View,
   TouchableOpacity,
-  ScrollView,
 } from 'react-native';
 import React, {useState, useRef} from 'react';
-import Back from '../../assets/svg/back.svg';
-import {appImages} from '../../assets/utilities/index';
+import RBSheet from 'react-native-raw-bottom-sheet';
+
+import {Button, Divider, TextInput} from 'react-native-paper';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import PlusPost from '../../../assets/svg/PlusPost.svg';
+
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+
+import Back from '../../../assets/svg/back.svg';
+import {appImages} from '../../../assets/utilities/index';
+import Slider from '@react-native-community/slider';
+import VolumeUp from '../../../assets/svg/VolumeUp.svg';
+import Like from '../../../assets/svg/Like.svg';
+import UnLike from '../../../assets/svg/Unlike.svg';
+import Comment from '../../../assets/svg/Comment.svg';
+import Send from '../../../assets/svg/Send.svg';
+import Download from '../../../assets/svg/Download.svg';
+import CustomButton from '../../../assets/Custom/Custom_Button';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
+import Share from 'react-native-share';
+
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
-import {Button, Divider, TextInput} from 'react-native-paper';
+
 import Fontiso from 'react-native-vector-icons/Fontisto';
-import Headers from '../../assets/Custom/Headers';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import Entypo from 'react-native-vector-icons/Entypo';
-import CustomButton from '../../assets/Custom/Custom_Button';
 
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import IonIcons from 'react-native-vector-icons/Ionicons';
+
 import {SelectCountry, Dropdown} from 'react-native-element-dropdown';
+import CPaperInput from '../../../assets/Custom/CPaperInput';
 
-import RBSheet from 'react-native-raw-bottom-sheet';
+const Category = [
+  {label: 'Item 1', value: '1'},
+  {label: 'Item 2', value: '2'},
+  {label: 'Item 3', value: '3'},
+];
 
-
-export default function Sell({navigation}) {
+export default function PostOnNews() {
   const [selectedItem, setSelectedItem] = useState('');
 
-  const [title, setTitle] = useState('');
-
-
-
-  const [price, setPrice] = useState('');
+  const [profileName, setProfileName] = useState('');
 
   const [isTextInputActive, setIsTextInputActive] = useState(false);
-
-  const [isTextInputActivePrice, setIsTextInputActivePrice] = useState(false);
-
-  const [isTextInputActiveDescription, setIsTextInputActiveDescription] =
-    useState(false);
-
-  const [isChecked, setIsChecked] = useState(false);
 
   const [category, setCategory] = useState('');
 
   const [description, setDescription] = useState('');
+
+  const [comment, setComment] = useState('');
 
   const [imageUri, setImageUri] = useState(null);
 
@@ -67,32 +79,6 @@ export default function Sell({navigation}) {
   const handleBlur = () => {
     setIsTextInputActive(false);
   };
-
-  const handleFocusPrice = () => {
-    setIsTextInputActivePrice(true);
-  };
-
-  const handleBlurPrice = () => {
-    setIsTextInputActivePrice(false);
-  };
-
-  const handleFocusDescription = () => {
-    setIsTextInputActiveDescription(true);
-  };
-
-  const handleBlurDescription = () => {
-    setIsTextInputActiveDescription(false);
-  };
-
-  const handleCheckboxChange = () => {
-    setIsChecked(!isChecked);
-  };
-
-  const Category = [
-    {label: 'Item 1', value: '1'},
-    {label: 'Item 2', value: '2'},
-    {label: 'Item 3', value: '3'},
-  ];
 
   const TakeImageFromCamera = () => {
     ImageCropPicker.openCamera({
@@ -119,8 +105,8 @@ export default function Sell({navigation}) {
     setSelectedItem(value);
     launchCamera(
       {
-        mediaType: 'photo',
-       // videoQuality: 'medium',
+        mediaType: 'Photo',
+        //videoQuality: 'medium',
       },
       response => {
         console.log('image here', response);
@@ -141,194 +127,152 @@ export default function Sell({navigation}) {
 
   const choosePhotoFromLibrary = value => {
     setSelectedItem(value);
-    launchImageLibrary({mediaType: 'photo'}, response => {
+    launchImageLibrary({mediaType: 'Photo'}, response => {
       console.log('image here', response);
       if (!response.didCancel && response.assets.length > 0) {
         setImageUri(response.assets[0].uri);
       }
+
       console.log('response', imageUri);
 
       ref_RBSheetCamera.current.close();
     });
   };
+
   return (
     <KeyboardAvoidingView
       style={{flex: 1, backgroundColor: 'white'}}
       behavior="height" // You can use ‘height’ as well, depending on your preference
       enabled>
-      <StatusBar
-        translucent={true}
-        backgroundColor="transparent"
-        barStyle="dark-content" // You can set the StatusBar text color to dark or light
-      />
-      <View style={{marginTop: hp(5)}}>
-        <Headers onPress={()=>navigation.goBack()} showBackIcon={true} text={'Sell'} showText={true} />
+      <View style={styles.header}>
+        <IonIcons name={'chevron-back'} color={'#282828'} size={25} />
+
+        <Text style={styles.headerText}>Post On News</Text>
       </View>
+
       <ScrollView
         keyboardShouldPersistTaps="always"
         showsVerticalScrollIndicator={false}
-        style={styles.container}>
-        <TouchableOpacity
-        onPress={()=>ref_RBSheetCamera.current.open()}
+        style={{flex: 1}}>
+        <View
           style={{
-            borderRadius: wp(3),
-            marginTop: hp(5),
-            height: hp(25),
-            justifyContent: 'center',
+            flexDirection: 'row',
+            height: hp(8),
             alignItems: 'center',
-            borderWidth: 1,
-            borderColor: '#E7EAF2',
+            marginTop: hp(3),
+            marginHorizontal: wp(8),
+            //borderWidth: 3,
           }}>
-          <Image style={{resizeMode: 'contain'}} source={appImages.gallery} />
-
+          <View
+            style={{
+              width: wp(10),
+              marginLeft: wp(3),
+              height: wp(10),
+              borderRadius: wp(10) / 2,
+            }}>
+            <Image
+              source={appImages.profileImg}
+              style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+            />
+          </View>
           <Text
             style={{
+              color: '#333333',
+              marginLeft: wp(3),
               fontFamily: 'Inter',
-              marginTop: hp(1.8),
-              //fontWeight: 'bold',
-              fontSize: hp(1.5),
-              color: '#939393',
+              fontWeight: 'bold',
             }}>
-            You can upload a minimum of 1 and{'\n'}a maximum of 10 images.
+            John Doe
           </Text>
-        </TouchableOpacity>
+        </View>
 
-        <TextInput
-          mode="outlined"
-          label="Title"
-          onChangeText={text => setTitle(text)}
-          style={styles.ti}
-          outlineColor="#0000001F"
-          placeholderTextColor={'#646464'}
-          activeOutlineColor="#FACA4E"
-          autoCapitalize="none"
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          // left={isTextInputActive ? <Oemail /> : <Gemail />}
-        />
-
-        <TextInput
-          mode="outlined"
-          label="Price"
-          onChangeText={text => setPrice(text)}
-          keyboardType="number-pad"
-          style={styles.ti}
-          outlineColor="#0000001F"
-          placeholderTextColor={'#646464'}
-          activeOutlineColor="#FACA4E"
-          autoCapitalize="none"
-          onFocus={handleFocusPrice}
-          onBlur={handleBlurPrice}
-          // left={isTextInputActive ? <Oemail /> : <Gemail />}
-        />
-
-        <View>
-          <Dropdown
-            style={
-              isFocus
-                ? styles.textInputSelectedCategory
-                : styles.textInputCategoryNonSelected
-            }
-            containerStyle={{
-              marginTop: 3,
-              alignSelf: 'center',
-              borderRadius: wp(3),
-              width: '100%',
-            }}
-            // dropdownPosition="top"
-            // mode="modal"
-            placeholderStyle={{
-              color: '#121420',
-              //   fontWeight: '400',
-              fontFamily: 'Inter',
-              fontSize: hp(1.8),
-            }}
-            iconStyle={isFocus ? styles.iconStyle : styles.iconStyleInactive}
-            itemTextStyle={{color: '#000000'}}
-            selectedTextStyle={{fontSize: 16, color: '#000000'}}
-            // inputSearchStyle={styles.inputSearchStyle}
-            // iconStyle={styles.iconStyle}
-            value={category}
-            data={Category}
-            search={false}
-            maxHeight={200}
-            labelField="label"
-            valueField="value"
-            placeholder={'Select Category'}
-            searchPlaceholder="Search..."
-            onFocus={() => setIsFocus(true)}
-            onBlur={() => setIsFocus(false)}
-            onChange={item => {
-              setCategory(item.value);
-              setIsFocus(false);
-            }}
-            renderRightIcon={() => (
-              <AntDesign
-                style={styles.icon}
-                color={isFocus ? '#FACA4E' : '#C4C4C4'}
-                name="down"
-                size={15}
-              />
-            )}
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: hp(-1),
+          }}>
+          <CPaperInput
+            multiline={true}
+            placeholder={'Add a comment'}
+            placeholderTextColor="#B0B0B0"
+            value={comment}
+            onChangeText={text => setComment(text)}
+            //height={hp(5)}
           />
         </View>
 
-        <TextInput
-          mode="outlined"
-          label="Description"
-          onChangeText={text => setDescription(text)}
-          multiline={true} // Enable multiline input
-          numberOfLines={3} // Set the initial number of lines
-          style={{height: hp(25), ...styles.ti}} // Adjust the height as needed
-          outlineColor="#0000001F"
-          placeholderTextColor="#646464"
-          activeOutlineColor="#FACA4E"
-          autoCapitalize="none"
-          onFocus={handleFocusDescription}
-          onBlur={handleBlurDescription}
-        />
-
-        <TouchableOpacity
-          onPress={() => handleCheckboxChange()}
-          style={{flexDirection: 'row', marginTop:hp(3), width: '100%'}}>
-          <TouchableOpacity
-            style={isChecked ? styles.selectCheckBox : styles.unSelectCheckBox}
-            onPress={
-              () => handleCheckboxChange()
-              // setChecked(!checked);
-            }>
-            {isChecked && <Entypo name={'check'} size={15} color={'#FACA4E'} />}
-
-            {/* {checked ? ( */}
-            {/* <Icon
-                  name="checkmark"
-                  size={28}
-                  color={AppColors.buttonColor}
-                /> */}
-            {/* ) : ( */}
-
-            {/* )} */}
+        <View
+          style={{
+            flexDirection: 'row',
+            height: hp(5),
+            marginTop: hp(3),
+            marginHorizontal: wp(8),
+          }}>
+          <TouchableOpacity onPress={() => ref_RBSheetCamera.current.open()}>
+            <PlusPost />
           </TouchableOpacity>
           <Text
             style={{
-              marginLeft: wp(1.8),
+              fontSize: hp(1.8),
+              marginLeft: wp(2),
+              color: '#FACA4E',
+              fontWeight: 'bold',
               fontFamily: 'Inter',
-              color: '#333333',
             }}>
-            Add to top post
+            Add Image
           </Text>
-        </TouchableOpacity>
-        
-        <View style={{marginTop:hp(5)}}>
+        </View>
 
-        <CustomButton
-            title={'Upload'}
+        {imageUri !== null ? (
+          <View
+            style={{
+              marginTop: hp(5),
+              height: hp(35),
+              borderRadius: wp(3),
+              marginHorizontal: wp(20),
+            }}>
+            {imageUri !== null && (
+              <Image
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  zIndex: 1, // Ensure it's on top of other elements
+                  flex: 1,
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: wp(3),
+                  resizeMode: 'contain',
+                }}
+                source={{uri: imageUri}}
+              />
+            )}
+            {imageUri == null && (
+              <Image
+                style={{
+                  flex: 1,
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: wp(3),
+                  resizeMode: 'stretch',
+                  zIndex: 0, // Ensure it's below other elements when no image
+                }}
+                source={appImages.updatePics}
+              />
+            )}
+          </View>
+        ) : null}
+
+        <View style={{marginTop: '2%', borderWidth:3, alignSelf: 'center'}}>
+           <CustomButton
+            title="Post"
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-              //navigation.navigate('Profile_image');
+              navigation.navigate('BottomTabNavigation');
             }}
-          />
+          /> 
         </View>
       </ScrollView>
 
@@ -417,9 +361,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
+  },
+  header: {
+    flexDirection: 'row',
+    height: hp(6.2),
+    marginTop: hp(7),
+    alignItems: 'center',
     marginHorizontal: wp(8),
   },
+  headerText: {
+    fontSize: hp(2.5),
+    alignSelf: 'center',
+    marginLeft: wp(23),
+    color: '#333333',
+    fontFamily: 'Inter',
+    fontWeight: 'bold',
+  },
   ti: {
+    marginHorizontal: '7%',
     marginTop: '5%',
     width: 300,
     backgroundColor: 'white',
@@ -492,23 +451,5 @@ const styles = StyleSheet.create({
     borderRadius: wp(1.8),
     borderWidth: 1,
     borderColor: '#FACA4E',
-  },
-  selectCheckBox:{
-    width: 17,
-    height: 17,
-    borderRadius: wp(1),
-    borderWidth: 1,
-    alignItems:'center',
-    justifyContent:'center',
-    borderColor: '#FACA4E',
-  },
-  unSelectCheckBox:{
-    width: 17,
-    height: 17,
-    borderRadius: wp(1),
-    borderWidth: 1,
-    alignItems:'center',
-    justifyContent:'center',
-    borderColor: '#C4C4C4',
   },
 });

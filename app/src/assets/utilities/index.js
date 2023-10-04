@@ -27,7 +27,10 @@ const appImages = {
   shoes:require(IMAGES_DIR + 'Shoes.png'),
   printer:require(IMAGES_DIR + 'Printer.png'),
   itemDetails:require(IMAGES_DIR + 'ItemDetails1.png'),
-  gallery:require(IMAGES_DIR + 'gallery.png')
+  gallery:require(IMAGES_DIR + 'gallery.png'),
+  verifyModal:require(IMAGES_DIR + 'AccountVerifyModal.png'),
+  bannerAds:require(IMAGES_DIR + 'BannerAds.png')
+
 
 
 

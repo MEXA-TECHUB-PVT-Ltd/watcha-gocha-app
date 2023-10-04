@@ -33,7 +33,7 @@ import Fontiso from 'react-native-vector-icons/Fontisto';
 
 import IonIcons from 'react-native-vector-icons/Ionicons';
 
-export default function UploadUpdateVideo() {
+export default function UploadUpdateVideo({navigation}) {
   return (
     <ImageBackground source={appImages.videoBG} style={{flex: 1}}>
       <StatusBar
@@ -43,7 +43,9 @@ export default function UploadUpdateVideo() {
       />
 
       <View style={styles.header}>
+        <TouchableOpacity onPress={()=>navigation.goBack()}>
         <IonIcons name={'chevron-back'} color={'white'} size={25} />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.bottomView}>
@@ -59,7 +61,8 @@ export default function UploadUpdateVideo() {
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-              //navigation.navigate('Profile_image');
+              navigation.navigate('UploadUpdateScreen');
+              //console.log("kjjkbkjc ")
             }}
           />
 
@@ -70,7 +73,7 @@ export default function UploadUpdateVideo() {
               fontSize: hp(2.1),
               color: '#FFFFFF',
             }}>
-            Change Pic
+            Change Video
           </Text>
         </View>
       </View>

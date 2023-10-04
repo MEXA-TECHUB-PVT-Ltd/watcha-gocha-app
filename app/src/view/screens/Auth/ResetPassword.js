@@ -23,7 +23,6 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons';
 
-
 import {appImages} from '../../../assets/utilities/index';
 import {Button, Divider, TextInput} from 'react-native-paper';
 import {
@@ -60,6 +59,29 @@ const ResetPassword = ({navigation}) => {
   const ref_RBSheet = useRef(null);
   const ref_RBSheetCamera = useRef(null);
 
+  const [signin_email, setsignin_email] = useState();
+  const [signin_pass, setsignin_pass] = useState();
+  const [confirm, setconfirm_pass] = useState();
+
+  const [signin_ShowPassword, setsignin_ShowPassword] = useState(true);
+  const [signin_ConfirmShowPassword, setsignin_ConfirmShowPassword] = useState(true);
+
+  const [signin_ShowPassword1, setsignin_ShowPassword1] = useState(true);
+  const [signin_ShowPassword2, setsignin_ShowPassword2] = useState(true);
+
+  const [username, setusername] = useState();
+  const [signup_email, setsignup_email] = useState();
+  const [signup_pass, setsignup_pass] = useState();
+  const [signup_cpass, setsignup_cpass] = useState();
+
+  const [isTextInputActive1, setIsTextInputActive1] = useState(false);
+  const [isTextInputActive2, setIsTextInputActive2] = useState(false);
+  const [isTextInputActive3, setIsTextInputActive3] = useState(false);
+  const [isTextInputActive4, setIsTextInputActive4] = useState(false);
+  const [isTextInputActive5, setIsTextInputActive5] = useState(false);
+
+  const [isTextInputActiveConfirmPass, setIsTextInputActiveConfirmPass] = useState(false);
+
   const handleFocus = () => {
     setIsTextInputActive(true);
   };
@@ -68,9 +90,69 @@ const ResetPassword = ({navigation}) => {
     setIsTextInputActive(false);
   };
 
+  const handleFocus1 = () => {
+    setIsTextInputActive1(true);
+  };
+
+  const handleBlur1 = () => {
+    setIsTextInputActive1(false);
+  };
+
+  const handleFocus2 = () => {
+    setIsTextInputActiveConfirmPass(true)
+  };
+
+  const handleBlur2 = () => {
+    setIsTextInputActiveConfirmPass(false)
+
+  };
+  const handleFocus3 = () => {
+    setIsTextInputActive3(true);
+  };
+
+  const handleBlur3 = () => {
+    setIsTextInputActive3(false);
+  };
+  const handleFocus4 = () => {
+    setIsTextInputActive4(true);
+  };
+
+  const handleBlur4 = () => {
+    setIsTextInputActive4(false);
+  };
+  const handleFocus5 = () => {
+    setIsTextInputActive5(true);
+  };
+
+  const handleBlur5 = () => {
+    setIsTextInputActive5(false);
+  };
+
+  const handleTogglePasswordVisibility = () => {
+    setsignin_ShowPassword(!signin_ShowPassword);
+  };
+
+  const handleTogglePasswordVisibilityConfirm = () => {
+    setsignin_ConfirmShowPassword(!signin_ConfirmShowPassword);
+  };
+  const handleTogglePasswordVisibility1 = () => {
+    setsignin_ShowPassword1(!signin_ShowPassword1);
+  };
+  const handleTogglePasswordVisibility2 = () => {
+    setsignin_ShowPassword2(!signin_ShowPassword2);
+  };
+
+  //----------------------------\\
+
   const handleFocusConfirmPassword = () => {
     setIsConfirmPasswordActive(true);
   };
+
+
+  //--------------------------\\
+
+  
+  //----------------------------\\
 
 
   const dismissSnackbar = () => {
@@ -106,63 +188,114 @@ const ResetPassword = ({navigation}) => {
 
         <Text style={styles.resetPasswordTxt}>Create a strong password</Text>
 
-        <TextInput
-          mode="outlined"
-          label="New Password"
-          onChangeText={text => setNewPassword(text)}
-          style={styles.ti}
-          outlineColor="#0000001F"
-          placeholderTextColor={'#646464'}
-          activeOutlineColor="#FACA4E"
-          autoCapitalize="none"
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          left={
-            <TextInput.Icon
-              icon={() => (
-                <SimpleLineIcon
-                  name={'lock'}
-                  size={23}
-                  color={isTextInputActive == true ? '#FACA4E' : '#64646485'}
-                />
-              )}
-            />
-          }
-          // left={isTextInputActive ? <Oemail /> : <Gemail />}
-        />
+        <View>
+          <TextInput
+            mode="outlined"
+            label="Password"
+            onChangeText={text => setsignin_pass(text)}
+            style={styles.ti}
+            placeholderTextColor={'#646464'}
+            outlineColor="#0000001F"
+            activeOutlineColor="#FACA4E"
+            secureTextEntry={signin_ShowPassword}
+            onFocus={handleFocus1}
+            onBlur={handleBlur1}
+            left={
+              <TextInput.Icon
+                icon={() => (
+                  <MaterialCommunityIcons
+                    name={'lock-outline'}
+                    size={23}
+                    color={isTextInputActive1 == true ? '#FACA4E' : '#64646485'}
+                  />
+                )}
+              />
+            }
+          />
+          <TouchableOpacity
+            onPress={handleTogglePasswordVisibility}
+            style={[
+              styles.hs,
+              {
+                borderColor: signin_ShowPassword ? '#646464' : '#FACA4E',
+                backgroundColor: signin_ShowPassword
+                  ? '#64646412'
+                  : '#FF660012',
+              },
+            ]}>
+            <Text
+              style={[
+                styles.txt,
+                {color: signin_ShowPassword ? '#646464' : '#FACA4E'},
+              ]}>
+              {signin_ShowPassword ? 'Show' : 'Hide'}
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-        <TextInput
-          mode="outlined"
-          label="Confirm Password"
-          onChangeText={text => setIsConfirmPasswordActive(text)}
-          style={styles.ti}
-          outlineColor="#0000001F"
-          placeholderTextColor={'#646464'}
-          activeOutlineColor="#FACA4E"
-          autoCapitalize="none"
-          onFocus={handleFocusConfirmPassword}
-          onBlur={handleBlurConfirmPassword}
-          left={
-            <TextInput.Icon
-              icon={() => (
-                <SimpleLineIcon
-                  name={'lock'}
-                  size={23}
-                  color={isTextInputActive == true ? '#FACA4E' : '#64646485'}
-                />
-              )}
-            />
-          }
-          // left={isTextInputActive ? <Oemail /> : <Gemail />}
-        />
+
+
+
+        <View>
+          <TextInput
+            mode="outlined"
+            label="Confirm Password"
+            onChangeText={text => setconfirm_pass(text)}
+            style={styles.ti}
+            placeholderTextColor={'#646464'}
+            outlineColor="#0000001F"
+            activeOutlineColor="#FACA4E"
+            secureTextEntry={signin_ConfirmShowPassword}
+            onFocus={handleFocus2}
+            onBlur={handleBlur2}
+            left={
+              <TextInput.Icon
+                icon={() => (
+                  <MaterialCommunityIcons
+                    name={'lock-outline'}
+                    size={23}
+                    color={isTextInputActive2 == true ? '#FACA4E' : '#64646485'}
+                  />
+                )}
+              />
+            }
+          />
+          <TouchableOpacity
+            onPress={handleTogglePasswordVisibilityConfirm}
+            style={[
+              styles.hs,
+              {
+                borderColor: signin_ConfirmShowPassword ? '#646464' : '#FACA4E',
+                backgroundColor: signin_ConfirmShowPassword
+                  ? '#64646412'
+                  : '#FF660012',
+              },
+            ]}>
+            <Text
+              style={[
+                styles.txt,
+                {color: signin_ConfirmShowPassword ? '#646464' : '#FACA4E'},
+              ]}>
+              {signin_ConfirmShowPassword ? 'Show' : 'Hide'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+ 
+
+
+
+
+
+
+
 
         <View style={{marginTop: '25%', alignSelf: 'center'}}>
           <CustomButton
-            title="Send Code"
+            title="Reset"
             load={loading}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-              //navigation.navigate('Profile_image');
+              navigation.navigate('BottomTabNavigation');
             }}
           />
         </View>
@@ -222,5 +355,45 @@ const styles = StyleSheet.create({
     fontSize: wp(4),
     paddingLeft: '2%',
     borderRadius: 10,
+  },
+
+  bg: {
+    // height:800,
+    backgroundColor: '#FACA4E',
+  },
+  mainv: {
+    flex: 1,
+    borderTopRightRadius: 40,
+    borderTopLeftRadius: 40,
+    marginTop: '15%',
+    alignItems: 'center',
+    backgroundColor: 'white',
+  },
+  ti: {
+    marginHorizontal: '7%',
+    marginTop: '5%',
+    width: 300,
+    backgroundColor: 'white',
+    fontSize: wp(4),
+    paddingLeft: '2%',
+    borderRadius: 10,
+  },
+  v1: {
+    marginTop: '10%',
+  },
+  hs: {
+    position: 'absolute',
+    borderWidth: 1,
+    borderRadius: 10,
+    width: 60,
+    height: 35,
+    alignItems: 'center',
+    justifyContent: 'center',
+    right: 35,
+    top: 31,
+  },
+  txt: {
+    fontSize: wp(3.6),
+    fontFamily: 'Inter-Medium',
   },
 });

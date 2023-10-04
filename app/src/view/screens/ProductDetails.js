@@ -40,7 +40,7 @@ import RadioForm, {
   RadioButtonLabel,
 } from 'react-native-simple-radio-button';
 
-export default function ProductDetails() {
+export default function ProductDetails({navigation}) {
   const [imageUri, setImageUri] = useState(null);
   const [selectedValueListView, setSelectedValueListView] = useState('');
 
@@ -109,7 +109,7 @@ export default function ProductDetails() {
         barStyle="dark-content" // You can set the StatusBar text color to dark or light
       />
       <View style={{marginTop: hp(5)}}>
-        <Headers showBackIcon={true} showText={true} text={'Item Details'} />
+        <Headers showBackIcon={true} onPress={()=>navigation.goBack()} showText={true} text={'Item Details'} />
       </View>
 
       <View style={{height: hp(25), marginTop: hp(5), borderWidth: 3}}>

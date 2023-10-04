@@ -26,10 +26,12 @@ import ProfileActive from '../assets/svg/ProfileActive.svg';
 
 import ProfileInActive from '../assets/svg/ProfileInactive.svg';
 
-
-
 import {appImages} from '../assets/utilities';
 import Dashboard from './../view/screens/BottomTab/Dashboard';
+import Categories from './../view/screens/BottomTab/Categories';
+import Video from './../view/screens/BottomTab/Video';
+import Disc from './../view/screens/BottomTab/Disc';
+import MarketZone from './../view/screens/BottomTab/MarketZone';
 
 const BottomtabNavigation = () => {
   const Bottom = createBottomTabNavigator();
@@ -41,6 +43,7 @@ const BottomtabNavigation = () => {
           // ... (other tabBarOptions)
         }
       }
+
       screenOptions={{
         headerShown: false,
         tabBarShowLabel:false,
@@ -86,7 +89,7 @@ const BottomtabNavigation = () => {
           ),
         })}
         name="Category"
-        component={Dashboard}
+        component={Categories}
       />
 
       <Bottom.Screen
@@ -106,7 +109,7 @@ const BottomtabNavigation = () => {
           ),
         })}
         name="Video"
-        component={Dashboard}
+        component={Video}
       />
 
       <Bottom.Screen
@@ -125,7 +128,7 @@ const BottomtabNavigation = () => {
           ),
         })}
         name="Mail"
-        component={Dashboard}
+        component={Disc}
       />
 
       <Bottom.Screen
@@ -142,8 +145,8 @@ const BottomtabNavigation = () => {
             </Text>
           ),
         })}
-        name="Profile"
-        component={Dashboard}
+        name="MarketPlace"
+        component={MarketZone}
       />
     </Bottom.Navigator>
   );

@@ -52,6 +52,13 @@ import SearchProducts from './app/src/view/screens/SearchProducts';
 import ProductDetails from './app/src/view/screens/ProductDetails';
 import Sell from './app/src/view/screens/Sell';
 import UpdateSellProduct from './app/src/view/screens/UpdateSellProduct';
+import Video from './app/src/view/screens/BottomTab/Video';
+import MarketZone from './app/src/view/screens/BottomTab/MarketZone';
+import Disc from './app/src/view/screens/BottomTab/Disc'
+import News from './app/src/view/screens/News';
+import ViewAllCategories from './app/src/view/screens/ViewAllCategories';
+import ChangeImageScreen from './app/src/view/screens/PostOnNews/ChangeImageScreen';
+import PostOnNews from './app/src/view/screens/PostOnNews/PostOnNews';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -60,6 +67,70 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
+
+      <Stack.Screen
+          name="Signin_signup"
+          component={Signin_signup}
+          options={{headerShown: false}}
+        />
+
+      <Stack.Screen
+          name="BottomTabNavigation"
+          component={BottomtabNavigation}
+          options={{headerShown: false}}
+        />
+
+      <Stack.Screen
+          name="PostOnNews"
+          component={PostOnNews}
+          options={{headerShown: false}}
+        />
+
+      <Stack.Screen
+          name="ChangeImageScreen"
+          component={ChangeImageScreen}
+          options={{headerShown: false}}
+        />
+
+      <Stack.Screen
+          name="ViewAllCategories"
+          component={ViewAllCategories}
+          options={{headerShown: false}}
+        />
+      <Stack.Screen
+          name="News"
+          component={News}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Disc"
+          component={Disc}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="MarketZone"
+          component={MarketZone}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="Video"
+          component={Video}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="Dashboard"
+          component={Dashboard}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="VerifyAccount"
+          component={VerifyAccount}
+          options={{headerShown: false}}
+        />
 
         <Stack.Screen
           name="UpdateSellProduct"
@@ -88,12 +159,6 @@ const App = () => {
         <Stack.Screen
           name="UploadUpdatePicScreen"
           component={UploadUpdatePicScreen}
-          options={{headerShown: false}}
-        />
-
-        <Stack.Screen
-          name="BottomTabNavigation"
-          component={BottomtabNavigation}
           options={{headerShown: false}}
         />
 
@@ -136,12 +201,6 @@ const App = () => {
         <Stack.Screen
           name="PrivacyPolicy"
           component={PrivacyPolicy}
-          options={{headerShown: false}}
-        />
-
-        <Stack.Screen
-          name="VerifyAccount"
-          component={VerifyAccount}
           options={{headerShown: false}}
         />
 
@@ -205,17 +264,6 @@ const App = () => {
           options={{headerShown: false}}
         />
 
-        <Stack.Screen
-          name="Dashboard"
-          component={Dashboard}
-          options={{headerShown: false}}
-        />
-
-        <Stack.Screen
-          name="Signin_signup"
-          component={Signin_signup}
-          options={{headerShown: false}}
-        />
       </Stack.Navigator>
     </NavigationContainer>
   );

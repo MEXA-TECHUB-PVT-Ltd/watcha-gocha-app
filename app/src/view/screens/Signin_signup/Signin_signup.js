@@ -225,10 +225,14 @@ const App = ({ navigation }) => {
                                 </Text>
                             </TouchableOpacity>
                         </View>
+
+                        <TouchableOpacity onPress={()=>navigation.navigate("ForgetPassword")}>
+
                         <Text style={{
                             color: '#FACA4E', fontSize: wp(4), fontFamily: 'Inter-Bold', marginRight: '5%',
                             alignSelf: 'flex-end', marginTop: '10%'
                         }}>Forgot Password?</Text>
+                        </TouchableOpacity>
 
 
                         <View style={{ marginTop: '25%', alignSelf: 'center' }}>
@@ -238,7 +242,7 @@ const App = ({ navigation }) => {
                                 // checkdisable={inn == '' && cm == '' ? true : false}
                                 customClick={() => {
                                    
-                                        navigation.navigate('')
+                                        navigation.navigate('BottomTabNavigation')
                                 }}
                             />
                         </View>
