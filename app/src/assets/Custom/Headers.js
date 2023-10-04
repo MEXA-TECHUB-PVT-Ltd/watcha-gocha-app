@@ -12,6 +12,8 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 
+import { appImages } from '../utilities';
+
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Fontiso from 'react-native-vector-icons/Fontisto';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -23,11 +25,14 @@ const Headers = ({
   showSearch,
   onPressSearch,
   onPressListings,
+  
   onPressGridView,
   onPressSettings,
   onPressfavourite,
   onPressAdd,
   text,
+  showLogo,
+  showProfileImage,
   showHeart,
   showSettings,
   showAdd,
@@ -46,22 +51,33 @@ const Headers = ({
         </TouchableOpacity>
       )}
 
+      {showListings && (
+        <TouchableOpacity style={styles.backArrow} onPress={onPressListings}>
+          <Ionicons name="menu" size={25} color="#282828" />
+        </TouchableOpacity>
+      )}
+
       {showText && <Text style={[styles.headerText, style]}>{text}</Text>}
+
+      {showLogo &&<Image source={appImages.logo} style={styles.logoImage} resizeMode='contain' />}
+       
+      {showProfileImage && <Image source={appImages.profileImg} style={styles.profileImgs} resizeMode='contain' />}
 
       {showHeart && (
         <TouchableOpacity onPress={onPressfavourite} style={styles.heartIcon}>
           {isFavorite ? (
-            <Fontiso name="heart" size={20} color={Colors.secondary}/>
+            <Fontiso name="heart" size={20} color={Colors.secondary} />
           ) : (
-            <Fontiso name="heart-alt" size={20} color="#2B2B2B"/>
+            <Fontiso name="heart-alt" size={20} color="#2B2B2B" />
           )}
         </TouchableOpacity>
       )}
 
       {showSearch && (
         <TouchableOpacity onPress={onPressSearch} style={styles.heartIcon}>
-          <Feater name="search" size={20} color="#2B2B2B"/>
-        </TouchableOpacity>)}
+          <Feater name="search" size={20} color="#FACA4E" />
+        </TouchableOpacity>
+      )}
 
       {showSettings && (
         <TouchableOpacity onPress={onPressSettings} style={styles.heartIcon}>
@@ -69,7 +85,7 @@ const Headers = ({
         </TouchableOpacity>
       )}
 
-     {/*  {showAdd && (
+      {/*  {showAdd && (
         <TouchableOpacity onPress={onPressAdd} style={styles.heartIcon}>
           <Image style={styles.imgAdd} source={Images.add} />
         </TouchableOpacity>
@@ -109,6 +125,12 @@ const styles = StyleSheet.create({
     fontSize: hp(2.8),
     alignSelf: 'center',
   },
+  logoImage:{
+      alignSelf: 'center',
+      resizeMode:'contain',
+      marginTop:hp(-1),
+      width: wp(50), height: 40, 
+  },
   backArrow: {
     position: 'absolute',
     left: 20,
@@ -120,9 +142,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 15,
   },
+  profileImgs:{
+    resizeMode:'contain',
+    marginTop:hp(-1),
+    position: 'absolute',
+    right: -18,
+    width: wp(30), height: 30, 
+  },
   imgAdd: {
     resizeMode: 'contain',
     height: hp(3),
   },
-  
 });

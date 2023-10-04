@@ -84,7 +84,7 @@ const ForgetPassword = ({navigation}) => {
           />
         </View>
 
-        <Text style={styles.resetPasswordHeadingTxt}>Reset Password</Text>
+        <Text style={styles.resetPasswordHeadingTxt}>Forget Password</Text>
 
         <Text style={styles.resetPasswordTxt}>
           Enter email address below, and well send you {'\n'} 4-digit code to
@@ -122,6 +122,7 @@ const ForgetPassword = ({navigation}) => {
             load={loading}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
+             navigation.navigate("VerifyAccount")
               //navigation.navigate('Profile_image');
             }}
           />

@@ -16,6 +16,7 @@ import {
   StatusBar,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import RBSheet from 'react-native-raw-bottom-sheet';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -50,8 +51,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import SwitchSelector from 'react-native-switch-selector';
 LogBox.ignoreAllLogs();
 
-export default function VerifyAccount() {
+export default function VerifyAccount({navigation}) {
   const [value, setValue] = useState('');
+  const ref_RBSendOffer = useRef(null);
   const [loading, setLoading] = useState(false);
 
   const ref = useBlurOnFulfill({value, cellCount: 4});
@@ -65,6 +67,7 @@ export default function VerifyAccount() {
       <StatusBar barStyle={'dark-content'} backgroundColor={'#FACA4E'} />
       <View style={styles.mainv}>
         <TouchableOpacity
+        onPress={()=>navigation.goBack()}
           style={{marginTop: '9%', marginLeft: '8%', alignSelf: 'flex-start'}}>
           <Back width={20} height={20} />
         </TouchableOpacity>
@@ -126,28 +129,33 @@ export default function VerifyAccount() {
             </TouchableOpacity>
           )}
         />
-        
-        <View style={{flexDirection:'row', alignItems:'center', height:hp(5.5), marginTop:hp(2.1)}}>
 
-        <Text
+        <View
           style={{
-            color: '#9597A6',
-            textAlign: 'center',
-            fontSize: hp(2.1),
-            fontFamily: 'Inter',
+            flexDirection: 'row',
+            alignItems: 'center',
+            height: hp(5.5),
+            marginTop: hp(2.1),
           }}>
-          Did'nt recieve the code?
-        </Text>
+          <Text
+            style={{
+              color: '#9597A6',
+              textAlign: 'center',
+              fontSize: hp(2.1),
+              fontFamily: 'Inter',
+            }}>
+            Did'nt recieve the code?
+          </Text>
 
-        <Text
-          style={{
-            color: '#FACA4E',
-            textAlign: 'center',
-            fontSize: hp(2.1),
-            fontFamily: 'Inter',
-          }}>
-         { } Resend in 00:45
-        </Text>
+          <Text
+            style={{
+              color: '#FACA4E',
+              textAlign: 'center',
+              fontSize: hp(2.1),
+              fontFamily: 'Inter',
+            }}>
+            {} Resend in 00:45
+          </Text>
         </View>
 
         <View style={{marginTop: '15%', alignSelf: 'center'}}>
@@ -156,11 +164,77 @@ export default function VerifyAccount() {
             load={loading}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
+              ref_RBSendOffer.current.open();
               //navigation.navigate('Profile_image');
             }}
           />
         </View>
       </View>
+
+      <RBSheet
+        ref={ref_RBSendOffer}
+        closeOnDragDown={true}
+        closeOnPressMask={false}
+        animationType="fade"
+        minClosingHeight={0}
+        customStyles={{
+          wrapper: {
+            backgroundColor: 'rgba(52, 52, 52, 0.5)',
+          },
+          draggableIcon: {
+            backgroundColor: 'white',
+          },
+          container: {
+            borderTopLeftRadius: wp(10),
+            borderTopRightRadius: wp(10),
+            height: hp(51),
+          },
+        }}>
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            marginHorizontal:wp(8),
+            justifyContent: 'space-evenly',
+          }}>
+          <Image
+            source={appImages.verifyModal}
+            style={{resizeMode: 'contain'}}
+          />
+
+          <View style={{height:hp(8)}}>
+          <Text
+            style={{
+              color: '#333333',
+              textAlign: 'center',
+              fontSize: hp(2.3),
+              fontWeight:'bold',
+              fontFamily: 'Inter',
+            }}>
+            Account Verified!
+          </Text>
+
+          <Text
+            style={{
+              color: '#9597A6',
+              marginTop:hp(0.5),
+              textAlign: 'center',
+              fontSize: hp(1.8),
+              //fontWeight:'bold',
+              fontFamily: 'Inter',
+            }}>
+            Your account has been successfully verified
+          </Text>
+          </View>
+
+          <View style={{marginHorizontal:wp(10)}}>
+             <CustomButton title='Reset Password' customClick={() => {
+              //ref_RBSendOffer.current.open();
+              navigation.navigate('ResetPassword');
+            }}  style={{width:wp(59)}} /> 
+          </View>
+        </View>
+      </RBSheet>
     </ScrollView>
   );
 }

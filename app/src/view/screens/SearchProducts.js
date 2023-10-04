@@ -19,7 +19,7 @@ import {
 
 import Fontiso from 'react-native-vector-icons/Fontisto';
 
-export default function SearchProducts() {
+export default function SearchProducts({navigation}) {
   const [selectedItemId, setSelectedItemId] = useState(null);
 
   const searches = [
@@ -136,7 +136,9 @@ export default function SearchProducts() {
         barStyle="dark-content" // You can set the StatusBar text color to dark or light
       />
       <View style={styles.searchHeader}>
+        <TouchableOpacity onPress={()=>navigation.goBack()}>
         <Back width={20} height={20} style={{marginLeft: '1%'}} />
+        </TouchableOpacity>
 
         <View style={styles.searchBar}>
           <Fontiso

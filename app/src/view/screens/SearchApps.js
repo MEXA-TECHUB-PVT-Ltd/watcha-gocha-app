@@ -18,7 +18,7 @@ import {
 
 import Fontiso from 'react-native-vector-icons/Fontisto';
 
-export default function SearchApps() {
+export default function SearchApps({navigation}) {
   const [selectedItemId, setSelectedItemId] = useState(null);
 
   const searches = [
@@ -107,7 +107,12 @@ export default function SearchApps() {
   return (
     <View style={styles.container}>
       <View style={styles.searchHeader}>
+
+        <TouchableOpacity onPress={()=>navigation.goBack()}>
+
         <Back width={20} height={20} style={{marginLeft: '1%'}} />
+
+        </TouchableOpacity>
 
         <View style={styles.searchBar}>
           <Fontiso

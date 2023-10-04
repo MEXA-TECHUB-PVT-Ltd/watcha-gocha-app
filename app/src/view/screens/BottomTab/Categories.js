@@ -9,7 +9,7 @@ import Fontiso from 'react-native-vector-icons/Fontisto';
 import Headers from '../../../assets/Custom/Headers';
 import { appImages } from '../../../assets/utilities';
 
-export default function Dashboard() {
+export default function Categories({navigation}) {
   const [selectedItemId, setSelectedItemId] = useState(null);
 
   const availableApps = [
@@ -89,7 +89,7 @@ export default function Dashboard() {
       />
       <View style={{marginTop:hp(5)}}>
 
-        <Headers showListings={true} showLogo={true} showProfileImage={true} />
+        <Headers showListings={true} showSearch={true} onPressSearch={()=>navigation.navigate("SearchApps")} />
 
       </View>
 
