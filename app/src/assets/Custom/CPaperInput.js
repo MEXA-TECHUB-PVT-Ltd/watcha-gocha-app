@@ -44,12 +44,17 @@ const CPaperInput = props => {
   const paperInputStyle = StyleSheet.create({
     heading: {
       color: '#0B0B0B',
-      fontSize: hp(1.8),
+      fontWeight:'bold',
+      marginBottom:hp(2.3),
+      fontSize: hp(2.1),
       fontFamily: 'Inter',
     },
     headingFocused:{
+      marginBottom:hp(1.5),
+      fontSize: hp(2.3),
+      fontWeight:'bold',
       color: '#FACA4E',
-      fontSize: 13,
+      //fontSize: 13,
       fontFamily: 'Inter',
     },
     paperInputThemeColor: {
@@ -91,7 +96,7 @@ const CPaperInput = props => {
   });
   return (
    
-    <View style={{marginVertical: 15}}>
+    <View style={{marginVertical: 12}}>
       
 
       
