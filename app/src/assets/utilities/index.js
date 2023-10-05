@@ -29,7 +29,15 @@ const appImages = {
   itemDetails:require(IMAGES_DIR + 'ItemDetails1.png'),
   gallery:require(IMAGES_DIR + 'gallery.png'),
   verifyModal:require(IMAGES_DIR + 'AccountVerifyModal.png'),
-  bannerAds:require(IMAGES_DIR + 'BannerAds.png')
+  bannerAds:require(IMAGES_DIR + 'BannerAds.png'),
+  openLettersFirst:require(IMAGES_DIR + 'OpenLettersFirst.png'),
+  OpenLetter:require(IMAGES_DIR + 'OpenLetter.png'),
+  Signature:require(IMAGES_DIR + 'signature.png'),
+  LogOut:require(IMAGES_DIR + 'Logout.png')
+
+
+
+
 
 
 

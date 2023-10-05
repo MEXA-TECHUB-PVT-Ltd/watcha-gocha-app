@@ -112,7 +112,7 @@ export default function Video({navigation}) {
           />
         </View>
         <View style={{flexDirection: 'row', alignItems:'center', marginLeft:wp(2), marginTop: hp(12.5)}}>
-          <Text style={{fontSize:hp(1.1), fontWeight:'bold', width:wp(23)}}>{item.title}</Text>
+          <Text style={{fontSize:hp(1.1) , fontWeight:'bold', width:wp(23)}}>{item.title}</Text>
 
           <Entypo name={'dots-three-vertical'} size={14} color={'#4A4A4A'} />
         </View>

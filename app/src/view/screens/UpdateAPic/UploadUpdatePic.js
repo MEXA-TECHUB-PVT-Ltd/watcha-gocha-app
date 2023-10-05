@@ -33,7 +33,7 @@ import Fontiso from 'react-native-vector-icons/Fontisto';
 
 import IonIcons from 'react-native-vector-icons/Ionicons';
 
-export default function UploadUpdatePic() {
+export default function UploadUpdatePic({navigation}) {
   return (
     <ImageBackground source={appImages.videoBG} style={{flex: 1}}>
       <StatusBar

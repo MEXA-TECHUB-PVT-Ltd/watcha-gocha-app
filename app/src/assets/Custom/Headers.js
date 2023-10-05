@@ -12,8 +12,9 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 
-import { appImages } from '../utilities';
+import {appImages} from '../utilities';
 
+import Settings from '../../assets/svg/Settings.svg';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Fontiso from 'react-native-vector-icons/Fontisto';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -25,11 +26,12 @@ const Headers = ({
   showSearch,
   onPressSearch,
   onPressListings,
-  
+
   onPressGridView,
   onPressSettings,
   onPressfavourite,
   onPressAdd,
+  onPressProfile,
   text,
   showLogo,
   showProfileImage,
@@ -59,10 +61,30 @@ const Headers = ({
 
       {showText && <Text style={[styles.headerText, style]}>{text}</Text>}
 
-      {showLogo &&<Image source={appImages.logo} style={styles.logoImage} resizeMode='contain' />}
-       
-      {showProfileImage && <Image source={appImages.profileImg} style={styles.profileImgs} resizeMode='contain' />}
+      {showLogo && (
+        <Image
+          source={appImages.logo}
+          style={styles.logoImage}
+          resizeMode="contain"
+        />
+      )}
 
+      {showProfileImage && (
+
+        <TouchableOpacity onPress={onPressProfile} style={{
+         
+          marginTop: hp(-2),
+          position: 'absolute',
+          right: -18
+        }}>
+
+          <Image
+            source={appImages.profileImg}
+            style={styles.profileImgs}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+      )}
       {showHeart && (
         <TouchableOpacity onPress={onPressfavourite} style={styles.heartIcon}>
           {isFavorite ? (
@@ -81,7 +103,7 @@ const Headers = ({
 
       {showSettings && (
         <TouchableOpacity onPress={onPressSettings} style={styles.heartIcon}>
-          <AntDesign name="setting" size={20} color="#2B2B2B" />
+          <Settings width={23} height={23} />
         </TouchableOpacity>
       )}
 
@@ -125,11 +147,12 @@ const styles = StyleSheet.create({
     fontSize: hp(2.8),
     alignSelf: 'center',
   },
-  logoImage:{
-      alignSelf: 'center',
-      resizeMode:'contain',
-      marginTop:hp(-1),
-      width: wp(50), height: 40, 
+  logoImage: {
+    alignSelf: 'center',
+    resizeMode: 'contain',
+    marginTop: hp(-1),
+    width: wp(68),
+    height: 47,
   },
   backArrow: {
     position: 'absolute',
@@ -142,12 +165,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 15,
   },
-  profileImgs:{
-    resizeMode:'contain',
-    marginTop:hp(-1),
-    position: 'absolute',
-    right: -18,
-    width: wp(30), height: 30, 
+  profileImgs: {
+    resizeMode: 'contain',
+    //marginTop: hp(-2),
+    //position: 'absolute',
+    //right: -10,
+    width: wp(30),
+    height: 30,
   },
   imgAdd: {
     resizeMode: 'contain',

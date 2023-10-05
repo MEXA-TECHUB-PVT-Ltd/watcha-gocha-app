@@ -22,7 +22,7 @@ import Headers from '../../../assets/Custom/Headers';
 import {appImages} from '../../../assets/utilities';
 import Add from '../../../assets/svg/AddMainScreen.svg';
 import Approved from '../../../assets/svg/Approved';
-export default function Disc({navigation}) {
+export default function LetterDisc({navigation}) {
   const [selectedItemId, setSelectedItemId] = useState(0);
 
   const availableApps = [
