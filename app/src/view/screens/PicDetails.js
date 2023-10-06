@@ -34,7 +34,7 @@ import {
   
   import IonIcons from 'react-native-vector-icons/Ionicons';
   
-  export default function ViewVideo() {
+  export default function ViewVideo({navigation}) {
     const [showFullContent, setShowFullContent] = useState(false);
   
     const [showLikes, setShowLikes] = useState(false);
@@ -73,7 +73,10 @@ import {
           barStyle="dark-content" // You can set the StatusBar text color to dark or light
         />
         <View style={styles.header}>
+          <TouchableOpacity onPress={()=>navigation.goBack()}>
           <IonIcons name={'chevron-back'} color={'white'} size={25} />
+
+          </TouchableOpacity>
   
           <View
               style={{

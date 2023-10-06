@@ -34,6 +34,37 @@ export default function Categories({navigation}) {
     {id: 10, title: 'Games'},
   ];
 
+  const favouriteApps = [
+    {id: 1, title: 'SnapChat', image: appImages.snapchat},
+    {id: 2, title: 'Gmail', image: appImages.gmail},
+    {id: 3, title: 'Pinterest', image: appImages.pinterest},
+    {id: 4, title: 'LinkedIn', image: appImages.linkedIn},
+    {id: 5, title: 'Calendar', image: appImages.calendar},
+    {id: 6, title: 'SnapChat', image: appImages.snapchat},
+
+    {id: 7, title: 'SnapChat', image: appImages.snapchat},
+    {id: 8, title: 'Gmail', image: appImages.gmail},
+    {id: 9, title: 'Pinterest', image: appImages.pinterest},
+    {id: 10, title: 'LinkedIn', image: appImages.linkedIn},
+  ];
+
+  const renderFavouriteApps = item => {
+    console.log('Items', item);
+    return (
+      <View
+        style={{
+          height: hp(8),
+          width: wp(15),
+          //flex: 1,
+          //borderRadius: wp(3),
+          margin: 2.8,
+        }}>
+        <Image source={item.image} />
+      </View>
+    );
+  };
+
+
   const renderAvailableApps = item => {
     console.log('Items', item);
     return (
@@ -93,7 +124,7 @@ export default function Categories({navigation}) {
 
       </View>
 
-      <ScrollView style={{flex:1, marginHorizontal:wp(3)}}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{flex:1, marginHorizontal:wp(3)}}>
       <View style={styles.searchBar}>
           <Fontiso
             name={'search'}
@@ -129,6 +160,139 @@ export default function Categories({navigation}) {
         renderItem={({item}) => renderAvailableApps(item)}
       />
       </View>
+
+
+      <View style={{marginTop: hp(2), height: hp(20)}}>
+          <Text
+            style={{
+              fontSize: hp(2.3),
+              marginLeft: wp(3),
+              fontFamily: 'Inter-Bold',
+              color: '#4A4A4A',
+              fontWeight: 'bold',
+            }}>
+            Favourite Apps
+          </Text>
+
+          <View
+            style={{
+              borderWidth: 1,
+              marginHorizontal: wp(2.3),
+              marginTop: hp(3),
+              height: hp(20),
+              borderColor: '#00000017',
+              borderRadius: wp(3),
+            }}>
+            <FlatList
+              style={{margin: 8, flex: 1}}
+              showsVerticalScrollIndicator={false}
+              data={favouriteApps}
+              keyExtractor={item => item.id.toString()}
+              numColumns={5} // Set the number of columns to 3
+              renderItem={({item}) => renderFavouriteApps(item)}
+            />
+          </View>
+        </View>
+
+        <View style={{marginTop: hp(8), height: hp(20)}}>
+          <Text
+            style={{
+              fontSize: hp(2.3),
+              marginLeft: wp(3),
+              fontFamily: 'Inter-Bold',
+              color: '#4A4A4A',
+              fontWeight: 'bold',
+            }}>
+            New Added Apps
+          </Text>
+
+          <View
+            style={{
+              borderWidth: 1,
+              marginHorizontal: wp(2.3),
+              marginTop: hp(3),
+              height: hp(20),
+              borderColor: '#00000017',
+              borderRadius: wp(3),
+            }}>
+            <FlatList
+              style={{margin: 8, flex: 1}}
+              showsVerticalScrollIndicator={false}
+              data={favouriteApps}
+              keyExtractor={item => item.id.toString()}
+              numColumns={5} // Set the number of columns to 3
+              renderItem={({item}) => renderFavouriteApps(item)}
+            />
+          </View>
+        </View>
+
+        <View style={{marginTop: hp(8), height: hp(20)}}>
+          <Text
+            style={{
+              fontSize: hp(2.3),
+              marginLeft: wp(3),
+              fontFamily: 'Inter-Bold',
+              color: '#4A4A4A',
+              fontWeight: 'bold',
+            }}>
+            Phone Based Apps
+          </Text>
+
+          <View
+            style={{
+              borderWidth: 1,
+              marginHorizontal: wp(2.3),
+              //marginBottom:hp(50),
+              marginTop: hp(3),
+              height: hp(20),
+              borderColor: '#00000017',
+              borderRadius: wp(3),
+            }}>
+            <FlatList
+              style={{margin: 8, flex: 1}}
+              showsVerticalScrollIndicator={false}
+              data={favouriteApps}
+              keyExtractor={item => item.id.toString()}
+              numColumns={5} // Set the number of columns to 3
+              renderItem={({item}) => renderFavouriteApps(item)}
+            />
+          </View>
+        </View>
+
+
+
+        <View style={{marginTop: hp(8), marginBottom:hp(10), height: hp(20)}}>
+          <Text
+            style={{
+              fontSize: hp(2.3),
+              marginLeft: wp(3),
+              fontFamily: 'Inter-Bold',
+              color: '#4A4A4A',
+              fontWeight: 'bold',
+            }}>
+            Unused Apps
+          </Text>
+
+          <View
+            style={{
+              borderWidth: 1,
+              marginHorizontal: wp(2.3),
+              //marginBottom:hp(50),
+              marginTop: hp(3),
+              height: hp(20),
+              borderColor: '#00000017',
+              borderRadius: wp(3),
+            }}>
+            <FlatList
+              style={{margin: 8, flex: 1}}
+              showsVerticalScrollIndicator={false}
+              data={favouriteApps}
+              keyExtractor={item => item.id.toString()}
+              numColumns={5} // Set the number of columns to 3
+              renderItem={({item}) => renderFavouriteApps(item)}
+            />
+          </View>
+        </View>
       </ScrollView>
 
       

@@ -54,11 +54,21 @@ import Sell from './app/src/view/screens/Sell';
 import UpdateSellProduct from './app/src/view/screens/UpdateSellProduct';
 import Video from './app/src/view/screens/BottomTab/Video';
 import MarketZone from './app/src/view/screens/BottomTab/MarketZone';
-import Disc from './app/src/view/screens/BottomTab/Disc'
+import Disc from './app/src/view/screens/BottomTab/Disc';
 import News from './app/src/view/screens/News';
 import ViewAllCategories from './app/src/view/screens/ViewAllCategories';
 import ChangeImageScreen from './app/src/view/screens/PostOnNews/ChangeImageScreen';
 import PostOnNews from './app/src/view/screens/PostOnNews/PostOnNews';
+import LetterDisc from './app/src/view/screens/BottomTab/LetterDisc';
+import QAFI from './app/src/view/screens/QAFI/QAFI';
+import GEBC from './app/src/view/screens/GEBC/GEBC';
+import LetterDetails from './app/src/view/screens/LetterDetails';
+import PrivateLetterDetails from './app/src/view/screens/PrivateLetterDetails';
+import Categories from './app/src/view/screens/BottomTab/Categories';
+import ViewProfile from './app/src/view/screens/Profile/ViewProfile';
+import ProfileSettings from './app/src/view/screens/Profile/ProfileSettings';
+import UpdateProfile from './app/src/view/screens/Profile/UpdateProfile';
+import UpdatePassword from './app/src/view/screens/Profile/UpdatePassword';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -75,29 +85,96 @@ const App = () => {
         />
 
       <Stack.Screen
+          name="ViewProfile"
+          component={ViewProfile}
+          options={{headerShown: false}}
+        />
+
+      <Stack.Screen
+          name="UpdatePassword"
+          component={UpdatePassword}
+          options={{headerShown: false}}
+        />
+
+      <Stack.Screen
+          name="UpdateProfile"
+          component={UpdateProfile}
+          options={{headerShown: false}}
+        />
+     
+      <Stack.Screen
+          name="ProfileSettings"
+          component={ProfileSettings}
+          options={{headerShown: false}}
+        />
+
+
+        <Stack.Screen
+          name="Dashboard"
+          component={Dashboard}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="Categories"
+          component={Categories}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="PrivateLetterDetails"
+          component={PrivateLetterDetails}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="LetterDetails"
+          component={LetterDetails}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="GEBC"
+          component={GEBC}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="QAFI"
+          component={QAFI}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="LetterDisc"
+          component={LetterDisc}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
           name="BottomTabNavigation"
           component={BottomtabNavigation}
           options={{headerShown: false}}
         />
 
-      <Stack.Screen
+        <Stack.Screen
           name="PostOnNews"
           component={PostOnNews}
           options={{headerShown: false}}
         />
 
-      <Stack.Screen
+        <Stack.Screen
           name="ChangeImageScreen"
           component={ChangeImageScreen}
           options={{headerShown: false}}
         />
 
-      <Stack.Screen
+        <Stack.Screen
           name="ViewAllCategories"
           component={ViewAllCategories}
           options={{headerShown: false}}
         />
-      <Stack.Screen
+        <Stack.Screen
           name="News"
           component={News}
           options={{headerShown: false}}
@@ -117,12 +194,6 @@ const App = () => {
         <Stack.Screen
           name="Video"
           component={Video}
-          options={{headerShown: false}}
-        />
-
-        <Stack.Screen
-          name="Dashboard"
-          component={Dashboard}
           options={{headerShown: false}}
         />
 
@@ -263,7 +334,6 @@ const App = () => {
           component={Profile_image}
           options={{headerShown: false}}
         />
-
       </Stack.Navigator>
     </NavigationContainer>
   );
