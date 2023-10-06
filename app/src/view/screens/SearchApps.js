@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-evenly',
-    marginTop: hp(5),
+    marginTop: hp(8),
     marginHorizontal: wp(8),
     height: hp(8),
     //borderWidth: 3,
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: wp(3.8),
     borderRadius: wp(5),
-    borderWidth: 0.5,
+    borderWidth: 1,
     borderColor: '#00000017',
   },
   latestSearch: {

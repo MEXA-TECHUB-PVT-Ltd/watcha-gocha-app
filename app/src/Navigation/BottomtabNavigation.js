@@ -78,15 +78,11 @@ const BottomtabNavigation = () => {
         options={({focused}) => ({
           tabBarIcon: ({focused}) =>
             focused ? (
-              <CategoryActive width={23} height={23} />
+              <CategoryActive />
             ) : (
-              <CategoryInActive  style={{resizeMode:'contain'}} />
+              <CategoryInActive  width={23} height={23}  />
             ),
-          tabBarLabel: ({focused}) => (
-            <Text style={focused ? styles.focusedLabel : styles.inactiveLabel}>
-              Home
-            </Text>
-          ),
+          
         })}
         name="Category"
         component={Categories}

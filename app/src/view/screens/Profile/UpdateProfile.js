@@ -28,18 +28,20 @@ import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SelectCountry, Dropdown} from 'react-native-element-dropdown';
-
 import RBSheet from 'react-native-raw-bottom-sheet';
 import CPaperInput from './../../../assets/Custom/CPaperInput';
+import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
 
 export default function UpdateProfile({navigation}) {
   const [selectedItem, setSelectedItem] = useState('');
 
   const [userName, setUserName] = useState('');
 
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState('JohnDoe@gmail.com');
 
   const [price, setPrice] = useState('');
+
+  const [snackbarVisible, setsnackbarVisible] = useState(false);
 
   const [isTextInputActive, setIsTextInputActive] = useState(false);
 
@@ -93,6 +95,10 @@ export default function UpdateProfile({navigation}) {
     {label: 'Item 2', value: '2'},
     {label: 'Item 3', value: '3'},
   ];
+
+  const dismissSnackbar = () => {
+    setsnackbarVisible(false);
+  };
 
   const TakeImageFromCamera = () => {
     ImageCropPicker.openCamera({
@@ -150,6 +156,19 @@ export default function UpdateProfile({navigation}) {
 
       ref_RBSheetCamera.current.close();
     });
+  };
+
+  const handleUpdatePassword = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setsnackbarVisible(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setsnackbarVisible(false);
+    }, 3000);
   };
   return (
     <KeyboardAvoidingView
@@ -245,7 +264,12 @@ export default function UpdateProfile({navigation}) {
             <CustomButton
               title="Update"
               customClick={() => {
-                navigation.goBack();
+                
+                handleUpdatePassword(); // Call your password update function here
+
+                //setsnackbarVisible(true);
+
+                //navigation.goBack();
                 //ref_RBSendOffer.current.close();
                 //navigation.navigate('ResetPassword');
               }}
@@ -331,6 +355,13 @@ export default function UpdateProfile({navigation}) {
           </TouchableOpacity>
         </View>
       </RBSheet>
+
+      <CustomSnackbar
+        message={'success'}
+        messageDescription={'Password Reset Successfully'}
+        onDismiss={dismissSnackbar} // Make sure this function is defined
+        visible={snackbarVisible}
+      />
     </KeyboardAvoidingView>
   );
 }

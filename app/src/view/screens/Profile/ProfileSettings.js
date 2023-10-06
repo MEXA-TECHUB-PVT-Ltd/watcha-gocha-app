@@ -22,8 +22,13 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 import {appImages} from '../../../assets/utilities';
+import RBSheet from 'react-native-raw-bottom-sheet';
+
 
 export default function ProfileSettings({navigation}) {
+
+  const ref_RBSheetLogout = useRef(null);
+
   return (
     <View style={styles.container}>
       <View style={{marginTop: hp(5)}}>
@@ -125,6 +130,7 @@ export default function ProfileSettings({navigation}) {
           justifyContent: 'flex-end',
         }}>
         <TouchableOpacity
+        onPress={()=>ref_RBSheetLogout.current.open()}
           style={{
             borderRadius: wp(5),
             flexDirection: 'row',
@@ -153,6 +159,55 @@ export default function ProfileSettings({navigation}) {
             </View>
         </TouchableOpacity>
       </View>
+
+      <RBSheet
+        ref={ref_RBSheetLogout}
+        height={330}
+        openDuration={250}
+        enableOverDrag={false}
+        enabledGestureInteraction={false}
+        closeOnDragDown={true}
+        closeOnPressMask={false}
+        customStyles={{
+          container: {
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderTopLeftRadius: 30,
+            borderTopRightRadius: 30,
+            paddingTop: 0,
+            padding: 20,
+            zIndex: 999,
+          },
+          draggableIcon: {
+            backgroundColor: 'transparent',
+          },
+        }}>
+
+            <Image source={appImages.alert} style={{resizeMode:'contain'}}/>
+        <Text
+          style={[
+            styles.txtNotification,
+            {marginTop: 1, fontSize: hp(2.5), fontWeight: '500'},
+          ]}>
+          Confirmation
+        </Text>
+
+        <Text style={{marginTop:hp(2)}}>Do You Really Want To Logout?</Text>
+
+        <View style={styles.buttonDirections}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => ref_RBSheetLogout.current.close()}>
+            <Text style={styles.textButton}>Cancel</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => ref_RBSheetLogout.current.close()}
+            style={[styles.button, {backgroundColor: '#FACA4E'}]}>
+            <Text style={[styles.textButton, {color: '#232323'}]}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+      </RBSheet>
     </View>
   );
 }
@@ -162,4 +217,29 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white',
   },
+  buttonDirections: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: hp(4.3),
+    width:'100%',
+    marginLeft: wp(5),
+    justifyContent: 'space-evenly',
+  }, button: {
+    borderColor: '#FACA4E',
+    borderWidth: 0.8,
+    borderRadius: wp(5),
+    width: wp(35),
+    height: hp(5.5),
+    justifyContent: 'center',
+    alignItems: 'center',
+  }, textButton: {
+    color: '#FACA4E',
+    fontWeight: 'bold',
+  }, txtNotification: {
+    fontWeight: '500',
+    marginTop: hp(10),
+    marginLeft: wp(5),
+    fontSize: hp(2.3),
+    color: '#0B0B0B',
+  }
 });

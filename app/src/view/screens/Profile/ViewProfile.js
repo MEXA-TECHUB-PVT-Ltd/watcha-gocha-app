@@ -161,7 +161,7 @@ export default function ViewProfile({navigation}) {
     console.log('Items', item);
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate('ProductDetails')}
+        onPress={() => navigation.navigate('ProductDetailsProfile')}
         style={{width: wp(35), margin: 5}}>
         <View>
           <Image

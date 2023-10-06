@@ -19,6 +19,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Fontiso from 'react-native-vector-icons/Fontisto';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Feater from 'react-native-vector-icons/Feather';
+import Entypo from 'react-native-vector-icons/Entypo';
+
 
 const Headers = ({
   showBackIcon,
@@ -30,13 +32,17 @@ const Headers = ({
   onPressGridView,
   onPressSettings,
   onPressfavourite,
+  onPressMenu,
+  onPressMenuWhite,
   onPressAdd,
   onPressProfile,
   text,
   showLogo,
   showProfileImage,
   showHeart,
+  showMenu,
   showSettings,
+  showMenuWhite,
   showAdd,
   showListings,
   showGridView,
@@ -99,7 +105,28 @@ const Headers = ({
         <TouchableOpacity onPress={onPressSearch} style={styles.heartIcon}>
           <Feater name="search" size={20} color="#FACA4E" />
         </TouchableOpacity>
-      )}
+      )} 
+
+       {showMenu && (
+        <TouchableOpacity onPress={onPressMenu} style={styles.heartIcon}>
+
+        <Entypo name={'dots-three-vertical'} size={18} color={'#4A4A4A'} />
+
+        </TouchableOpacity>
+      )}    
+
+      {showMenuWhite && (
+        <TouchableOpacity onPress={onPressMenuWhite} style={styles.heartIcon}>
+
+        <Entypo name={'dots-three-vertical'} size={18} color={'#ffffff'} />
+
+        </TouchableOpacity>
+      )}        
+      
+      
+      
+      
+
 
       {showSettings && (
         <TouchableOpacity onPress={onPressSettings} style={styles.heartIcon}>

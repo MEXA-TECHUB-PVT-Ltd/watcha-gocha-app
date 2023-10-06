@@ -47,7 +47,7 @@ const UpdatePassword = ({navigation}) => {
   useEffect(() => {}, [isFocused]);
 
   const [newPassword, setNewPassword] = useState('');
-  const [snackbarVisible, setSnackbarVisible] = useState();
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
 
   const [isTextInputActive, setIsTextInputActive] = useState(false);
   const [isConfirmActive, setIsConfirmPasswordActive] = useState(false);
@@ -101,9 +101,11 @@ const UpdatePassword = ({navigation}) => {
     setIsTextInputActive(false);
   };
 
+
   const handleFocus1 = () => {
     setIsTextInputActive1(true);
   };
+
 
   const handleBlur1 = () => {
     setIsTextInputActive1(false);
@@ -181,7 +183,7 @@ const UpdatePassword = ({navigation}) => {
 
 
   const dismissSnackbar = () => {
-    setSnackbarVisible(true);
+    setSnackbarVisible(false);
   };
 
   const handleBlurConfirmPassword = () => {
@@ -214,7 +216,7 @@ const UpdatePassword = ({navigation}) => {
                   <MaterialCommunityIcons
                     name={'lock-outline'}
                     size={23}
-                    color={isTextInputActive1 == true ? '#FACA4E' : '#64646485'}
+                    color={isConfirmActive == true ? '#FACA4E' : '#64646485'}
                   />
                 )}
               />
@@ -308,7 +310,7 @@ const UpdatePassword = ({navigation}) => {
                   <MaterialCommunityIcons
                     name={'lock-outline'}
                     size={23}
-                    color={isTextInputActive2 == true ? '#FACA4E' : '#64646485'}
+                    color={isTextInputActiveConfirmPass == true ? '#FACA4E' : '#64646485'}
                   />
                 )}
               />
@@ -442,7 +444,7 @@ const styles = StyleSheet.create({
     height: 35,
     alignItems: 'center',
     justifyContent: 'center',
-    right: 35,
+    right: 45,
     top: 31,
   },
   txt: {

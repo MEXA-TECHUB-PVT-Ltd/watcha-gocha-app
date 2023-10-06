@@ -53,7 +53,7 @@ const Category = [
   {label: 'Item 3', value: '3'},
 ];
 
-export default function PostOnNews() {
+export default function PostOnNews({navigation}) {
   const [selectedItem, setSelectedItem] = useState('');
 
   const [profileName, setProfileName] = useState('');
@@ -145,7 +145,11 @@ export default function PostOnNews() {
       behavior="height" // You can use ‘height’ as well, depending on your preference
       enabled>
       <View style={styles.header}>
+        <TouchableOpacity onPress={()=>navigation.goBack()}>
+
         <IonIcons name={'chevron-back'} color={'#282828'} size={25} />
+
+        </TouchableOpacity>
 
         <Text style={styles.headerText}>Post On News</Text>
       </View>
@@ -266,7 +270,10 @@ export default function PostOnNews() {
           </View>
         ) : null}
 
-        <View style={{marginTop: '2%', borderWidth:3, alignSelf: 'center'}}>
+        
+      </ScrollView>
+
+      <View style={{flex:1,marginBottom:hp(3),justifyContent:'flex-end', alignSelf: 'center'}}>
            <CustomButton
             title="Post"
             load={false}
@@ -276,7 +283,6 @@ export default function PostOnNews() {
             }}
           /> 
         </View>
-      </ScrollView>
 
       <RBSheet
         ref={ref_RBSheetCamera}

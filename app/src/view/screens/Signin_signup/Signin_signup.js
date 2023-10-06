@@ -130,8 +130,6 @@ const App = ({ navigation }) => {
             <View style={styles.mainv}>
                 <Image source={appImages.logo} style={{ width: 280, height: 80, marginTop: '5%' }} resizeMode='contain' />
 
-
-
                 <SwitchSelector
                     options={options}
                     initial={0}
@@ -156,6 +154,7 @@ const App = ({ navigation }) => {
                     onPress={value => {
                         setcheck(value)
                     }}
+
                 />
                 {check == 0 ?
                     <Text style={{ color: '#9597A6', fontSize: wp(4), marginVertical: '5%', fontFamily: 'Inter-Medium' }}>Please sign in to access your account.</Text>
@@ -163,10 +162,8 @@ const App = ({ navigation }) => {
                     <Text style={{ color: '#9597A6', fontSize: wp(4), marginVertical: '5%', fontFamily: 'Inter-Medium' }}>Let's begin by creating your account.</Text>
                 }
 
-
                 {check == 0 ?
                     <View style={styles.v1}>
-
                         <TextInput
                             mode='outlined'
                             label="Email Address"

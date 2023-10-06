@@ -39,15 +39,20 @@ import RadioForm, {
   RadioButtonInput,
   RadioButtonLabel,
 } from 'react-native-simple-radio-button';
-
 import HeaderImageSlider from '../../assets/Custom/HeaderImageSlider';
+import EditItem from '../../assets/svg/UpdateItem.svg';
 
-export default function ProductDetails({navigation}) {
+import Delete from '../../assets/svg/Delete.svg';
+
+
+export default function ProductDetailsProfile({navigation}) {
   const [imageUri, setImageUri] = useState(null);
   const [selectedValueListView, setSelectedValueListView] = useState('');
 
   const ref_RBSendOffer = useRef(null);
   const ref_RBSendOffer2 = useRef(null);
+  const ref_RBSheetCamera = useRef(null);
+
 
   const details = [
     {id: 1, title: 'Lense', image: appImages.lense},
@@ -116,14 +121,14 @@ export default function ProductDetails({navigation}) {
     <ScrollView style={styles.container}>
       <StatusBar
         translucent={true}
-        backgroundColor="transparent"
+        backgroundColor="black"
         barStyle="dark-content" // You can set the StatusBar text color to dark or light
       />
       <View style={{marginTop: hp(5)}}>
-        <Headers showBackIcon={true} onPress={()=>navigation.goBack()} showText={true} text={'Item Details'} />
+        <Headers showBackIcon={true} showMenu={true} onPressMenu={()=>ref_RBSheetCamera.current.open()} onPress={()=>navigation.goBack()} showText={true} text={'Item Details'} />
       </View>
 
-      <View style={{height: hp(25), marginTop: hp(5)}}>
+      <View style={{height: hp(35), marginTop: hp(5)}}>
 
       <HeaderImageSlider data={details}  paginationStyleItemActiveStyle={{
               width: 18,
@@ -160,11 +165,12 @@ export default function ProductDetails({navigation}) {
       renderPagination={({ index, currentIndex }) => renderDot(index, currentIndex)}
     /> */}
       </View>
+      
 
       <View
         style={{
           flex: 1,
-          marginTop: hp(19),
+          marginTop: hp(10),
           marginHorizontal: wp(8),
         }}>
         <Text
@@ -210,7 +216,6 @@ export default function ProductDetails({navigation}) {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            marginTop: hp(1.8),
             height: hp(5),
           }}>
           <Location width={15} height={15} />
@@ -229,7 +234,7 @@ export default function ProductDetails({navigation}) {
 
         <ScrollView
           showsVerticalScrollIndicator={false}
-          style={{marginTop: hp(3), height: hp(23)}}>
+          style={{ height: hp(23)}}>
           <Text
             style={{
               color: '#77838F',
@@ -247,158 +252,7 @@ export default function ProductDetails({navigation}) {
             beautiful bokeh.
           </Text>
         </ScrollView>
-
-        <View
-          style={{
-            flexDirection: 'row',
-            height: hp(8),
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}>
-          <View style={{flexDirection: 'row', width: wp(60)}}>
-            <TouchableOpacity style={styles.circleBox}>
-              {imageUri == null ? (
-                <Image
-                  style={{
-                    flex: 1,
-                    width: '100%',
-                    height: '100%',
-                    borderRadius: wp(12) / 2, // Half of the width (25/2)
-                    resizeMode: 'contain',
-                  }}
-                  source={appImages.profileImg}
-                />
-              ) : (
-                <Image
-                  style={{
-                    flex: 1,
-                    width: '100%',
-                    height: '100%',
-                    borderRadius: wp(12) / 2, // Half of the width (25/2)
-                    resizeMode: 'contain',
-                  }}
-                  source={{uri: imageUri}}
-                />
-              )}
-            </TouchableOpacity>
-
-            <View>
-              <Text
-                style={{
-                  color: '#FACA4E',
-                  fontFamily: 'Inter',
-                  marginLeft: wp(3),
-                  fontWeight: '400',
-                  fontSize: hp(2),
-                }}>
-                John Doe
-              </Text>
-
-              <Text
-                style={{
-                  color: '#77838F',
-                  fontFamily: 'Inter',
-                  marginLeft: wp(3),
-                  fontSize: hp(2),
-                }}>
-                johndoe@gmail.com
-              </Text>
-            </View>
-          </View>
-          <SendMessage width={39} height={39} />
-        </View>
-
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-
-            height: hp(8),
-          }}>
-          <TouchableOpacity
-            onPress={() => ref_RBSendOffer2.current.open()}
-            style={{
-              width: wp(21),
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}>
-            <SendMail />
-
-            <Text
-              style={{
-                color: '#4C4C4C',
-                fontFamily: 'Inter',
-                fontWeight: 'bold',
-                fontSize: hp(1.8),
-              }}>
-              Send Offer
-            </Text>
-          </TouchableOpacity>
-
-          <View
-            style={{
-              width: wp(21),
-              height: hp(7.5),
-              //borderWidth:3,
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}>
-            <BellAlert style={{marginTop: hp(1)}} width={21} height={21} />
-
-            <Text
-              style={{
-                color: '#4C4C4C',
-                fontFamily: 'Inter',
-                fontWeight: 'bold',
-                fontSize: hp(1.8),
-              }}>
-              Alert
-            </Text>
-          </View>
-
-          <View
-            style={{
-              width: wp(21),
-              alignItems: 'center',
-              height: hp(7.5),
-              justifyContent: 'space-between',
-            }}>
-            <BookMark style={{marginTop: hp(1)}} width={21} height={21} />
-
-            <Text
-              style={{
-                color: '#4C4C4C',
-                fontFamily: 'Inter',
-                fontWeight: 'bold',
-                fontSize: hp(1.8),
-              }}>
-              Book Mark
-            </Text>
-          </View>
-
-          <View
-            style={{
-              width: wp(21),
-              alignItems: 'center',
-              height: hp(7.5),
-              justifyContent: 'space-between',
-            }}>
-            <Share style={{marginTop: hp(1)}} width={18} height={18} />
-
-            <Text
-              style={{
-                color: '#4C4C4C',
-                fontFamily: 'Inter',
-                fontWeight: 'bold',
-
-                fontSize: hp(1.8),
-              }}>
-              Share
-            </Text>
-          </View>
-        </View>
-      </View>
+       </View>
 
       <RBSheet
         ref={ref_RBSendOffer}
@@ -791,6 +645,104 @@ export default function ProductDetails({navigation}) {
               //navigation.navigate('Profile_image');
             }}
           />
+        </View>
+      </RBSheet>
+
+
+
+      <RBSheet
+        ref={ref_RBSheetCamera}
+        closeOnDragDown={true}
+        closeOnPressMask={false}
+        animationType="fade"
+        minClosingHeight={0}
+        customStyles={{
+          wrapper: {
+            backgroundColor: 'rgba(52, 52, 52, 0.5)',
+          },
+          draggableIcon: {
+            backgroundColor: 'white',
+          },
+          container: {
+            borderTopLeftRadius: wp(10),
+            borderTopRightRadius: wp(10),
+            height: hp(25),
+          },
+        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginHorizontal: wp(8),
+            alignItems: 'center',
+          }}>
+          <Text
+            style={{
+              fontFamily: 'Inter-Medium',
+              color: '#303030',
+              fontSize: hp(2.3),
+            }}>
+            Select an option
+          </Text>
+          <TouchableOpacity onPress={() => ref_RBSheetCamera.current.close()}>
+            <Ionicons
+              name="close"
+              size={22}
+              color={'#303030'}
+              onPress={() => ref_RBSheetCamera.current.close()}
+            />
+          </TouchableOpacity>
+        </View>
+
+        <View
+          style={{
+            //flexDirection: 'row',
+            justifyContent: 'space-evenly',
+            //alignItems: 'center',
+            //borderWidth: 3,
+            marginTop: hp(3),
+          }}>
+          <View style={{flexDirection: 'row', marginHorizontal:wp(7)}}>
+
+            <EditItem height={23} width={23}/>
+
+          <Text
+            style={{
+              fontFamily: 'Inter-Regular',
+              color: '#656565',
+              marginLeft:wp(3),
+              fontSize: hp(2.1),
+            }}>
+
+            Update Item
+
+          </Text>
+
+          </View>
+
+          <View style={{height:hp(0.1), marginHorizontal:wp(8), marginTop:hp(3), backgroundColor:'#00000012'}}>
+
+          </View>
+
+          <View style={{flexDirection: 'row', marginTop:hp(2.5), marginHorizontal:wp(7)}}>
+
+            <Delete height={23} width={23}/>
+
+          <Text
+            style={{
+              fontFamily: 'Inter-Regular',
+              color: '#656565',
+              marginLeft:wp(3),
+              fontSize: hp(2.1),
+            }}>
+
+            Delete Item
+
+          </Text>
+
+          </View>
+
+          
         </View>
       </RBSheet>
     </ScrollView>
