@@ -110,9 +110,12 @@ export default function SearchScreen({navigation}) {
         <Text
           style={{
             marginLeft: wp(3),
+            fontSize:hp(1.6),
+            lineHeight:18,
+            marginTop:hp(1.5),
             flex: 1,
-            color: '#333333',
-            fontFamily: 'Inter',
+            color: '#000000',
+            fontFamily: 'Inter-Medium',
           }}>
           {item.title}
         </Text>
@@ -143,7 +146,7 @@ export default function SearchScreen({navigation}) {
         </View>
       </View>
 
-      <Text style={styles.latestSearch}>Latest Search</Text>
+      <Text style={styles.latestSearch}>Latest Searches</Text>
 
       <View style={styles.latestSearchList}>
         <FlatList

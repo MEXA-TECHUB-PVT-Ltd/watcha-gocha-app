@@ -23,7 +23,6 @@ import Download from '../../../assets/svg/Download.svg';
 
 import Share from 'react-native-share';
 
-
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP,
@@ -33,6 +32,9 @@ import {
 import Fontiso from 'react-native-vector-icons/Fontisto';
 
 import IonIcons from 'react-native-vector-icons/Ionicons';
+
+import Entypo from 'react-native-vector-icons/Entypo';
+
 
 export default function ViewVideo({navigation}) {
   const [showFullContent, setShowFullContent] = useState(false);
@@ -73,10 +75,8 @@ export default function ViewVideo({navigation}) {
         barStyle="dark-content" // You can set the StatusBar text color to dark or light
       />
       <View style={styles.header}>
-        <TouchableOpacity onPress={()=>navigation.goBack()}>
-
-        <IonIcons name={'chevron-back'} color={'white'} size={25} />
-
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <IonIcons name={'chevron-back'} color={'white'} size={25} />
         </TouchableOpacity>
 
         <Image
@@ -84,15 +84,20 @@ export default function ViewVideo({navigation}) {
           style={{width: wp(39), marginLeft: wp(18)}}
           resizeMode="contain"
         />
+        
+        <TouchableOpacity style={{marginLeft:wp(18), marginTop:hp(1)}}>
+
+        <Entypo name={'dots-three-vertical'} size={18} color={'white'} />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.bottomView}>
-        <View style={{height: hp(28), marginHorizontal: wp(8)}}>
+        <View style={{height: hp(30), marginHorizontal: wp(8)}}>
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              height: hp(6.5),
+              height: hp(5),
             }}>
             <View
               style={{
@@ -118,7 +123,7 @@ export default function ViewVideo({navigation}) {
 
           <ScrollView
             showsVerticalScrollIndicator={false} // Hide vertical scroll indicator
-            style={{flex: 1}}
+            style={{flex: 1, marginTop: hp(1)}}
             contentContainerStyle={{verticalLine: false}}>
             <Text
               style={{
@@ -185,29 +190,30 @@ export default function ViewVideo({navigation}) {
               flexDirection: 'row',
               justifyContent: 'space-between',
               alignItems: 'center',
-              height: hp(5),
+              height: hp(8),
             }}>
             <View
               style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                width: wp(14),
-                borderWidth:3,
+                width: wp(15),
+                //borderWidth:3,
                 height: hp(5),
               }}>
               <TouchableOpacity onPress={toggleContentLike}>
                 {showLikes ? (
-                  <Like height={14} width={14} />
+                  <Like height={21} width={21} />
                 ) : (
-                  <UnLike height={14} width={14} />
+                  <UnLike height={21} width={21} />
                 )}
               </TouchableOpacity>
 
               <Text
                 style={{
-                  fontFamily: 'Inter',
-                  fontSize: hp(1.5),
+                  fontFamily: 'Inter-Regular',
+                  fontSize: hp(1.7),
+                  marginLeft: wp(1),
                   color: '#FFFFFF',
                 }}>
                 2.3 k
@@ -219,36 +225,34 @@ export default function ViewVideo({navigation}) {
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                width: wp(12),
+                width: wp(15),
                 height: hp(5),
               }}>
               <TouchableOpacity>
-                <Comment height={14} width={14} />
+                <Comment height={21} width={21} />
               </TouchableOpacity>
 
               <Text
                 style={{
-                  fontFamily: 'Inter',
-                  fontSize: hp(1.5),
+                  fontFamily: 'Inter-Regular',
+                  fontSize: hp(1.7),
                   color: '#FFFFFF',
                 }}>
                 2.3 k
               </Text>
             </View>
 
-
             <View
               style={{
                 flexDirection: 'row',
                 justifyContent: 'center',
                 alignItems: 'center',
-                width: wp(10),
+                width: wp(15),
                 height: hp(5),
               }}>
               <TouchableOpacity>
-                <Send height={14} width={14} />
+                <Send height={20} width={20} />
               </TouchableOpacity>
-
             </View>
 
             <View
@@ -259,12 +263,10 @@ export default function ViewVideo({navigation}) {
                 width: wp(10),
                 height: hp(5),
               }}>
-              <TouchableOpacity onPress={()=> shareViaWhatsApp()}>
-                <Download height={18} width={18} />
+              <TouchableOpacity onPress={() => shareViaWhatsApp()}>
+                <Download height={20} width={20} />
               </TouchableOpacity>
-
             </View>
-
           </View>
         </View>
       </View>

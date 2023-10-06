@@ -25,6 +25,15 @@ import Approved from '../../../assets/svg/Approved';
 export default function Disc({navigation}) {
   const [selectedItemId, setSelectedItemId] = useState(0);
 
+  const goToScreen=()=>{
+    if(selectedItemId===2){
+      navigation.navigate("PostLetter")
+    }else if(selectedItemId===1){
+      navigation.navigate("PostOnNews")
+
+    }
+  }
+
   const availableApps = [
     {
       id: 1,
@@ -84,10 +93,8 @@ export default function Disc({navigation}) {
     {id: 1, title: 'On News'},
     {id: 2, title: 'Open Letters'},
     {id: 3, title: 'QAFI'},
-    {id: 4, title: 'XYZ'},
-    {id: 5, title: 'XYZ'},
-    {id: 6, title: 'XYZ'},
-    {id: 7, title: 'XYZ'},
+    {id: 4, title: 'GEBC'},
+
   ];
 
   const renderAvailableApps = item => {
@@ -166,7 +173,13 @@ export default function Disc({navigation}) {
         ]}
         onPress={() => {
           setSelectedItemId(item.id);
-          console.log('Selected item:', item.title);
+          console.log('Selected item:', item.id);
+          if(item.id===1){
+            navigation.navigate('ViewAllCategories')
+            console.log("Log screen")
+          }else if(item.id===1){
+             
+          }
         }}>
         <Text
           style={[
@@ -456,7 +469,7 @@ export default function Disc({navigation}) {
 
       <View style={{marginTop: hp(1), marginHorizontal: wp(8)}}>
         <Text style={{color: '#FACA4E', fontWeight: 'bold', fontSize: hp(2.3)}}>
-          Disc
+          DISC
         </Text>
       </View>
 
@@ -497,7 +510,7 @@ export default function Disc({navigation}) {
       </ScrollView>
 
       <TouchableOpacity
-        onPress={() => navigation.navigate('PostOnNews')}
+        onPress={() => goToScreen()}
         style={{position: 'absolute', bottom: 1, right: 25}}>
         <Add />
       </TouchableOpacity>
@@ -553,7 +566,7 @@ const styles = StyleSheet.create({
     marginLeft: wp(3),
     alignItems: 'center',
     justifyContent: 'center',
-    width: wp(30),
+    width: wp(25),
     backgroundColor: '#F2F2F2',
     borderRadius: wp(5),
     height: hp(5),

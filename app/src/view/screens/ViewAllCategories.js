@@ -22,7 +22,7 @@ import Headers from '../../assets/Custom/Headers';
 import {appImages} from '../../assets/utilities';
 import Add from '../../assets/svg/AddMainScreen.svg';
 
-export default function ViewAllCategories() {
+export default function ViewAllCategories({navigation}) {
   const [selectedItemId, setSelectedItemId] = useState(null);
 
   const searches = [
@@ -66,7 +66,7 @@ export default function ViewAllCategories() {
         barStyle="dark-content" // You can set the StatusBar text color to dark or light
       />
       <View style={{marginTop: hp(5)}}>
-        <Headers showBackIcon={true} showText={true} text={'Categories'} />
+        <Headers showBackIcon={true} onPress={()=>navigation.goBack()} showText={true} text={'Categories'} />
       </View>
 
       <View style={{flex:1, marginTop:hp(5), alignItems:'center'}}>

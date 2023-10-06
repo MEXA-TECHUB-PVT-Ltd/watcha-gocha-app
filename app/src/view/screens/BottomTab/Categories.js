@@ -125,20 +125,25 @@ export default function Categories({navigation}) {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} style={{flex:1, marginHorizontal:wp(3)}}>
-      <View style={styles.searchBar}>
-          <Fontiso
-            name={'search'}
-            size={18}
-            color={'#A8A8A8'}
-            style={{marginLeft: wp(5)}}
-          />
-          <TextInput
-            style={{flex: 1, marginLeft: wp(3)}}
-            placeholder="Search here"
+     
+      <View
+          style={{
+            height: hp(18),
+            marginTop: hp(-1.3),
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Image
+            style={{width: wp(60), resizeMode: 'contain'}}
+            source={appImages.bannerAds}
           />
         </View>
 
         <View style={styles.latestSearchList}>
+
+        <Text style={{fontFamily: 'Inter-Medium', marginLeft: wp(-1.5)}}>
+            Top
+          </Text>
         <FlatList
           style={{flex: 1}}
           contentContainerStyle={{alignItems: 'center'}}
@@ -150,7 +155,7 @@ export default function Categories({navigation}) {
         />
       </View>
 
-      <View style={{marginTop:hp(2), height:hp(20), width:wp(53) }}>
+      <View style={{marginTop:hp(2), marginLeft:wp(3), height:hp(20), width:wp(53) }}>
       <FlatList
         style={{margin:8,flex: 1}}
         showsVerticalScrollIndicator={false}
@@ -259,8 +264,6 @@ export default function Categories({navigation}) {
           </View>
         </View>
 
-
-
         <View style={{marginTop: hp(8), marginBottom:hp(10), height: hp(20)}}>
           <Text
             style={{
@@ -317,9 +320,12 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: '#00000017',
   }, latestSearchList: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginTop: hp(2.1),
     height: hp(7),
     marginLeft: wp(5),
+    //borderWidth: 3,
   },
 
 
@@ -340,11 +346,6 @@ const styles = StyleSheet.create({
     marginTop: hp(2),
     marginLeft: wp(10),
     color: '#595959',
-  },
-  latestSearchList: {
-    marginTop: hp(2.1),
-    height: hp(7),
-    //marginLeft: wp(5),
   },
   searchesDetails: {
     flexDirection: 'row',

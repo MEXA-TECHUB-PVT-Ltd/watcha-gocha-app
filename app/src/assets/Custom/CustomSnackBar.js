@@ -80,7 +80,7 @@ const CustomSnackbar = ({visible, message, messageDescription, onDismiss}) => {
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    top: 5, // Display at the top of the screen
+    top: 60, // Display at the top of the screen
     left: 15,
     right: 15,
     height:hp(7.5),

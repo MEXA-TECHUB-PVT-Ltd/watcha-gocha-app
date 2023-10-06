@@ -148,7 +148,7 @@ export default function UploadUpdateScreen({navigation}) {
 
         </TouchableOpacity>
 
-        <Text style={styles.headerText}>Update Video</Text>
+        <Text style={styles.headerText}>Upload Video</Text>
       </View>
 
       <ScrollView
@@ -198,7 +198,7 @@ export default function UploadUpdateScreen({navigation}) {
                 color: '#232323',
                 fontWeight: '700',
               }}>
-              Change Pic
+              Change Video
             </Text>
           </View>
           {imageUri == null && (
@@ -218,7 +218,7 @@ export default function UploadUpdateScreen({navigation}) {
 
         <TextInput
           mode="outlined"
-          label="Pic Name"
+          label="Video Name"
           onChangeText={text => setProfileName(text)}
           style={styles.ti}
           outlineColor="#0000001F"
@@ -304,7 +304,7 @@ export default function UploadUpdateScreen({navigation}) {
             alignItems: 'center',
           }}>
           <CustomButton
-            title={'Update'}
+            title={'Upload'}
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {

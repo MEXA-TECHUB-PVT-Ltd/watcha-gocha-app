@@ -69,6 +69,8 @@ import ViewProfile from './app/src/view/screens/Profile/ViewProfile';
 import ProfileSettings from './app/src/view/screens/Profile/ProfileSettings';
 import UpdateProfile from './app/src/view/screens/Profile/UpdateProfile';
 import UpdatePassword from './app/src/view/screens/Profile/UpdatePassword';
+import ProductDetailsProfile from './app/src/view/screens/ProductDetailsProfile';
+import PostLetter from './app/src/view/screens/PostLetter/PostLetter';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -84,30 +86,44 @@ const App = () => {
           options={{headerShown: false}}
         />
 
+        
+
       <Stack.Screen
+          name="PostLetter"
+          component={PostLetter}
+          options={{headerShown: false}}
+        />
+
+
+        <Stack.Screen
           name="ViewProfile"
           component={ViewProfile}
           options={{headerShown: false}}
         />
 
-      <Stack.Screen
+        <Stack.Screen
+          name="ProductDetailsProfile"
+          component={ProductDetailsProfile}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
           name="UpdatePassword"
           component={UpdatePassword}
           options={{headerShown: false}}
         />
 
-      <Stack.Screen
+        <Stack.Screen
           name="UpdateProfile"
           component={UpdateProfile}
           options={{headerShown: false}}
         />
-     
-      <Stack.Screen
+
+        <Stack.Screen
           name="ProfileSettings"
           component={ProfileSettings}
           options={{headerShown: false}}
         />
-
 
         <Stack.Screen
           name="Dashboard"

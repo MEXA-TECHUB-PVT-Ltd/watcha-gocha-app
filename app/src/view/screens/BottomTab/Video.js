@@ -24,6 +24,61 @@ import {appImages} from '../../../assets/utilities';
 export default function Video({navigation}) {
   const [selectedItemId, setSelectedItemId] = useState(null);
 
+
+  const availableAppsVideo = [
+    {
+      id: 1,
+      title: 'Explore the intricate web of global pol.....',
+      image: appImages.topSearches1,
+    },
+    {
+      id: 2,
+      title: 'Explore the intricate web of global pol.....',
+      image: appImages.topSearches2,
+    },
+    {
+      id: 3,
+      title: 'Explore the intricate web of global pol.....',
+      image: appImages.topSearches3,
+    },
+    {
+      id: 4,
+      title: 'Explore the intricate web of global pol.....',
+      image: appImages.topSearches4,
+    },
+    {
+      id: 5,
+      title: 'Explore the intricate web of global pol.....',
+      image: appImages.topSearches1,
+    },
+    {
+      id: 6,
+      title: 'Explore the intricate web of global pol.....',
+      image: appImages.topSearches2,
+    },
+    {
+      id: 7,
+      title: 'Explore the intricate web of global pol.....',
+      image: appImages.topSearches3,
+    },
+    {
+      id: 8,
+      title: 'Explore the intricate web of global pol.....',
+      image: appImages.topSearches4,
+    },
+    {
+      id: 9,
+      title: 'Explore the intricate web of global pol.....',
+      image: appImages.topSearches1,
+    },
+    {
+      id: 10,
+      title: 'Explore the intricate web of global pol.....',
+      image: appImages.topSearches2,
+    },
+  ];
+
+
   const availableApps = [
     {
       id: 1,
@@ -120,6 +175,45 @@ export default function Video({navigation}) {
     );
   };
 
+
+  const renderAvailableAppsVideo = item => {
+    console.log('Items', item);
+    return (
+      <TouchableOpacity  onPress={() => navigation.navigate('ViewVideo')} style={{width: wp(27), margin: 5}}>
+        <View>
+          <Image
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+
+              zIndex: 1, // Ensure it's on top of other elements
+              //flex: 1,
+              width: '100%',
+              height: hp(12),
+              borderRadius: wp(1),
+              resizeMode: 'cover',
+            }}
+            source={item.image}
+          />
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginLeft: wp(0.5),
+            marginTop: hp(12.5),
+          }}>
+          <Text style={{fontSize: hp(1.5), fontFamily:'Inter-Regular', color:'#000000', width: wp(23)}}>
+            {item.title}
+          </Text>
+
+          <Entypo name={'dots-three-vertical'} size={14} color={'#4A4A4A'} />
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
   const renderSearches = item => {
     console.log('Items', item);
     const isSelected = selectedItemId === item.id;
@@ -195,8 +289,14 @@ export default function Video({navigation}) {
             renderItem={({item}) => renderSearches(item)}
           />
         </View>
-        <View style={{marginTop: hp(1.5), flexDirection:'row', height: hp(18)}}>
-          <View style={{width: wp(40), height: '100%', borderRadius: wp(5)}}>
+        <View
+          style={{
+            marginTop: hp(1.5),
+            marginLeft: wp(2.5),
+            flexDirection: 'row',
+            height: hp(18),
+          }}>
+          <View style={{width: wp(35), height: '100%', borderRadius: wp(5)}}>
             <Image
               style={{
                 position: 'absolute',
@@ -215,7 +315,7 @@ export default function Video({navigation}) {
             <View
               style={{
                 position: 'absolute',
-                top: hp(14),
+                top: hp(15),
                 left: 7,
                 //height: hp(3),
                 //width: wp(21),
@@ -235,28 +335,28 @@ export default function Video({navigation}) {
                 name
               </Text>
             </View>
-
           </View>
-          
-          <View style={{justifyContent:'flex-end',width:'50%'}}>
-          <Text
-            style={{
-              fontSize: hp(1.1),
-              marginLeft: wp(1),
-              lineHeight:15,
-              fontFamily: 'Inter',
-              color: '#000000',
-              fontWeight: '700',
-            }}>
-            Explore the intricate web of global politics in this
-            thought-provoking video as we delve into the ever-shifting landscape
-            of international diplomacy......
-          </Text>
 
+          <View style={{marginTop: hp(2), marginLeft: wp(3), width: '35%'}}>
+            <Text
+              style={{
+                fontSize: hp(1.6),
+                marginLeft: wp(1),
+                //lineHeight: 15.5,
+                fontFamily: 'Inter-Regular',
+                color: '#000000',
+                //fontWeight: '700',
+              }}>
+              Explore the intricate web of global politics in this
+              thought-provoking video as we delve into the ever-shifting
+              landscape of
+            </Text>
           </View>
         </View>
 
-        <TouchableOpacity onPress={()=>navigation.navigate("ViewVideo")} style={{marginTop: hp(1.5), height: hp(23)}}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('ViewVideo')}
+          style={{marginTop: hp(1.5), height: hp(23)}}>
           <Text
             style={{
               fontSize: hp(2.3),
@@ -272,16 +372,15 @@ export default function Video({navigation}) {
             <FlatList
               style={{flex: 1}}
               showsVerticalScrollIndicator={false}
-              data={availableApps}
+              data={availableAppsVideo}
               horizontal
               keyExtractor={item => item.id.toString()}
-              renderItem={({item}) => renderAvailableApps(item)}
+              renderItem={({item}) => renderAvailableAppsVideo(item)}
             />
           </View>
         </TouchableOpacity>
 
-
-        <View style={{height: hp(23)}}>
+        <View style={{marginTop:hp(2.1),height: hp(23)}}>
           <Text
             style={{
               fontSize: hp(2.3),
@@ -297,16 +396,15 @@ export default function Video({navigation}) {
             <FlatList
               style={{flex: 1}}
               showsVerticalScrollIndicator={false}
-              data={availableApps}
+              data={availableAppsVideo}
               horizontal
               keyExtractor={item => item.id.toString()}
-              renderItem={({item}) => renderAvailableApps(item)}
+              renderItem={({item}) => renderAvailableAppsVideo(item)}
             />
           </View>
         </View>
 
-
-        <View style={{height: hp(23)}}>
+        <View style={{marginTop:hp(2.1),height: hp(23)}}>
           <Text
             style={{
               fontSize: hp(2.3),
@@ -322,15 +420,15 @@ export default function Video({navigation}) {
             <FlatList
               style={{flex: 1}}
               showsVerticalScrollIndicator={false}
-              data={availableApps}
+              data={availableAppsVideo}
               horizontal
               keyExtractor={item => item.id.toString()}
-              renderItem={({item}) => renderAvailableApps(item)}
+              renderItem={({item}) => renderAvailableAppsVideo(item)}
             />
           </View>
         </View>
 
-        <View style={{height: hp(23)}}>
+        <View style={{marginTop:hp(2.1),height: hp(23)}}>
           <Text
             style={{
               fontSize: hp(2.3),
@@ -346,13 +444,14 @@ export default function Video({navigation}) {
             <FlatList
               style={{flex: 1}}
               showsVerticalScrollIndicator={false}
-              data={availableApps}
+              data={availableAppsVideo}
               horizontal
               keyExtractor={item => item.id.toString()}
-              renderItem={({item}) => renderAvailableApps(item)}
+              renderItem={({item}) => renderAvailableAppsVideo(item)}
             />
           </View>
         </View>
+
         
 
       
