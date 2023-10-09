@@ -116,7 +116,7 @@ export default function SearchProducts({navigation}) {
             }}>
             <Text
               style={{
-                fontSize: hp(1),
+                fontSize: hp(1.6),
                 fontFamily: 'Inter',
                 color: '#FFFFFF',
                 fontWeight: '700',

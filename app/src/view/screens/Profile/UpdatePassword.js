@@ -190,6 +190,7 @@ const UpdatePassword = ({navigation}) => {
     setIsConfirmPasswordActive(false);
   };
 
+
   return (
     <ScrollView style={{backgroundColor:'white'}} contentContainerStyle={{flexGrow: 1}}>
       <StatusBar barStyle={'dark-content'} backgroundColor={'transparent'} />
@@ -359,7 +360,7 @@ const UpdatePassword = ({navigation}) => {
       <CustomSnackbar
         message={'success'}
         messageDescription={'Password Reset Successfully'}
-        onDismiss={dismissSnackbar} // Make sure this function is defined
+        onDismiss={handleUpdatePassword} // Make sure this function is defined
         visible={snackbarVisible}
       />
     </ScrollView>

@@ -874,6 +874,7 @@ export default function Dashboard({navigation}) {
         <Headers
           showListings={true}
           showLogo={true}
+          onPressListings={()=>navigation.openDrawer()}
           onPressProfile={() => navigation.navigate('ViewProfile')}
           showProfileImage={true}
         />

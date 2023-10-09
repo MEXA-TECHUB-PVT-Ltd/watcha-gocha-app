@@ -198,12 +198,12 @@ export default function PostLetter({navigation}) {
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-              //navigation.navigate('Profile_image');
+              navigation.navigate('PostLetterSignature');
             }}
           />
           </View>
 
-          <RBSheet
+        <RBSheet
         ref={ref_RBSheetCamera}
         closeOnDragDown={true}
         closeOnPressMask={false}
