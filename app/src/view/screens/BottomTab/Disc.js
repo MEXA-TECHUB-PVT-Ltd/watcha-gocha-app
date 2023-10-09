@@ -27,7 +27,7 @@ export default function Disc({navigation}) {
 
   const goToScreen=()=>{
     if(selectedItemId===2){
-      navigation.navigate("PostLetter")
+      navigation.navigate("PostLetterInfo")
     }else if(selectedItemId===1){
       navigation.navigate("PostOnNews")
 

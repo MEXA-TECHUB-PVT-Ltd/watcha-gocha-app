@@ -33,6 +33,8 @@ const appImages = {
   openLettersFirst:require(IMAGES_DIR + 'OpenLettersFirst.png'),
   OpenLetter:require(IMAGES_DIR + 'OpenLetter.png'),
   Signature:require(IMAGES_DIR + 'signature.png'),
+  Upload:require(IMAGES_DIR + 'Upload.png'),
+  ArtBoard:require(IMAGES_DIR + 'ArtBoard.png'),
   LogOut:require(IMAGES_DIR + 'Logout.png')
 
 

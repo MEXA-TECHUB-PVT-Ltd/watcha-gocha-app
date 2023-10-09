@@ -99,7 +99,6 @@ const CPaperInput = props => {
     <View style={{marginVertical: 12}}>
       
 
-      
       {props?.heading && (
         <Text style={[
           paperInputStyle.heading,

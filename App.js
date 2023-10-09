@@ -71,6 +71,12 @@ import UpdateProfile from './app/src/view/screens/Profile/UpdateProfile';
 import UpdatePassword from './app/src/view/screens/Profile/UpdatePassword';
 import ProductDetailsProfile from './app/src/view/screens/ProductDetailsProfile';
 import PostLetter from './app/src/view/screens/PostLetter/PostLetter';
+import DrawerNavigation from './app/src/Navigation/DrawerNavigation';
+import PostLetterInfo from './app/src/view/screens/PostLetter/PostLetterInfo';
+import PostLetterSignature from './app/src/view/screens/PostLetter/PostLetterSignature';
+import PostLetterEditSignature from './app/src/view/screens/PostLetter/PostLetterEditSignature';
+import PostLetterEditSignaturePics from './app/src/view/screens/PostLetter/PostLetterEditSignaturePics';
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -86,14 +92,37 @@ const App = () => {
           options={{headerShown: false}}
         />
 
-        
 
       <Stack.Screen
+          name="PostLetterEditSignature"
+          component={PostLetterEditSignature}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="PostLetterEditSignaturePics"
+          component={PostLetterEditSignaturePics}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="PostLetterSignature"
+          component={PostLetterSignature}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="PostLetterInfo"
+          component={PostLetterInfo}
+          options={{headerShown: false}}
+        />
+
+
+        <Stack.Screen
           name="PostLetter"
           component={PostLetter}
           options={{headerShown: false}}
         />
-
 
         <Stack.Screen
           name="ViewProfile"
@@ -169,7 +198,7 @@ const App = () => {
 
         <Stack.Screen
           name="BottomTabNavigation"
-          component={BottomtabNavigation}
+          component={DrawerNavigation}
           options={{headerShown: false}}
         />
 

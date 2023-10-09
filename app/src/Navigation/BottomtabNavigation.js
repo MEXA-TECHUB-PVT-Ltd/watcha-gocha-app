@@ -32,12 +32,15 @@ import Categories from './../view/screens/BottomTab/Categories';
 import Video from './../view/screens/BottomTab/Video';
 import Disc from './../view/screens/BottomTab/Disc';
 import MarketZone from './../view/screens/BottomTab/MarketZone';
+import CustomTabBar from '../assets/Custom/CustomTabBar';
 
 const BottomtabNavigation = () => {
   const Bottom = createBottomTabNavigator();
   return (
+    
     <Bottom.Navigator
       initialRouteName="Dashboard"
+      //tabBar={(props) => <CustomTabBar {...props} />} // Use your custom tab bar
       tabBarOptions={
         {
           // ... (other tabBarOptions)
@@ -52,6 +55,8 @@ const BottomtabNavigation = () => {
         activeTintColor: '#24A59E', // Color of the active tab icon and label
         inactiveTintColor: '#CACACA',
         tabBarHideOnKeyboard: true,
+        lazy: false, // Set lazy to false to ensure all tabs are rendered
+
       }}>
       <Bottom.Screen
         options={({focused}) => ({
