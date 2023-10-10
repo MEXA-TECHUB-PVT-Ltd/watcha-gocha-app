@@ -2,11 +2,6 @@ import 'react-native-gesture-handler';
 import React, {useState} from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-import Signin_signup from './app/src/view/screens/Signin_signup/Signin_signup';
-import Profile_image from './app/src/view/screens/Profile_image/Profile_image';
-
-import ForgetPassword from './app/src/view/screens/Auth/ForgetPassword';
-
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -26,58 +21,67 @@ import {
   Alert,
 } from 'react-native';
 
+//Screens
+
+import Signin_signup from './app/src/view/screens/Signin_signup/Signin_signup';
+import ViewAllBlogs from './app/src/view/screens/ViewAllBlogs/ViewAllBlogs';
+import ViewVideoPicProfile from './app/src/view/screens/ViewVideoProfile/ViewVideoPicProfile';
+import ViewVideoProfile from './app/src/view/screens/ViewVideoProfile/ViewVideoProfile';
+import PostLetterEditSignature from './app/src/view/screens/PostLetter/PostLetterEditSignature';
+import PostLetterEditSignaturePics from './app/src/view/screens/PostLetter/PostLetterEditSignaturePics';
+import PostLetterSignature from './app/src/view/screens/PostLetter/PostLetterEditSignature';
+import PostLetterInfo from './app/src/view/screens/PostLetter/PostLetterInfo';
+import PostLetter from './app/src/view/screens/PostLetter/PostLetter';
+import ViewProfile from './app/src/view/screens/Profile/ViewProfile';
+import ProductDetailsProfile from './app/src/view/screens/ProductDetailsProfile';
+import UpdatePassword from './app/src/view/screens/Profile/UpdatePassword';
+import UpdateProfile from './app/src/view/screens/Profile/UpdateProfile';
+import ProfileSettings from './app/src/view/screens/Profile/ProfileSettings';
+import Dashboard from './app/src/view/screens/BottomTab/Dashboard';
+import Categories from './app/src/view/screens/BottomTab/Categories';
+import PrivateLetterDetails from './app/src/view/screens/PrivateLetterDetails';
+import LetterDetails from './app/src/view/screens/LetterDetails';
+import GEBC from './app/src/view/screens/GEBC/GEBC';
+import QAFI from './app/src/view/screens/QAFI/QAFI';
+import LetterDisc from './app/src/view/screens/BottomTab/LetterDisc';
+import DrawerNavigation from './app/src/Navigation/DrawerNavigation';
+import PostOnNews from './app/src/view/screens/PostOnNews/PostOnNews';
+import ChangeImageScreen from './app/src/view/screens/PostOnNews/ChangeImageScreen';
+import ViewAllCategories from './app/src/view/screens/ViewAllCategories';
+import News from './app/src/view/screens/News';
+import Disc from './app/src/view/screens/BottomTab/Disc';
+import MarketZone from './app/src/view/screens/BottomTab/MarketZone';
+import Video from './app/src/view/screens/BottomTab/Video';
+import VerifyAccount from './app/src/view/screens/Auth/VerifyAccount';
+import UpdateSellProduct from './app/src/view/screens/UpdateSellProduct';
+import Sell from './app/src/view/screens/Sell';
+import ProductDetails from './app/src/view/screens/ProductDetails';
+import SearchProducts from './app/src/view/screens/SearchProducts';
+import UploadUpdatePicScreen from './app/src/view/screens/UpdateAPic/UploadUpdatePicScreen';
+import UploadUpdatePic from './app/src/view/screens/UpdateAPic/UploadUpdatePic';
+import UploadUpdateVideo from './app/src/view/screens/UpdateAVideo/UploadUpdateVideo';
+import UploadUpdateScreen from './app/src/view/screens/UpdateAVideo/UploadUpdateScreen';
+import SubscriptionPayment from './app/src/view/screens/SubscriptionPayment';
+import ContactUs from './app/src/view/screens/ContactUs';
+import TermsAndCondition from './app/src/view/screens/TermsAndCondition';
+import PrivacyPolicy from './app/src/view/screens/PrivacyPolicy';
+import SearchScreen from './app/src/view/screens/SearchScreen';
+import PicDetails from './app/src/view/screens/PicDetails';
+import UploadScreen from './app/src/view/screens/UploadAVideo/UploadScreen';
+import UploadVideo from './app/src/view/screens/UploadAVideo/UploadVideo';
+import ViewVideo from './app/src/view/screens/PicDetails';
+import SearchApps from './app/src/view/screens/SearchApps';
+import PhoneBase from './app/src/view/screens/PhoneBase';
+import ResetPassword from './app/src/view/screens/Auth/ResetPassword';
+import ForgetPassword from './app/src/view/screens/Auth/ForgetPassword';
+import Profile_image from './app/src/view/screens/Profile_image/Profile_image';
+import ChatScreen from './app/src/view/screens/ChatScreen';
+
+//------------------\\
+
 // import B1 from './src/assets/svg/b1.svg'
 // import B2 from './src/assets/svg/b2.svg'
 // import B3 from './src/assets/svg/b3.svg'
-import ResetPassword from './app/src/view/screens/Auth/ResetPassword';
-import BottomtabNavigation from './app/src/Navigation/BottomtabNavigation';
-import Dashboard from './app/src/view/screens/BottomTab/Dashboard';
-import PhoneBase from './app/src/view/screens/PhoneBase';
-import SearchApps from './app/src/view/screens/SearchApps';
-import ViewVideo from './app/src/view/screens/VideoView/ViewVideo';
-import UploadVideo from './app/src/view/screens/UploadAVideo/UploadVideo';
-import UploadScreen from './app/src/view/screens/UploadAVideo/UploadScreen';
-import PicDetails from './app/src/view/screens/PicDetails';
-import SearchScreen from './app/src/view/screens/SearchScreen';
-import VerifyAccount from './app/src/view/screens/Auth/VerifyAccount';
-import PrivacyPolicy from './app/src/view/screens/PrivacyPolicy';
-import TermsAndCondition from './app/src/view/screens/TermsAndCondition';
-import ContactUs from './app/src/view/screens/ContactUs';
-import SubscriptionPayment from './app/src/view/screens/SubscriptionPayment';
-import UploadUpdateScreen from './app/src/view/screens/UpdateAVideo/UploadUpdateScreen';
-import UploadUpdatePicScreen from './app/src/view/screens/UpdateAPic/UploadUpdatePicScreen';
-import UploadUpdateVideo from './app/src/view/screens/UpdateAVideo/UploadUpdateVideo';
-import UploadUpdatePic from './app/src/view/screens/UpdateAPic/UploadUpdatePic';
-import SearchProducts from './app/src/view/screens/SearchProducts';
-import ProductDetails from './app/src/view/screens/ProductDetails';
-import Sell from './app/src/view/screens/Sell';
-import UpdateSellProduct from './app/src/view/screens/UpdateSellProduct';
-import Video from './app/src/view/screens/BottomTab/Video';
-import MarketZone from './app/src/view/screens/BottomTab/MarketZone';
-import Disc from './app/src/view/screens/BottomTab/Disc';
-import News from './app/src/view/screens/News';
-import ViewAllCategories from './app/src/view/screens/ViewAllCategories';
-import ChangeImageScreen from './app/src/view/screens/PostOnNews/ChangeImageScreen';
-import PostOnNews from './app/src/view/screens/PostOnNews/PostOnNews';
-import LetterDisc from './app/src/view/screens/BottomTab/LetterDisc';
-import QAFI from './app/src/view/screens/QAFI/QAFI';
-import GEBC from './app/src/view/screens/GEBC/GEBC';
-import LetterDetails from './app/src/view/screens/LetterDetails';
-import PrivateLetterDetails from './app/src/view/screens/PrivateLetterDetails';
-import Categories from './app/src/view/screens/BottomTab/Categories';
-import ViewProfile from './app/src/view/screens/Profile/ViewProfile';
-import ProfileSettings from './app/src/view/screens/Profile/ProfileSettings';
-import UpdateProfile from './app/src/view/screens/Profile/UpdateProfile';
-import UpdatePassword from './app/src/view/screens/Profile/UpdatePassword';
-import ProductDetailsProfile from './app/src/view/screens/ProductDetailsProfile';
-import PostLetter from './app/src/view/screens/PostLetter/PostLetter';
-import DrawerNavigation from './app/src/Navigation/DrawerNavigation';
-import PostLetterInfo from './app/src/view/screens/PostLetter/PostLetterInfo';
-import PostLetterSignature from './app/src/view/screens/PostLetter/PostLetterSignature';
-import PostLetterEditSignature from './app/src/view/screens/PostLetter/PostLetterEditSignature';
-import PostLetterEditSignaturePics from './app/src/view/screens/PostLetter/PostLetterEditSignaturePics';
-
-
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -85,15 +89,37 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-
-      <Stack.Screen
+        <Stack.Screen
           name="Signin_signup"
           component={Signin_signup}
           options={{headerShown: false}}
         />
 
+        <Stack.Screen
+          name="ChatScreen"
+          component={ChatScreen}
+          options={{headerShown: false}}
+        />
 
-      <Stack.Screen
+        <Stack.Screen
+          name="ViewAllBlogs"
+          component={ViewAllBlogs}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ViewVideoPicProfile"
+          component={ViewVideoPicProfile}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ViewVideoProfile"
+          component={ViewVideoProfile}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
           name="PostLetterEditSignature"
           component={PostLetterEditSignature}
           options={{headerShown: false}}
@@ -116,7 +142,6 @@ const App = () => {
           component={PostLetterInfo}
           options={{headerShown: false}}
         />
-
 
         <Stack.Screen
           name="PostLetter"
@@ -219,11 +244,13 @@ const App = () => {
           component={ViewAllCategories}
           options={{headerShown: false}}
         />
+
         <Stack.Screen
           name="News"
           component={News}
           options={{headerShown: false}}
         />
+
         <Stack.Screen
           name="Disc"
           component={Disc}

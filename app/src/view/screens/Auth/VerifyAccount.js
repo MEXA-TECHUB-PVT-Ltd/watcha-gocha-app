@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import RBSheet from 'react-native-raw-bottom-sheet';
+import OTPInputView from '@twotalltotems/react-native-otp-input';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -53,6 +54,8 @@ LogBox.ignoreAllLogs();
 
 export default function VerifyAccount({navigation}) {
   const [value, setValue] = useState('');
+  const [otpCode, setOtpCode] = useState(null);
+
   const ref_RBSendOffer = useRef(null);
   const [loading, setLoading] = useState(false);
 
@@ -72,12 +75,12 @@ export default function VerifyAccount({navigation}) {
           <Back width={20} height={20} />
         </TouchableOpacity>
 
-        <View>
+        <View style={{}}>
           <Image
-            source={require('../../../assets/images/forget.png')}
+            source={require('../../../assets/images/Verify.png')}
             resizeMode="contain"
             style={{
-              width: wp(50),
+              width: wp(40),
               height: hp(30),
             }}
           />
@@ -105,9 +108,9 @@ export default function VerifyAccount({navigation}) {
           We've send a verification code on your{'\n'} email address
         </Text>
 
-        <CodeField
+         <CodeField
           ref={ref}
-          {...props}
+          //{...props}
           // Use `caretHidden={false}` when users can't paste a text value, because context menu doesn't appear
           value={value}
           onChangeText={setValue}
@@ -119,8 +122,9 @@ export default function VerifyAccount({navigation}) {
             <TouchableOpacity
               key={index}
               style={[
-                styles.cell,
-                isFocused && styles.focusCell,
+                isFocused==true?styles.focusCell:styles.cell,
+                /* styles.cell,
+                isFocused && styles.focusCell, */
                 index !== 0 && {marginLeft: wp(2)}, // Add margin between cells
               ]}
               onPress={() => setIsFocused(true)}
@@ -130,6 +134,27 @@ export default function VerifyAccount({navigation}) {
           )}
         />
 
+{/* <View style={{width: wp(90), flex: 1, zIndex: 999}}>
+            <OTPInputView
+              ref={ref}
+              style={{
+                height: 50,
+                // marginTop: hp(5),
+              }}
+              pinCount={4}
+              code={otpCode}
+              onCodeChanged={code => {
+                setOtpCode(code);
+              }}
+              autoFocusOnLoad={false}
+              placeholderCharacter={''}
+              placeholderTextColor={'#ABA7AF'}
+              codeInputFieldStyle={styles.underlineStyleBase}
+              codeInputHighlightStyle={{
+                ...styles.underlineStyleHighLighted,
+              }}
+            />
+          </View> */}
         <View
           style={{
             flexDirection: 'row',
@@ -198,7 +223,7 @@ export default function VerifyAccount({navigation}) {
             justifyContent: 'space-evenly',
           }}>
           <Image
-            source={appImages.verifyModal}
+            source={appImages.Verify}
             style={{resizeMode: 'contain'}}
           />
 
@@ -287,11 +312,35 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: wp(10), // Rounded corners
     borderWidth: 1,
-    borderColor: 'gray', // Default border color
+    borderColor: '#E7EAF2', // Default border color
     alignItems: 'center',
     justifyContent: 'center',
   },
   focusCell: {
-    borderColor: 'pink', // Border color when focused
+    flex: 1,
+    height: 50,
+    borderRadius: wp(10), // Rounded corners
+    borderWidth: 1,
+    borderColor: '#000000', // Default border color
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  underlineStyleBase: {
+    color: '#DDDDDD',
+    fontSize: 24,
+    fontFamily: 'Inter-Medium',
+    width: 48,
+    height: 50,
+    borderRadius: 30,
+    borderWidth: 0,
+    // borderBottomWidth: 1,
+    borderColor: '#DDDDDD',
+    // marginHorizontal: 2,
+    backgroundColor: '#F5F6FA',
+  },
+  underlineStyleHighLighted: {
+    borderColor: '#FACA4E',
+    borderRadius: 30,
+    borderWidth: 1,
   },
 });

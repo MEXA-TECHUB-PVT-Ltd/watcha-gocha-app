@@ -177,6 +177,20 @@ const UpdatePassword = ({navigation}) => {
 
 
   //--------------------------\\
+  
+  const handleUpdatePassword = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setSnackbarVisible(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setSnackbarVisible(false);
+      navigation.goBack()
+    }, 3000);
+  };
 
   
   //----------------------------\\
@@ -352,7 +366,7 @@ const UpdatePassword = ({navigation}) => {
             load={loading}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-              navigation.goBack();
+              handleUpdatePassword()
             }}
           />
         </View>
@@ -360,7 +374,7 @@ const UpdatePassword = ({navigation}) => {
       <CustomSnackbar
         message={'success'}
         messageDescription={'Password Reset Successfully'}
-        onDismiss={handleUpdatePassword} // Make sure this function is defined
+        onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackbarVisible}
       />
     </ScrollView>

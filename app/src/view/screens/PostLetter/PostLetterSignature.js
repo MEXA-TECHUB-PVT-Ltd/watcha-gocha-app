@@ -33,7 +33,6 @@ import {
   import Ionicons from 'react-native-vector-icons/Ionicons';
   import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
   import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-
   import PublicLetter from '../../../assets/svg/PublicLetter.svg';
   import PrivateLetter from '../../../assets/svg/PrivateLetter.svg';
   
@@ -52,6 +51,7 @@ import {
   import {SelectCountry, Dropdown} from 'react-native-element-dropdown';
   import CPaperInput from '../../../assets/Custom/CPaperInput';
   import Headers from '../../../assets/Custom/Headers';
+  import CustomSnackbar from './../../../assets/Custom/CustomSnackBar';
 
 export default function PostLetterSignature({navigation}) {
 
@@ -83,6 +83,9 @@ export default function PostLetterSignature({navigation}) {
   const ref_RBSheetCamera = useRef(null);
   const [postLetter, setPostLetter] = useState('');
   const [letterType, setLetterTypes] = useState('Public');
+
+  const [snackbarVisible, setsnackbarVisible] = useState(false);
+
 
   const takePhotoFromCamera = async value => {
     setSelectedItem(value);
@@ -127,6 +130,23 @@ export default function PostLetterSignature({navigation}) {
     ref_RBSheetCameraCanvas.current.close()
     navigation.navigate("PostLetterEditSignature")
   }
+
+  const handleUpdatePassword = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setsnackbarVisible(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setsnackbarVisible(false);
+    }, 3000);
+  };
+
+  const dismissSnackbar = () => {
+    setsnackbarVisible(false);
+  };
 
 
   const handleFocus = () => {
@@ -309,6 +329,8 @@ export default function PostLetterSignature({navigation}) {
       </View>
 
       
+
+      
       <RBSheet
         ref={ref_RBSheetCameraCanvas}
         closeOnDragDown={true}
@@ -382,6 +404,13 @@ export default function PostLetterSignature({navigation}) {
           </TouchableOpacity>
         </View>
       </RBSheet>
+
+      <CustomSnackbar
+        message={'success'}
+        messageDescription={'Letter Posted Successfully'}
+        onDismiss={dismissSnackbar} // Make sure this function is defined
+        visible={snackbarVisible}
+      />
       </View>
   )
 }

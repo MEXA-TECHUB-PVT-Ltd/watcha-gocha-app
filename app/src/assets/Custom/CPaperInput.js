@@ -107,7 +107,7 @@ const CPaperInput = props => {
       )}
       <TextInputPaper
       textAlignVertical="top"
-
+      editable={props?.editable}
         // label={'Email'}
         {...props}
         //   placeholder="Password"

@@ -33,7 +33,6 @@ import {
 
 const Drawer = createDrawerNavigator();
 
-
 const DrawerNavigation = () => {
 
     const CustomDrawerContent = props => {

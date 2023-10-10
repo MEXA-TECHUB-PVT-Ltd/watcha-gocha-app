@@ -78,8 +78,8 @@ const ForgetPassword = ({navigation}) => {
             source={require('../../../assets/images/forget.png')}
             resizeMode="contain"
             style={{
-              width: wp(45),
-              height: hp(45),
+              width: wp(40),
+              height: hp(40),
             }}
           />
         </View>

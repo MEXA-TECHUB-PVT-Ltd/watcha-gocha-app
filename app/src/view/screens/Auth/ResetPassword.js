@@ -37,7 +37,9 @@ import {useIsFocused} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SwitchSelector from 'react-native-switch-selector';
 import User from '../../../assets/svg/User.svg';
+
 import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
+
 LogBox.ignoreAllLogs();
 
 const ResetPassword = ({navigation}) => {
@@ -146,6 +148,20 @@ const ResetPassword = ({navigation}) => {
 
   const handleFocusConfirmPassword = () => {
     setIsConfirmPasswordActive(true);
+  };
+
+  const handleUpdatePassword = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setSnackbarVisible(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setSnackbarVisible(false);
+      navigation.navigate("Signin_signup")
+    }, 3000);
   };
 
 
@@ -282,20 +298,13 @@ const ResetPassword = ({navigation}) => {
         </View>
  
 
-
-
-
-
-
-
-
         <View style={{marginTop: '25%', alignSelf: 'center'}}>
           <CustomButton
             title="Reset"
             load={loading}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-              navigation.navigate('BottomTabNavigation');
+              handleUpdatePassword()
             }}
           />
         </View>
@@ -303,7 +312,7 @@ const ResetPassword = ({navigation}) => {
 
       <CustomSnackbar
         message={'success'}
-        messageDescription={'Password Reset Successfully'}
+        messageDescription={'Password reset successfully'}
         onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackbarVisible}
       />
