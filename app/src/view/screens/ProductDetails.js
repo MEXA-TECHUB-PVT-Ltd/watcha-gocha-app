@@ -42,10 +42,17 @@ import RadioForm, {
 
 import HeaderImageSlider from '../../assets/Custom/HeaderImageSlider';
 
+import CustomSnackbar from '../../assets/Custom/CustomSnackBar';
+
+import Shares from 'react-native-share';
+
 export default function ProductDetails({navigation}) {
   const [imageUri, setImageUri] = useState(null);
   const [selectedValueListView, setSelectedValueListView] = useState('');
-
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [snackbarVisibleAlert, setSnackbarVisibleAlert] = useState(false);
+  const [snackbarVisibleSaved, setSnackbarVisibleSaved] = useState(false);
+  
   const ref_RBSendOffer = useRef(null);
   const ref_RBSendOffer2 = useRef(null);
 
@@ -70,6 +77,22 @@ export default function ProductDetails({navigation}) {
     {id: 9, title: 'Shoes', image: appImages.shoes},
     //{id: 10, title: 'Printer', image: appImages.printer},
   ];
+
+  const shareViaWhatsApp = async () => {
+    const shareOptions = {
+      title: 'Share via',
+      message: 'Hey! Check out this cool app!',
+      url: 'https://play.google.com/store/apps/details?id=your.app.package',
+      //social: Share.Social,
+    };
+
+    try {
+      await Shares.open(shareOptions);
+    } catch (error) {
+      console.error('Error sharing via WhatsApp:', error.message);
+    }
+  };
+
 
   const renderAvailableApps = item => {
     console.log('Items', item);
@@ -112,6 +135,49 @@ export default function ProductDetails({navigation}) {
     ref_RBSendOffer.current.close();
   };
 
+  const dismissSnackbar = () => {
+    setSnackbarVisible(true);
+  };
+
+  const handleUpdatePassword = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setSnackbarVisible(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setSnackbarVisible(false);
+    }, 3000);
+  };
+
+  const handleUpdateAlert = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setSnackbarVisibleAlert(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setSnackbarVisibleAlert(false);
+    }, 3000);
+  };
+
+  const handleUpdateSaved = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setSnackbarVisibleSaved(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setSnackbarVisibleSaved(false);
+    }, 3000);
+  };
+
   return (
     <ScrollView style={styles.container}>
       <StatusBar
@@ -120,20 +186,27 @@ export default function ProductDetails({navigation}) {
         barStyle="dark-content" // You can set the StatusBar text color to dark or light
       />
       <View style={{marginTop: hp(5)}}>
-        <Headers showBackIcon={true} onPress={()=>navigation.goBack()} showText={true} text={'Item Details'} />
+        <Headers
+          showBackIcon={true}
+          onPress={() => navigation.goBack()}
+          showText={true}
+          text={'Item Details'}
+        />
       </View>
 
       <View style={{height: hp(25), marginTop: hp(5)}}>
-
-      <HeaderImageSlider data={details}  paginationStyleItemActiveStyle={{
-              width: 18,
-              height: 7,
-              borderRadius: 7 / 2,
-            }}
-            paginationStyleItemInactive={{
-              backgroundColor: '#D4D4D4',
-              borderWidth: 0,
-            }} />
+        <HeaderImageSlider
+          data={details}
+          paginationStyleItemActiveStyle={{
+            width: 18,
+            height: 7,
+            borderRadius: 7 / 2,
+          }}
+          paginationStyleItemInactive={{
+            backgroundColor: '#D4D4D4',
+            borderWidth: 0,
+          }}
+        />
 
         {/* <SwiperFlatList
       autoplay
@@ -317,7 +390,7 @@ export default function ProductDetails({navigation}) {
             height: hp(8),
           }}>
           <TouchableOpacity
-            onPress={() => ref_RBSendOffer2.current.open()}
+            onPress={() => ref_RBSendOffer.current.open()}
             style={{
               width: wp(21),
               alignItems: 'center',
@@ -344,7 +417,11 @@ export default function ProductDetails({navigation}) {
               alignItems: 'center',
               justifyContent: 'space-between',
             }}>
+              <TouchableOpacity onPress={()=>handleUpdateAlert()}>
+
             <BellAlert style={{marginTop: hp(1)}} width={21} height={21} />
+
+              </TouchableOpacity>
 
             <Text
               style={{
@@ -364,7 +441,10 @@ export default function ProductDetails({navigation}) {
               height: hp(7.5),
               justifyContent: 'space-between',
             }}>
+              <TouchableOpacity onPress={()=>handleUpdateSaved()}>
+
             <BookMark style={{marginTop: hp(1)}} width={21} height={21} />
+              </TouchableOpacity>
 
             <Text
               style={{
@@ -384,7 +464,12 @@ export default function ProductDetails({navigation}) {
               height: hp(7.5),
               justifyContent: 'space-between',
             }}>
+
+              <TouchableOpacity onPress={()=>shareViaWhatsApp()}>
+
             <Share style={{marginTop: hp(1)}} width={18} height={18} />
+
+              </TouchableOpacity>
 
             <Text
               style={{
@@ -613,7 +698,8 @@ export default function ProductDetails({navigation}) {
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-              ref_RBSendOffer.current.open();
+              ref_RBSendOffer.current.close();
+              handleUpdatePassword();
               //navigation.navigate('Profile_image');
             }}
           />
@@ -756,12 +842,15 @@ export default function ProductDetails({navigation}) {
 
               fontSize: hp(4.3),
             }}>
-             $ 435
+            $ 435
           </Text>
 
-          <View style={{height:hp(0.1), width:'100%', backgroundColor:'#00000042'}}>
-
-          </View>
+          <View
+            style={{
+              height: hp(0.1),
+              width: '100%',
+              backgroundColor: '#00000042',
+            }}></View>
 
           <Text
             style={{
@@ -771,7 +860,7 @@ export default function ProductDetails({navigation}) {
 
               fontSize: hp(2.5),
             }}>
-             Listed Price $456
+            Listed Price $456
           </Text>
         </View>
 
@@ -793,6 +882,27 @@ export default function ProductDetails({navigation}) {
           />
         </View>
       </RBSheet>
+
+      <CustomSnackbar
+        message={'Success'}
+        messageDescription={'Your Offer Sent Successfully'}
+        onDismiss={dismissSnackbar} // Make sure this function is defined
+        visible={snackbarVisible}
+      />
+
+      <CustomSnackbar
+        message={'Success'}
+        messageDescription={'You will get notified to the relevant feed'}
+        onDismiss={dismissSnackbar} // Make sure this function is defined
+        visible={snackbarVisibleAlert}
+      />
+
+      <CustomSnackbar
+        message={'Success'}
+        messageDescription={'Item saved successfully'}
+        onDismiss={dismissSnackbar} // Make sure this function is defined
+        visible={snackbarVisibleSaved}
+      />
     </ScrollView>
   );
 }

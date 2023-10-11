@@ -30,6 +30,7 @@ import Download from '../../../assets/svg/Download.svg';
 import CustomButton from '../../../assets/Custom/Custom_Button';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
 
 import Share from 'react-native-share';
 
@@ -56,6 +57,9 @@ export default function UploadUpdateScreen({navigation}) {
   const [selectedItem, setSelectedItem] = useState('');
 
   const [profileName, setProfileName] = useState('');
+
+  const [snackbarVisible, setsnackbarVisible] = useState(false);
+
 
   const [isTextInputActive, setIsTextInputActive] = useState(false);
 
@@ -136,16 +140,33 @@ export default function UploadUpdateScreen({navigation}) {
     });
   };
 
+
+  const handleUpdatePassword = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setsnackbarVisible(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setsnackbarVisible(false);
+      navigation.navigate("Home")
+    }, 3000);
+  };
+
+  const dismissSnackbar = () => {
+    setsnackbarVisible(false);
+  };
+
   return (
     <KeyboardAvoidingView
       style={{flex: 1, backgroundColor: 'white'}}
       behavior="height" // You can use ‘height’ as well, depending on your preference
       enabled>
       <View style={styles.header}>
-        <TouchableOpacity onPress={()=>navigation.goBack()}>
-
-        <IonIcons name={'chevron-back'} color={'#282828'} size={25} />
-
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <IonIcons name={'chevron-back'} color={'#282828'} size={25} />
         </TouchableOpacity>
 
         <Text style={styles.headerText}>Upload Video</Text>
@@ -178,7 +199,8 @@ export default function UploadUpdateScreen({navigation}) {
               source={{uri: imageUri}}
             />
           )}
-          <View
+          <TouchableOpacity
+            onPress={() => ref_RBSheetCamera.current.open()}
             style={{
               position: 'absolute',
               top: 10,
@@ -200,7 +222,7 @@ export default function UploadUpdateScreen({navigation}) {
               }}>
               Change Video
             </Text>
-          </View>
+          </TouchableOpacity>
           {imageUri == null && (
             <Image
               style={{
@@ -216,19 +238,22 @@ export default function UploadUpdateScreen({navigation}) {
           )}
         </View>
 
-        <TextInput
-          mode="outlined"
-          label="Video Name"
-          onChangeText={text => setProfileName(text)}
-          style={styles.ti}
-          outlineColor="#0000001F"
-          placeholderTextColor={'#646464'}
-          activeOutlineColor="#FACA4E"
-          autoCapitalize="none"
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          // left={isTextInputActive ? <Oemail /> : <Gemail />}
-        />
+        <View style={{marginRight:wp(2)}}>
+          <TextInput
+            mode="outlined"
+            label="Video Name"
+            outlineStyle={{borderRadius: wp(3)}}
+            onChangeText={text => setProfileName(text)}
+            style={[styles.ti, {borderRadius: wp(10)}]}
+            outlineColor="#0000001F"
+            placeholderTextColor={'#646464'}
+            activeOutlineColor="#FACA4E"
+            autoCapitalize="none"
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            // left={isTextInputActive ? <Oemail /> : <Gemail />}
+          />
+        </View>
 
         <View style={{marginHorizontal: wp(7)}}>
           <Dropdown
@@ -308,7 +333,7 @@ export default function UploadUpdateScreen({navigation}) {
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-              ref_RBSheetCamera.current.open();
+              handleUpdatePassword()
               //navigation.navigate('Profile_image');
             }}
           />
@@ -392,6 +417,15 @@ export default function UploadUpdateScreen({navigation}) {
           </TouchableOpacity>
         </View>
       </RBSheet>
+
+      <CustomSnackbar
+        message={'success'}
+        messageDescription={'Update profile successfully'}
+        onDismiss={dismissSnackbar} // Make sure this function is defined
+        visible={snackbarVisible}
+      />
+
+      
     </KeyboardAvoidingView>
   );
 }
@@ -419,11 +453,11 @@ const styles = StyleSheet.create({
   ti: {
     marginHorizontal: '7%',
     marginTop: '5%',
-    width: 300,
+    //width: 300,
     backgroundColor: 'white',
     fontSize: wp(4),
     paddingLeft: '2%',
-    borderRadius: 10,
+    borderRadius: 100,
   },
   textInputSelectedCategory: {
     borderWidth: 1,

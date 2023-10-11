@@ -52,7 +52,7 @@ const Category = [
   {label: 'Item 3', value: '3'},
 ];
 
-export default function UploadUpdatePicScreen() {
+export default function UploadUpdatePicScreen({navigation}) {
   const [selectedItem, setSelectedItem] = useState('');
 
   const [profileName, setProfileName] = useState('');
@@ -142,7 +142,11 @@ export default function UploadUpdatePicScreen() {
       behavior="height" // You can use ‘height’ as well, depending on your preference
       enabled>
       <View style={styles.header}>
+        <TouchableOpacity onPress={()=>navigation.goBack()}>
+
         <IonIcons name={'chevron-back'} color={'#282828'} size={25} />
+
+        </TouchableOpacity>
 
         <Text style={styles.headerText}>Update Pic</Text>
       </View>
@@ -174,7 +178,8 @@ export default function UploadUpdatePicScreen() {
               source={{uri: imageUri}}
             />
           )}
-          <View
+          <TouchableOpacity
+          onPress={()=>ref_RBSheetCamera.current.open()}
             style={{
               position: 'absolute',
               top: 10,
@@ -196,7 +201,7 @@ export default function UploadUpdatePicScreen() {
               }}>
               Change Pic
             </Text>
-          </View>
+          </TouchableOpacity>
           {imageUri == null && (
             <Image
               style={{
@@ -215,6 +220,7 @@ export default function UploadUpdatePicScreen() {
         <TextInput
           mode="outlined"
           label="Pic Name"
+          outlineStyle={{borderRadius:wp(3)}}
           onChangeText={text => setProfileName(text)}
           style={styles.ti}
           outlineColor="#0000001F"
@@ -400,7 +406,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     height: hp(6.2),
-    marginTop: hp(3),
+    marginTop: hp(5),
     alignItems: 'center',
     marginHorizontal: wp(8),
   },

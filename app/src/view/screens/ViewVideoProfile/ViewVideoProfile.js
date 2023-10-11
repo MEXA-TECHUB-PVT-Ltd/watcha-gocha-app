@@ -10,7 +10,9 @@ import {
   View,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
+import RBSheet from 'react-native-raw-bottom-sheet';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import Back from '../../../assets/svg/back.svg';
 import {appImages} from '../../../assets/utilities/index';
 import Slider from '@react-native-community/slider';
@@ -35,16 +37,24 @@ import IonIcons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
 
-export default function ViewVideo({navigation}) {
+import EditItem from '../../../assets/svg/UpdateItem.svg';
+
+import Delete from '../../../assets/svg/Delete.svg';
+
+export default function ViewVideoProfile({navigation}) {
   const [showFullContent, setShowFullContent] = useState(false);
 
   const [showLikes, setShowLikes] = useState(false);
 
-  const [showMenu, setShowMenu] = useState(false);
+  const [showMenu, setShowMenu] = useState(true);
 
   const [snackbarVisible, setsnackbarVisible] = useState(false);
 
-  
+  const ref_RBSheetCamera = useRef(null);
+
+  const ref_RBSheetLogout = useRef(null);
+
+
 
   var details =
     'Hold onto your seats and get ready to be mesmerized by the beauty and grandeur of the Hold onto your seats';
@@ -74,6 +84,11 @@ export default function ViewVideo({navigation}) {
 
   const dismissSnackbar = () => {
     setsnackbarVisible(false);
+  };
+
+  const changeModal = () => {
+    ref_RBSheetCamera.current.close();
+    ref_RBSheetLogout.current.open();
   };
 
   const handleUpdatePassword = async () => {
@@ -110,7 +125,7 @@ export default function ViewVideo({navigation}) {
           resizeMode="contain"
         />
         
-        {showMenu&&<TouchableOpacity style={{marginLeft:wp(18), marginTop:hp(1)}}>
+        {showMenu&&<TouchableOpacity onPress={()=> ref_RBSheetCamera.current.open()} style={{marginLeft:wp(18), marginTop:hp(1)}}>
 
         <Entypo name={'dots-three-vertical'} size={18} color={'white'} />
         </TouchableOpacity>}
@@ -302,6 +317,153 @@ export default function ViewVideo({navigation}) {
         onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackbarVisible}
       />
+
+
+<RBSheet
+        ref={ref_RBSheetCamera}
+        closeOnDragDown={true}
+        closeOnPressMask={false}
+        animationType="fade"
+        minClosingHeight={0}
+        customStyles={{
+          wrapper: {
+            backgroundColor: 'rgba(52, 52, 52, 0.5)',
+          },
+          draggableIcon: {
+            backgroundColor: 'white',
+          },
+          container: {
+            borderTopLeftRadius: wp(10),
+            borderTopRightRadius: wp(10),
+            height: hp(25),
+          },
+        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginHorizontal: wp(8),
+            alignItems: 'center',
+          }}>
+          <Text
+            style={{
+              fontFamily: 'Inter-Medium',
+              color: '#303030',
+              fontSize: hp(2.3),
+            }}>
+            Select an option
+          </Text>
+          <TouchableOpacity onPress={() => ref_RBSheetCamera.current.close()}>
+            <Ionicons
+              name="close"
+              size={22}
+              color={'#303030'}
+              onPress={() => ref_RBSheetCamera.current.close()}
+            />
+          </TouchableOpacity>
+        </View>
+
+        <View
+          style={{
+            //flexDirection: 'row',
+            justifyContent: 'space-evenly',
+            //alignItems: 'center',
+            //borderWidth: 3,
+            marginTop: hp(3),
+          }}>
+          <TouchableOpacity style={{flexDirection: 'row', marginHorizontal:wp(7)}}>
+
+            <EditItem height={23} width={23}/>
+
+          <Text
+            style={{
+              fontFamily: 'Inter-Regular',
+              color: '#656565',
+              marginLeft:wp(3),
+              fontSize: hp(2.1),
+            }}>
+
+            Update Video
+
+          </Text>
+
+          </TouchableOpacity>
+
+          <View style={{height:hp(0.1), marginHorizontal:wp(8), marginTop:hp(3), backgroundColor:'#00000012'}}>
+
+          </View>
+
+          <TouchableOpacity onPress={()=>changeModal()} style={{flexDirection: 'row', marginTop:hp(2.5), marginHorizontal:wp(7)}}>
+
+            <Delete height={23} width={23}/>
+
+          <Text
+            style={{
+              fontFamily: 'Inter-Regular',
+              color: '#656565',
+              marginLeft:wp(3),
+              fontSize: hp(2.1),
+            }}>
+
+            Delete Video
+
+          </Text>
+
+          </TouchableOpacity>
+
+          
+        </View>
+      </RBSheet>
+
+
+      <RBSheet
+        ref={ref_RBSheetLogout}
+        height={330}
+        openDuration={250}
+        enableOverDrag={false}
+        enabledGestureInteraction={false}
+        closeOnDragDown={true}
+        closeOnPressMask={false}
+        customStyles={{
+          container: {
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderTopLeftRadius: 30,
+            borderTopRightRadius: 30,
+            paddingTop: 0,
+            padding: 20,
+            zIndex: 999,
+          },
+          draggableIcon: {
+            backgroundColor: 'transparent',
+          },
+        }}>
+
+            <Image source={appImages.alert} style={{resizeMode:'contain'}}/>
+        <Text
+          style={[
+            styles.txtNotification,
+            {marginTop: 1, fontSize: hp(2.5), fontWeight: '500'},
+          ]}>
+          Confirmation
+        </Text>
+
+        <Text style={{marginTop:hp(2)}}>Do you really want to delete this video?</Text>
+
+        <View style={styles.buttonDirections}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => ref_RBSheetLogout.current.close()}>
+            <Text style={styles.textButton}>Cancel</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => ref_RBSheetLogout.current.close()}
+            style={[styles.button, {backgroundColor: '#FACA4E'}]}>
+            <Text style={[styles.textButton, {color: '#232323'}]}>Delete</Text>
+          </TouchableOpacity>
+        </View>
+      </RBSheet>
     </ImageBackground>
   );
 }
@@ -331,5 +493,39 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 
-  
+
+  ti: {
+    marginHorizontal: '7%',
+    marginTop: '5%',
+    width: 300,
+    backgroundColor: 'white',
+    fontSize: wp(4),
+    paddingLeft: '2%',
+    borderRadius: 10,
+  },
+  buttonDirections: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: hp(4.3),
+    width:'100%',
+    marginLeft: wp(5),
+    justifyContent: 'space-evenly',
+  }, button: {
+    borderColor: '#FACA4E',
+    borderWidth: 0.8,
+    borderRadius: wp(5),
+    width: wp(35),
+    height: hp(5.5),
+    justifyContent: 'center',
+    alignItems: 'center',
+  }, textButton: {
+    color: '#FACA4E',
+    fontWeight: 'bold',
+  }, txtNotification: {
+    fontWeight: '500',
+    marginTop: hp(10),
+    marginLeft: wp(5),
+    fontSize: hp(2.3),
+    color: '#0B0B0B',
+  }
 });

@@ -168,6 +168,7 @@ export default function UpdateProfile({navigation}) {
     // Automatically hide the Snackbar after 3 seconds
     setTimeout(() => {
       setsnackbarVisible(false);
+      navigation.goBack()
     }, 3000);
   };
   return (
@@ -226,7 +227,7 @@ export default function UpdateProfile({navigation}) {
               fontFamily: 'Inter-Medium',
               color: '#232323',
             }}>
-            Update Image
+            Change Image
           </Button>
         </TouchableOpacity>
 
@@ -243,6 +244,7 @@ export default function UpdateProfile({navigation}) {
         <CPaperInput
           //multiline={true}
           //placeholder={'Description'}
+          editable={false}
           heading={'Email Address'}
           placeholderTextColor="#121420"
           value={email}
@@ -358,7 +360,7 @@ export default function UpdateProfile({navigation}) {
 
       <CustomSnackbar
         message={'success'}
-        messageDescription={'Password Reset Successfully'}
+        messageDescription={'Update profile successfully'}
         onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackbarVisible}
       />

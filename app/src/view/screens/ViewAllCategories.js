@@ -99,15 +99,14 @@ const styles = StyleSheet.create({
     height: hp(7),
   },
   textColor: {
-    fontSize: hp(1.7),
+    fontSize: hp(2.1),
     color: '#00000017',
-    fontFamily: 'Inter',
-    fontWeight: 'bold',
+    fontFamily: 'Inter-Bold',
   },
   textColorSelected: {
-    fontSize: hp(1.5),
+    fontSize: hp(2.1),
     color: '#232323',
-    fontFamily: 'Inter',
-    fontWeight: 'bold',
+    fontFamily: 'Inter-Bold',
+
   },
 });

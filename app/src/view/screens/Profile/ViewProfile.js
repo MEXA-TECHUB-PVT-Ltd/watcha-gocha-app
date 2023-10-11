@@ -212,8 +212,8 @@ export default function ViewProfile({navigation}) {
     console.log('Items', item);
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate('PicDetails')}
-        style={{width: wp(26), margin: 5}}>
+        onPress={() => navigation.navigate('ViewVideoPicProfile')}
+        style={{width: wp(28), margin: 5}}>
         <View>
           <Image
             style={{
@@ -238,10 +238,9 @@ export default function ViewProfile({navigation}) {
             marginLeft: wp(2),
             marginTop: hp(12.5),
           }}>
-          <Text style={{fontSize: hp(1.5), fontWeight: 'bold', width: wp(23)}}>
+           <Text style={{fontSize: hp(1.5), color:'#000000', fontFamily:'Inter-Regular', width: wp(23)}}>
             {item.title}
           </Text>
-
           <Entypo name={'dots-three-vertical'} size={14} color={'#4A4A4A'} />
         </View>
       </TouchableOpacity>
@@ -252,8 +251,8 @@ export default function ViewProfile({navigation}) {
     console.log('Items', item);
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate('ViewVideo')}
-        style={{width: wp(26), margin: 5}}>
+        onPress={() => navigation.navigate('ViewVideoProfile')}
+        style={{width: wp(28), margin: 5}}>
         <View>
           <Image
             style={{
@@ -278,7 +277,7 @@ export default function ViewProfile({navigation}) {
             marginLeft: wp(2),
             marginTop: hp(12.5),
           }}>
-          <Text style={{fontSize: hp(1.5), fontWeight: 'bold', width: wp(23)}}>
+          <Text style={{fontSize: hp(1.5), color:'#000000', fontFamily:'Inter-Regular', width: wp(23)}}>
             {item.title}
           </Text>
 
@@ -485,7 +484,7 @@ export default function ViewProfile({navigation}) {
         </View>
 
         <View
-          style={{height: hp(23), marginHorizontal: wp(8), marginTop: hp(5)}}>
+          style={{height: hp(23), marginLeft: wp(8), marginTop: hp(5)}}>
           <Text
             style={{
               fontSize: hp(2.1),
@@ -511,7 +510,7 @@ export default function ViewProfile({navigation}) {
         </View>
 
         <View
-          style={{height: hp(23), marginHorizontal: wp(8), marginTop: hp(1)}}>
+          style={{height: hp(23), marginLeft:wp(8), marginTop: hp(1)}}>
           <Text
             style={{
               fontSize: hp(2.1),

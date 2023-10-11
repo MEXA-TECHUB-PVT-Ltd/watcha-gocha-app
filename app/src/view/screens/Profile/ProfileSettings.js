@@ -29,6 +29,11 @@ export default function ProfileSettings({navigation}) {
 
   const ref_RBSheetLogout = useRef(null);
 
+  const goBack=()=>{
+    navigation.replace("Signin_signup");
+    ref_RBSheetLogout.current.close();
+  }
+
   return (
     <View style={styles.container}>
       <View style={{marginTop: hp(5)}}>
@@ -202,7 +207,7 @@ export default function ProfileSettings({navigation}) {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => ref_RBSheetLogout.current.close()}
+            onPress={()=>goBack()}
             style={[styles.button, {backgroundColor: '#FACA4E'}]}>
             <Text style={[styles.textButton, {color: '#232323'}]}>Logout</Text>
           </TouchableOpacity>

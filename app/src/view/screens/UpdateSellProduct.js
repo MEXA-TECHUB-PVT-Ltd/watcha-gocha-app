@@ -31,7 +31,7 @@ import UpdateItems from '../../assets/svg/UpdateItems.svg';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import CPaperInput from '../../assets/Custom/CPaperInput';
 
-export default function UpdateSellProduct() {
+export default function UpdateSellProduct({navigation}) {
   const [selectedItem, setSelectedItem] = useState('');
 
   const [title, setTitle] = useState('');
@@ -221,7 +221,7 @@ export default function UpdateSellProduct() {
         barStyle="dark-content" // You can set the StatusBar text color to dark or light
       />
       <View style={{marginTop: hp(5)}}>
-        <Headers showBackIcon={true} text={'Update Item'} showText={true} />
+        <Headers onPress={()=>navigation.goBack()} showBackIcon={true} text={'Update Item'} showText={true} />
       </View>
       <ScrollView
         keyboardShouldPersistTaps="always"

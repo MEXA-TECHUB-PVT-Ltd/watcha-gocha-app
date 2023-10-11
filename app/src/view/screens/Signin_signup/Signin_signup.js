@@ -332,7 +332,7 @@ const App = ({ navigation }) => {
 
                             <TextInput
                                 mode='outlined'
-                                label="Password"
+                                label="Confirm Password"
                                 onChangeText={text => setsignup_cpass(text)}
                                 style={styles.ti}
                                 placeholderTextColor={'#646464'}

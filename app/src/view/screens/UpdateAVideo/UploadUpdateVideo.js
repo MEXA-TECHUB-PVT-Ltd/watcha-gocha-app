@@ -21,6 +21,7 @@ import Comment from '../../../assets/svg/Comment.svg';
 import Send from '../../../assets/svg/Send.svg';
 import Download from '../../../assets/svg/Download.svg';
 import CustomButton from '../../../assets/Custom/Custom_Button';
+
 import Share from 'react-native-share';
 
 import {
@@ -34,6 +35,8 @@ import Fontiso from 'react-native-vector-icons/Fontisto';
 import IonIcons from 'react-native-vector-icons/Ionicons';
 
 export default function UploadUpdateVideo({navigation}) {
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+
   return (
     <ImageBackground source={appImages.videoBG} style={{flex: 1}}>
       <StatusBar

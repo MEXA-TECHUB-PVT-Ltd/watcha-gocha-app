@@ -93,7 +93,7 @@ import {
     const renderAvailableApps = item => {
       console.log('Items', item);
       return (
-        <View style={{width: wp(35),margin:5}}>
+        <TouchableOpacity onPress={()=>navigation.navigate("ProductDetails")} style={{width: wp(25.5),margin:5}}>
           <View>
             <Image
               style={{
@@ -104,8 +104,8 @@ import {
                 zIndex: 1, // Ensure it's on top of other elements
                 //flex: 1,
                 width: '100%',
-                height: hp(18),
-                borderRadius: wp(3),
+                height: hp(16),
+                borderRadius: wp(2.5),
                 resizeMode: 'cover',
               }}
               source={item.image}
@@ -115,7 +115,7 @@ import {
           <View
             style={{
               position: 'absolute',
-              top: hp(14),
+              top: hp(12),
               left: 7,
               //height: hp(3),
               //width: wp(21),
@@ -127,7 +127,7 @@ import {
             }}>
             <Text
               style={{
-                fontSize: hp(1.6),
+                fontSize: hp(1.7),
                 fontFamily: 'Inter',
                 color: '#FFFFFF',
                 fontWeight: '700',
@@ -137,7 +137,7 @@ import {
           </View>
      
           
-        </View>
+        </TouchableOpacity>
       );
     };
   
@@ -224,8 +224,8 @@ import {
               renderItem={({item}) => renderSearches(item)}
             />
           </View>
-          <View style={{marginTop: hp(1.5), flexDirection:'row', height: hp(18)}}>
-            <TouchableOpacity onPress={()=>navigation.navigate("ProductDetails")} style={{width: wp(40), height: '100%', borderRadius: wp(5)}}>
+          <View style={{marginTop: hp(1.5), flexDirection:'row', height: hp(16)}}>
+            <TouchableOpacity onPress={()=>navigation.navigate("ProductDetails")} style={{width: wp(43), height: '100%', borderRadius: wp(5)}}>
               <Image
                 style={{
                   position: 'absolute',
@@ -244,7 +244,7 @@ import {
               <View
                 style={{
                   position: 'absolute',
-                  top: hp(14),
+                  top: hp(12),
                   left: 7,
                   //height: hp(3),
                   //width: wp(21),
@@ -256,12 +256,12 @@ import {
                 }}>
                 <Text
                   style={{
-                    fontSize: hp(1.6),
-                    fontFamily: 'Inter',
+                    fontSize: hp(2.5),
+                    fontFamily: 'Inter-Medium',
                     color: '#FFFFFF',
                     fontWeight: '700',
                   }}>
-                  name
+                  Name
                 </Text>
               </View>
   
@@ -270,10 +270,10 @@ import {
             <View style={{justifyContent:'flex-end',width:'50%'}}>
             <Text
               style={{
-                fontSize: hp(1.1),
-                marginLeft: wp(1),
-                lineHeight:15,
-                fontFamily: 'Inter',
+                fontSize: hp(1.3),
+                marginLeft: wp(1.7),
+                lineHeight:12,
+                fontFamily: 'Inter-Regular',
                 color: '#000000',
                 fontWeight: '700',
               }}>

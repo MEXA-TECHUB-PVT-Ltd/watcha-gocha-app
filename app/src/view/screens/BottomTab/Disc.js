@@ -22,6 +22,9 @@ import Headers from '../../../assets/Custom/Headers';
 import {appImages} from '../../../assets/utilities';
 import Add from '../../../assets/svg/AddMainScreen.svg';
 import Approved from '../../../assets/svg/Approved';
+
+import NonVerified from '../../../assets/svg/NonVerified.svg';
+
 export default function Disc({navigation}) {
   const [selectedItemId, setSelectedItemId] = useState(0);
 
@@ -100,7 +103,7 @@ export default function Disc({navigation}) {
   const renderAvailableApps = item => {
     console.log('Items', item);
     return (
-      <View style={{width: wp(30), margin: 5}}>
+      <TouchableOpacity onPress={()=>navigation.navigate("News")} style={{width: wp(30), margin: 5}}>
         <View>
           <Image
             style={{
@@ -125,7 +128,7 @@ export default function Disc({navigation}) {
             alignItems: 'center',
             marginTop: hp(12),
             height: hp(7),
-            width: wp(40),
+            width: wp(30),
           }}>
           <View
             style={{
@@ -152,10 +155,11 @@ export default function Disc({navigation}) {
           </Text>
 
           <View style={{marginLeft: wp(1)}}>
-            <Approved />
+          <NonVerified />
+
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -197,7 +201,7 @@ export default function Disc({navigation}) {
       <View style={{flex: 1}}>
         <View
           style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(18)}}>
-          <View style={{width: wp(40), height: '100%', borderRadius: wp(5)}}>
+          <TouchableOpacity onPress={()=>navigation.navigate("News")} style={{width: wp(35), height: '100%', borderRadius: wp(5)}}>
             <Image
               style={{
                 position: 'absolute',
@@ -213,7 +217,7 @@ export default function Disc({navigation}) {
               }}
               source={appImages.topSearches1}
             />
-          </View>
+          </TouchableOpacity>
 
           <View style={{justifyContent: 'flex-end', flex: 1}}>
             <View
@@ -257,14 +261,13 @@ export default function Disc({navigation}) {
                 flexDirection: 'row',
                 alignItems: 'center',
                 height: hp(7),
-                width: wp(40),
+                width: wp(35),
               }}>
               <Text
                 style={{
                   fontSize: hp(1.5),
                   marginLeft: wp(2.5),
-                  fontWeight: 'bold',
-                  fontFamily: 'Inter',
+                  fontFamily:'Inter-Regular',
                   color: '#000000',
                 }}>
                 Explore the intricate web of global politics in this thought-
@@ -354,15 +357,21 @@ export default function Disc({navigation}) {
               justifyContent: 'space-between',
               alignItems: 'center',
             }}>
+
+              <TouchableOpacity onPress={()=>navigation.navigate("LetterDetails")}>
             <Image
               source={appImages.OpenLetter}
               style={{resizeMode: 'contain', width: wp(39)}}
             />
 
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>navigation.navigate("LetterDetails")}>
+
             <Image
               source={appImages.OpenLetter}
               style={{resizeMode: 'contain', width: wp(39)}}
             />
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -377,15 +386,22 @@ export default function Disc({navigation}) {
               justifyContent: 'space-between',
               alignItems: 'center',
             }}>
-            <Image
-              source={appImages.OpenLetter}
-              style={{resizeMode: 'contain', width: wp(39)}}
-            />
+                            <TouchableOpacity onPress={()=>navigation.navigate("LetterDetails")}>
 
             <Image
               source={appImages.OpenLetter}
               style={{resizeMode: 'contain', width: wp(39)}}
             />
+
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>navigation.navigate("LetterDetails")}>
+
+            <Image
+              source={appImages.OpenLetter}
+              style={{resizeMode: 'contain', width: wp(39)}}
+            />
+
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -400,15 +416,23 @@ export default function Disc({navigation}) {
               justifyContent: 'space-between',
               alignItems: 'center',
             }}>
-            <Image
-              source={appImages.OpenLetter}
-              style={{resizeMode: 'contain', width: wp(39)}}
-            />
+
+<TouchableOpacity onPress={()=>navigation.navigate("LetterDetails")}>
 
             <Image
               source={appImages.OpenLetter}
               style={{resizeMode: 'contain', width: wp(39)}}
             />
+
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>navigation.navigate("LetterDetails")}>
+
+            <Image
+              source={appImages.OpenLetter}
+              style={{resizeMode: 'contain', width: wp(39)}}
+            />
+
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -423,15 +447,23 @@ export default function Disc({navigation}) {
               justifyContent: 'space-between',
               alignItems: 'center',
             }}>
-            <Image
-              source={appImages.OpenLetter}
-              style={{resizeMode: 'contain', width: wp(39)}}
-            />
+
+<TouchableOpacity onPress={()=>navigation.navigate("LetterDetails")}>
 
             <Image
               source={appImages.OpenLetter}
               style={{resizeMode: 'contain', width: wp(39)}}
             />
+
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>navigation.navigate("LetterDetails")}>
+
+            <Image
+              source={appImages.OpenLetter}
+              style={{resizeMode: 'contain', width: wp(39)}}
+            />
+
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -449,6 +481,7 @@ export default function Disc({navigation}) {
       <View style={{marginTop: hp(5)}}>
         <Headers
           showListings={true}
+          onPressSearch={()=>navigation.navigate("SearchAppsDisc")}
           showText={true}
           text={'Disc'}
           showSearch={true}

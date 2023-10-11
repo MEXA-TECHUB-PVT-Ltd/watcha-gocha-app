@@ -29,11 +29,16 @@ import {
 
 import Back from '../../../assets/svg/back.svg';
 
+import RBSheet from 'react-native-raw-bottom-sheet';
+
+
 import CustomButton from '../../../assets/Custom/Custom_Button';
 import {useIsFocused} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SwitchSelector from 'react-native-switch-selector';
 import User from '../../../assets/svg/User.svg'
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import styles from './styles';
 LogBox.ignoreAllLogs();
 
@@ -44,12 +49,56 @@ const App = ({navigation}) => {
 
   const [signin_email, setsignin_email] = useState();
 
+  const [selectedItem, setSelectedItem] = useState('');
+
+
+
   const [openModel, setOpenModel] = useState(false);
   const [openGallery, setOpenGallery] = useState(false);
   const [userName, setUserName] = useState('');
   const [imageUri, setImageUri] = useState(null);
   const ref_RBSheet = useRef(null);
   const ref_RBSheetCamera = useRef(null);
+
+
+  const takePhotoFromCamera = async value => {
+    setSelectedItem(value);
+    launchCamera(
+      {
+        mediaType: 'Photo',
+        //videoQuality: 'medium',
+      },
+      response => {
+        console.log('image here', response);
+        if (!response.didCancel) {
+          if (response.assets && response.assets.length > 0) {
+            setImageUri(response.assets[0].uri);
+            console.log('response', response.assets[0].uri);
+          } else if (response.uri) {
+            // Handle the case when no assets are present (e.g., for videos)
+            setImageUri(response.uri);
+            console.log('response', response.uri);
+          }
+        }
+        ref_RBSheetCamera.current.close();
+      },
+    );
+  };
+
+  const choosePhotoFromLibrary = value => {
+    setSelectedItem(value);
+    launchImageLibrary({mediaType: 'Photo'}, response => {
+      console.log('image here', response);
+      if (!response.didCancel && response.assets.length > 0) {
+        setImageUri(response.assets[0].uri);
+      }
+
+      console.log('response', imageUri);
+
+      ref_RBSheetCamera.current.close();
+    });
+  };
+
 
   return (
     <ScrollView style={styles.bg} contentContainerStyle={{flexGrow: 1}}>
@@ -87,7 +136,7 @@ const App = ({navigation}) => {
 
         <Button
           mode="contained"
-          onPress={() => {}}
+          onPress={() => ref_RBSheetCamera.current.open()}
           style={styles.button}
           contentStyle={{
             padding: '1%',
@@ -111,10 +160,89 @@ const App = ({navigation}) => {
           />
         </View>
       </View>
+
+
+      <RBSheet
+          ref={ref_RBSheetCamera}
+          closeOnDragDown={true}
+          closeOnPressMask={false}
+          animationType="fade"
+          minClosingHeight={0}
+          customStyles={{
+            wrapper: {
+              backgroundColor: 'rgba(52, 52, 52, 0.5)',
+            },
+            draggableIcon: {
+              backgroundColor: 'white',
+            },
+            container: {
+              borderTopLeftRadius: wp(10),
+              borderTopRightRadius: wp(10),
+              height: hp(25),
+            },
+          }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginHorizontal: wp(8),
+              alignItems: 'center',
+            }}>
+            <Text style={styles.maintext}>Select an option</Text>
+            <TouchableOpacity onPress={() => ref_RBSheetCamera.current.close()}>
+              <Ionicons
+                name="close"
+                size={22}
+                color={'#303030'}
+                onPress={() => ref_RBSheetCamera.current.close()}
+              />
+            </TouchableOpacity>
+          </View>
+  
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-evenly',
+              alignItems: 'center',
+              marginTop: hp(3),
+            }}>
+            <TouchableOpacity
+              onPress={() => takePhotoFromCamera('camera')}
+              style={
+                selectedItem === 'camera'
+                  ? styles.selectedItems
+                  : styles.nonselectedItems
+              }>
+              <Ionicons
+                color={selectedItem === 'camera' ? '#FACA4E' : '#888888'}
+                name="camera"
+                size={25}
+              />
+  
+              <Text style={{color: '#333333'}}>From camera</Text>
+            </TouchableOpacity>
+  
+            <TouchableOpacity
+              onPress={() => choosePhotoFromLibrary('gallery')}
+              style={
+                selectedItem === 'gallery'
+                  ? styles.selectedItems
+                  : styles.nonselectedItems
+              }>
+              <MaterialCommunityIcons
+                color={selectedItem === 'gallery' ? '#FACA4E' : '#888888'}
+                name="image"
+                size={25}
+              />
+  
+              <Text style={{color: '#333333'}}>From gallery</Text>
+            </TouchableOpacity>
+          </View>
+        </RBSheet>
+
     </ScrollView>
   );
 };
-
 
 
 export default App;

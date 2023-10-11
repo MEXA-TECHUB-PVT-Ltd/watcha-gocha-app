@@ -2,7 +2,6 @@ import {
   StyleSheet,
   FlatList,
   Text,
-  StatusBar,
   Image,
   TextInput,
   View,
@@ -19,35 +18,28 @@ import {
 
 import Fontiso from 'react-native-vector-icons/Fontisto';
 
-export default function SearchProducts({navigation}) {
+export default function SearchAppsDisc({navigation}) {
   const [selectedItemId, setSelectedItemId] = useState(null);
 
   const searches = [
-    {id: 1, title: 'Lense'},
-    {id: 2, title: 'Shoes'},
-    {id: 3, title: 'HeadPhones'},
-    {id: 4, title: 'Lense'},
-    {id: 5, title: 'Shoes'},
-    {id: 6, title: 'HeadPhones'},
-    {id: 7, title: 'Lense'},
-    {id: 8, title: 'Shoes'},
-    {id: 9, title: 'HeadPhones'},
-    {id: 10, title: 'Lense'},
+    {id: 1, title: 'Important Business...'},
+    {id: 2, title: 'Update on Travel...'},
+    {id: 3, title: 'Important Business...'},
+    {id: 4, title: 'Update on Travel...'},
+    {id: 5, title: 'Important Business...'},
   ];
 
   const availableApps = [
-    {id: 1, title: 'Lense', image: appImages.lense},
-    {id: 2, title: 'Holder', image: appImages.holder},
-    {id: 3, title: 'HeadPhone', image: appImages.headPhone},
-    {id: 4, title: 'Shoes', image: appImages.shoes},
-    {id: 5, title: 'Printer', image: appImages.printer},
-    {id: 6, title: 'Lense', image: appImages.lense},
-    {id: 7, title: 'Holder', image: appImages.holder},
-    {id: 8, title: 'HeadPhone', image: appImages.headPhone},
-    {id: 9, title: 'Shoes', image: appImages.shoes},
-    //{id: 10, title: 'Printer', image: appImages.printer},
-    
-    
+    {id: 1, title: 'SnapChat', image: appImages.snapchat },
+    {id: 2, title: 'Gmail', image: appImages.gmail},
+    {id: 3, title: 'Pinterest', image: appImages.pinterest},
+    {id: 4, title: 'LinkedIn', image: appImages.linkedIn},
+    {id: 5, title: 'Calendar', image: appImages.calendar},
+    {id: 6, title: 'SnapChat', image: appImages.snapchat},
+    {id: 7, title: 'Gmail', image: appImages.gmail},
+    {id: 8, title: 'Pinterest', image: appImages.pinterest},
+    {id: 9, title: 'LinkedIn', image: appImages.linkedIn},
+    {id: 10, title: 'SnapChat', image: appImages.snapchat},
   ];
 
   const renderSearches = item => {
@@ -82,61 +74,39 @@ export default function SearchProducts({navigation}) {
     return (
       <View
         style={{
-          height: hp(18),
-          flex: 1,
+          height: hp(8),
+          marginTop:hp(1),
+          marginBottom:hp(1.5),
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginHorizontal: wp(7),
+          borderWidth: 1,
           borderRadius: wp(3),
-          margin: 5,
+          borderColor: '#00000017',
         }}>
         <Image
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            zIndex: 1, // Ensure it's on top of other elements
-            flex: 1,
-            width: '100%',
-            height: '100%',
-            borderRadius: wp(3),
-            resizeMode: 'contain',
-          }}
           source={item.image}
+          style={{width: 30, height: 80, marginLeft:wp(5)}}
+          resizeMode="contain"
         />
-        <View
-            style={{
-              position: 'absolute',
-              top: hp(14.5),
-              left: 7,
-              //height: hp(3),
-              //width: wp(21),
-              //borderRadius: wp(3),
-              //backgroundColor: '#FACA4E',
-              justifyContent: 'center',
-              alignItems: 'center',
-              zIndex: 2, // Ensure it's on top
-            }}>
-            <Text
-              style={{
-                fontSize: hp(1.9),
-                fontFamily: 'Inter-Medium',
-                color: '#FFFFFF',
-              }}>
-              {item.title}
-            </Text>
-          </View>
+
+        <Text style={{marginLeft:wp(3), flex:1, color:'#333333',fontFamily:'Inter'}}>
+            {item.title}
+        </Text>
+        
       </View>
     );
   };
 
+
   return (
     <View style={styles.container}>
-      <StatusBar
-        translucent={true}
-        backgroundColor="transparent"
-        barStyle="dark-content" // You can set the StatusBar text color to dark or light
-      />
       <View style={styles.searchHeader}>
+
         <TouchableOpacity onPress={()=>navigation.goBack()}>
+
         <Back width={20} height={20} style={{marginLeft: '1%'}} />
+
         </TouchableOpacity>
 
         <View style={styles.searchBar}>
@@ -153,7 +123,7 @@ export default function SearchProducts({navigation}) {
         </View>
       </View>
 
-      <Text style={styles.latestSearch}>Latest Search</Text>
+      <Text style={styles.latestSearch}>Latest Searches</Text>
 
       <View style={styles.latestSearchList}>
         <FlatList
@@ -169,14 +139,87 @@ export default function SearchProducts({navigation}) {
 
       <Text style={styles.latestSearch}>Top Searches</Text>
 
-      <FlatList
-        style={{marginTop: hp(3), marginHorizontal:wp(5), flex: 1}}
+
+      <View
+            style={{
+              flexDirection: 'row',
+              marginTop:hp(3),
+              justifyContent: 'space-evenly',
+              alignItems: 'center',
+            }}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('LetterDetails')}>
+              <Image
+                source={appImages.OpenLetter}
+                style={{resizeMode: 'contain', width: wp(39)}}
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate('LetterDetails')}>
+              <Image
+                source={appImages.OpenLetter}
+                style={{resizeMode: 'contain', width: wp(39)}}
+              />
+            </TouchableOpacity>
+          </View>
+
+
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-evenly',
+              alignItems: 'center',
+            }}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('LetterDetails')}>
+              <Image
+                source={appImages.OpenLetter}
+                style={{resizeMode: 'contain', width: wp(39)}}
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate('LetterDetails')}>
+              <Image
+                source={appImages.OpenLetter}
+                style={{resizeMode: 'contain', width: wp(39)}}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              marginTop:hp(1),
+              justifyContent: 'space-evenly',
+              alignItems: 'center',
+            }}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('LetterDetails')}>
+              <Image
+                source={appImages.OpenLetter}
+                style={{resizeMode: 'contain', width: wp(39)}}
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate('LetterDetails')}>
+              <Image
+                source={appImages.OpenLetter}
+                style={{resizeMode: 'contain', width: wp(39)}}
+              />
+            </TouchableOpacity>
+          </View>
+
+
+      {/* <FlatList
+        style={{marginTop: hp(3), flex:1}}
         showsVerticalScrollIndicator={false}
         data={availableApps}
         keyExtractor={item => item.id.toString()}
-        numColumns={3} // Set the number of columns to 3
         renderItem={({item}) => renderAvailableApps(item)}
-      />
+      /> */}
     </View>
   );
 }
@@ -202,7 +245,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: wp(3.8),
     borderRadius: wp(5),
-    borderWidth: 0.5,
+    borderWidth: 1,
     borderColor: '#00000017',
   },
   latestSearch: {
@@ -223,7 +266,7 @@ const styles = StyleSheet.create({
     marginLeft: wp(3),
     alignItems: 'center',
     justifyContent: 'center',
-    width: wp(30),
+    width: wp(39),
     backgroundColor: '#F2F2F2',
     borderRadius: wp(5),
     height: hp(5),

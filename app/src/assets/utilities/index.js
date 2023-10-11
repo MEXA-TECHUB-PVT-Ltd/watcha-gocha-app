@@ -35,6 +35,7 @@ const appImages = {
   Signature:require(IMAGES_DIR + 'signature.png'),
   Upload:require(IMAGES_DIR + 'Upload.png'),
   ArtBoard:require(IMAGES_DIR + 'ArtBoard.png'),
+  Verify:require(IMAGES_DIR + 'Verify.png'),
   LogOut:require(IMAGES_DIR + 'Logout.png')
 
 

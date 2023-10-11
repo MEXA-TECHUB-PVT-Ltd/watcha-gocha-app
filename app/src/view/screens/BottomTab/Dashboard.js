@@ -20,6 +20,8 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import Fontiso from 'react-native-vector-icons/Fontisto';
 import Headers from '../../../assets/Custom/Headers';
 import Approved from '../../../assets/svg/Approved';
+import Chat from '../../../assets/svg/Chat.svg';
+
 import {appImages} from '../../../assets/utilities';
 
 export default function Dashboard({navigation}) {
@@ -1100,7 +1102,7 @@ export default function Dashboard({navigation}) {
             flexDirection: 'row',
             height: hp(18),
           }}>
-          <View style={{width: wp(35), height: '100%', borderRadius: wp(5)}}>
+          <TouchableOpacity onPress={()=> navigation.navigate('ViewVideo')} style={{width: wp(35), height: '100%', borderRadius: wp(5)}}>
             <Image
               style={{
                 position: 'absolute',
@@ -1139,7 +1141,7 @@ export default function Dashboard({navigation}) {
                 name
               </Text>
             </View>
-          </View>
+          </TouchableOpacity>
 
           <View style={{marginTop: hp(0.8), marginLeft: wp(3), width: '35%'}}>
             <Text
@@ -1296,9 +1298,9 @@ export default function Dashboard({navigation}) {
             />
           </View>
 
-          <View
+          <View 
             style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(18)}}>
-            <View style={{width: wp(35), marginLeft:wp(2), height: '100%', borderRadius: wp(5)}}>
+            <TouchableOpacity onPress={()=>navigation.navigate("News")} style={{width: wp(35), marginLeft:wp(2), height: '100%', borderRadius: wp(5)}}>
               <Image
                 style={{
                   position: 'absolute',
@@ -1314,7 +1316,7 @@ export default function Dashboard({navigation}) {
                 }}
                 source={appImages.topSearches1}
               />
-            </View>
+            </TouchableOpacity>
 
             <View style={{justifyContent: 'flex-end', flex: 1}}>
               <View
@@ -1444,13 +1446,12 @@ export default function Dashboard({navigation}) {
         </View>
         <View
           style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(18)}}>
-          <View style={{width: wp(35),  marginLeft: wp(2.5), height: '100%', borderRadius: wp(5)}}>
+          <TouchableOpacity onPress={()=>navigation.navigate("ViewVideo")} style={{width: wp(35),  marginLeft: wp(2.5), height: '100%', borderRadius: wp(5)}}>
             <Image
               style={{
                 position: 'absolute',
                 top: 0,
                 left: 0,
-
                 zIndex: 1, // Ensure it's on top of other elements
                 //flex: 1,
                 width: '100%',
@@ -1483,7 +1484,7 @@ export default function Dashboard({navigation}) {
                 name
               </Text>
             </View>
-          </View>
+          </TouchableOpacity>
 
           <View style={{marginTop: hp(0.8), marginLeft: wp(3), width: '35%'}}>
           <Text
@@ -1795,10 +1796,18 @@ export default function Dashboard({navigation}) {
           </View>
         </View>
 
+       
+
         {/* //---------------------\\ */}
 
         {/* //------------\\ */}
       </ScrollView>
+
+      <TouchableOpacity
+        onPress={() => navigation.navigate("ChatScreen")}
+        style={{position: 'absolute', bottom: 1, right: 20}}>
+       <Chat/>
+      </TouchableOpacity>
     </View>
   );
 }
