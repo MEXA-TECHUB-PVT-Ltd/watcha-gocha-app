@@ -124,10 +124,14 @@ export default function PostLetterInfo({navigation}) {
   };
 
   const setType= ()=>{
+    ref_RBSheetCamera.current.close();
+
     setLetterType('Private Letter');
+
     ref_RBSendOffer.current.open();
 
   }
+
 
   const renderSearches = item => {
     console.log('Items', item);
@@ -501,6 +505,9 @@ export default function PostLetterInfo({navigation}) {
             />
           </View>
 
+
+          <TouchableOpacity onPress={()=>ref_RBSendOffer.current.close()}>
+
           <Text
             style={{
               color: '#9597A6',
@@ -515,6 +522,8 @@ export default function PostLetterInfo({navigation}) {
             }}>
             Maybe later
           </Text>
+
+          </TouchableOpacity>
         </View>
       </RBSheet>
 

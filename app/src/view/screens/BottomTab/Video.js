@@ -284,6 +284,7 @@ export default function Video({navigation}) {
       />
 
       <View style={{marginTop: hp(5)}}>
+        
         <Headers
           showListings={true}
           onPressListings={()=>navigation.openDrawer()}

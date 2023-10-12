@@ -68,6 +68,7 @@ import {
 
   const [snackbarVisible, setsnackbarVisible] = useState(false);
 
+  const ref_RBSendOffer = useRef(null);
 
 
   const [isTextInputActive, setIsTextInputActive] = useState(false);
@@ -189,6 +190,15 @@ import {
     setLetterTypes(value);
     ref_RBSheetCamera.current.close();
   };
+
+  const setType= ()=>{
+    ref_RBSheetCamera.current.close();
+
+    setLetterType('Private Letter');
+
+    ref_RBSendOffer.current.open();
+
+  }
 
   const renderSearches = item => {
     console.log('Items', item);
@@ -395,7 +405,7 @@ import {
 
           </View>
 
-          <TouchableOpacity onPress={()=>setLetterType("Private Letter")} style={{flexDirection: 'row', marginTop:hp(2.5), marginHorizontal:wp(7)}}>
+          <TouchableOpacity onPress={()=>setType()} style={{flexDirection: 'row', marginTop:hp(2.5), marginHorizontal:wp(7)}}>
 
             <PrivateLetter height={23} width={23}/>
 
@@ -488,6 +498,93 @@ import {
             />
 
             <Text style={{color: '#333333'}}>From gallery</Text>
+          </TouchableOpacity>
+        </View>
+      </RBSheet>
+
+      <RBSheet
+        ref={ref_RBSendOffer}
+        closeOnDragDown={true}
+        closeOnPressMask={false}
+        animationType="fade"
+        minClosingHeight={0}
+        customStyles={{
+          wrapper: {
+            backgroundColor: 'rgba(52, 52, 52, 0.5)',
+          },
+          draggableIcon: {
+            backgroundColor: 'white',
+          },
+          container: {
+            borderTopLeftRadius: wp(10),
+            borderTopRightRadius: wp(10),
+            height: hp(55),
+          },
+        }}>
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            marginHorizontal: wp(8),
+            justifyContent: 'space-evenly',
+          }}>
+          <Image source={appImages.alert} style={{resizeMode: 'contain'}} />
+
+          <Text
+            style={{
+              color: '#333333',
+              marginLeft: wp(1),
+              fontSize: hp(2.3),
+              //textDecorationLine:'underline',
+              fontFamily: 'Inter-Bold',
+              //fontWeight: 'bold',
+            }}>
+            Unable To Post!
+          </Text>
+
+          <Text
+            style={{
+              color: '#9597A6',
+              marginLeft: wp(1),
+              fontSize: hp(2),
+              textAlign: 'center',
+              lineHeight: hp(3),
+              //textDecorationLine:'underline',
+              fontFamily: 'Inter-Regular',
+              //fontWeight: 'bold',
+            }}>
+            Upgrade for private letter posting and a{'\n'}seamless experience
+          </Text>
+
+          <View style={{marginHorizontal: wp(10)}}>
+            <CustomButton
+              title="Buy Subscription"
+              customClick={() => {
+                ref_RBSendOffer.current.close();
+                navigation.navigate('SubscriptionPayment');
+              }}
+              style={{width: wp(59)}}
+            />
+          </View>
+
+
+          <TouchableOpacity onPress={()=>ref_RBSendOffer.current.close()}>
+
+          <Text
+            style={{
+              color: '#9597A6',
+              marginLeft: wp(1),
+              marginBottom: hp(3),
+              fontSize: hp(2),
+              textAlign: 'center',
+              lineHeight: hp(3),
+              //textDecorationLine:'underline',
+              fontFamily: 'Inter-Regular',
+              //fontWeight: 'bold',
+            }}>
+            Maybe later
+          </Text>
+
           </TouchableOpacity>
         </View>
       </RBSheet>
