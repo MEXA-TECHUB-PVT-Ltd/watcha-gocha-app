@@ -898,7 +898,7 @@ export default function Dashboard({navigation}) {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        style={{flex: 1, marginHorizontal: wp(3)}}>
+        style={{flex: 1, marginHorizontal: wp(5)}}>
         <View style={styles.searchBar}>
           {/* Home */}
           <Fontiso
@@ -1829,7 +1829,7 @@ export default function Dashboard({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginHorizontal: wp(3),
+    //marginHorizontal: wp(3),
     backgroundColor: 'white',
   },
   searchBar: {

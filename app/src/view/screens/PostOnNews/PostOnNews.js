@@ -46,6 +46,7 @@ import IonIcons from 'react-native-vector-icons/Ionicons';
 
 import {SelectCountry, Dropdown} from 'react-native-element-dropdown';
 import CPaperInput from '../../../assets/Custom/CPaperInput';
+import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
 
 const Category = [
   {label: 'Item 1', value: '1'},
@@ -55,6 +56,8 @@ const Category = [
 
 export default function PostOnNews({navigation}) {
   const [selectedItem, setSelectedItem] = useState('');
+
+  const [snackbarVisible, setsnackbarVisible] = useState(false);
 
   const [profileName, setProfileName] = useState('');
 
@@ -139,6 +142,27 @@ export default function PostOnNews({navigation}) {
     });
   };
 
+
+
+
+  const handleUpdatePassword = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setsnackbarVisible(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setsnackbarVisible(false);
+      navigation.navigate('BottomTabNavigation');
+    }, 3000);
+  };
+
+  const dismissSnackbar = () => {
+    setsnackbarVisible(false);
+  };
+
   return (
     <KeyboardAvoidingView
       style={{flex: 1, backgroundColor: 'white'}}
@@ -208,10 +232,13 @@ export default function PostOnNews({navigation}) {
           />
         </View>
 
-        <View
+        <TouchableOpacity
+        onPress={() => ref_RBSheetCamera.current.open()}
           style={{
             flexDirection: 'row',
             height: hp(5),
+            width:wp(35),
+            alignItems:'center',
             marginTop: hp(3),
             marginHorizontal: wp(8),
           }}>
@@ -228,12 +255,13 @@ export default function PostOnNews({navigation}) {
             }}>
             Add Image
           </Text>
-        </View>
+        </TouchableOpacity>
 
         {imageUri !== null ? (
           <View
             style={{
               marginTop: hp(5),
+              borderWidth:3,
               height: hp(35),
               borderRadius: wp(3),
               marginHorizontal: wp(20),
@@ -279,7 +307,7 @@ export default function PostOnNews({navigation}) {
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-              navigation.navigate('BottomTabNavigation');
+              handleUpdatePassword()
             }}
           /> 
         </View>
@@ -361,6 +389,13 @@ export default function PostOnNews({navigation}) {
           </TouchableOpacity>
         </View>
       </RBSheet>
+
+      <CustomSnackbar
+        message={'Success'}
+        messageDescription={'News Posted Successfully'}
+        onDismiss={dismissSnackbar} // Make sure this function is defined
+        visible={snackbarVisible}
+      />
     </KeyboardAvoidingView>
   );
 }

@@ -103,7 +103,7 @@ export default function Disc({navigation}) {
     return (
       <TouchableOpacity
         onPress={() => navigation.navigate('News')}
-        style={{width: wp(30), margin: 5}}>
+        style={{width: wp(25.5), margin: 5}}>
         <View>
           <Image
             style={{
@@ -115,7 +115,7 @@ export default function Disc({navigation}) {
               //flex: 1,
               width: '100%',
               height: hp(12),
-              borderRadius: wp(3),
+              borderRadius: wp(1),
               resizeMode: 'cover',
             }}
             source={item.image}
@@ -128,7 +128,7 @@ export default function Disc({navigation}) {
             alignItems: 'center',
             marginTop: hp(12),
             height: hp(7),
-            width: wp(30),
+            width: wp(25),
           }}>
           <View
             style={{
@@ -145,8 +145,8 @@ export default function Disc({navigation}) {
 
           <Text
             style={{
-              fontSize: hp(1.6),
-              marginLeft: wp(2),
+              fontSize: hp(1.5),
+              marginLeft: wp(0.7),
               color: '#000000',
               fontWeight: 'bold',
               fontFamily: 'Inter',
@@ -198,7 +198,7 @@ export default function Disc({navigation}) {
     return (
       <View style={{flex: 1}}>
         <View
-          style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(18)}}>
+          style={{marginTop: hp(1.5),  flexDirection: 'row', height: hp(18)}}>
           <TouchableOpacity
             onPress={() => navigation.navigate('News')}
             style={{width: wp(35), height: '100%', borderRadius: wp(5)}}>

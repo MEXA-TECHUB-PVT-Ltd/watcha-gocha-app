@@ -124,7 +124,7 @@ export default function Categories({navigation}) {
 
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} style={{flex:1, marginHorizontal:wp(3)}}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{flex:1, marginHorizontal:wp(5)}}>
      
       <View
           style={{
@@ -306,7 +306,6 @@ export default function Categories({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginHorizontal: wp(3),
     backgroundColor: 'white',
   },searchBar: {
     height: hp(5.9),

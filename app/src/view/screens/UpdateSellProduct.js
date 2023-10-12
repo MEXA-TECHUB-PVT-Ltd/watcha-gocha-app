@@ -30,9 +30,14 @@ import {SelectCountry, Dropdown} from 'react-native-element-dropdown';
 import UpdateItems from '../../assets/svg/UpdateItems.svg';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import CPaperInput from '../../assets/Custom/CPaperInput';
+import CustomSnackbar from '../../assets/Custom/CustomSnackBar';
+
 
 export default function UpdateSellProduct({navigation}) {
   const [selectedItem, setSelectedItem] = useState('');
+
+  const [snackbarVisible, setsnackbarVisible] = useState(false);
+
 
   const [title, setTitle] = useState('');
 
@@ -91,6 +96,20 @@ export default function UpdateSellProduct({navigation}) {
 
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
+  };
+
+  const handleUpdatePassword = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setsnackbarVisible(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setsnackbarVisible(false);
+      navigation.goBack();
+    }, 3000);
   };
 
   const Category = [
@@ -209,6 +228,10 @@ export default function UpdateSellProduct({navigation}) {
         </TouchableOpacity>
       </View>
     );
+  };
+
+  const dismissSnackbar = () => {
+    setsnackbarVisible(false);
   };
   return (
     <KeyboardAvoidingView
@@ -510,11 +533,19 @@ export default function UpdateSellProduct({navigation}) {
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
+              handleUpdatePassword()
               //navigation.navigate('Profile_image');
             }}
           />
           </View>
       </ScrollView>
+
+      <CustomSnackbar
+        message={'Success'}
+        messageDescription={'Item updated Successfully'}
+        onDismiss={dismissSnackbar} // Make sure this function is defined
+        visible={snackbarVisible}
+      />
     </KeyboardAvoidingView>
   );
 }

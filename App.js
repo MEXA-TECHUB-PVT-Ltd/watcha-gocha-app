@@ -81,6 +81,9 @@ import AddBanner from './app/src/view/screens/BannerAds/AddBanner';
 import BannerDetails from './app/src/view/screens/BannerAds/BannerDetails';
 import ViewVideo from './app/src/view/screens/VideoView/ViewVideo';
 import UploadUpdateVideoScreen from './app/src/view/screens/UpdateAVideo/UploadUpdateVideoScreen';
+import PicTours from './app/src/view/screens/BottomTab/PicTours';
+import SearchAppsDisc from './app/src/view/screens/SearchAppsDisc';
+import Conversation from './app/src/view/screens/Conversation';
 
 //------------------\\
 
@@ -97,6 +100,24 @@ const App = () => {
         <Stack.Screen
           name="Signin_signup"
           component={Signin_signup}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="Conversation"
+          component={Conversation}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="SearchAppsDisc"
+          component={SearchAppsDisc}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="PicTours"
+          component={PicTours}
           options={{headerShown: false}}
         />
 
