@@ -50,6 +50,9 @@ export default function ViewVideoProfile({navigation}) {
 
   const [snackbarVisible, setsnackbarVisible] = useState(false);
 
+  const [snackbarDeleteVisible, setSnackbarDeleteVisible] = useState(false);
+
+
   const ref_RBSheetCamera = useRef(null);
 
   const ref_RBSheetLogout = useRef(null);
@@ -86,9 +89,20 @@ export default function ViewVideoProfile({navigation}) {
     setsnackbarVisible(false);
   };
 
+  const dismissDeleteSnackbar = () => {
+    setsnackbarVisible(false);
+  };
+
+
   const changeModal = () => {
     ref_RBSheetCamera.current.close();
     ref_RBSheetLogout.current.open();
+  };
+
+  const changeDelete = () => {
+    ref_RBSheetLogout.current.close();
+    handleUpdateDelete();
+    //navigation.goBack()
   };
 
   const handleUpdatePassword = async () => {
@@ -101,6 +115,21 @@ export default function ViewVideoProfile({navigation}) {
     // Automatically hide the Snackbar after 3 seconds
     setTimeout(() => {
       setsnackbarVisible(false);
+      navigation.goBack()
+    }, 3000);
+  };
+
+
+  const handleUpdateDelete = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setSnackbarDeleteVisible(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setSnackbarDeleteVisible(false);
       navigation.goBack()
     }, 3000);
   };
@@ -311,11 +340,20 @@ export default function ViewVideoProfile({navigation}) {
         </View>
       </View>
 
+      
+
       <CustomSnackbar
         message={'success'}
         messageDescription={'Video downloaded successfully'}
         onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackbarVisible}
+      />
+
+        <CustomSnackbar
+        message={'success'}
+        messageDescription={'Video deleted successfully'}
+        onDismiss={dismissDeleteSnackbar} // Make sure this function is defined
+        visible={snackbarDeleteVisible}
       />
 
 
@@ -371,7 +409,7 @@ export default function ViewVideoProfile({navigation}) {
             //borderWidth: 3,
             marginTop: hp(3),
           }}>
-          <TouchableOpacity style={{flexDirection: 'row', marginHorizontal:wp(7)}}>
+          <TouchableOpacity onPress={()=>navigation.navigate("UploadUpdateVideoScreen")} style={{flexDirection: 'row', marginHorizontal:wp(7)}}>
 
             <EditItem height={23} width={23}/>
 
@@ -458,7 +496,7 @@ export default function ViewVideoProfile({navigation}) {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => ref_RBSheetLogout.current.close()}
+            onPress={() => changeDelete()}
             style={[styles.button, {backgroundColor: '#FACA4E'}]}>
             <Text style={[styles.textButton, {color: '#232323'}]}>Delete</Text>
           </TouchableOpacity>

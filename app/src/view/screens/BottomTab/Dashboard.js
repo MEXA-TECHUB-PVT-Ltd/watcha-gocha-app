@@ -364,13 +364,25 @@ export default function Dashboard({navigation}) {
   //Market Zone
 
   const searchesPics = [
-    {id: 1, title: 'On News'},
-    {id: 2, title: 'Open Letters'},
-    {id: 3, title: 'QAFI'},
-    {id: 4, title: 'XYZ'},
-    {id: 5, title: 'XYZ'},
-    {id: 6, title: 'XYZ'},
-    {id: 7, title: 'XYZ'},
+    {id: 1, title: 'Funny'},
+    {id: 2, title: 'Sports'},
+    {id: 3, title: 'Historic'},
+    {id: 4, title: 'Technology'},
+    {id: 5, title: 'Celebrities'},
+    {id: 6, title: 'Animals'},
+    {id: 7, title: 'Beauty & Fashion'},
+    {id: 8, title: 'People'},
+    {id: 9, title: 'Food'},
+    {id: 8, title: 'Science'},
+    {id: 9, title: 'Nature'},
+    {id: 10, title: 'Travel'},
+    {id:11, title: 'Art'},
+
+
+
+
+
+
   ];
 
   //------------\\
@@ -789,8 +801,9 @@ export default function Dashboard({navigation}) {
 
   const renderAvailableAppsMarketZone = item => {
     console.log('Items', item);
+
     return (
-      <View style={{width: wp(27), margin: 5}}>
+      <TouchableOpacity onPress={()=>navigation.navigate('ProductDetails')} style={{width: wp(27), margin: 5}}>
         <View>
           <Image
             style={{
@@ -832,7 +845,7 @@ export default function Dashboard({navigation}) {
             {item.title}
           </Text>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -872,6 +885,7 @@ export default function Dashboard({navigation}) {
         backgroundColor="transparent"
         barStyle="dark-content" // You can set the StatusBar text color to dark or light
       />
+
       <View style={{marginTop: hp(5)}}>
         <Headers
           showListings={true}

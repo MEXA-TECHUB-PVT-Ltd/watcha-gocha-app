@@ -94,7 +94,7 @@ const ForgetPassword = ({navigation}) => {
         <TextInput
           mode="outlined"
           label="Email Address"
-          onChangeText={text => setsignin_email(text)}
+          onChangeText={text => setEmail(text)}
           style={styles.ti}
           outlineColor="#0000001F"
           placeholderTextColor={'#646464'}

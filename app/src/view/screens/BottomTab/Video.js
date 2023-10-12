@@ -286,6 +286,7 @@ export default function Video({navigation}) {
       <View style={{marginTop: hp(5)}}>
         <Headers
           showListings={true}
+          onPressListings={()=>navigation.openDrawer()}
           onPressSearch={() => navigation.navigate('SearchScreen')}
           showText={true}
           text={'XPi/3.14 videos'}

@@ -34,9 +34,9 @@ import {
 const Drawer = createDrawerNavigator();
 
 const DrawerNavigation = () => {
-
+    
     const CustomDrawerContent = props => {
-        const navigation = useNavigation();
+    const navigation = useNavigation();
       
         return (
           <DrawerContentScrollView
@@ -76,13 +76,14 @@ const DrawerNavigation = () => {
                   }}
                 /> */}
               </View>
-      
+              
               <View style={{flex: 1}}>
-                <View style={{marginLeft: 20, marginTop:hp(-5)}}>
+                <View style={{marginLeft: 18, marginTop:hp(-5)}}>
                   <DrawerItem
                     label="Home"
-                    labelStyle={{ color: '#333333', fontFamily:'Inter-Medium'}}
-                    icon={focused => <HomeActive />}
+                    labelStyle={{ color: '#333333', marginLeft:wp(-2.3), fontFamily:'Inter-Medium'}}
+                    //onPress={() => navigation.navigate('Dashboard')}
+                    icon={focused => <HomeActive /> }
                   />
                   {/* <DrawerItem
                     label="Chats"
@@ -93,64 +94,73 @@ const DrawerNavigation = () => {
       
                   <DrawerItem
                     label="Category"
-                    labelStyle={{ color: '#333333', fontFamily:'Inter-Medium'}}
-
+                    labelStyle={{ color: '#333333', marginLeft:wp(-4.3), fontFamily:'Inter-Medium'}}
+                    onPress={() => navigation.navigate('Category')}
+                    
                     icon={focused => <CategoryActive/>}
                   />
+
                   <DrawerItem
                     label="Pi/3.14 Videos"
-                    labelStyle={{ color: '#333333', fontFamily:'Inter-Medium'}}
+                    //onPress={() =>  navigation.navigate("Video")}
+
+                    labelStyle={{ color: '#333333', marginLeft:wp(-5), fontFamily:'Inter-Medium'}}
                     icon={focused => <VideoActive/>}
                   />
                   <DrawerItem
                     label="DISC"
-                    labelStyle={{ color: '#333333', fontFamily:'Inter-Medium'}}
-                    onPress={() => navigation.navigate('PromoCodes')}
+                    labelStyle={{ color: '#333333', marginLeft:wp(-4), fontFamily:'Inter-Medium'}}
+                    onPress={() => navigation.navigate('Mail')}
                     icon={focused => <MailActive/>}
                   />
 
                    <DrawerItem
                     label="Pic Tours"
-                    labelStyle={{ color: '#333333', fontFamily:'Inter-Medium'}}
-                    //onPress={() => navigation.navigate('PromoCodes')}
+                    labelStyle={{ color: '#333333', marginLeft:wp(-2), fontFamily:'Inter-Medium'}}
+                    //onPress={() => navigation.navigate('PicTours')}
                     icon={focused => <ProfileActive/>}
                   />
 
                     <DrawerItem
                     label="Market Zone"
-                    labelStyle={{ color: '#333333', fontFamily:'Inter-Medium'}}
-                    //onPress={() => navigation.navigate('PromoCodes')}
+                    labelStyle={{ color: '#333333', marginLeft:wp(-5), fontFamily:'Inter-Medium'}}
+                    onPress={() => navigation.navigate('MarketPlace')}
                     icon={focused => <MarketActive/>}
                   />
 
                     <DrawerItem
                     label="Banner Advertisement"
-                    labelStyle={{ color: '#333333', fontFamily:'Inter-Medium'}}
+                    labelStyle={{ color: '#333333', marginLeft:wp(-4.3), fontFamily:'Inter-Medium'}}
 
-                    //onPress={() => navigation.navigate('PromoCodes')}
+                    onPress={() => navigation.navigate('ViewBanners')}
                     icon={focused => <AddActive/>}
                   />
 
+
                     <DrawerItem
                     label="Privacy policy"
-                    labelStyle={{ color: '#333333', fontFamily:'Inter-Medium'}}
-                    //onPress={() => navigation.navigate('PromoCodes')}
+                    labelStyle={{ color: '#333333', marginLeft:wp(-4.1), fontFamily:'Inter-Medium'}}
+                    onPress={() => navigation.navigate('PrivacyPolicy')}
                     icon={focused => <PrivacyPolicyActiveActive/>}
                   />
 
+
                     <DrawerItem
                     label="Terms & Condition"
-                    labelStyle={{ color: '#333333', fontFamily:'Inter-Medium'}}
-                    //onPress={() => navigation.navigate('PromoCodes')}
+                    labelStyle={{ color: '#333333',  marginLeft:wp(-4.1), fontFamily:'Inter-Medium'}}
+                    onPress={() => navigation.navigate('TermsAndCondition')}
                     icon={focused => <TermsAndconditionActive/>}
                   />
 
+
                     <DrawerItem
                     label="Contact Us"
-                    labelStyle={{ color: '#333333', fontFamily:'Inter-Medium'}}
-                    //onPress={() => navigation.navigate('PromoCodes')}
+                    labelStyle={{ color: '#333333',  marginLeft:wp(-4.1), fontFamily:'Inter-Medium'}}
+                    onPress={() => navigation.navigate('ContactUs')}
                     icon={focused => <ContactUsActive/>}
                   />
+
+                  
                 </View>
                   <View
                     style={{

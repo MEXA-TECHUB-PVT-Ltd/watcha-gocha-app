@@ -120,7 +120,7 @@ export default function Categories({navigation}) {
       />
       <View style={{marginTop:hp(5)}}>
 
-        <Headers showListings={true} showSearch={true} onPressSearch={()=>navigation.navigate("SearchApps")} />
+        <Headers showListings={true} onPressListings={()=>navigation.openDrawer()} showSearch={true} onPressSearch={()=>navigation.navigate("SearchApps")} />
 
       </View>
 

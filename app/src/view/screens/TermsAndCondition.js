@@ -37,11 +37,16 @@ import {
 
 LogBox.ignoreAllLogs();
 
-export default function TermsAndCondition() {
+export default function TermsAndCondition({navigation}) {
   return (
     <View style={styles.container}>
       <StatusBar barStyle={'dark-content'} backgroundColor={'#FFFFFF'} />
-      <Headers showBackIcon={true} showText={true} text={'Terms And Condition'} />
+
+      <View style={{marginTop:hp(5)}}>
+
+      <Headers onPress={()=>navigation.goBack()} showBackIcon={true} showText={true} text={'Terms And Condition'} />
+
+      </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
