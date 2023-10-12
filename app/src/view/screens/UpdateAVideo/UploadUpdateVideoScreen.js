@@ -30,6 +30,7 @@ import Download from '../../../assets/svg/Download.svg';
 import CustomButton from '../../../assets/Custom/Custom_Button';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
 
 import Share from 'react-native-share';
 
@@ -45,7 +46,6 @@ import IonIcons from 'react-native-vector-icons/Ionicons';
 
 import {SelectCountry, Dropdown} from 'react-native-element-dropdown';
 import CPaperInput from '../../../assets/Custom/CPaperInput';
-import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
 
 const Category = [
   {label: 'Item 1', value: '1'},
@@ -53,12 +53,12 @@ const Category = [
   {label: 'Item 3', value: '3'},
 ];
 
-export default function UploadUpdatePicScreen({navigation}) {
+export default function UploadUpdateVideoScreen({navigation}) {
   const [selectedItem, setSelectedItem] = useState('');
 
   const [profileName, setProfileName] = useState('');
 
-  const [snackBarVisible, setSnackbarVisible] = useState(false);
+  const [snackbarVisible, setsnackbarVisible] = useState(false);
 
 
   const [isTextInputActive, setIsTextInputActive] = useState(false);
@@ -72,8 +72,6 @@ export default function UploadUpdatePicScreen({navigation}) {
   const [isFocus, setIsFocus] = useState(false);
 
   const ref_RBSheetCamera = useRef(null);
-
-
 
   const handleFocus = () => {
     setIsTextInputActive(true);
@@ -142,22 +140,23 @@ export default function UploadUpdatePicScreen({navigation}) {
     });
   };
 
+
   const handleUpdatePassword = async () => {
     // Perform the password update logic here
     // For example, you can make an API request to update the password
 
     // Assuming the update was successful
-    setSnackbarVisible(true);
+    setsnackbarVisible(true);
 
     // Automatically hide the Snackbar after 3 seconds
     setTimeout(() => {
-      setSnackbarVisible(false);
-      navigation.goBack();
+      setsnackbarVisible(false);
+      navigation.navigate("Home")
     }, 3000);
   };
 
   const dismissSnackbar = () => {
-    setSnackbarVisible(true);
+    setsnackbarVisible(false);
   };
 
   return (
@@ -166,13 +165,11 @@ export default function UploadUpdatePicScreen({navigation}) {
       behavior="height" // You can use ‘height’ as well, depending on your preference
       enabled>
       <View style={styles.header}>
-        <TouchableOpacity onPress={()=>navigation.goBack()}>
-
-        <IonIcons name={'chevron-back'} color={'#282828'} size={25} />
-
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <IonIcons name={'chevron-back'} color={'#282828'} size={25} />
         </TouchableOpacity>
 
-        <Text style={styles.headerText}>Update Pic</Text>
+        <Text style={styles.headerText}>Update Video</Text>
       </View>
 
       <ScrollView
@@ -203,7 +200,7 @@ export default function UploadUpdatePicScreen({navigation}) {
             />
           )}
           <TouchableOpacity
-          onPress={()=>ref_RBSheetCamera.current.open()}
+            onPress={() => ref_RBSheetCamera.current.open()}
             style={{
               position: 'absolute',
               top: 10,
@@ -223,7 +220,7 @@ export default function UploadUpdatePicScreen({navigation}) {
                 color: '#232323',
                 fontWeight: '700',
               }}>
-              Change Pic
+              Change Video
             </Text>
           </TouchableOpacity>
           {imageUri == null && (
@@ -241,20 +238,22 @@ export default function UploadUpdatePicScreen({navigation}) {
           )}
         </View>
 
-        <TextInput
-          mode="outlined"
-          label="Pic Name"
-          outlineStyle={{borderRadius:wp(3)}}
-          onChangeText={text => setProfileName(text)}
-          style={styles.ti}
-          outlineColor="#0000001F"
-          placeholderTextColor={'#646464'}
-          activeOutlineColor="#FACA4E"
-          autoCapitalize="none"
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          // left={isTextInputActive ? <Oemail /> : <Gemail />}
-        />
+        <View style={{marginRight:wp(2)}}>
+          <TextInput
+            mode="outlined"
+            label="Video Name"
+            outlineStyle={{borderRadius: wp(3)}}
+            onChangeText={text => setProfileName(text)}
+            style={[styles.ti, {borderRadius: wp(10)}]}
+            outlineColor="#0000001F"
+            placeholderTextColor={'#646464'}
+            activeOutlineColor="#FACA4E"
+            autoCapitalize="none"
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            // left={isTextInputActive ? <Oemail /> : <Gemail />}
+          />
+        </View>
 
         <View style={{marginHorizontal: wp(7)}}>
           <Dropdown
@@ -335,7 +334,6 @@ export default function UploadUpdatePicScreen({navigation}) {
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
               handleUpdatePassword()
-              //ref_RBSheetCamera.current.open();
               //navigation.navigate('Profile_image');
             }}
           />
@@ -421,11 +419,13 @@ export default function UploadUpdatePicScreen({navigation}) {
       </RBSheet>
 
       <CustomSnackbar
-        message={'Success'}
-        messageDescription={'Pic updated Successfully'}
+        message={'success'}
+        messageDescription={'Video Updated Successfully'}
         onDismiss={dismissSnackbar} // Make sure this function is defined
-        visible={snackBarVisible}
+        visible={snackbarVisible}
       />
+
+      
     </KeyboardAvoidingView>
   );
 }
@@ -453,11 +453,11 @@ const styles = StyleSheet.create({
   ti: {
     marginHorizontal: '7%',
     marginTop: '5%',
-    width: 300,
+    //width: 300,
     backgroundColor: 'white',
     fontSize: wp(4),
     paddingLeft: '2%',
-    borderRadius: 10,
+    borderRadius: 100,
   },
   textInputSelectedCategory: {
     borderWidth: 1,

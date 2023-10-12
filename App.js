@@ -1,4 +1,4 @@
-import 'react-native-gesture-handler';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import React, {useState} from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
@@ -69,13 +69,18 @@ import SearchScreen from './app/src/view/screens/SearchScreen';
 import PicDetails from './app/src/view/screens/PicDetails';
 import UploadScreen from './app/src/view/screens/UploadAVideo/UploadScreen';
 import UploadVideo from './app/src/view/screens/UploadAVideo/UploadVideo';
-import ViewVideo from './app/src/view/screens/PicDetails';
 import SearchApps from './app/src/view/screens/SearchApps';
 import PhoneBase from './app/src/view/screens/PhoneBase';
 import ResetPassword from './app/src/view/screens/Auth/ResetPassword';
 import ForgetPassword from './app/src/view/screens/Auth/ForgetPassword';
 import Profile_image from './app/src/view/screens/Profile_image/Profile_image';
 import ChatScreen from './app/src/view/screens/ChatScreen';
+import BlogDetails from './app/src/view/screens/ViewAllBlogs/BlogDetails';
+import ViewBanners from './app/src/view/screens/BannerAds/ViewBanners';
+import AddBanner from './app/src/view/screens/BannerAds/AddBanner';
+import BannerDetails from './app/src/view/screens/BannerAds/BannerDetails';
+import ViewVideo from './app/src/view/screens/VideoView/ViewVideo';
+import UploadUpdateVideoScreen from './app/src/view/screens/UpdateAVideo/UploadUpdateVideoScreen';
 
 //------------------\\
 
@@ -96,14 +101,50 @@ const App = () => {
         />
 
         <Stack.Screen
-          name="ChatScreen"
-          component={ChatScreen}
+          name="ViewVideo"
+          component={ViewVideo}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="UploadUpdateVideoScreen"
+          component={UploadUpdateVideoScreen}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="BannerDetails"
+          component={BannerDetails}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="AddBanner"
+          component={AddBanner}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ViewBanners"
+          component={ViewBanners}
           options={{headerShown: false}}
         />
 
         <Stack.Screen
           name="ViewAllBlogs"
           component={ViewAllBlogs}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="BlogDetails"
+          component={BlogDetails}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ChatScreen"
+          component={ChatScreen}
           options={{headerShown: false}}
         />
 
@@ -368,12 +409,6 @@ const App = () => {
         <Stack.Screen
           name="UploadVideo"
           component={UploadVideo}
-          options={{headerShown: false}}
-        />
-
-        <Stack.Screen
-          name="ViewVideo"
-          component={ViewVideo}
           options={{headerShown: false}}
         />
 

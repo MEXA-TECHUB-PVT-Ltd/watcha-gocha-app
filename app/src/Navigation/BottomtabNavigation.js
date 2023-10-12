@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, ScrollView, View} from 'react-native';
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -38,6 +38,7 @@ const BottomtabNavigation = () => {
   const Bottom = createBottomTabNavigator();
   return (
     
+
     <Bottom.Navigator
       initialRouteName="Dashboard"
       //tabBar={(props) => <CustomTabBar {...props} />} // Use your custom tab bar
@@ -149,7 +150,12 @@ const BottomtabNavigation = () => {
         name="MarketPlace"
         component={MarketZone}
       />
+
+
+      
+
     </Bottom.Navigator>
+    
   );
 };
 

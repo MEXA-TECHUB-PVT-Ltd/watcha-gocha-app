@@ -4,14 +4,17 @@ import {
   Text,
   Image,
   ScrollView,
+  Platform,
   TextInput,
   StatusBar,
   ImageBackground,
   View,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useRef, useMemo, useCallback, useEffect} from 'react';
+
 import Back from '../../../assets/svg/back.svg';
+
 import {appImages} from '../../../assets/utilities/index';
 import Slider from '@react-native-community/slider';
 import VolumeUp from '../../../assets/svg/VolumeUp.svg';
@@ -20,6 +23,14 @@ import UnLike from '../../../assets/svg/Unlike.svg';
 import Comment from '../../../assets/svg/Comment.svg';
 import Send from '../../../assets/svg/Send.svg';
 import Download from '../../../assets/svg/Download.svg';
+import DownArrowComments from '../../../assets/svg/DownArrowComments.svg';
+import UpArrowComments from '../../../assets/svg/UpArrowComments.svg';
+
+import BottomSheet, {BottomSheetFlatList} from '@gorhom/bottom-sheet';
+
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
+
+
 import Share from 'react-native-share';
 
 import {
@@ -32,19 +43,31 @@ import Fontiso from 'react-native-vector-icons/Fontisto';
 
 import IonIcons from 'react-native-vector-icons/Ionicons';
 
+import ButtonSend from '../../../assets/svg/ButtonSend.svg';
+
+import SmileEmoji from '../../../assets/svg/SmileEmoji.svg';
+
 import Entypo from 'react-native-vector-icons/Entypo';
 import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
 
 export default function ViewVideo({navigation}) {
   const [showFullContent, setShowFullContent] = useState(false);
 
+  const [showReply, setShowReply] = useState(false);
+
   const [showLikes, setShowLikes] = useState(false);
 
   const [showMenu, setShowMenu] = useState(false);
 
-  const [snackbarVisible, setsnackbarVisible] = useState(false);
+  const [isBottomSheetExpanded, setIsBottomSheetExpanded] = useState(false);
 
-  
+  const ref_Comments = useRef(null);
+
+  const bottomSheetRef = useRef(null);
+  // variables
+  const snapPoints = useMemo(() => ['25%', '50%'], []);
+
+  const [snackbarVisible, setsnackbarVisible] = useState(false);
 
   var details =
     'Hold onto your seats and get ready to be mesmerized by the beauty and grandeur of the Hold onto your seats';
@@ -86,13 +109,241 @@ export default function ViewVideo({navigation}) {
     // Automatically hide the Snackbar after 3 seconds
     setTimeout(() => {
       setsnackbarVisible(false);
-      navigation.goBack()
+      navigation.goBack();
     }, 3000);
   };
 
+  const chats = [
+    {
+      id: 1,
+      name: 'John Doe',
+      message: 'The laughter in this video is contagious!',
+      reply: true,
+    },
+    {
+      id: 2,
+      name: 'Olivia Bennett',
+      message: 'I wish I had a friend group like this. You all are incredible!',
+      reply: false,
+    },
+    {
+      id: 3,
+      name: 'Ethan Rodriguez',
+      message:
+        'This video just made my day! Thanks for sharing your awesome moments.',
+      reply: false,
+    },
+    {
+      id: 4,
+      name: 'Mia Bennett',
+      message: 'Friendship goals right there! Love how close you all are',
+      reply: false,
+    },
+    {
+      id: 5,
+      name: 'Liam Sullivan',
+      message:
+        'Looks like you guys are having an absolute blast! Wish I could join in on the fun',
+      reply: false,
+    },
+  ];
 
+  const renderComments = item => {
+    console.log('Items', item);
+    return (
+      <View>
+        <View
+          style={{
+            height: hp(14),
+            //borderWidth:3,
+            paddingHorizontal: wp(5),
+            flexDirection: 'row',
+            width: '100%',
+          }}>
+          <View
+            style={{
+              height: wp(14),
+              alignSelf: 'center',
+              resizeMode: 'hidden',
+              width: wp(14),
+              borderRadius: wp(14),
+            }}>
+            <Image
+              style={{width: '100%', borderRadius: wp(2.1), height: '100%'}}
+              source={appImages.profileImg}
+            />
+          </View>
+
+          <View
+            style={{
+              flex: 1,
+              marginLeft: wp(3),
+              marginTop: hp(3),
+              //borderWidth:3,
+              justifyContent: 'space-around',
+            }}>
+            <Text
+              style={{
+                color: '#000000',
+                fontFamily: 'Inter-Medium',
+                fontSize: hp(2.1),
+              }}>
+              John Doe
+            </Text>
+
+            <Text
+              style={{
+                color: '#4C4C4C',
+                fontFamily: 'Inter-Regular',
+                fontSize: hp(1.6),
+              }}>
+              I wish I had a friend group like this. You all are incredible!
+            </Text>
+
+            {item.reply && (
+              <TouchableOpacity
+                onPress={() => setShowReply(!showReply)}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  //borderWidth:3,
+                  height: hp(3),
+                  width: wp(21),
+                }}>
+                {showReply === true ? (
+                  <UpArrowComments />
+                ) : (
+                  <DownArrowComments />
+                )}
+
+                <Text
+                  style={{
+                    color: '#FACA4E',
+                    fontFamily: 'Inter-Regular',
+                    marginLeft: wp(1.8),
+                    fontSize: hp(1.6),
+                  }}>
+                  2
+                </Text>
+
+                <Text
+                  style={{
+                    color: '#FACA4E',
+                    fontFamily: 'Inter-Regular',
+                    marginLeft: wp(1.3),
+                    fontSize: hp(1.6),
+                  }}>
+                  replies
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+
+        {showReply && (
+          <View
+            style={{
+              justifyContent: 'space-evenly',
+              height: hp(15),
+              //borderWidth:3,
+              marginLeft: wp(20),
+            }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                height: hp(6),
+                width: '100%',
+              }}>
+              <View
+                style={{
+                  height: wp(10),
+                  alignSelf: 'center',
+                  resizeMode: 'hidden',
+                  width: wp(10),
+                  borderRadius: wp(10),
+                }}>
+                <Image
+                  style={{width: '100%', borderRadius: wp(2.1), height: '100%'}}
+                  source={appImages.profileImg}
+                />
+              </View>
+
+              <View style={{flex: 1, justifyContent: 'space-between'}}>
+                <Text
+                  style={{
+                    color: '#000000',
+                    fontFamily: 'Inter-Regular',
+                    marginLeft: wp(1.8),
+                    fontSize: hp(1.6),
+                  }}>
+                  Olivia Bennett
+                </Text>
+
+                <Text
+                  style={{
+                    color: '#4C4C4C',
+                    fontFamily: 'Inter-Regular',
+                    marginLeft: wp(2),
+                    fontSize: hp(1.3),
+                  }}>
+                  I wish I had a friend group like this. You all are incredible!
+                </Text>
+              </View>
+            </View>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                height: hp(6),
+                width: '100%',
+              }}>
+              <View
+                style={{
+                  height: wp(10),
+                  alignSelf: 'center',
+                  resizeMode: 'hidden',
+                  width: wp(10),
+                  borderRadius: wp(10),
+                }}>
+                <Image
+                  style={{width: '100%', borderRadius: wp(2.1), height: '100%'}}
+                  source={appImages.profileImg}
+                />
+              </View>
+
+              <View style={{flex: 1, justifyContent: 'space-between'}}>
+                <Text
+                  style={{
+                    color: '#000000',
+                    fontFamily: 'Inter-Regular',
+                    marginLeft: wp(1.8),
+                    fontSize: hp(1.6),
+                  }}>
+                  Olivia Bennett
+                </Text>
+
+                <Text
+                  style={{
+                    color: '#4C4C4C',
+                    fontFamily: 'Inter-Regular',
+                    marginLeft: wp(2),
+                    fontSize: hp(1.3),
+                  }}>
+                  I wish I had a friend group like this. You all are incredible!
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
+      </View>
+    );
+  };
 
   return (
+     
+    <GestureHandlerRootView style={{flex:1}}>
     <ImageBackground source={appImages.videoBG} style={{flex: 1}}>
       <StatusBar
         translucent={true}
@@ -109,11 +360,12 @@ export default function ViewVideo({navigation}) {
           style={{width: wp(39), marginLeft: wp(18)}}
           resizeMode="contain"
         />
-        
-        {showMenu&&<TouchableOpacity style={{marginLeft:wp(18), marginTop:hp(1)}}>
 
-        <Entypo name={'dots-three-vertical'} size={18} color={'white'} />
-        </TouchableOpacity>}
+        {showMenu && (
+          <TouchableOpacity style={{marginLeft: wp(18), marginTop: hp(1)}}>
+            <Entypo name={'dots-three-vertical'} size={18} color={'white'} />
+          </TouchableOpacity>
+        )}
       </View>
 
       <View style={styles.bottomView}>
@@ -245,7 +497,8 @@ export default function ViewVideo({navigation}) {
               </Text>
             </View>
 
-            <View
+            <TouchableOpacity
+              onPress={() => setIsBottomSheetExpanded(!isBottomSheetExpanded)}
               style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between',
@@ -265,7 +518,7 @@ export default function ViewVideo({navigation}) {
                 }}>
                 2.3 k
               </Text>
-            </View>
+            </TouchableOpacity>
 
             <View
               style={{
@@ -288,7 +541,7 @@ export default function ViewVideo({navigation}) {
                 width: wp(10),
                 height: hp(5),
               }}>
-              <TouchableOpacity onPress={()=>handleUpdatePassword()}>
+              <TouchableOpacity onPress={() => handleUpdatePassword()}>
                 <Download height={20} width={20} />
               </TouchableOpacity>
             </View>
@@ -302,7 +555,165 @@ export default function ViewVideo({navigation}) {
         onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackbarVisible}
       />
+
+      {/* <RBSheet
+        ref={ref_Comments}
+        height={330}
+        openDuration={250}
+        enableOverDrag={false}
+        enabledGestureInteraction={false}
+        closeOnDragDown={false}
+        closeOnPressMask={false}
+        customStyles={{
+          container: {
+            borderTopLeftRadius: 30,
+            borderTopRightRadius: 30,
+            paddingTop: 0,
+            padding: 20,
+            zIndex: 999,
+          },
+          draggableIcon: {
+            backgroundColor: 'transparent',
+          },
+        }}>
+        <View
+          style={{
+            width: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: hp(5),
+          }}>
+          <Text
+            style={{
+              color: '#000000',
+              fontFamily: 'Inter-Bold',
+              fontSize: hp(2.3),
+            }}>
+            Comments
+          </Text>
+        </View>
+
+        <View style={{marginTop: hp(1),flex:1}}>
+        <FlatList
+          style={{flexGrow:1}}
+          showsVerticalScrollIndicator={false}
+          data={chats}
+          keyExtractor={item => item.id.toString()}
+          renderItem={({item}) => renderComments(item)}
+        />
+      </View>
+
+      <View style={{width:'100%', flexDirection:'row', alignItems:'center', height:hp(8)}}>
+      <TouchableOpacity style={{height:hp(8), justifyContent:'center', alignItems:'center', width:wp(14),}}>
+        <SmileEmoji/>
+      </TouchableOpacity>
+
+      <TextInput placeholderTextColor={'#848484'} placeholder='Write Comment Here' style={{flex:1, marginLeft:wp(1),}}/>
+
+      <TouchableOpacity>
+        <ButtonSend/>
+      </TouchableOpacity>
+      </View>
+
+        
+      </RBSheet> */}
+      
+      <BottomSheet
+        ref={ref_Comments}
+        index={isBottomSheetExpanded ? 0 : -1} // Set to -1 to start with collapsed state
+        snapPoints={['39%', '90%']} // Adjust snap points as needed
+        onScroll={event => {
+          console.log('Event', event);
+          const offsetY = event.nativeEvent.contentOffset.y;
+          if (isBottomSheetExpanded && offsetY === 0) {
+            setIsBottomSheetExpanded(false);
+          } else if (!isBottomSheetExpanded && offsetY > 0) {
+            setIsBottomSheetExpanded(true);
+          }
+        }}
+        //snapPoints={snapPoints}
+        //onChange={handleSheetChange}
+        height={210}
+        openDuration={250}
+        closeOnDragDown={true}
+        draggableIcon={false}
+        closeOnPressMask={true}
+        customStyles={{
+          container: {
+            borderTopLeftRadius: 100,
+            borderTopRightRadius: 100,
+            paddingTop: 0,
+            padding: 20,
+            zIndex: 999,
+            backgroundColor: 'white',
+          },
+          draggableIcon: {
+            backgroundColor: 'white',
+          },
+        }}>
+        <View
+          style={{
+            width: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: hp(5),
+          }}>
+          <Text
+            style={{
+              color: '#000000',
+              fontFamily: 'Inter-Bold',
+              fontSize: hp(2.3),
+            }}>
+            Comments
+          </Text>
+
+          </View>
+
+          
+           <View style={{marginTop: hp(1),flex:1}}>
+
+
+          <BottomSheetFlatList
+              data={chats}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({item}) => renderComments(item)}
+            />
+
+            </View> 
+
+            {showReply===false?(<View style={{width:'100%', flexDirection:'row', alignItems:'center', height:hp(8)}}>
+      <TouchableOpacity style={{height:hp(8), justifyContent:'center', alignItems:'center', width:wp(14),}}>
+        <SmileEmoji/>
+      </TouchableOpacity>
+
+      <TextInput placeholderTextColor={'#848484'} placeholder='Write Comment Here' style={{flex:1, marginLeft:wp(1),}}/>
+
+      <TouchableOpacity>
+        <ButtonSend/>
+      </TouchableOpacity>
+      </View>): (
+
+<View style={{width:'100%', flexDirection:'row', alignItems:'center', height:hp(8)}}>
+      <TouchableOpacity style={{height:hp(8), justifyContent:'center', alignItems:'center', width:wp(14),}}>
+        <SmileEmoji/>
+      </TouchableOpacity>
+
+      <TextInput placeholderTextColor={'#848484'} placeholder='Add a reply' style={{flex:1, marginLeft:wp(1),}}/>
+
+      <TouchableOpacity>
+        <ButtonSend/>
+      </TouchableOpacity>
+      </View>
+
+      )}
+
+      </BottomSheet>
+
+
     </ImageBackground>
+    </GestureHandlerRootView>
+
+
   );
 }
 
@@ -330,6 +741,4 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter',
     fontWeight: 'bold',
   },
-
-  
 });

@@ -80,7 +80,12 @@ export default function ContactUs({navigation}) {
 
   return (
     <View style={styles.container}>
-      <Headers showBackIcon={true} showText={true} text={'Contact Us'} />
+
+      <View style={{marginTop:hp(5)}}>
+
+      <Headers onPress={()=>navigation.goBack()} showBackIcon={true} showText={true} text={'Contact Us'} />
+
+      </View>
       <CustomSnackbar
         message={'Success'}
         messageDescription={'Message Submitted Successfully'}

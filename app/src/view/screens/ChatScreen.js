@@ -104,14 +104,14 @@ export default function ChatScreen({navigation}) {
 
 
   const chats = [
-    {id: 1, name: 'Fleece Marigold', message:'Quisque blandit arcu quis turpis tincidunt facilisis…', time:'15 min', messageNumber:'1'},
-    {id: 2, name: 'Gustav Purpleson', message:'Sed ligula erat, dignissim sit at amet dictum id, iaculis… ', time:'15 min', messageNumber:'2'},
-    {id: 3, name: 'Chauffina Carr', message:'Duis eget nibh tincidunt odio id venenatis ornare quis… ', time:'15 min', messageNumber:'2'},
-    {id: 4, name: 'Piff Jenkins', message:'Curabitur elementum orci vitae turpis vulputate…', time:'15 min', messageNumber:'2'},
-    {id: 5, name: 'Justin Case', message:'Donec ut lorem tristique dui sit faucibus tincidunt….', time:'15 min', messageNumber:'2'},
-    {id: 6, name: 'Justin Case', message:'Donec ut lorem tristique dui sit faucibus tincidunt….', time:'15 min', messageNumber:'2'},
-    {id: 7, name: 'Chauffina Carr', message:'Duis eget nibh tincidunt odio id venenatis ornare quis… ', time:'15 min', messageNumber:'2'},
-    {id: 8, name: 'Chauffina Carr', message:'Duis eget nibh tincidunt odio id venenatis ornare quis… ', time:'15 min', messageNumber:'2'},
+    {id: 1, name: 'Fleece Marigold', message:'Quisque blandit arcu quis turpis tincidunt facilisis…', time:'15 min', messageNumber:'1', showMessageNumber:true},
+    {id: 2, name: 'Gustav Purpleson', message:'Sed ligula erat, dignissim sit at amet dictum id, iaculis… ', time:'15 min', messageNumber:'2',showMessageNumber:true},
+    {id: 3, name: 'Chauffina Carr', message:'Duis eget nibh tincidunt odio id venenatis ornare quis… ', time:'15 min', messageNumber:'2',showMessageNumber:false},
+    {id: 4, name: 'Piff Jenkins', message:'Curabitur elementum orci vitae turpis vulputate…', time:'15 min', messageNumber:'2', showMessageNumber:false},
+    {id: 5, name: 'Justin Case', message:'Donec ut lorem tristique dui sit faucibus tincidunt….', time:'15 min', messageNumber:'2', showMessageNumber:false},
+    {id: 6, name: 'Justin Case', message:'Donec ut lorem tristique dui sit faucibus tincidunt….', time:'15 min', messageNumber:'2', showMessageNumber:false},
+    {id: 7, name: 'Chauffina Carr', message:'Duis eget nibh tincidunt odio id venenatis ornare quis… ', time:'15 min', messageNumber:'2', showMessageNumber:false},
+    {id: 8, name: 'Chauffina Carr', message:'Duis eget nibh tincidunt odio id venenatis ornare quis… ', time:'15 min', messageNumber:'2', showMessageNumber:false},
 
   ];
 
@@ -168,11 +168,11 @@ export default function ChatScreen({navigation}) {
           </Text>
 
 
-          <View style={{height:hp(2.6), width:wp(5), justifyContent:'center',alignItems:'center', backgroundColor:'#FACA4E'}}>
+          {item.showMessageNumber&&<View style={{height:hp(2.6), width:wp(5), justifyContent:'center',alignItems:'center', backgroundColor:'#FACA4E'}}>
           <Text style={{color: '#ffffff', fontSize:hp(1), fontFamily: 'Inter-Medium'}}>
             {item.messageNumber}
           </Text>
-        </View>
+        </View>}
 
           
         </View>
@@ -195,7 +195,7 @@ export default function ChatScreen({navigation}) {
 
       <StatusBar barStyle={'dark-content'} backgroundColor={'#FACA4E'} />
 
-      <View style={{marginTop: hp(3), width: '100%', height: hp(7)}}>
+      <View style={{marginTop: hp(3), width: '100%', height: hp(6)}}>
         <View style={styles.searchBar}>
           <Fontiso
             name={'search'}
@@ -320,12 +320,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Medium',
   },
   searchBar: {
-    height: hp(5.9),
+    height: hp(5),
     alignSelf: 'center',
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: wp(3.8),
+    marginHorizontal:wp(5),
     borderRadius: wp(5),
     borderWidth: 0.5,
     borderColor: '#00000017',

@@ -37,11 +37,16 @@ import {
 
 LogBox.ignoreAllLogs();
 
-export default function PrivacyPolicy() {
+export default function PrivacyPolicy({navigation}) {
   return (
     <View style={styles.container}>
       <StatusBar barStyle={'dark-content'} backgroundColor={'#FFFFFF'} />
-      <Headers showBackIcon={true} showText={true} text={'Privacy Policy'} />
+
+      <View style={{marginTop:hp(5)}}>
+
+      <Headers onPress={()=>navigation.goBack()} showBackIcon={true} showText={true} text={'Privacy Policy'} />
+
+      </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}

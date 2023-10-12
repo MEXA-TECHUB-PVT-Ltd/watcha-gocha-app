@@ -506,7 +506,7 @@ export default function UpdateSellProduct({navigation}) {
         </TouchableOpacity>
         <View style={{marginTop:hp(5),marginHorizontal:wp(8)}}>
         <CustomButton
-            title={'Upload'}
+            title={'Update'}
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {

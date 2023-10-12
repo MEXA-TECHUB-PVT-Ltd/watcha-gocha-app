@@ -16,6 +16,8 @@ export default function Custom_Button(props) {
             loading={props.load}
             labelStyle={{
                 fontSize: widthPercentageToDP(4),
+                //borderWidth:3,
+                width:widthPercentageToDP(70),
                 fontFamily: 'Inter',
                 fontWeight:'900',
                 color: '#232323'

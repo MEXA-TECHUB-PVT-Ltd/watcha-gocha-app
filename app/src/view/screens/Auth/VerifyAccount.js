@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import RBSheet from 'react-native-raw-bottom-sheet';
+
 import OTPInputView from '@twotalltotems/react-native-otp-input';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -30,12 +31,12 @@ import {
 
 import Back from '../../../assets/svg/back.svg';
 
-import {
+/* import {
   CodeField,
   Cursor,
   useBlurOnFulfill,
   useClearByFocusCell,
-} from 'react-native-confirmation-code-field';
+} from 'react-native-confirmation-code-field'; */
 
 import Gemail from '../../../assets/svg/gemail.svg';
 import Oemail from '../../../assets/svg/oemail.svg';
@@ -54,16 +55,17 @@ LogBox.ignoreAllLogs();
 
 export default function VerifyAccount({navigation}) {
   const [value, setValue] = useState('');
-  const [otpCode, setOtpCode] = useState(null);
+  const [otpCode, setOtpCode] = useState('');
+
 
   const ref_RBSendOffer = useRef(null);
   const [loading, setLoading] = useState(false);
 
-  const ref = useBlurOnFulfill({value, cellCount: 4});
-  const [props, getCellOnLayoutHandler] = useClearByFocusCell({
+  //const ref = useBlurOnFulfill({value, cellCount: 4});
+ /*  const [props, getCellOnLayoutHandler] = useClearByFocusCell({
     value,
     setValue,
-  });
+  }); */
   const [isFocused, setIsFocused] = useState(false);
   return (
     <ScrollView style={styles.bg} contentContainerStyle={{flexGrow: 1}}>
@@ -77,7 +79,7 @@ export default function VerifyAccount({navigation}) {
 
         <View style={{}}>
           <Image
-            source={require('../../../assets/images/Verify.png')}
+            source={require('../../../assets/images/VerifyModal.png')}
             resizeMode="contain"
             style={{
               width: wp(40),
@@ -108,31 +110,31 @@ export default function VerifyAccount({navigation}) {
           We've send a verification code on your{'\n'} email address
         </Text>
 
-         <CodeField
-          ref={ref}
-          //{...props}
-          // Use `caretHidden={false}` when users can't paste a text value, because context menu doesn't appear
-          value={value}
-          onChangeText={setValue}
-          cellCount={4}
-          rootStyle={styles.codeFieldRoot}
-          keyboardType="number-pad"
-          textContentType="oneTimeCode"
-          renderCell={({index, symbol}) => (
-            <TouchableOpacity
-              key={index}
-              style={[
-                isFocused==true?styles.focusCell:styles.cell,
-                /* styles.cell,
-                isFocused && styles.focusCell, */
-                index !== 0 && {marginLeft: wp(2)}, // Add margin between cells
-              ]}
-              onPress={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}>
-              <Text>{symbol || (isFocused ? <Cursor /> : null)}</Text>
-            </TouchableOpacity>
-          )}
-        />
+        <View style={{marginHorizontal:wp(8), paddingTop: 1}}>
+              <View style={{}}>
+
+              <OTPInputView
+                  style={{
+                    height: 50,
+                    marginTop: hp(7),
+                  }}
+                  autoFocusOnLoad={false}
+
+                  pinCount={4}
+                  code={otpCode}
+                  onCodeChanged={code => {
+                    setOtpCode(code);
+                  }}
+                  placeholderTextColor={'#ABA7AF'}
+                  codeInputFieldStyle={styles.underlineStyleBase}
+                  codeInputHighlightStyle={{
+                    ...styles.underlineStyleHighLighted,
+                  }}
+                />
+
+               
+              </View>
+            </View>
 
 {/* <View style={{width: wp(90), flex: 1, zIndex: 999}}>
             <OTPInputView
@@ -223,11 +225,11 @@ export default function VerifyAccount({navigation}) {
             justifyContent: 'space-evenly',
           }}>
           <Image
-            source={appImages.Verify}
-            style={{resizeMode: 'contain'}}
+            source={appImages.model_verify}
+            style={{width:wp(30),marginTop:hp(-10),height:hp(30),resizeMode: 'contain'}}
           />
 
-          <View style={{height:hp(8)}}>
+          <View style={{marginTop:hp(-5),height:hp(8)}}>
           <Text
             style={{
               color: '#333333',
@@ -245,6 +247,7 @@ export default function VerifyAccount({navigation}) {
               marginTop:hp(0.5),
               textAlign: 'center',
               fontSize: hp(1.8),
+              marginTop:hp(1.5),
               //fontWeight:'bold',
               fontFamily: 'Inter',
             }}>
@@ -325,22 +328,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+ 
+  borderStyleBase: {
+    width: 30,
+    height: 45
+  },
+
   underlineStyleBase: {
-    color: '#DDDDDD',
+    color: '#000000',
     fontSize: 24,
     fontFamily: 'Inter-Medium',
-    width: 48,
+    width: 60,
     height: 50,
-    borderRadius: 30,
-    borderWidth: 0,
-    // borderBottomWidth: 1,
-    borderColor: '#DDDDDD',
-    // marginHorizontal: 2,
-    backgroundColor: '#F5F6FA',
+    borderRadius: wp(15),
+    borderWidth: 1,
+    //borderBottomWidth: 1,
+    borderColor: '#CCC',
+    marginHorizontal: 5,
   },
   underlineStyleHighLighted: {
     borderColor: '#FACA4E',
-    borderRadius: 30,
+    borderRadius: 0,
     borderWidth: 1,
+    borderRadius: wp(15),
   },
 });

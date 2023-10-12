@@ -178,8 +178,7 @@ import {
         
         <View style={{marginTop:hp(5)}}>
   
-        <Headers showListings={true} showText={true} onPressSearch={()=>navigation.navigate("SearchProducts")} text={'Market Zone'} showSearch={true}/>
-
+        <Headers onPressListings={()=>navigation.openDrawer()} showListings={true} showText={true} onPressSearch={()=>navigation.navigate("SearchProducts")} text={'Market Zone'} showSearch={true}/>
 
         </View>
   
@@ -203,6 +202,7 @@ import {
           </View>
 
           <View style={{marginTop:hp(1), marginLeft:wp(5)}}>
+
           <Text
               style={{color: '#FACA4E', fontWeight: 'bold', fontSize: hp(2.3)}}>
               Market Zone
@@ -270,12 +270,12 @@ import {
             <View style={{justifyContent:'flex-end',width:'50%'}}>
             <Text
               style={{
-                fontSize: hp(1.3),
-                marginLeft: wp(1.7),
-                lineHeight:12,
+                fontSize: hp(1.5),
+                marginLeft: wp(1),
+                lineHeight: hp(2),
                 fontFamily: 'Inter-Regular',
                 color: '#000000',
-                fontWeight: '700',
+                //fontWeight: '700',
               }}>
               Explore the intricate web of global politics in this
               thought-provoking video as we delve into the ever-shifting landscape
