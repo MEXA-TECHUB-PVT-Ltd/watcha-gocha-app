@@ -76,7 +76,7 @@ const BottomtabNavigation = () => {
             </Text>
           ),
         })}
-        name="Dashboard"
+        name="Dashboards"
         component={Dashboard}
       />
 
@@ -110,7 +110,7 @@ const BottomtabNavigation = () => {
             </Text>
           ),
         })}
-        name="Video"
+        name="Videos"
         component={Video}
       />
 

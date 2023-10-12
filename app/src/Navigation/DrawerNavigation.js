@@ -82,7 +82,7 @@ const DrawerNavigation = () => {
                   <DrawerItem
                     label="Home"
                     labelStyle={{ color: '#333333', marginLeft:wp(-2.3), fontFamily:'Inter-Medium'}}
-                    //onPress={() => navigation.navigate('Dashboard')}
+                    onPress={() => navigation.navigate('Dashboards')}
                     icon={focused => <HomeActive /> }
                   />
                   {/* <DrawerItem
@@ -102,8 +102,7 @@ const DrawerNavigation = () => {
 
                   <DrawerItem
                     label="Pi/3.14 Videos"
-                    //onPress={() =>  navigation.navigate("Video")}
-
+                    onPress={() =>  navigation.navigate("Videos")}
                     labelStyle={{ color: '#333333', marginLeft:wp(-5), fontFamily:'Inter-Medium'}}
                     icon={focused => <VideoActive/>}
                   />
@@ -117,7 +116,7 @@ const DrawerNavigation = () => {
                    <DrawerItem
                     label="Pic Tours"
                     labelStyle={{ color: '#333333', marginLeft:wp(-2), fontFamily:'Inter-Medium'}}
-                    //onPress={() => navigation.navigate('PicTours')}
+                    onPress={() => navigation.navigate('PicTours')}
                     icon={focused => <ProfileActive/>}
                   />
 
@@ -151,7 +150,6 @@ const DrawerNavigation = () => {
                     onPress={() => navigation.navigate('TermsAndCondition')}
                     icon={focused => <TermsAndconditionActive/>}
                   />
-
 
                     <DrawerItem
                     label="Contact Us"

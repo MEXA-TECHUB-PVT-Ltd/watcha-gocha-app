@@ -50,11 +50,12 @@ export default function ViewVideoPicProfile({navigation}) {
 
   const [snackbarVisible, setsnackbarVisible] = useState(false);
 
+  const [snackbarDeleteVisible, setSnackbarDeleteVisible] = useState(false);
+
+
   const ref_RBSheetCamera = useRef(null);
 
   const ref_RBSheetLogout = useRef(null);
-
-
 
   var details =
     'Hold onto your seats and get ready to be mesmerized by the beauty and grandeur of the Hold onto your seats';
@@ -91,6 +92,10 @@ export default function ViewVideoPicProfile({navigation}) {
     ref_RBSheetLogout.current.open();
   };
 
+  const dismissDeleteSnackbar = () => {
+    setsnackbarVisible(false);
+  };
+
   const handleUpdatePassword = async () => {
     // Perform the password update logic here
     // For example, you can make an API request to update the password
@@ -101,6 +106,26 @@ export default function ViewVideoPicProfile({navigation}) {
     // Automatically hide the Snackbar after 3 seconds
     setTimeout(() => {
       setsnackbarVisible(false);
+      navigation.goBack();
+    }, 3000);
+  };
+
+  const changeDelete = () => {
+    ref_RBSheetLogout.current.close();
+    handleUpdateDelete();
+    //navigation.goBack()
+  };
+
+  const handleUpdateDelete = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setSnackbarDeleteVisible(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setSnackbarDeleteVisible(false);
       navigation.goBack()
     }, 3000);
   };
@@ -124,11 +149,14 @@ export default function ViewVideoPicProfile({navigation}) {
           style={{width: wp(39), marginLeft: wp(18)}}
           resizeMode="contain"
         />
-        
-        {showMenu&&<TouchableOpacity onPress={()=> ref_RBSheetCamera.current.open()} style={{marginLeft:wp(18), marginTop:hp(1)}}>
 
-        <Entypo name={'dots-three-vertical'} size={18} color={'white'} />
-        </TouchableOpacity>}
+        {showMenu && (
+          <TouchableOpacity
+            onPress={() => ref_RBSheetCamera.current.open()}
+            style={{marginLeft: wp(18), marginTop: hp(1)}}>
+            <Entypo name={'dots-three-vertical'} size={18} color={'white'} />
+          </TouchableOpacity>
+        )}
       </View>
 
       <View style={styles.bottomView}>
@@ -303,7 +331,7 @@ export default function ViewVideoPicProfile({navigation}) {
                 width: wp(10),
                 height: hp(5),
               }}>
-              <TouchableOpacity onPress={()=>handleUpdatePassword()}>
+              <TouchableOpacity onPress={() => handleUpdatePassword()}>
                 <Download height={20} width={20} />
               </TouchableOpacity>
             </View>
@@ -318,8 +346,14 @@ export default function ViewVideoPicProfile({navigation}) {
         visible={snackbarVisible}
       />
 
+      <CustomSnackbar
+        message={'success'}
+        messageDescription={'Pic deleted successfully'}
+        onDismiss={dismissDeleteSnackbar} // Make sure this function is defined
+        visible={snackbarDeleteVisible}
+      />
 
-<RBSheet
+      <RBSheet
         ref={ref_RBSheetCamera}
         closeOnDragDown={true}
         closeOnPressMask={false}
@@ -371,50 +405,51 @@ export default function ViewVideoPicProfile({navigation}) {
             //borderWidth: 3,
             marginTop: hp(3),
           }}>
-          <TouchableOpacity onPress={()=>navigation.navigate("UploadUpdatePicScreen")} style={{flexDirection: 'row', marginHorizontal:wp(7)}}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('UploadUpdatePicScreen')}
+            style={{flexDirection: 'row', marginHorizontal: wp(7)}}>
+            <EditItem height={23} width={23} />
 
-            <EditItem height={23} width={23}/>
-
-          <Text
-            style={{
-              fontFamily: 'Inter-Regular',
-              color: '#656565',
-              marginLeft:wp(3),
-              fontSize: hp(2.1),
-            }}>
-
-            Update Pic
-
-          </Text>
-
+            <Text
+              style={{
+                fontFamily: 'Inter-Regular',
+                color: '#656565',
+                marginLeft: wp(3),
+                fontSize: hp(2.1),
+              }}>
+              Update Pic
+            </Text>
           </TouchableOpacity>
 
-          <View style={{height:hp(0.1), marginHorizontal:wp(8), marginTop:hp(3), backgroundColor:'#00000012'}}>
-
-          </View>
-
-          <TouchableOpacity onPress={()=>changeModal()} style={{flexDirection: 'row', marginTop:hp(2.5), marginHorizontal:wp(7)}}>
-
-            <Delete height={23} width={23}/>
-
-          <Text
+          <View
             style={{
-              fontFamily: 'Inter-Regular',
-              color: '#656565',
-              marginLeft:wp(3),
-              fontSize: hp(2.1),
+              height: hp(0.1),
+              marginHorizontal: wp(8),
+              marginTop: hp(3),
+              backgroundColor: '#00000012',
+            }}></View>
+
+          <TouchableOpacity
+            onPress={() => changeModal()}
+            style={{
+              flexDirection: 'row',
+              marginTop: hp(2.5),
+              marginHorizontal: wp(7),
             }}>
+            <Delete height={23} width={23} />
 
-            Delete Pic
-
-          </Text>
-
+            <Text
+              style={{
+                fontFamily: 'Inter-Regular',
+                color: '#656565',
+                marginLeft: wp(3),
+                fontSize: hp(2.1),
+              }}>
+              Delete Pic
+            </Text>
           </TouchableOpacity>
-
-          
         </View>
       </RBSheet>
-
 
       <RBSheet
         ref={ref_RBSheetLogout}
@@ -438,8 +473,7 @@ export default function ViewVideoPicProfile({navigation}) {
             backgroundColor: 'transparent',
           },
         }}>
-
-            <Image source={appImages.alert} style={{resizeMode:'contain'}}/>
+        <Image source={appImages.alert} style={{resizeMode: 'contain'}} />
         <Text
           style={[
             styles.txtNotification,
@@ -448,7 +482,9 @@ export default function ViewVideoPicProfile({navigation}) {
           Confirmation
         </Text>
 
-        <Text style={{marginTop:hp(2)}}>Do you really want to delete this video?</Text>
+        <Text style={{marginTop: hp(2)}}>
+          Do you really want to delete this video?
+        </Text>
 
         <View style={styles.buttonDirections}>
           <TouchableOpacity
@@ -458,7 +494,7 @@ export default function ViewVideoPicProfile({navigation}) {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => ref_RBSheetLogout.current.close()}
+            onPress={() => changeDelete()}
             style={[styles.button, {backgroundColor: '#FACA4E'}]}>
             <Text style={[styles.textButton, {color: '#232323'}]}>Delete</Text>
           </TouchableOpacity>
@@ -493,7 +529,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 
-
   ti: {
     marginHorizontal: '7%',
     marginTop: '5%',
@@ -507,10 +542,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: hp(4.3),
-    width:'100%',
+    width: '100%',
     marginLeft: wp(5),
     justifyContent: 'space-evenly',
-  }, button: {
+  },
+  button: {
     borderColor: '#FACA4E',
     borderWidth: 0.8,
     borderRadius: wp(5),
@@ -518,14 +554,16 @@ const styles = StyleSheet.create({
     height: hp(5.5),
     justifyContent: 'center',
     alignItems: 'center',
-  }, textButton: {
+  },
+  textButton: {
     color: '#FACA4E',
     fontWeight: 'bold',
-  }, txtNotification: {
+  },
+  txtNotification: {
     fontWeight: '500',
     marginTop: hp(10),
     marginLeft: wp(5),
     fontSize: hp(2.3),
     color: '#0B0B0B',
-  }
+  },
 });

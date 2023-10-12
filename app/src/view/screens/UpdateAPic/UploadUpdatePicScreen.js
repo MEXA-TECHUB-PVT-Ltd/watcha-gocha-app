@@ -108,7 +108,7 @@ export default function UploadUpdatePicScreen({navigation}) {
     setSelectedItem(value);
     launchCamera(
       {
-        mediaType: 'video',
+        mediaType: 'photo',
         videoQuality: 'medium',
       },
       response => {
@@ -130,7 +130,7 @@ export default function UploadUpdatePicScreen({navigation}) {
 
   const choosePhotoFromLibrary = value => {
     setSelectedItem(value);
-    launchImageLibrary({mediaType: 'video'}, response => {
+    launchImageLibrary({mediaType: 'photo'}, response => {
       console.log('image here', response);
       if (!response.didCancel && response.assets.length > 0) {
         setImageUri(response.assets[0].uri);

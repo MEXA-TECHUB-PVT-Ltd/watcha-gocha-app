@@ -23,13 +23,13 @@ import Headers from '../../assets/Custom/Headers';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
 import CustomButton from '../../assets/Custom/Custom_Button';
-
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SelectCountry, Dropdown} from 'react-native-element-dropdown';
 
 import RBSheet from 'react-native-raw-bottom-sheet';
+import CustomSnackbar from '../../assets/Custom/CustomSnackBar';
 
 
 export default function Sell({navigation}) {
@@ -37,7 +37,7 @@ export default function Sell({navigation}) {
 
   const [title, setTitle] = useState('');
 
-
+  const [snackbarVisible, setsnackbarVisible] = useState(false);
 
   const [price, setPrice] = useState('');
 
@@ -150,6 +150,24 @@ export default function Sell({navigation}) {
 
       ref_RBSheetCamera.current.close();
     });
+  };
+
+  const dismissSnackbar = () => {
+    setsnackbarVisible(false);
+  };
+
+  const handleUpdatePassword = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setsnackbarVisible(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setsnackbarVisible(false);
+      navigation.goBack();
+    }, 3000);
   };
   return (
     <KeyboardAvoidingView
@@ -326,6 +344,7 @@ export default function Sell({navigation}) {
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
+              handleUpdatePassword()
               //navigation.navigate('Profile_image');
             }}
           />
@@ -409,6 +428,13 @@ export default function Sell({navigation}) {
           </TouchableOpacity>
         </View>
       </RBSheet>
+
+      <CustomSnackbar
+        message={'success'}
+        messageDescription={'Item updated successfully'}
+        onDismiss={dismissSnackbar} // Make sure this function is defined
+        visible={snackbarVisible}
+      />
     </KeyboardAvoidingView>
   );
 }

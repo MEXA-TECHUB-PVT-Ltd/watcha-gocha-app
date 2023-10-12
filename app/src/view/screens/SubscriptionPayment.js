@@ -34,7 +34,7 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 
 LogBox.ignoreAllLogs();
 
-export default function SubscriptionPayment() {
+export default function SubscriptionPayment({navigation}) {
   const [selectedValue, setSelectedValue] = useState('');
 
   const changeSelectedValue = value => {
@@ -70,8 +70,13 @@ export default function SubscriptionPayment() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle={'dark-content'} backgroundColor={'#FFFFFF'} />
+      
+      <View style={{marginTop:hp(5)}}>
 
-      <Headers showBackIcon={true} />
+      <Headers onPress={()=>navigation.goBack()} showBackIcon={true} />
+
+
+      </View>
 
       <View style={{marginLeft: wp(7), marginTop: hp(3)}}>
         <Text

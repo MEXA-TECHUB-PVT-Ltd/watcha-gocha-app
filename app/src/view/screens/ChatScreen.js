@@ -118,7 +118,8 @@ export default function ChatScreen({navigation}) {
   const renderChats = item => {
     console.log('Items', item);
     return (
-        <View
+        <TouchableOpacity
+        onPress={()=>navigation.navigate("Conversation")}
         style={{
           flexDirection: 'row',
           alignItems: 'center',
@@ -155,8 +156,6 @@ export default function ChatScreen({navigation}) {
           </Text>
         </View>
 
-
-
         <View
           style={{
             height: '100%',
@@ -176,7 +175,7 @@ export default function ChatScreen({navigation}) {
 
           
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 

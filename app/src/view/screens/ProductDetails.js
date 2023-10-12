@@ -139,6 +139,12 @@ export default function ProductDetails({navigation}) {
     setSnackbarVisible(true);
   };
 
+  const changeModal = () => {
+    ref_RBSendOffer.current.close();
+    ref_RBSendOffer2.current.open();
+  };
+
+
   const handleUpdatePassword = async () => {
     // Perform the password update logic here
     // For example, you can make an API request to update the password
@@ -179,7 +185,7 @@ export default function ProductDetails({navigation}) {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar
         translucent={true}
         backgroundColor="transparent"
@@ -193,6 +199,9 @@ export default function ProductDetails({navigation}) {
           text={'Item Details'}
         />
       </View>
+
+      <ScrollView style={{flex:1}}>
+
 
       <View style={{height: hp(25), marginTop: hp(5)}}>
         <HeaderImageSlider
@@ -378,7 +387,12 @@ export default function ProductDetails({navigation}) {
               </Text>
             </View>
           </View>
+
+          <TouchableOpacity onPress={()=>navigation.navigate("ChatScreen")}>
+
           <SendMessage width={39} height={39} />
+
+          </TouchableOpacity>
         </View>
 
         <View
@@ -484,6 +498,9 @@ export default function ProductDetails({navigation}) {
           </View>
         </View>
       </View>
+
+      </ScrollView>
+
 
       <RBSheet
         ref={ref_RBSendOffer}
@@ -621,8 +638,7 @@ export default function ProductDetails({navigation}) {
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                borderBottomColor: '#0000001A',
-                borderBottomWidth: 1,
+
                 justifyContent: 'space-between',
               }}>
               <RadioButtonLabel
@@ -667,7 +683,8 @@ export default function ProductDetails({navigation}) {
           ))}
         </View>
 
-        <View
+        <TouchableOpacity
+        onPress={()=>changeModal()}
           style={{
             height: hp(5),
             marginTop: hp(1.9),
@@ -684,7 +701,7 @@ export default function ProductDetails({navigation}) {
             }}>
             Offer a different amount
           </Text>
-        </View>
+        </TouchableOpacity>
 
         <View
           style={{
@@ -876,7 +893,8 @@ export default function ProductDetails({navigation}) {
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-              ref_RBSendOffer.current.open();
+              ref_RBSendOffer2.current.close();
+              //ref_RBSendOffer.current.open();
               //navigation.navigate('Profile_image');
             }}
           />
@@ -903,7 +921,7 @@ export default function ProductDetails({navigation}) {
         onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackbarVisibleSaved}
       />
-    </ScrollView>
+    </View>
   );
 }
 
