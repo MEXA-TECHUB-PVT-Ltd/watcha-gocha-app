@@ -253,7 +253,8 @@ export default function SubscriptionPayment({navigation}) {
           load={false}
           // checkdisable={inn == '' && cm == '' ? true : false}
           customClick={() => {
-            ref_RBSheetLogout.current.open();
+            navigation.goBack()
+            //ref_RBSheetLogout.current.open();
             //navigation.navigate('Profile_image');
           }}
         />

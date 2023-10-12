@@ -638,7 +638,6 @@ export default function ProductDetails({navigation}) {
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-
                 justifyContent: 'space-between',
               }}>
               <RadioButtonLabel

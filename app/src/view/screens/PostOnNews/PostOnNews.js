@@ -261,7 +261,6 @@ export default function PostOnNews({navigation}) {
           <View
             style={{
               marginTop: hp(5),
-              borderWidth:3,
               height: hp(35),
               borderRadius: wp(3),
               marginHorizontal: wp(20),
@@ -301,7 +300,7 @@ export default function PostOnNews({navigation}) {
         
       </ScrollView>
 
-      <View style={{flex:1,marginBottom:hp(3),justifyContent:'flex-end', alignSelf: 'center'}}>
+      <View style={{height:hp(12),marginBottom:hp(3),justifyContent:'flex-end', alignSelf: 'center'}}>
            <CustomButton
             title="Post"
             load={false}

@@ -134,8 +134,6 @@ export default function ViewVideoProfile({navigation}) {
     }, 3000);
   };
 
-
-
   return (
     <ImageBackground source={appImages.videoBG} style={{flex: 1}}>
       <StatusBar
