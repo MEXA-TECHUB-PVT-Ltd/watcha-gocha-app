@@ -84,6 +84,7 @@ import UploadUpdateVideoScreen from './app/src/view/screens/UpdateAVideo/UploadU
 import PicTours from './app/src/view/screens/BottomTab/PicTours';
 import SearchAppsDisc from './app/src/view/screens/SearchAppsDisc';
 import Conversation from './app/src/view/screens/Conversation';
+import UploadScreenPic from './app/src/view/screens/UploadAVideo/UploadScreenPic';
 
 //------------------\\
 
@@ -103,6 +104,11 @@ const App = () => {
           options={{headerShown: false}}
         />
 
+        <Stack.Screen
+          name="UploadScreenPic"
+          component={UploadScreenPic}
+          options={{headerShown: false}}
+        />
         <Stack.Screen
           name="Conversation"
           component={Conversation}

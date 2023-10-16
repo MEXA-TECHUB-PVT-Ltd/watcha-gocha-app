@@ -43,10 +43,10 @@ export default function SubscriptionPayment({navigation}) {
   };
 
   const payDesc = [
-    {id: 1, desc: 'Lorem ipsum dolor sit amet, consectetur'},
-    {id: 2, desc: 'Lorem ipsum dolor sit amet, consectetur'},
-    {id: 3, desc: 'Lorem ipsum dolor sit amet, consectetur'},
-    {id: 4, desc: 'Lorem ipsum dolor sit amet, consectetur'},
+    {id: 1, desc: ' Seal your letter with a touch of elegance'},
+    {id: 2, desc: 'Choose from a curated collection of luxurious'},
+    {id: 3, desc: 'Opt for priority, expedited delivery services'},
+    {id: 4, desc: 'Your words will be transformed into a work of art.'},
   ];
 
   const PlanDesc = ({PlanDescItems}) => {

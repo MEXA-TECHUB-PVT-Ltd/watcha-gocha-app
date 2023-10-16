@@ -43,7 +43,10 @@ export default function UploadUpdatePic({navigation}) {
       />
 
       <View style={styles.header}>
+        <TouchableOpacity onPress={()=>navigation.goBack()}>
+
         <IonIcons name={'chevron-back'} color={'white'} size={25} />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.bottomView}>
@@ -59,6 +62,7 @@ export default function UploadUpdatePic({navigation}) {
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
+              navigation.navigate("UploadScreenPic")
               //navigation.navigate('Profile_image');
             }}
           />

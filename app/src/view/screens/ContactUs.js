@@ -38,11 +38,10 @@ export default function ContactUs({navigation}) {
   const [message, setMessage] = useState('');
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const ref_RBSheetLogout = useRef(null);
-
+  
   const [isTextInputActive, setIsInputActive] = useState(false);
 
-  const [isTextInputActiveEmailAddress, setIsInputActiveEmailAddress] =
-    useState(false);
+  const [isTextInputActiveEmailAddress, setIsInputActiveEmailAddress] = useState(false);
 
   const [isTextInputActiveMessage, setIsInputActiveMessage] = useState(false);
 
@@ -76,6 +75,21 @@ export default function ContactUs({navigation}) {
 
   const handleBlurConfirmPassword = () => {
     setIsConfirmPasswordActive(false);
+  };
+
+
+ const handleUpdatePassword = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setSnackbarVisible(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      navigation.goBack();
+      setSnackbarVisible(false);
+    }, 3000);
   };
 
   return (
@@ -149,11 +163,12 @@ export default function ContactUs({navigation}) {
           alignItems: 'center',
         }}>
         <CustomButton
-          title={'Sumbit'}
+          title={'Submit'}
           load={false}
           // checkdisable={inn == '' && cm == '' ? true : false}
           customClick={() => {
-            ref_RBSheetLogout.current.open()
+            handleUpdatePassword()
+            //ref_RBSheetLogout.current.open()
             //navigation.navigate('Profile_image');
           }}
         />

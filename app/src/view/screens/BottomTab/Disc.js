@@ -33,6 +33,10 @@ export default function Disc({navigation}) {
       navigation.navigate('PostLetterInfo');
     } else if (selectedItemId === 1) {
       navigation.navigate('PostOnNews');
+    } else if (selectedItemId === 3) {
+      navigation.navigate('QAFI');
+    } else if (selectedItemId === 4) {
+      navigation.navigate('GEBC');
     }
   };
 

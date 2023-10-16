@@ -311,7 +311,7 @@ export default function AddBanner({navigation}) {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <StatusBar barStyle={'dark-content'} backgroundColor={'#FFFFFF'} />
 
 
@@ -407,7 +407,7 @@ export default function AddBanner({navigation}) {
         />
       </View>
 
-      <View style={{flex:1, alignSelf:'center', justifyContent:'flex-end'}}>
+      <View style={{flex:1, marginTop:hp(21), alignSelf:'center', justifyContent:'flex-end'}}>
       <CustomButton
             title={'Add'}
             load={false}
@@ -505,7 +505,7 @@ export default function AddBanner({navigation}) {
           </TouchableOpacity>
         </View>
       </RBSheet>
-    </View>
+    </ScrollView>
   );
 }
 

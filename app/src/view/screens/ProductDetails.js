@@ -388,7 +388,7 @@ export default function ProductDetails({navigation}) {
             </View>
           </View>
 
-          <TouchableOpacity onPress={()=>navigation.navigate("ChatScreen")}>
+          <TouchableOpacity onPress={()=>navigation.navigate("Conversation")}>
 
           <SendMessage width={39} height={39} />
 

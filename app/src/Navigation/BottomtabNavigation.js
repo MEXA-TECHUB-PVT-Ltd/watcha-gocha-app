@@ -26,6 +26,10 @@ import ProfileActive from '../assets/svg/ProfileActive.svg';
 
 import ProfileInActive from '../assets/svg/ProfileInactive.svg';
 
+import MarketZoneActive from '../assets/svg/MarketActive.svg';
+
+import MarketZoneInActive from '../assets/svg/MarketInactive.svg';
+
 import {appImages} from '../assets/utilities';
 import Dashboard from './../view/screens/BottomTab/Dashboard';
 import Categories from './../view/screens/BottomTab/Categories';
@@ -33,12 +37,11 @@ import Video from './../view/screens/BottomTab/Video';
 import Disc from './../view/screens/BottomTab/Disc';
 import MarketZone from './../view/screens/BottomTab/MarketZone';
 import CustomTabBar from '../assets/Custom/CustomTabBar';
+import PicTours from '../view/screens/BottomTab/PicTours';
 
 const BottomtabNavigation = () => {
   const Bottom = createBottomTabNavigator();
   return (
-    
-
     <Bottom.Navigator
       initialRouteName="Dashboard"
       //tabBar={(props) => <CustomTabBar {...props} />} // Use your custom tab bar
@@ -47,28 +50,23 @@ const BottomtabNavigation = () => {
           // ... (other tabBarOptions)
         }
       }
-
       screenOptions={{
         headerShown: false,
-        tabBarShowLabel:false,
+        tabBarShowLabel: false,
         tabBarActiveBackgroundColor: '#FFFFFF',
         tabBarInactiveBackgroundColor: '#FFFFFF',
         activeTintColor: '#24A59E', // Color of the active tab icon and label
         inactiveTintColor: '#CACACA',
         tabBarHideOnKeyboard: true,
         lazy: false, // Set lazy to false to ensure all tabs are rendered
-
       }}>
       <Bottom.Screen
         options={({focused}) => ({
           tabBarIcon: ({focused}) =>
             focused ? (
               <HomeActive width={23} height={23} />
-
-
             ) : (
               <HomeInActive width={23} height={23} />
-
             ),
           tabBarLabel: ({focused}) => (
             <Text style={focused ? styles.focusedLabel : styles.inactiveLabel}>
@@ -86,9 +84,8 @@ const BottomtabNavigation = () => {
             focused ? (
               <CategoryActive />
             ) : (
-              <CategoryInActive  width={23} height={23}  />
+              <CategoryInActive width={23} height={23} />
             ),
-          
         })}
         name="Category"
         component={Categories}
@@ -99,10 +96,8 @@ const BottomtabNavigation = () => {
           tabBarIcon: ({focused}) =>
             focused ? (
               <VideoActive width={23} height={23} />
-
             ) : (
               <VideoInActive width={23} height={23} />
-
             ),
           tabBarLabel: ({focused}) => (
             <Text style={focused ? styles.focusedLabel : styles.inactiveLabel}>
@@ -119,7 +114,6 @@ const BottomtabNavigation = () => {
           tabBarIcon: ({focused}) =>
             focused ? (
               <MailActive width={23} height={23} />
-
             ) : (
               <MailInActive width={23} height={23} />
             ),
@@ -147,15 +141,28 @@ const BottomtabNavigation = () => {
             </Text>
           ),
         })}
+        name="PicTourss"
+        component={PicTours}
+      />
+
+      <Bottom.Screen
+        options={({focused}) => ({
+          tabBarIcon: ({focused}) =>
+            focused ? (
+              <MarketZoneActive width={23} height={23} />
+            ) : (
+              <MarketZoneInActive width={23} height={23} />
+            ),
+          tabBarLabel: ({focused}) => (
+            <Text style={focused ? styles.focusedLabel : styles.inactiveLabel}>
+              Home
+            </Text>
+          ),
+        })}
         name="MarketPlace"
         component={MarketZone}
       />
-
-
-      
-
     </Bottom.Navigator>
-    
   );
 };
 

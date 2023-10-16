@@ -420,7 +420,7 @@ export default function UploadUpdateScreen({navigation}) {
 
       <CustomSnackbar
         message={'success'}
-        messageDescription={'Update profile successfully'}
+        messageDescription={'Upload Video successfully'}
         onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackbarVisible}
       />

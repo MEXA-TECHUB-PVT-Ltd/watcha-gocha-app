@@ -117,7 +117,7 @@ const Headers = ({
 
       {showMenuWhite && (
         <TouchableOpacity onPress={onPressMenuWhite} style={styles.heartIcon}>
-
+  
         <Entypo name={'dots-three-vertical'} size={18} color={'#ffffff'} />
 
         </TouchableOpacity>
