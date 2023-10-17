@@ -5,6 +5,7 @@ import {
   Dimensions,
   ScrollView,
   View,
+  ActivityIndicator,
   FlatList,
   Image,
   Text,
@@ -31,12 +32,11 @@ import Back from '../../../assets/svg/back.svg';
 
 import RBSheet from 'react-native-raw-bottom-sheet';
 
-
 import CustomButton from '../../../assets/Custom/Custom_Button';
 import {useIsFocused} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SwitchSelector from 'react-native-switch-selector';
-import User from '../../../assets/svg/User.svg'
+import User from '../../../assets/svg/User.svg';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import styles from './styles';
@@ -51,15 +51,13 @@ const App = ({navigation}) => {
 
   const [selectedItem, setSelectedItem] = useState('');
 
-
-
   const [openModel, setOpenModel] = useState(false);
   const [openGallery, setOpenGallery] = useState(false);
   const [userName, setUserName] = useState('');
   const [imageUri, setImageUri] = useState(null);
   const ref_RBSheet = useRef(null);
   const ref_RBSheetCamera = useRef(null);
-
+  const [isLoading, setIsLoading] = useState(false);
 
   const takePhotoFromCamera = async value => {
     setSelectedItem(value);
@@ -99,40 +97,39 @@ const App = ({navigation}) => {
     });
   };
 
-
   return (
     <ScrollView style={styles.bg} contentContainerStyle={{flexGrow: 1}}>
       <StatusBar barStyle={'dark-content'} backgroundColor={'#FACA4E'} />
       <View style={styles.mainv}>
-        <TouchableOpacity onPress={()=>navigation.goBack()}>
-        <Back
-          width={20}
-          height={20}
-          style={{marginTop: '9%', marginLeft: '8%'}}
-        />
-
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Back
+            width={20}
+            height={20}
+            style={{marginTop: '9%', marginLeft: '8%'}}
+          />
         </TouchableOpacity>
 
         <Text style={styles.txt}>Profile Image</Text>
         <Text style={styles.txt1}>Add your profile image below</Text>
 
-        <View style={{alignItems: 'center', marginTop:hp(15) }}>
-            <TouchableOpacity  style={styles.circleBox}>
-              {
-                imageUri==null?
-                <User width={30} height={30} />
-                :
-                <Image
-                style={{flex: 1, width: '100%', height: '100%',borderRadius: wp(25) / 2, // Half of the width (25/2)
-                resizeMode: 'contain'}}
+        <View style={{alignItems: 'center', marginTop: hp(15)}}>
+          <TouchableOpacity style={styles.circleBox}>
+            {imageUri == null ? (
+              <User width={30} height={30} />
+            ) : (
+              <Image
+                style={{
+                  flex: 1,
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: wp(25) / 2, // Half of the width (25/2)
+                  resizeMode: 'contain',
+                }}
                 source={{uri: imageUri}}
               />
-              }
-              
-            </TouchableOpacity>
-           
-          </View>
-        
+            )}
+          </TouchableOpacity>
+        </View>
 
         <Button
           mode="contained"
@@ -154,95 +151,111 @@ const App = ({navigation}) => {
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-              navigation.navigate('BottomTabNavigation')
-
+              setIsLoading(true);
+              setTimeout(() => {
+                navigation.navigate('BottomTabNavigation');
+                setIsLoading(false);
+                // Replace 'YourTargetScreen' with the screen you want to navigate to
+              }, 2000);
             }}
           />
         </View>
       </View>
 
-
       <RBSheet
-          ref={ref_RBSheetCamera}
-          closeOnDragDown={true}
-          closeOnPressMask={false}
-          animationType="fade"
-          minClosingHeight={0}
-          customStyles={{
-            wrapper: {
-              backgroundColor: 'rgba(52, 52, 52, 0.5)',
-            },
-            draggableIcon: {
-              backgroundColor: 'white',
-            },
-            container: {
-              borderTopLeftRadius: wp(10),
-              borderTopRightRadius: wp(10),
-              height: hp(25),
-            },
+        ref={ref_RBSheetCamera}
+        closeOnDragDown={true}
+        closeOnPressMask={false}
+        animationType="fade"
+        minClosingHeight={0}
+        customStyles={{
+          wrapper: {
+            backgroundColor: 'rgba(52, 52, 52, 0.5)',
+          },
+          draggableIcon: {
+            backgroundColor: 'white',
+          },
+          container: {
+            borderTopLeftRadius: wp(10),
+            borderTopRightRadius: wp(10),
+            height: hp(25),
+          },
+        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginHorizontal: wp(8),
+            alignItems: 'center',
           }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginHorizontal: wp(8),
-              alignItems: 'center',
-            }}>
-            <Text style={styles.maintext}>Select an option</Text>
-            <TouchableOpacity onPress={() => ref_RBSheetCamera.current.close()}>
-              <Ionicons
-                name="close"
-                size={22}
-                color={'#303030'}
-                onPress={() => ref_RBSheetCamera.current.close()}
-              />
-            </TouchableOpacity>
-          </View>
-  
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-evenly',
-              alignItems: 'center',
-              marginTop: hp(3),
-            }}>
-            <TouchableOpacity
-              onPress={() => takePhotoFromCamera('camera')}
-              style={
-                selectedItem === 'camera'
-                  ? styles.selectedItems
-                  : styles.nonselectedItems
-              }>
-              <Ionicons
-                color={selectedItem === 'camera' ? '#FACA4E' : '#888888'}
-                name="camera"
-                size={25}
-              />
-  
-              <Text style={{color: '#333333'}}>From camera</Text>
-            </TouchableOpacity>
-  
-            <TouchableOpacity
-              onPress={() => choosePhotoFromLibrary('gallery')}
-              style={
-                selectedItem === 'gallery'
-                  ? styles.selectedItems
-                  : styles.nonselectedItems
-              }>
-              <MaterialCommunityIcons
-                color={selectedItem === 'gallery' ? '#FACA4E' : '#888888'}
-                name="image"
-                size={25}
-              />
-  
-              <Text style={{color: '#333333'}}>From gallery</Text>
-            </TouchableOpacity>
-          </View>
-        </RBSheet>
+          <Text style={styles.maintext}>Select an option</Text>
+          <TouchableOpacity onPress={() => ref_RBSheetCamera.current.close()}>
+            <Ionicons
+              name="close"
+              size={22}
+              color={'#303030'}
+              onPress={() => ref_RBSheetCamera.current.close()}
+            />
+          </TouchableOpacity>
+        </View>
 
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-evenly',
+            alignItems: 'center',
+            marginTop: hp(3),
+          }}>
+          <TouchableOpacity
+            onPress={() => takePhotoFromCamera('camera')}
+            style={
+              selectedItem === 'camera'
+                ? styles.selectedItems
+                : styles.nonselectedItems
+            }>
+            <Ionicons
+              color={selectedItem === 'camera' ? '#FACA4E' : '#888888'}
+              name="camera"
+              size={25}
+            />
+
+            <Text style={{color: '#333333'}}>From camera</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => choosePhotoFromLibrary('gallery')}
+            style={
+              selectedItem === 'gallery'
+                ? styles.selectedItems
+                : styles.nonselectedItems
+            }>
+            <MaterialCommunityIcons
+              color={selectedItem === 'gallery' ? '#FACA4E' : '#888888'}
+              name="image"
+              size={25}
+            />
+
+            <Text style={{color: '#333333'}}>From gallery</Text>
+          </TouchableOpacity>
+        </View>
+      </RBSheet>
+
+      {isLoading && (
+        <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ActivityIndicator size="large" color="#FACA4E" />
+        </View>
+      )}
     </ScrollView>
   );
 };
-
 
 export default App;
