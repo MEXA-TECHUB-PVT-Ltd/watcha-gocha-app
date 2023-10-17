@@ -53,7 +53,7 @@ const Category = [
   {label: 'Item 3', value: '3'},
 ];
 
-export default function UploadUpdateVideoScreen({navigation}) {
+export default function UploadScreenPic({navigation}) {
   const [selectedItem, setSelectedItem] = useState('');
 
   const [profileName, setProfileName] = useState('');
@@ -106,7 +106,7 @@ export default function UploadUpdateVideoScreen({navigation}) {
     setSelectedItem(value);
     launchCamera(
       {
-        mediaType: 'video',
+        mediaType: 'photo',
         videoQuality: 'medium',
       },
       response => {
@@ -128,7 +128,7 @@ export default function UploadUpdateVideoScreen({navigation}) {
 
   const choosePhotoFromLibrary = value => {
     setSelectedItem(value);
-    launchImageLibrary({mediaType: 'video'}, response => {
+    launchImageLibrary({mediaType: 'photo'}, response => {
       console.log('image here', response);
       if (!response.didCancel && response.assets.length > 0) {
         setImageUri(response.assets[0].uri);
@@ -151,8 +151,7 @@ export default function UploadUpdateVideoScreen({navigation}) {
     // Automatically hide the Snackbar after 3 seconds
     setTimeout(() => {
       setsnackbarVisible(false);
-      //navigation.navigate("Home")
-      navigation.goBack();
+      navigation.navigate("Home")
     }, 3000);
   };
 
@@ -170,7 +169,7 @@ export default function UploadUpdateVideoScreen({navigation}) {
           <IonIcons name={'chevron-back'} color={'#282828'} size={25} />
         </TouchableOpacity>
 
-        <Text style={styles.headerText}>Update Video</Text>
+        <Text style={styles.headerText}>Upload Video</Text>
       </View>
 
       <ScrollView
@@ -221,7 +220,7 @@ export default function UploadUpdateVideoScreen({navigation}) {
                 color: '#232323',
                 fontWeight: '700',
               }}>
-              Change Video
+              Change Pic
             </Text>
           </TouchableOpacity>
           {imageUri == null && (
@@ -242,7 +241,7 @@ export default function UploadUpdateVideoScreen({navigation}) {
         <View style={{marginRight:wp(2)}}>
           <TextInput
             mode="outlined"
-            label="Video Name"
+            label="Pic Name"
             outlineStyle={{borderRadius: wp(3)}}
             onChangeText={text => setProfileName(text)}
             style={[styles.ti, {borderRadius: wp(10)}]}
@@ -330,7 +329,7 @@ export default function UploadUpdateVideoScreen({navigation}) {
             alignItems: 'center',
           }}>
           <CustomButton
-            title={'Update'}
+            title={'Upload'}
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
@@ -421,7 +420,7 @@ export default function UploadUpdateVideoScreen({navigation}) {
 
       <CustomSnackbar
         message={'success'}
-        messageDescription={'Video Updated Successfully'}
+        messageDescription={'Upload Pic successfully'}
         onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackbarVisible}
       />

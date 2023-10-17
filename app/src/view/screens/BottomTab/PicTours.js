@@ -9,7 +9,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP,
@@ -22,7 +22,14 @@ import Headers from '../../../assets/Custom/Headers';
 import Approved from '../../../assets/svg/Approved';
 import Chat from '../../../assets/svg/Chat.svg';
 
+import Add from '../../../assets/svg/AddMainScreen.svg';
+
 import {appImages} from '../../../assets/utilities';
+
+import RBSheet from 'react-native-raw-bottom-sheet';
+
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default function PicTours({navigation}) {
   const [selectedItemId, setSelectedItemId] = useState(null);
@@ -34,6 +41,24 @@ export default function PicTours({navigation}) {
   const [selectedItemPicsId, setSelectedItemPicsId] = useState(null);
 
   const [selectedItemMarketId, setSelectedItemMarketId] = useState(null);
+
+  const [selectedItem, setSelectedItem] = useState('');
+
+  const ref_RBSheetCamera = useRef(null);
+
+
+  const takePhotoFromCamera = value => {
+    ref_RBSheetCamera.current.close();
+    setSelectedItem(value);
+    navigation.navigate('UploadUpdatePic');
+  };
+
+  const choosePhotoFromLibrary = value => {
+    ref_RBSheetCamera.current.close();
+    setSelectedItem(value);
+    navigation.navigate('UploadUpdatePic');
+  };
+
 
   //pics search
 
@@ -195,7 +220,7 @@ export default function PicTours({navigation}) {
           showSearch={true}
           onPressSearch={()=>navigation.navigate("SearchScreen")}
           showText={true}
-          onPressListings={()=>navigation.goBack()}
+          onPressListings={()=>navigation.openDrawer()}
           showListings={true}
           text={'Pic Tour'}
 
@@ -409,6 +434,91 @@ export default function PicTours({navigation}) {
           </View>
         </View>
       </ScrollView>
+
+
+      <RBSheet
+        ref={ref_RBSheetCamera}
+        closeOnDragDown={true}
+        closeOnPressMask={false}
+        animationType="fade"
+        minClosingHeight={0}
+        customStyles={{
+          wrapper: {
+            backgroundColor: 'rgba(52, 52, 52, 0.5)',
+          },
+          draggableIcon: {
+            backgroundColor: 'white',
+          },
+          container: {
+            borderTopLeftRadius: wp(10),
+            borderTopRightRadius: wp(10),
+            height: hp(25),
+          },
+        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginHorizontal: wp(8),
+            alignItems: 'center',
+          }}>
+          <Text style={styles.maintext}>Select an option</Text>
+          <TouchableOpacity onPress={() => ref_RBSheetCamera.current.close()}>
+            <Ionicons
+              name="close"
+              size={22}
+              color={'#303030'}
+              onPress={() => ref_RBSheetCamera.current.close()}
+            />
+          </TouchableOpacity>
+        </View>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-evenly',
+            alignItems: 'center',
+            marginTop: hp(3),
+          }}>
+          <TouchableOpacity
+            onPress={() => takePhotoFromCamera('camera')}
+            style={
+              selectedItem === 'camera'
+                ? styles.selectedItems
+                : styles.nonselectedItems
+            }>
+            <Ionicons
+              color={selectedItem === 'camera' ? '#FACA4E' : '#888888'}
+              name="camera"
+              size={25}
+            />
+
+            <Text style={{color: '#333333'}}>From camera</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => choosePhotoFromLibrary('gallery')}
+            style={
+              selectedItem === 'gallery'
+                ? styles.selectedItems
+                : styles.nonselectedItems
+            }>
+            <MaterialCommunityIcons
+              color={selectedItem === 'gallery' ? '#FACA4E' : '#888888'}
+              name="image"
+              size={25}
+            />
+
+            <Text style={{color: '#333333'}}>From gallery</Text>
+          </TouchableOpacity>
+        </View>
+      </RBSheet>
+
+      <TouchableOpacity
+        onPress={() => ref_RBSheetCamera.current.open()}
+        style={{position: 'absolute', bottom: 1, right: 25}}>
+        <Add />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -440,5 +550,29 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter',
     fontWeight: '700',
     fontSize: hp(1.8),
-  }
+  },
+
+  maintext: {
+    fontSize: hp(2.3),
+    color: '#303030',
+    fontWeight: 'bold',
+  },
+  nonselectedItems: {
+    width: wp(35),
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    height: hp(14),
+    borderRadius: wp(1.8),
+    borderWidth: 1,
+    borderColor: '#E7EAF2',
+  },
+  selectedItems: {
+    width: wp(35),
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    height: hp(14),
+    borderRadius: wp(1.8),
+    borderWidth: 1,
+    borderColor: '#FACA4E',
+  },
 });

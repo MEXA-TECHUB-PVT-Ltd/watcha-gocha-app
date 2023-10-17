@@ -794,7 +794,7 @@ export default function ProductDetailsProfile({navigation}) {
           Confirmation
         </Text>
 
-        <Text style={{marginTop:hp(2)}}>Do you really want to delete this video?</Text>
+        <Text style={{marginTop:hp(2)}}>Do you really want to delete this item?</Text>
 
         <View style={styles.buttonDirections}>
           <TouchableOpacity

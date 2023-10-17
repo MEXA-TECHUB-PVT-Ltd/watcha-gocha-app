@@ -28,8 +28,7 @@ import UpArrowComments from '../../../assets/svg/UpArrowComments.svg';
 
 import BottomSheet, {BottomSheetFlatList} from '@gorhom/bottom-sheet';
 
-import { GestureHandlerRootView } from 'react-native-gesture-handler'
-
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 import Share from 'react-native-share';
 
@@ -68,6 +67,9 @@ export default function ViewVideo({navigation}) {
   const snapPoints = useMemo(() => ['25%', '50%'], []);
 
   const [snackbarVisible, setsnackbarVisible] = useState(false);
+
+  const [commentText, setCommentText] = useState(null); // State variable to hold the text
+
 
   var details =
     'Hold onto your seats and get ready to be mesmerized by the beauty and grandeur of the Hold onto your seats';
@@ -112,6 +114,14 @@ export default function ViewVideo({navigation}) {
       navigation.goBack();
     }, 3000);
   };
+
+  const clearTextInput = () => {
+    console.log("came to logssssss", commentText)
+    // Clear the text in the TextInput
+    setCommentText(null);
+  };
+
+  
 
   const chats = [
     {
@@ -342,221 +352,224 @@ export default function ViewVideo({navigation}) {
   };
 
   return (
-     
-    <GestureHandlerRootView style={{flex:1}}>
-    <ImageBackground source={appImages.videoBG} style={{flex: 1}}>
-      <StatusBar
-        translucent={true}
-        backgroundColor="transparent"
-        barStyle="dark-content" // You can set the StatusBar text color to dark or light
-      />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <IonIcons name={'chevron-back'} color={'white'} size={25} />
-        </TouchableOpacity>
-
-        <Image
-          source={appImages.logoTransparent}
-          style={{width: wp(39), marginLeft: wp(18)}}
-          resizeMode="contain"
+    <GestureHandlerRootView style={{flex: 1}}>
+      <ImageBackground source={appImages.videoBG} style={{flex: 1}}>
+        <StatusBar
+          translucent={true}
+          backgroundColor="transparent"
+          barStyle="dark-content" // You can set the StatusBar text color to dark or light
         />
-
-        {showMenu && (
-          <TouchableOpacity style={{marginLeft: wp(18), marginTop: hp(1)}}>
-            <Entypo name={'dots-three-vertical'} size={18} color={'white'} />
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <IonIcons name={'chevron-back'} color={'white'} size={25} />
           </TouchableOpacity>
-        )}
-      </View>
 
-      <View style={styles.bottomView}>
-        <View style={{height: hp(30), marginHorizontal: wp(8)}}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              height: hp(5),
-            }}>
+          <Image
+            source={appImages.logoTransparent}
+            style={{width: wp(39), marginLeft: wp(18)}}
+            resizeMode="contain"
+          />
+
+          {showMenu && (
+            <TouchableOpacity style={{marginLeft: wp(18), marginTop: hp(1)}}>
+              <Entypo name={'dots-three-vertical'} size={18} color={'white'} />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <View style={styles.bottomView}>
+          <View style={{height: hp(30), marginHorizontal: wp(8)}}>
             <View
               style={{
-                height: hp(10),
-                width: wp(10),
-                borderRadius: wp(8),
-                marginLeft: wp(3),
-                overflow: 'hidden',
+                flexDirection: 'row',
+                alignItems: 'center',
+                height: hp(5),
               }}>
-              <Image
+              <View
                 style={{
-                  flex: 1,
-                  width: null,
-                  height: null,
-                  resizeMode: 'contain',
-                }}
-                source={appImages.profileImg}
-              />
+                  height: hp(10),
+                  width: wp(10),
+                  borderRadius: wp(8),
+                  marginLeft: wp(3),
+                  overflow: 'hidden',
+                }}>
+                <Image
+                  style={{
+                    flex: 1,
+                    width: null,
+                    height: null,
+                    resizeMode: 'contain',
+                  }}
+                  source={appImages.profileImg}
+                />
+              </View>
+
+              <Text style={styles.textProfileName}>John Doe</Text>
             </View>
 
-            <Text style={styles.textProfileName}>John Doe</Text>
-          </View>
+            <ScrollView
+              showsVerticalScrollIndicator={false} // Hide vertical scroll indicator
+              style={{flex: 1, marginTop: hp(1)}}
+              contentContainerStyle={{verticalLine: false}}>
+              <Text
+                style={{
+                  marginTop: hp(1),
+                  fontFamily: 'Inter',
+                  fontSize: hp(1.8),
+                  lineHeight: hp(2.1),
+                  color: '#FFFFFF',
+                }}>
+                {showFullContent
+                  ? details
+                  : details.length > 90
+                  ? details.substring(0, 90) + '...'
+                  : details.slice(0)}
+              </Text>
 
-          <ScrollView
-            showsVerticalScrollIndicator={false} // Hide vertical scroll indicator
-            style={{flex: 1, marginTop: hp(1)}}
-            contentContainerStyle={{verticalLine: false}}>
-            <Text
+              <TouchableOpacity onPress={toggleContent}>
+                <Text
+                  style={{
+                    fontFamily: 'Inter',
+                    fontSize: hp(1.8),
+                    color: '#FACA4E',
+                  }}>
+                  {details.length > 90
+                    ? showFullContent
+                      ? 'See Less'
+                      : 'See More'
+                    : null}
+                </Text>
+              </TouchableOpacity>
+            </ScrollView>
+            <View
               style={{
-                marginTop: hp(1),
-                fontFamily: 'Inter',
-                fontSize: hp(1.8),
-                lineHeight: hp(2.1),
-                color: '#FFFFFF',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                height: hp(5),
               }}>
-              {showFullContent
-                ? details
-                : details.length > 90
-                ? details.substring(0, 90) + '...'
-                : details.slice(0)}
-            </Text>
+              <View
+                style={{
+                  height: hp(2),
+                  width: wp(65),
+                  justifyContent: 'center',
+                }}>
+                <Slider
+                  value={95}
+                  minimumValue={0}
+                  thumbTintColor="#FACA4E"
+                  maximumValue={100}
+                  minimumTrackTintColor={'#FACA4E'}
+                  maximumTrackTintColor={'#F6F6F6'}
+                />
+              </View>
 
-            <TouchableOpacity onPress={toggleContent}>
               <Text
                 style={{
                   fontFamily: 'Inter',
-                  fontSize: hp(1.8),
-                  color: '#FACA4E',
+                  fontSize: hp(1.5),
+                  color: '#FFFFFF',
                 }}>
-                {details.length > 90
-                  ? showFullContent
-                    ? 'See Less'
-                    : 'See More'
-                  : null}
+                02:14
               </Text>
-            </TouchableOpacity>
-          </ScrollView>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              height: hp(5),
-            }}>
-            <View
-              style={{height: hp(2), width: wp(65), justifyContent: 'center'}}>
-              <Slider
-                value={95}
-                minimumValue={0}
-                thumbTintColor="#FACA4E"
-                maximumValue={100}
-                minimumTrackTintColor={'#FACA4E'}
-                maximumTrackTintColor={'#F6F6F6'}
-              />
+              <VolumeUp height={14} width={14} />
             </View>
 
-            <Text
-              style={{
-                fontFamily: 'Inter',
-                fontSize: hp(1.5),
-                color: '#FFFFFF',
-              }}>
-              02:14
-            </Text>
-            <VolumeUp height={14} width={14} />
-          </View>
-
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              height: hp(8),
-            }}>
             <View
               style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                width: wp(15),
-                //borderWidth:3,
-                height: hp(5),
+                height: hp(8),
               }}>
-              <TouchableOpacity onPress={toggleContentLike}>
-                {showLikes ? (
-                  <Like height={21} width={21} />
-                ) : (
-                  <UnLike height={21} width={21} />
-                )}
-              </TouchableOpacity>
-
-              <Text
+              <View
                 style={{
-                  fontFamily: 'Inter-Regular',
-                  fontSize: hp(1.7),
-                  marginLeft: wp(1),
-                  color: '#FFFFFF',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  width: wp(15),
+                  //borderWidth:3,
+                  height: hp(5),
                 }}>
-                2.3 k
-              </Text>
-            </View>
+                <TouchableOpacity onPress={toggleContentLike}>
+                  {showLikes ? (
+                    <Like height={21} width={21} />
+                  ) : (
+                    <UnLike height={21} width={21} />
+                  )}
+                </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() => setIsBottomSheetExpanded(!isBottomSheetExpanded)}
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                width: wp(15),
-                height: hp(5),
-              }}>
-              <TouchableOpacity>
-                <Comment height={21} width={21} />
-              </TouchableOpacity>
+                <Text
+                  style={{
+                    fontFamily: 'Inter-Regular',
+                    fontSize: hp(1.7),
+                    marginLeft: wp(1),
+                    color: '#FFFFFF',
+                  }}>
+                  2.3 k
+                </Text>
+              </View>
 
-              <Text
+              <TouchableOpacity
+                onPress={() => setIsBottomSheetExpanded(!isBottomSheetExpanded)}
                 style={{
-                  fontFamily: 'Inter-Regular',
-                  fontSize: hp(1.7),
-                  color: '#FFFFFF',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  width: wp(15),
+                  height: hp(5),
                 }}>
-                2.3 k
-              </Text>
-            </TouchableOpacity>
+                <TouchableOpacity>
+                  <Comment height={21} width={21} />
+                </TouchableOpacity>
 
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: wp(15),
-                height: hp(5),
-              }}>
-              <TouchableOpacity onPress={() => shareViaWhatsApp()}>
-                <Send height={20} width={20} />
+                <Text
+                  style={{
+                    fontFamily: 'Inter-Regular',
+                    fontSize: hp(1.7),
+                    color: '#FFFFFF',
+                  }}>
+                  2.3 k
+                </Text>
               </TouchableOpacity>
-            </View>
 
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: wp(10),
-                height: hp(5),
-              }}>
-              <TouchableOpacity onPress={() => handleUpdatePassword()}>
-                <Download height={20} width={20} />
-              </TouchableOpacity>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: wp(15),
+                  height: hp(5),
+                }}>
+                <TouchableOpacity onPress={() => shareViaWhatsApp()}>
+                  <Send height={20} width={20} />
+                </TouchableOpacity>
+              </View>
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: wp(10),
+                  height: hp(5),
+                }}>
+                <TouchableOpacity onPress={() => handleUpdatePassword()}>
+                  <Download height={20} width={20} />
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </View>
-      </View>
 
-      <CustomSnackbar
-        message={'success'}
-        messageDescription={'Video downloaded successfully'}
-        onDismiss={dismissSnackbar} // Make sure this function is defined
-        visible={snackbarVisible}
-      />
+        <CustomSnackbar
+          message={'success'}
+          messageDescription={'Video downloaded successfully'}
+          onDismiss={dismissSnackbar} // Make sure this function is defined
+          visible={snackbarVisible}
+        />
 
-      {/* <RBSheet
+        {/* <RBSheet
         ref={ref_Comments}
         height={330}
         openDuration={250}
@@ -617,103 +630,198 @@ export default function ViewVideo({navigation}) {
 
         
       </RBSheet> */}
-      
-      <BottomSheet
-        ref={ref_Comments}
-        index={isBottomSheetExpanded ? 0 : -1} // Set to -1 to start with collapsed state
-        snapPoints={['39%', '90%']} // Adjust snap points as needed
-        onScroll={event => {
-          console.log('Event', event);
-          const offsetY = event.nativeEvent.contentOffset.y;
-          if (isBottomSheetExpanded && offsetY === 0) {
-            setIsBottomSheetExpanded(false);
-          } else if (!isBottomSheetExpanded && offsetY > 0) {
-            setIsBottomSheetExpanded(true);
-          }
-        }}
-        //snapPoints={snapPoints}
-        //onChange={handleSheetChange}
-        height={210}
-        openDuration={250}
-        closeOnDragDown={true}
-        draggableIcon={false}
-        closeOnPressMask={true}
-        customStyles={{
-          container: {
-            borderTopLeftRadius: 100,
-            borderTopRightRadius: 100,
-            paddingTop: 0,
-            padding: 20,
-            zIndex: 999,
-            backgroundColor: 'white',
-          },
-          draggableIcon: {
-            backgroundColor: 'white',
-          },
-        }}>
-        <View
-          style={{
-            width: '100%',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: hp(5),
-          }}>
-          <Text
-            style={{
-              color: '#000000',
-              fontFamily: 'Inter-Bold',
-              fontSize: hp(2.3),
-            }}>
-            Comments
-          </Text>
 
+        <BottomSheet
+          ref={ref_Comments}
+          index={isBottomSheetExpanded ? 0 : -1} // Set to -1 to start with collapsed state
+          snapPoints={['65%', '90%']} // Adjust snap points as needed
+          onScroll={event => {
+            console.log('Event', event);
+            const offsetY = event.nativeEvent.contentOffset.y;
+            if (isBottomSheetExpanded && offsetY === 0) {
+              setIsBottomSheetExpanded(false);
+            } else if (!isBottomSheetExpanded && offsetY > 0) {
+              setIsBottomSheetExpanded(true);
+            }
+          }}
+          //snapPoints={snapPoints}
+          //onChange={handleSheetChange}
+          height={210}
+          openDuration={250}
+          closeOnDragDown={true}
+          draggableIcon={false}
+          closeOnPressMask={true}
+          customStyles={{
+            container: {
+              borderTopLeftRadius: 100,
+              borderTopRightRadius: 100,
+              paddingTop: 0,
+              padding: 20,
+              zIndex: 999,
+              backgroundColor: 'white',
+            },
+            draggableIcon: {
+              backgroundColor: 'white',
+            },
+          }}>
+          <View
+            style={{
+              width: '100%',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: hp(5),
+            }}>
+            <Text
+              style={{
+                color: '#000000',
+                fontFamily: 'Inter-Bold',
+                fontSize: hp(2.3),
+              }}>
+              Comments
+            </Text>
           </View>
 
-          
-           <View style={{marginTop: hp(1),flex:1}}>
-
-
-          <BottomSheetFlatList
+          <View style={{marginTop: hp(1), flex: 1}}>
+            <BottomSheetFlatList
               data={chats}
               keyExtractor={(item, index) => index.toString()}
               renderItem={({item}) => renderComments(item)}
             />
+          </View>
 
-            </View> 
+          {showReply === false ? (
+            <View
+              style={{
+                width: '100%',
+                flexDirection: 'row',
+                alignItems: 'center',
+                height: hp(8),
+              }}>
+              <TouchableOpacity
+                style={{
+                  height: hp(8),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: wp(14),
+                }}>
+                <SmileEmoji />
+              </TouchableOpacity>
 
-            {showReply===false?(<View style={{width:'100%', flexDirection:'row', alignItems:'center', height:hp(8)}}>
-      <TouchableOpacity style={{height:hp(8), justifyContent:'center', alignItems:'center', width:wp(14),}}>
-        <SmileEmoji/>
-      </TouchableOpacity>
+              <TextInput
+                value={commentText} // Bind the value to the state variable
+                onChangeText={text => setCommentText(text)} // Update state on text change
+                placeholderTextColor={'#848484'}
+                placeholder="Write Comment Heressssss"
+                style={{flex: 1, marginLeft: wp(1)}}
+              />
 
-      <TextInput placeholderTextColor={'#848484'} placeholder='Write Comment Here' style={{flex:1, marginLeft:wp(1),}}/>
+              <TouchableOpacity onPress={clearTextInput}>
+                <ButtonSend />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View
+              style={{
+                width: '100%',
+                flexDirection: 'row',
+                alignItems: 'center',
+                height: hp(8),
+              }}>
+              <TouchableOpacity
+                style={{
+                  height: hp(8),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: wp(14),
+                }}>
+                <SmileEmoji />
+              </TouchableOpacity>
 
-      <TouchableOpacity>
-        <ButtonSend/>
-      </TouchableOpacity>
-      </View>): (
+              <TextInput
+                value={commentText} // Bind the value to the state variable
+                onChangeText={text => setCommentText(text)} // Update state on text change
+                placeholderTextColor={'#848484'}
+                placeholder="Add a reply"
+                style={{flex: 1, marginLeft: wp(1)}}
+              />
 
-<View style={{width:'100%', flexDirection:'row', alignItems:'center', height:hp(8)}}>
-      <TouchableOpacity style={{height:hp(8), justifyContent:'center', alignItems:'center', width:wp(14),}}>
-        <SmileEmoji/>
-      </TouchableOpacity>
+              <TouchableOpacity onPress={()=>clearTextInput()}>
+                <ButtonSend />
+              </TouchableOpacity>
+            </View>
+          )}
+        </BottomSheet>
 
-      <TextInput placeholderTextColor={'#848484'} placeholder='Add a reply' style={{flex:1, marginLeft:wp(1),}}/>
+        {isBottomSheetExpanded && showReply === false ? (
+          <View
+            style={{
+              width: '100%',
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              backgroundColor: 'white',
+              flexDirection: 'row',
+              alignItems: 'center',
+              height: hp(8),
+            }}>
+            <TouchableOpacity
+              style={{
+                height: hp(8),
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: wp(14),
+              }}>
+              <SmileEmoji />
+            </TouchableOpacity>
 
-      <TouchableOpacity>
-        <ButtonSend/>
-      </TouchableOpacity>
-      </View>
+            <TextInput
+               value={commentText} // Bind the value to the state variable
+               onChangeText={text => setCommentText(text)} // Update state on text change
+               placeholderTextColor={'#848484'}
+               placeholder="Write Comment Here"
+              style={{flex: 1, marginLeft: wp(1)}}
+            />
 
-      )}
+            <TouchableOpacity onPress={()=>clearTextInput()}>
+              <ButtonSend />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          isBottomSheetExpanded && (
+            <View
+              style={{
+                width: '100%',
+                backgroundColor: 'white',
+                flexDirection: 'row',
+                alignItems: 'center',
+                height: hp(8),
+              }}>
+              <TouchableOpacity
+                style={{
+                  height: hp(8),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: wp(14),
+                }}>
+                <SmileEmoji />
+              </TouchableOpacity>
 
-      </BottomSheet>
+              <TextInput
+                value={commentText} // Bind the value to the state variable
+                onChangeText={text => setCommentText(text)} // Update state on text change
+                placeholderTextColor={'#848484'}
+                placeholder="Add a reply"
+                style={{flex: 1, marginLeft: wp(1)}}
+              />
 
-
-    </ImageBackground>
+              <TouchableOpacity onPress={()=>clearTextInput()}>
+                <ButtonSend />
+              </TouchableOpacity>
+            </View>
+          )
+        )}
+      </ImageBackground>
     </GestureHandlerRootView>
-
-
   );
 }
 

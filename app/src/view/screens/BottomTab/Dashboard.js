@@ -88,6 +88,147 @@ export default function Dashboard({navigation}) {
 
   ];
 
+  const goToScreen = () => {
+    if (selectedItemId === 2) {
+      navigation.navigate('PostLetterInfo');
+    } else if (selectedItemId === 1) {
+      navigation.navigate('PostOnNews');
+    }
+  };
+
+
+  const OpenLetters = () => {
+    return (
+      <View style={{flex: 1}}>
+        <View
+          style={{
+            height: hp(21),
+            alignItems: 'flex-start',
+            justifyContent: 'center',
+          }}>
+          <Image
+            source={appImages.openLettersFirst}
+            style={{resizeMode: 'contain', width: wp(55)}}
+          />
+        </View>
+
+        <View style={{height: hp(21)}}>
+          <Text style={{color: '#4A4A4A', fontWeight: 'bold', fontSize: hp(2)}}>
+            Public (general)
+          </Text>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('LetterDetails')}>
+              <Image
+                source={appImages.OpenLetter}
+                style={{resizeMode: 'contain', width: wp(39)}}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('LetterDetails')}>
+              <Image
+                source={appImages.OpenLetter}
+                style={{resizeMode: 'contain', width: wp(39)}}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={{marginTop: hp(5), height: hp(21)}}>
+          <Text style={{color: '#4A4A4A', fontWeight: 'bold', fontSize: hp(2)}}>
+            Public (to authorities, celebrities, leaders)
+          </Text>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('LetterDetails')}>
+              <Image
+                source={appImages.OpenLetter}
+                style={{resizeMode: 'contain', width: wp(39)}}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('LetterDetails')}>
+              <Image
+                source={appImages.OpenLetter}
+                style={{resizeMode: 'contain', width: wp(39)}}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={{marginTop: hp(5), height: hp(21)}}>
+          <Text style={{color: '#4A4A4A', fontWeight: 'bold', fontSize: hp(2)}}>
+            Private (to friends, peers, followers)
+          </Text>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('LetterDetails')}>
+              <Image
+                source={appImages.OpenLetter}
+                style={{resizeMode: 'contain', width: wp(39)}}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('LetterDetails')}>
+              <Image
+                source={appImages.OpenLetter}
+                style={{resizeMode: 'contain', width: wp(39)}}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={{marginTop: hp(5), height: hp(21)}}>
+          <Text style={{color: '#4A4A4A', fontWeight: 'bold', fontSize: hp(2)}}>
+            Private (to authorities, celebrities, leaders){' '}
+          </Text>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('LetterDetails')}>
+              <Image
+                source={appImages.OpenLetter}
+                style={{resizeMode: 'contain', width: wp(39)}}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('LetterDetails')}>
+              <Image
+                source={appImages.OpenLetter}
+                style={{resizeMode: 'contain', width: wp(39)}}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    );
+  };
+
+
+
   const renderAvailableApps = item => {
     console.log('Items', item);
     return (
@@ -460,10 +601,11 @@ export default function Dashboard({navigation}) {
 
   const renderSearchesDisc = item => {
     console.log('Items', item);
-    const isSelected = selectedItemId === item.id;
+    const isSelected = selectedItemDiscId === item.id;
 
     return (
       <TouchableOpacity
+        
         style={[
           styles.searchesDetails,
           {
@@ -472,7 +614,8 @@ export default function Dashboard({navigation}) {
           },
         ]}
         onPress={() => {
-          setSelectedItemId(item.id);
+          setSelectedItemDiscId(item.id);
+
           console.log('Selected item:', item.title);
         }}>
         <Text
@@ -877,6 +1020,127 @@ export default function Dashboard({navigation}) {
   };
 
   //----------------------\\
+
+
+  const DiscScreenOpen=()=>{
+
+    return(
+<View>
+
+<View 
+style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(18)}}>
+<TouchableOpacity onPress={()=>navigation.navigate("News")} style={{width: wp(35), marginLeft:wp(2), height: '100%', borderRadius: wp(5)}}>
+  <Image
+    style={{
+      position: 'absolute',
+      top: 0,
+      left: 0,
+
+      zIndex: 1, // Ensure it's on top of other elements
+      //flex: 1,
+      width: '100%',
+      height: '100%',
+      borderRadius: wp(3),
+      resizeMode: 'cover',
+    }}
+    source={appImages.topSearches1}
+  />
+</TouchableOpacity>
+
+<View style={{justifyContent: 'flex-end', flex: 1}}>
+  <View
+    style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      height: hp(7),
+      width: wp(40),
+    }}>
+    <View
+      style={{
+        width: wp(10),
+        marginLeft: wp(3),
+        height: wp(10),
+        borderRadius: wp(10) / 2,
+      }}>
+      <Image
+        source={appImages.profileImg}
+        style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+      />
+    </View>
+
+    <Text
+      style={{
+        fontSize: hp(1.6),
+        marginLeft: wp(2),
+        color: '#000000',
+        fontWeight: 'bold',
+        fontFamily: 'Inter',
+      }}>
+      John Doe
+    </Text>
+
+    <View style={{marginLeft: wp(1)}}>
+      <Approved />
+    </View>
+  </View>
+
+  <View
+    style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      height: hp(7),
+      marginLeft:wp(1.5),
+      width: wp(35),
+    }}>
+    <Text
+      style={{
+        fontSize: hp(1.5),
+        lineHeight:hp(2.3),
+        marginLeft: wp(2.5),
+        //fontWeight: 'Inter_Regular',
+        fontFamily: 'Inter_Regular',
+        color: '#000000',
+      }}>
+      Explore the intricate web of global politics in this thought-
+    </Text>
+  </View>
+</View>
+</View>
+
+<View style={{marginTop: hp(2), height: hp(23)}}>
+<View style={{marginTop: hp(1), height: '100%'}}>
+  <FlatList
+    style={{flex: 1}}
+    showsVerticalScrollIndicator={false}
+    data={availableAppsDisc}
+    horizontal
+    keyExtractor={item => item.id.toString()}
+    renderItem={({item}) => renderAvailableAppsDisc(item)}
+  />
+</View>
+</View>
+
+<View style={{height: hp(23)}}>
+<View style={{marginTop: hp(1), height: '100%'}}>
+  <FlatList
+    style={{flex: 1}}
+    showsVerticalScrollIndicator={false}
+    data={availableAppsDisc}
+    horizontal
+    keyExtractor={item => item.id.toString()}
+    renderItem={({item}) => renderAvailableAppsDisc(item)}
+  />
+</View>
+</View>
+
+</View>
+
+
+    )
+
+    
+  };
+
 
   return (
     <View style={styles.container}>
@@ -1312,111 +1576,16 @@ export default function Dashboard({navigation}) {
             />
           </View>
 
-          <View 
-            style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(18)}}>
-            <TouchableOpacity onPress={()=>navigation.navigate("News")} style={{width: wp(35), marginLeft:wp(2), height: '100%', borderRadius: wp(5)}}>
-              <Image
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
+          {selectedItemDiscId === 0 ? (
+            <DiscScreenOpen/>
+        ) : selectedItemDiscId === 2 ? (
+          <OpenLetters />
+        ) : (
+          <DiscScreenOpen/>
 
-                  zIndex: 1, // Ensure it's on top of other elements
-                  //flex: 1,
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: wp(3),
-                  resizeMode: 'cover',
-                }}
-                source={appImages.topSearches1}
-              />
-            </TouchableOpacity>
+        )}
 
-            <View style={{justifyContent: 'flex-end', flex: 1}}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  height: hp(7),
-                  width: wp(40),
-                }}>
-                <View
-                  style={{
-                    width: wp(10),
-                    marginLeft: wp(3),
-                    height: wp(10),
-                    borderRadius: wp(10) / 2,
-                  }}>
-                  <Image
-                    source={appImages.profileImg}
-                    style={{width: '100%', height: '100%', resizeMode: 'cover'}}
-                  />
-                </View>
 
-                <Text
-                  style={{
-                    fontSize: hp(1.6),
-                    marginLeft: wp(2),
-                    color: '#000000',
-                    fontWeight: 'bold',
-                    fontFamily: 'Inter',
-                  }}>
-                  John Doe
-                </Text>
-
-                <View style={{marginLeft: wp(1)}}>
-                  <Approved />
-                </View>
-              </View>
-
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  height: hp(7),
-                  marginLeft:wp(1.5),
-                  width: wp(35),
-                }}>
-                <Text
-                  style={{
-                    fontSize: hp(1.5),
-                    lineHeight:hp(2.3),
-                    marginLeft: wp(2.5),
-                    //fontWeight: 'Inter_Regular',
-                    fontFamily: 'Inter_Regular',
-                    color: '#000000',
-                  }}>
-                  Explore the intricate web of global politics in this thought-
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          <View style={{marginTop: hp(2), height: hp(23)}}>
-            <View style={{marginTop: hp(1), height: '100%'}}>
-              <FlatList
-                style={{flex: 1}}
-                showsVerticalScrollIndicator={false}
-                data={availableAppsDisc}
-                horizontal
-                keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableAppsDisc(item)}
-              />
-            </View>
-          </View>
-
-          <View style={{height: hp(23)}}>
-            <View style={{marginTop: hp(1), height: '100%'}}>
-              <FlatList
-                style={{flex: 1}}
-                showsVerticalScrollIndicator={false}
-                data={availableAppsDisc}
-                horizontal
-                keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableAppsDisc(item)}
-              />
-            </View>
-          </View>
         </View>
 
         {/* Pic Tours */}
@@ -1551,7 +1720,7 @@ export default function Dashboard({navigation}) {
               color: '#4A4A4A',
               fontWeight: 'bold',
             }}>
-            Latest Video
+            Latest Pics
           </Text>
 
           <View style={{marginTop: hp(1), height: '100%'}}>

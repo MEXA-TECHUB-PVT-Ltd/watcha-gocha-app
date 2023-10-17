@@ -84,16 +84,13 @@ export default function MarketZone({navigation}) {
   ];
 
   const searches = [
-    {id: 1, title: 'Games'},
-    {id: 2, title: 'Business'},
-    {id: 3, title: 'Education'},
-    {id: 4, title: 'Games'},
-    {id: 5, title: 'Business'},
-    {id: 6, title: 'Education'},
-    {id: 7, title: 'Games'},
-    {id: 8, title: 'Business'},
-    {id: 9, title: 'Education'},
-    {id: 10, title: 'Games'},
+    {id: 1, title: 'Africa'},
+    {id: 2, title: 'Europe'},
+    {id: 3, title: 'N America'},
+    {id: 4, title: 'L. America'},
+    {id: 5, title: 'Asia'},
+    {id: 6, title: 'Middle East'},
+    {id: 7, title: 'Carribean'},
   ];
 
   const handleUpdatePassword = async () => {

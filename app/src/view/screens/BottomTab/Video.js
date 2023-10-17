@@ -416,7 +416,7 @@ export default function Video({navigation}) {
 
           <View style={{marginTop: hp(1), height: '100%'}}>
             <FlatList
-              style={{flex: 1}}
+              style={{flex: 1,}}
               showsVerticalScrollIndicator={false}
               data={availableAppsVideo}
               horizontal

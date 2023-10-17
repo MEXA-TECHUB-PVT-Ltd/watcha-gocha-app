@@ -123,6 +123,7 @@ import {
   };
 
   const takePhotoFromCamera = async value => {
+    ref_RBSheetCameraCanvas.current.close();
     setSelectedItem(value);
     launchCamera(
       {
@@ -141,12 +142,14 @@ import {
             console.log('response', response.uri);
           }
         }
-        ref_RBSheetCamera.current.close();
       },
     );
   };
 
   const choosePhotoFromLibrary = value => {
+
+    ref_RBSheetCameraCanvas.current.close();
+
     setSelectedItem(value);
     launchImageLibrary({mediaType: 'photo'}, response => {
       console.log('image here', response);
@@ -155,7 +158,7 @@ import {
       }
       console.log('response', imageUri);
 
-      ref_RBSheetCamera.current.close();
+      //ref_RBSheetCamera.current.close();
     });
   };
 
