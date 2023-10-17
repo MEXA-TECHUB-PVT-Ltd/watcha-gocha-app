@@ -186,31 +186,86 @@ export default function Sell({navigation}) {
         keyboardShouldPersistTaps="always"
         showsVerticalScrollIndicator={false}
         style={styles.container}>
-        <TouchableOpacity
-        onPress={()=>ref_RBSheetCamera.current.open()}
-          style={{
-            borderRadius: wp(3),
-            marginTop: hp(5),
-            height: hp(25),
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderWidth: 1,
-            borderColor: '#E7EAF2',
-          }}>
-          <Image style={{resizeMode: 'contain'}} source={appImages.gallery} />
 
-          <Text
+          {/* //post letter */}
+
+          <TouchableOpacity
+      onPress={()=>ref_RBSheetCamera.current.open()}
+      style={{
+        borderRadius: wp(3),
+        marginTop: hp(5),
+        height: hp(25),
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#E7EAF2',
+      }}
+    >
+      {imageUri!==null ? (
+        <Image style={{ resizeMode: 'contain' }} source={{ uri: imageUri }} />
+      ) : (
+        <Image style={{ resizeMode: 'contain' }} source={appImages.gallery} />
+      )}
+
+      <Text
+        style={{
+          fontFamily: 'Inter',
+          marginTop: hp(1.8),
+          // fontWeight: 'bold',
+          fontSize: hp(1.5),
+          color: '#939393',
+        }}
+      >
+        You can upload a minimum of 1 and {'\n'}a maximum of 10 images.
+      </Text>
+    </TouchableOpacity>
+
+          
+          {/* //-------------------\\ */}
+
+          {imageUri !== null ? (
+          <View
             style={{
-              fontFamily: 'Inter',
-              marginTop: hp(1.8),
-              //fontWeight: 'bold',
-              fontSize: hp(1.5),
-              color: '#939393',
+              marginTop: hp(5),
+              height: hp(35),
+              borderRadius: wp(3),
+              marginHorizontal: wp(20),
             }}>
-            You can upload a minimum of 1 and{'\n'}a maximum of 10 images.
-          </Text>
-        </TouchableOpacity>
+            {imageUri !== null && (
+              <Image
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  zIndex: 1, // Ensure it's on top of other elements
+                  flex: 1,
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: wp(3),
+                  resizeMode: 'contain',
+                }}
+                source={{uri: imageUri}}
+              />
+            )}
+            {imageUri == null && (
+              <Image
+                style={{
+                  flex: 1,
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: wp(3),
+                  resizeMode: 'stretch',
+                  zIndex: 0, // Ensure it's below other elements when no image
+                }}
+                source={appImages.updatePics}
+              />
+            )}
+          </View>
+        ) : null}
 
+
+
+        
         <TextInput
           mode="outlined"
           label="Title"
@@ -431,7 +486,7 @@ export default function Sell({navigation}) {
 
       <CustomSnackbar
         message={'success'}
-        messageDescription={'Item updated successfully'}
+        messageDescription={'Item uploaded successfully'}
         onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackbarVisible}
       />

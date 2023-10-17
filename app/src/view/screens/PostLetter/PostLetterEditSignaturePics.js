@@ -230,7 +230,7 @@ import {
     );
   };
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
     <StatusBar
         translucent={true}
         backgroundColor="transparent"
@@ -317,6 +317,48 @@ import {
             You can maximum 3 images or videos
           </Text>
         </TouchableOpacity>
+
+
+        {imageUri !== null ? (
+          <View
+            style={{
+              marginTop: hp(5),
+              height: hp(35),
+              borderRadius: wp(3),
+              marginHorizontal: wp(20),
+            }}>
+            {imageUri !== null && (
+              <Image
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  zIndex: 1, // Ensure it's on top of other elements
+                  flex: 1,
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: wp(3),
+                  resizeMode: 'contain',
+                }}
+                source={{uri: imageUri}}
+              />
+            )}
+            {imageUri == null && (
+              <Image
+                style={{
+                  flex: 1,
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: wp(3),
+                  resizeMode: 'stretch',
+                  zIndex: 0, // Ensure it's below other elements when no image
+                }}
+                source={appImages.updatePics}
+              />
+            )}
+          </View>
+        ) : null}
+
 
         <View style={{flex:1, justifyContent:'flex-end'}}>
         <View style={{marginTop: '25%', alignSelf: 'center'}}>
@@ -599,7 +641,7 @@ import {
         visible={snackbarVisible}
       />
       
-      </View>
+      </ScrollView>
   )
 }
 

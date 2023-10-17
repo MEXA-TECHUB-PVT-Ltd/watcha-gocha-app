@@ -56,6 +56,14 @@ import CustomSnackbar from '../../assets/Custom/CustomSnackBar';
 export default function Conversation({navigation}) {
   const [messages, setMessages] = useState([]);
 
+  const [commentText, setCommentText] = useState(null); // State variable to hold the text
+
+  const clearTextInput = () => {
+    console.log('came to logssssss', commentText);
+    // Clear the text in the TextInput
+    setCommentText(null);
+  };
+
   useEffect(() => {
     setMessages([
       {
@@ -259,11 +267,13 @@ export default function Conversation({navigation}) {
 
         <TextInput
           placeholderTextColor={'#848484'}
+          value={commentText} // Bind the value to the state variable
+          onChangeText={text => setCommentText(text)} // Update state on text change
           placeholder="Write Comment Here"
           style={{flex: 1, marginLeft: wp(1)}}
         />
 
-        <TouchableOpacity>
+        <TouchableOpacity onPress={()=> clearTextInput()}>
           <ButtonSend />
         </TouchableOpacity>
       </View>
