@@ -75,6 +75,21 @@ export default function GEBC({navigation}) {
 
   const [snackbarVisible, setSnackbarVisible] = useState(false);
 
+  const [loading, setIsLoading] = useState(false);
+
+  const Category = [
+    {label: 'Politics', value: 'Politics'},
+    {label: 'Sports', value: 'Sports'},
+    {label: 'Business', value: 'Business'},
+    {label: 'Finance', value: 'Finance'},
+    {label: 'Tech', value: 'Tech'},
+    {label: 'Health', value: 'Health'},
+    {label: 'Culture', value: 'Culture'},
+
+  ];
+
+
+
   const dismissSnackbar = () => {
     setSnackbarVisible(true);
   };
@@ -166,7 +181,11 @@ export default function GEBC({navigation}) {
       behavior="height" // You can use ‘height’ as well, depending on your preference
       enabled>
       <View style={styles.header}>
+        <TouchableOpacity onPress={()=>navigation.goBack()}>
+
         <IonIcons name={'chevron-back'} color={'#282828'} size={25} />
+
+        </TouchableOpacity>
 
         <Text style={styles.headerText}>GEBC</Text>
       </View>
@@ -284,6 +303,56 @@ export default function GEBC({navigation}) {
             )}
           </View>
         ) : null}
+
+<View style={{marginLeft:wp(8), marginRight:wp(7)}}>
+          <Dropdown
+            style={styles.textInputCategoryNonSelected}
+            containerStyle={{
+              marginTop: 3,
+              alignSelf: 'center',
+              borderRadius: wp(3),
+              width: '100%',
+            }}
+            // dropdownPosition="top"
+            // mode="modal"
+            placeholderStyle={{
+              color: '#121420',
+              //   fontWeight: '400',
+              fontFamily: 'Inter',
+              fontSize: hp(1.8),
+            }}
+            iconStyle={isFocus ? styles.iconStyle : styles.iconStyleInactive}
+            itemTextStyle={{color: '#000000'}}
+            selectedTextStyle={{fontSize: 16, color: '#000000'}}
+            // inputSearchStyle={styles.inputSearchStyle}
+            // iconStyle={styles.iconStyle}
+            value={category}
+            data={Category}
+            search={false}
+            maxHeight={200}
+            labelField="label"
+            valueField="value"
+            placeholder={'Select Category'}
+            searchPlaceholder="Search..."
+            onFocus={() => setIsFocus(true)}
+            onBlur={() => setIsFocus(false)}
+            onChange={item => {
+              setCategory(item.value);
+              setIsFocus(false);
+            }}
+            renderRightIcon={() => (
+              <AntDesign
+                style={styles.icon}
+                color={isFocus ? '#000000' : '#000000'}
+                name="down"
+                size={15}
+              />
+            )}
+          />
+        </View>
+
+
+
 
         <View style={{marginTop: '2%', alignSelf: 'center'}}>
           <CustomButton

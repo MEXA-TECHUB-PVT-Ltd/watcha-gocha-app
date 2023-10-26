@@ -53,13 +53,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import SwitchSelector from 'react-native-switch-selector';
 LogBox.ignoreAllLogs();
 
-export default function VerifyAccount({navigation}) {
+export default function VerifyAccount({navigation, route}) {
   const [value, setValue] = useState('');
   const [otpCode, setOtpCode] = useState('');
 
-
   const ref_RBSendOffer = useRef(null);
   const [loading, setLoading] = useState(false);
+
+  const [otpError, setOTPError] = useState(false);
+
 
   //const ref = useBlurOnFulfill({value, cellCount: 4});
  /*  const [props, getCellOnLayoutHandler] = useClearByFocusCell({
@@ -67,6 +69,81 @@ export default function VerifyAccount({navigation}) {
     setValue,
   }); */
   const [isFocused, setIsFocused] = useState(false);
+  
+  const email = route.params?.email; // Use optional chaining
+
+  console.log("Email Verify", email);
+
+  const goTOScreen = () => {
+    console.log('clicked');
+
+    const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+
+    setOTPError(false);
+
+    if (otpCode === '') {
+      setOTPError(true);
+    } else {
+      setLoading(true);
+      setTimeout(() => {
+        handleSendCode()
+        //setIsLoading(false);
+
+        // Replace 'YourTargetScreen' with the screen you want to navigate to
+      }, 2000);
+    }
+  };
+
+
+  const verifyOTPEndpoint =
+    'https://watch-gotcha-be.mtechub.com/user/verifyOtp'; // Replace with your actual API endpoint
+
+  const handleSendCode = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(verifyOTPEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          code: otpCode,
+          role:"user"
+        }),
+      });
+
+      const data = await response.json();
+
+      console.log('error data sign in', data);
+
+      if (data.statusCode === 200) {
+        setLoading(false);
+
+        ref_RBSendOffer.current.open();
+
+        // Assuming there's at least one result
+        
+      } else {
+        setLoading(false);
+        console.error('No results found.', data.response.result);
+      }
+
+      setLoading(false);
+      // Reset the input fields
+      //setEmail('');
+      // navigation.navigate('SelectGender');
+    } catch (error) {
+      //console.error('Error:');
+      //showAlert();
+      setLoading(false);
+    }
+  };
+
+  
+
+
+
   return (
     <ScrollView style={styles.bg} contentContainerStyle={{flexGrow: 1}}>
       <StatusBar barStyle={'dark-content'} backgroundColor={'#FACA4E'} />
@@ -134,6 +211,18 @@ export default function VerifyAccount({navigation}) {
 
                
               </View>
+
+              {otpError === true ? (
+          <Text
+            style={{
+              color: 'red',
+              marginLeft:wp(1),
+              marginTop: hp(1.8),
+              fontSize: hp(1.8),
+            }}>
+             Please Enter Your Otp First
+          </Text>
+        ) : null}
             </View>
 
 {/* <View style={{width: wp(90), flex: 1, zIndex: 999}}>
@@ -191,7 +280,7 @@ export default function VerifyAccount({navigation}) {
             load={loading}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-              ref_RBSendOffer.current.open();
+             goTOScreen()
               //navigation.navigate('Profile_image');
             }}
           />

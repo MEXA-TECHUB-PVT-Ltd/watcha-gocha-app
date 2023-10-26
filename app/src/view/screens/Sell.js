@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import Back from '../../assets/svg/back.svg';
 import {appImages} from '../../assets/utilities/index';
 import {
@@ -28,12 +28,36 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SelectCountry, Dropdown} from 'react-native-element-dropdown';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import RBSheet from 'react-native-raw-bottom-sheet';
 import CustomSnackbar from '../../assets/Custom/CustomSnackBar';
 
-
 export default function Sell({navigation}) {
+  
+  const [userId, setUserId] = useState('');
+
+  useEffect(() => {
+    const getUserID = async () => {
+      console.log("Id's");
+      try {
+        const result = await AsyncStorage.getItem('userId ');
+        if (result !== null) {
+          setUserId(result);
+          console.log('user id retrieved:', result);
+        }
+      } catch (error) {
+        // Handle errors here
+        console.error('Error retrieving user ID:', error);
+      }
+    };
+
+    getUserID();
+  }, []);
+
   const [selectedItem, setSelectedItem] = useState('');
+
+  const ref_RBSendOffer = useRef(null);
 
   const [title, setTitle] = useState('');
 
@@ -120,7 +144,7 @@ export default function Sell({navigation}) {
     launchCamera(
       {
         mediaType: 'photo',
-       // videoQuality: 'medium',
+        // videoQuality: 'medium',
       },
       response => {
         console.log('image here', response);
@@ -180,50 +204,51 @@ export default function Sell({navigation}) {
         barStyle="dark-content" // You can set the StatusBar text color to dark or light
       />
       <View style={{marginTop: hp(5)}}>
-        <Headers onPress={()=>navigation.goBack()} showBackIcon={true} text={'Sell'} showText={true} />
+        <Headers
+          onPress={() => navigation.goBack()}
+          showBackIcon={true}
+          text={'Sell'}
+          showText={true}
+        />
       </View>
       <ScrollView
         keyboardShouldPersistTaps="always"
         showsVerticalScrollIndicator={false}
         style={styles.container}>
+        {/* //post letter */}
 
-          {/* //post letter */}
-
-          <TouchableOpacity
-      onPress={()=>ref_RBSheetCamera.current.open()}
-      style={{
-        borderRadius: wp(3),
-        marginTop: hp(5),
-        height: hp(25),
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#E7EAF2',
-      }}
-    >
-      {imageUri!==null ? (
-        <Image style={{ resizeMode: 'contain' }} source={{ uri: imageUri }} />
-      ) : (
-        <Image style={{ resizeMode: 'contain' }} source={appImages.gallery} />
-      )}
-
-      <Text
-        style={{
-          fontFamily: 'Inter',
-          marginTop: hp(1.8),
-          // fontWeight: 'bold',
-          fontSize: hp(1.5),
-          color: '#939393',
-        }}
-      >
-        You can upload a minimum of 1 and {'\n'}a maximum of 10 images.
-      </Text>
-    </TouchableOpacity>
-
-          
-          {/* //-------------------\\ */}
-
+        <TouchableOpacity
+          onPress={() => ref_RBSheetCamera.current.open()}
+          style={{
+            borderRadius: wp(3),
+            marginTop: hp(5),
+            height: hp(25),
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderWidth: 1,
+            borderColor: '#E7EAF2',
+          }}>
           {imageUri !== null ? (
+            <Image style={{resizeMode: 'contain'}} source={{uri: imageUri}} />
+          ) : (
+            <Image style={{resizeMode: 'contain'}} source={appImages.gallery} />
+          )}
+
+          <Text
+            style={{
+              fontFamily: 'Inter',
+              marginTop: hp(1.8),
+              // fontWeight: 'bold',
+              fontSize: hp(1.5),
+              color: '#939393',
+            }}>
+            You can upload a minimum of 1 and {'\n'}a maximum of 10 images.
+          </Text>
+        </TouchableOpacity>
+
+        {/* //-------------------\\ */}
+
+        {imageUri !== null ? (
           <View
             style={{
               marginTop: hp(5),
@@ -263,9 +288,6 @@ export default function Sell({navigation}) {
           </View>
         ) : null}
 
-
-
-        
         <TextInput
           mode="outlined"
           label="Title"
@@ -363,7 +385,7 @@ export default function Sell({navigation}) {
 
         <TouchableOpacity
           onPress={() => handleCheckboxChange()}
-          style={{flexDirection: 'row', marginTop:hp(3), width: '100%'}}>
+          style={{flexDirection: 'row', marginTop: hp(3), width: '100%'}}>
           <TouchableOpacity
             style={isChecked ? styles.selectCheckBox : styles.unSelectCheckBox}
             onPress={
@@ -391,15 +413,23 @@ export default function Sell({navigation}) {
             Add to top post
           </Text>
         </TouchableOpacity>
-        
-        <View style={{marginTop:hp(5)}}>
 
-        <CustomButton
+        <View style={{marginTop: hp(5)}}>
+          <CustomButton
             title={'Upload'}
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-              handleUpdatePassword()
+              if (userId === '') {
+
+                handleUpdatePassword();
+               
+              } else {
+                
+                ref_RBSendOffer.current.open();
+
+
+              }
               //navigation.navigate('Profile_image');
             }}
           />
@@ -490,6 +520,75 @@ export default function Sell({navigation}) {
         onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackbarVisible}
       />
+      <RBSheet
+        ref={ref_RBSendOffer}
+        closeOnDragDown={true}
+        closeOnPressMask={false}
+        animationType="fade"
+        minClosingHeight={0}
+        customStyles={{
+          wrapper: {
+            backgroundColor: 'rgba(52, 52, 52, 0.5)',
+          },
+          draggableIcon: {
+            backgroundColor: 'white',
+          },
+          container: {
+            borderTopLeftRadius: wp(10),
+            borderTopRightRadius: wp(10),
+            height: hp(51),
+          },
+        }}>
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            marginHorizontal: wp(8),
+            justifyContent: 'space-evenly',
+          }}>
+          <Image
+            source={appImages.alert}
+            style={{
+              width: wp(30),
+              marginTop: hp(-10),
+              height: hp(30),
+              resizeMode: 'contain',
+            }}
+          />
+
+          <View style={{marginTop: hp(-5), height: hp(8)}}>
+            <Text
+              style={{
+                color: '#333333',
+                textAlign: 'center',
+                fontSize: hp(2.3),
+                fontWeight: 'bold',
+                fontFamily: 'Inter',
+              }}>
+              Join Us Today
+            </Text>
+
+            <Text
+              style={{
+                color: '#9597A6',
+                marginTop: hp(0.5),
+                textAlign: 'center',
+                fontSize: hp(1.8),
+                marginTop: hp(1.5),
+                //fontWeight:'bold',
+                fontFamily: 'Inter',
+              }}>
+              We invite you to become a part of our community
+            </Text>
+          </View>
+
+          <View style={{flexDirection:'row', width:'80%',  justifyContent:'space-around', alignItems:'center',borderWidth:3,height:hp(8),marginHorizontal: wp(5)}}>
+            <View style={{width:wp(12), borderWidth:3, height:hp(5)}}>
+
+            </View>
+          </View>
+        </View>
+      </RBSheet>
     </KeyboardAvoidingView>
   );
 }
@@ -574,22 +673,22 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#FACA4E',
   },
-  selectCheckBox:{
+  selectCheckBox: {
     width: 17,
     height: 17,
     borderRadius: wp(1),
     borderWidth: 1,
-    alignItems:'center',
-    justifyContent:'center',
+    alignItems: 'center',
+    justifyContent: 'center',
     borderColor: '#FACA4E',
   },
-  unSelectCheckBox:{
+  unSelectCheckBox: {
     width: 17,
     height: 17,
     borderRadius: wp(1),
     borderWidth: 1,
-    alignItems:'center',
-    justifyContent:'center',
+    alignItems: 'center',
+    justifyContent: 'center',
     borderColor: '#C4C4C4',
   },
 });

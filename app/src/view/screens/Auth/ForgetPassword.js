@@ -50,6 +50,7 @@ const ForgetPassword = ({navigation}) => {
   const [openGallery, setOpenGallery] = useState(false);
   const [userName, setUserName] = useState('');
   const [imageUri, setImageUri] = useState(null);
+  const [emailSignInError, setEmailSignInError] = useState(false);
   const ref_RBSheet = useRef(null);
   const ref_RBSheetCamera = useRef(null);
 
@@ -61,12 +62,73 @@ const ForgetPassword = ({navigation}) => {
     setIsTextInputActive(false);
   };
 
+  const goTOScreen = () => {
+    console.log('clicked');
+
+    const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+
+    setEmailSignInError(false);
+
+    if (email === '') {
+      setEmailSignInError(true);
+    } else {
+      setIsLoading(true);
+      setTimeout(() => {
+        handleSendCode()
+        //setIsLoading(false);
+
+        // Replace 'YourTargetScreen' with the screen you want to navigate to
+      }, 2000);
+    }
+  };
+
+  const forgetPasswordEndpoint =
+    'https://watch-gotcha-be.mtechub.com/user/forgetPassword'; // Replace with your actual API endpoint
+
+  const handleSendCode = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(forgetPasswordEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          role:'user'
+        }),
+      });
+
+      const data = await response.json();
+
+      console.log('error data sign in', data);
+
+      if (data.statusCode === 200) {
+        setIsLoading(false);
+        console.log("Email", email)
+        // Assuming there's at least one result
+        navigation.navigate('VerifyAccount', {
+          email: email,
+        });
+      } else {
+        setIsLoading(false);
+        console.error('No results found.', data.response.result);
+      }
+
+      setIsLoading(false);
+      // Reset the input fields
+      // navigation.navigate('SelectGender');
+    } catch (error) {
+      //console.error('Error:');
+      //showAlert();
+      setIsLoading(false);
+    }
+  };
+
   return (
     <ScrollView style={styles.bg} contentContainerStyle={{flexGrow: 1}}>
       <StatusBar barStyle={'dark-content'} backgroundColor={'#FACA4E'} />
       <View style={styles.mainv}>
-
-        
         <TouchableOpacity
           style={{marginTop: '9%', marginLeft: '8%', alignSelf: 'flex-start'}}
           onPress={() => navigation.goBack()}>
@@ -116,13 +178,25 @@ const ForgetPassword = ({navigation}) => {
           // left={isTextInputActive ? <Oemail /> : <Gemail />}
         />
 
+        {emailSignInError === true ? (
+          <Text
+            style={{
+              color: 'red',
+              marginLeft:wp(-39),
+              marginTop: hp(1.8),
+              fontSize: hp(1.8),
+            }}>
+            Please Enter Your Email!
+          </Text>
+        ) : null}
+
         <View style={{marginTop: '25%', alignSelf: 'center'}}>
           <CustomButton
             title="Send Code"
             load={loading}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-             navigation.navigate("VerifyAccount")
+               goTOScreen()
               //navigation.navigate('Profile_image');
             }}
           />

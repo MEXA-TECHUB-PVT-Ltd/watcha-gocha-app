@@ -44,9 +44,10 @@ import Fontiso from 'react-native-vector-icons/Fontisto';
 
 import IonIcons from 'react-native-vector-icons/Ionicons';
 
-import {SelectCountry, Dropdown} from 'react-native-element-dropdown';
 import CPaperInput from '../../../assets/Custom/CPaperInput';
 import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
+
+import {SelectCountry, Dropdown} from 'react-native-element-dropdown';
 
 const Category = [
   {label: 'Item 1', value: '1'},
@@ -162,6 +163,18 @@ export default function PostOnNews({navigation}) {
   const dismissSnackbar = () => {
     setsnackbarVisible(false);
   };
+
+  const Category = [
+    {label: 'Politics', value: 'Politics'},
+    {label: 'Sports', value: 'Sports'},
+    {label: 'Business', value: 'Business'},
+    {label: 'Finance', value: 'Finance'},
+    {label: 'Tech', value: 'Tech'},
+    {label: 'Health', value: 'Health'},
+    {label: 'Culture', value: 'Culture'},
+
+  ];
+
 
   return (
     <KeyboardAvoidingView
@@ -296,6 +309,54 @@ export default function PostOnNews({navigation}) {
             )}
           </View>
         ) : null}
+
+
+<View style={{marginLeft:wp(8), marginRight:wp(7)}}>
+          <Dropdown
+            style={styles.textInputCategoryNonSelected}
+            containerStyle={{
+              marginTop: 3,
+              alignSelf: 'center',
+              borderRadius: wp(3),
+              width: '100%',
+            }}
+            // dropdownPosition="top"
+            // mode="modal"
+            placeholderStyle={{
+              color: '#121420',
+              //   fontWeight: '400',
+              fontFamily: 'Inter',
+              fontSize: hp(1.8),
+            }}
+            iconStyle={isFocus ? styles.iconStyle : styles.iconStyleInactive}
+            itemTextStyle={{color: '#000000'}}
+            selectedTextStyle={{fontSize: 16, color: '#000000'}}
+            // inputSearchStyle={styles.inputSearchStyle}
+            // iconStyle={styles.iconStyle}
+            value={category}
+            data={Category}
+            search={false}
+            maxHeight={200}
+            labelField="label"
+            valueField="value"
+            placeholder={'Select Category'}
+            searchPlaceholder="Search..."
+            onFocus={() => setIsFocus(true)}
+            onBlur={() => setIsFocus(false)}
+            onChange={item => {
+              setCategory(item.value);
+              setIsFocus(false);
+            }}
+            renderRightIcon={() => (
+              <AntDesign
+                style={styles.icon}
+                color={isFocus ? '#000000' : '#000000'}
+                name="down"
+                size={15}
+              />
+            )}
+          />
+        </View>
 
         
       </ScrollView>
