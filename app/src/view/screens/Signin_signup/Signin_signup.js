@@ -20,6 +20,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
+
 import {appImages} from '../../../assets/utilities/index';
 import {Button, Divider, TextInput} from 'react-native-paper';
 import {
@@ -151,35 +152,31 @@ const App = ({navigation}) => {
       setSignUpEmailError(false);
       setSignUpPasswordError(false);
       setSignUpConfirmPasswordError(true);
-    }
-    
-    else if (
-        username === '' &&
-        signup_email === '' &&
-        signup_pass === '' &&
-        signup_cpass !== ''
-      ) {
-        console.log('user name not present');
-  
-        setSignUpUserNameError(true);
-        setSignUpEmailError(true);
-        setSignUpPasswordError(true);
-        setSignUpConfirmPasswordError(false);
-      }
-      else if (
-        username !== '' &&
-        signup_email === '' &&
-        signup_pass !== '' &&
-        signup_cpass !== ''
-      ) {
-        console.log('user name not present');
-  
-        setSignUpUserNameError(false);
-        setSignUpEmailError(true);
-        setSignUpPasswordError(false);
-        setSignUpConfirmPasswordError(false);
-      }
-     else if (!emailRegex.test(signup_email)) {
+    } else if (
+      username === '' &&
+      signup_email === '' &&
+      signup_pass === '' &&
+      signup_cpass !== ''
+    ) {
+      console.log('user name not present');
+
+      setSignUpUserNameError(true);
+      setSignUpEmailError(true);
+      setSignUpPasswordError(true);
+      setSignUpConfirmPasswordError(false);
+    } else if (
+      username !== '' &&
+      signup_email === '' &&
+      signup_pass !== '' &&
+      signup_cpass !== ''
+    ) {
+      console.log('user name not present');
+
+      setSignUpUserNameError(false);
+      setSignUpEmailError(true);
+      setSignUpPasswordError(false);
+      setSignUpConfirmPasswordError(false);
+    } else if (!emailRegex.test(signup_email)) {
       //setEmailSnackBarVisible(true);
       setemailNotCorrectSignUp(true);
       //console.log("Email Not Correct", emailNotCorrect)
@@ -194,7 +191,8 @@ const App = ({navigation}) => {
     //   setSignUpConfirmPasswordError(true);
     // }
     else {
-      navigation.navigate('Profile_image');
+      handleSignup()
+      //navigation.navigate('Profile_image');
       //   setIsLoading(true);
       //   setTimeout(() => {
 
@@ -239,9 +237,8 @@ const App = ({navigation}) => {
     } else {
       setIsLoading(true);
       setTimeout(() => {
-        navigation.navigate('BottomTabNavigation');
-
-        setIsLoading(false);
+        handleSignIn()
+        //setIsLoading(false);
 
         // Replace 'YourTargetScreen' with the screen you want to navigate to
       }, 2000);
@@ -304,6 +301,168 @@ const App = ({navigation}) => {
   const handleTogglePasswordVisibility2 = () => {
     setsignin_ShowPassword2(!signin_ShowPassword2);
   };
+
+  const signupEndpoint =
+    'https://watch-gotcha-be.mtechub.com/user/register'; // Replace with your actual API endpoint
+
+  const handleSignup = async () => {
+    setIsLoading(true)
+    try {
+      const response = await fetch(signupEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: signup_email,
+          username: username,
+          password: signup_pass,
+          confirmPassword: signup_cpass,
+          role: 'user',
+        }),
+      });
+
+      const data = await response.json();
+
+      console.log('error data', data.newUser.role);
+
+      if (data.newUser.role==='user') {
+
+        setIsLoading(false)
+        // Assuming there's at least one result
+        const firstResult = data.newUser;
+        console.log('id', firstResult.id);
+        console.log('email', firstResult.email);
+        console.log('username', firstResult.username);
+
+         AsyncStorage.setItem('email', firstResult.email.toString(), () => {
+          console.log('user email saved successfully');
+        });
+
+        AsyncStorage.setItem(
+          'userName',
+          firstResult.username.toString(),
+          () => {
+            console.log('user name saved successfully');
+          },
+        );
+
+        AsyncStorage.setItem('userId ', firstResult.id.toString(), () => {
+          console.log('user id saved successfully of signup');
+        });
+      } else {
+        setIsLoading(false)
+        console.error('No results found.', data.response.result);
+      }
+
+      setIsLoading(false);
+
+      // Reset the input fields
+      setsignup_email('');
+      setsignup_pass('');
+      setsignup_cpass('');
+      setusername('');
+
+      
+      // navigation.navigate('SelectGender');
+    } catch (error) {
+      //console.error('Error:');
+      showAlert();
+      setIsLoading(false);
+    }
+  };
+
+
+
+
+
+  const signInEndpoint =
+    'https://watch-gotcha-be.mtechub.com/user/login'; // Replace with your actual API endpoint
+
+  const handleSignIn = async () => {
+    setIsLoading(true)
+    try {
+      const response = await fetch(signInEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: signin_email,
+          password: signin_pass,
+          role: 'user',
+        }),
+      });
+
+      const data = await response.json();
+
+      console.log('error data sign in', data);
+
+      if (data.statusCode===200) {
+
+        setIsLoading(false)
+        // Assuming there's at least one result
+        const firstResult = data.user;
+        console.log('id', firstResult.id);
+        console.log('email', firstResult.email);
+        console.log('username', firstResult.username);
+
+         AsyncStorage.setItem('email', firstResult.email.toString(), () => {
+          console.log('user email saved successfully');
+        });
+
+        AsyncStorage.setItem(
+          'userName',
+          firstResult.username.toString(),
+          () => {
+            console.log('user name saved successfully');
+          },
+        );
+
+        AsyncStorage.setItem('userId ', firstResult.id.toString(), () => {
+          console.log('user id saved successfully of sign in');
+        });
+
+        AsyncStorage.setItem('email ', firstResult.email.toString(), () => {
+          console.log('user email saved successfully of sign in');
+
+        });
+
+        navigation.navigate('BottomTabNavigation');
+
+      } else {
+        setIsLoading(false)
+        console.error('No results found.', data.response.result);
+      }
+
+      setIsLoading(false);
+
+      // Reset the input fields
+      setsignin_email('');
+      setsignin_pass('');
+
+      
+      // navigation.navigate('SelectGender');
+    } catch (error) {
+      //console.error('Error:');
+      //showAlert();
+      setIsLoading(false);
+    }
+  };
+
+  const skipforNow=()=>{
+    setIsLoading(true)
+
+       setTimeout(() => {
+
+          setIsLoading(false);
+        
+          navigation.navigate("BottomTabNavigation")
+
+    }, 2000);
+  }
+
+
   return (
     <ScrollView style={styles.bg} contentContainerStyle={{flexGrow: 1}}>
       <StatusBar barStyle={'dark-content'} backgroundColor={'#FACA4E'} />
@@ -492,6 +651,22 @@ const App = ({navigation}) => {
               </Text>
             </TouchableOpacity>
 
+            <TouchableOpacity
+              onPress={() => skipforNow() }>
+              <Text
+                style={{
+                  color: '#FACA4E',
+                  fontSize: wp(4),
+                  textDecorationLine:'underline',
+                  fontFamily: 'Inter-Bold',
+                  marginRight: '5%',
+                  alignSelf: 'center',
+                  marginTop: '3%',
+                }}>
+                 Skip For Now
+              </Text>
+            </TouchableOpacity>
+
             <View style={{marginTop: '25%', alignSelf: 'center'}}>
               <CustomButton
                 title="Sign In"
@@ -510,7 +685,6 @@ const App = ({navigation}) => {
             <TextInput
               mode="outlined"
               label="Username"
-              
               onChangeText={text => setusername(text)}
               value={username}
               style={styles.ti}

@@ -38,6 +38,8 @@ const appImages = {
   //Verify:require(IMAGES_DIR + 'VerifyModal.png'),
   BlogsPic:require(IMAGES_DIR + 'BlogPics.png'),
   UploadBanner:require(IMAGES_DIR + 'UploadBanner.png'),
+  logoWhite: require(IMAGES_DIR + 'LogoWhite.png'),
+  LogoBlack: require(IMAGES_DIR + 'LogoBlack.png'),
   LogOut:require(IMAGES_DIR + 'Logout.png')
 
 

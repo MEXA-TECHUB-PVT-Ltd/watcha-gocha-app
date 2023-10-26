@@ -85,6 +85,11 @@ import PicTours from './app/src/view/screens/BottomTab/PicTours';
 import SearchAppsDisc from './app/src/view/screens/SearchAppsDisc';
 import Conversation from './app/src/view/screens/Conversation';
 import UploadScreenPic from './app/src/view/screens/UploadAVideo/UploadScreenPic';
+import SavedItems from './app/src/view/screens/SavedItems';
+import Notification from './app/src/view/screens/Notification';
+import HelpScreen from './app/src/view/screens/HelpScreen';
+import SplashScreen from './app/src/view/screens/SplashScreen';
+import RateApp from './app/src/view/screens/RateApp';
 
 //------------------\\
 
@@ -98,6 +103,27 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
+
+      <Stack.Screen
+          name="SpashScreen"
+          component={SplashScreen}
+          options={{headerShown: false}}
+        />
+
+      <Stack.Screen
+          name="ResetPassword"
+          component={ResetPassword}
+          options={{headerShown: false}}
+        />
+
+        
+
+        <Stack.Screen
+          name="RateApp"
+          component={RateApp}
+          options={{headerShown: false}}
+        />
+
         <Stack.Screen
           name="Signin_signup"
           component={Signin_signup}
@@ -105,10 +131,17 @@ const App = () => {
         />
 
         <Stack.Screen
-          name="UploadScreenPic"
-          component={UploadScreenPic}
+          name="HelpScreen"
+          component={HelpScreen}
           options={{headerShown: false}}
         />
+
+        <Stack.Screen
+          name="Notification"
+          component={Notification}
+          options={{headerShown: false}}
+        />
+
         <Stack.Screen
           name="Conversation"
           component={Conversation}
@@ -172,6 +205,18 @@ const App = () => {
         <Stack.Screen
           name="ChatScreen"
           component={ChatScreen}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ProfileSettings"
+          component={ProfileSettings}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="UploadScreenPic"
+          component={UploadScreenPic}
           options={{headerShown: false}}
         />
 
@@ -242,12 +287,6 @@ const App = () => {
         />
 
         <Stack.Screen
-          name="ProfileSettings"
-          component={ProfileSettings}
-          options={{headerShown: false}}
-        />
-
-        <Stack.Screen
           name="Dashboard"
           component={Dashboard}
           options={{headerShown: false}}
@@ -298,6 +337,12 @@ const App = () => {
         <Stack.Screen
           name="PostOnNews"
           component={PostOnNews}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="SavedItems"
+          component={SavedItems}
           options={{headerShown: false}}
         />
 
@@ -451,11 +496,7 @@ const App = () => {
           options={{headerShown: false}}
         />
 
-        <Stack.Screen
-          name="ResetPassword"
-          component={ResetPassword}
-          options={{headerShown: false}}
-        />
+       
 
         <Stack.Screen
           name="ForgetPassword"

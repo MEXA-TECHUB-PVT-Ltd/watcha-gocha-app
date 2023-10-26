@@ -43,9 +43,36 @@ import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
 LogBox.ignoreAllLogs();
 
 const ResetPassword = ({navigation}) => {
+
+
+  const [userId, setUserId] = useState('');
+
+  const [passwordError, setPasswordError] = useState(false);
+
+  const [confirmPasswordError, setConfirmPasswordError] = useState(false);
+
+
+
   const isFocused = useIsFocused();
 
-  useEffect(() => {}, [isFocused]);
+  useEffect(() => {
+
+    const getUserID = async () => {
+      console.log("Id's")
+      try {
+        const result = await AsyncStorage.getItem('userId ');
+        if (result !== null) {
+          setUserId(result);
+          console.log('user id retrieved:', result);
+        }
+      } catch (error) {
+        // Handle errors here
+        console.error('Error retrieving user ID:', error);
+      }
+    };
+
+    getUserID()
+  }, [isFocused]);
 
   const [newPassword, setNewPassword] = useState('');
   const [snackbarVisible, setSnackbarVisible] = useState();
@@ -62,8 +89,8 @@ const ResetPassword = ({navigation}) => {
   const ref_RBSheetCamera = useRef(null);
 
   const [signin_email, setsignin_email] = useState();
-  const [signin_pass, setsignin_pass] = useState();
-  const [confirm, setconfirm_pass] = useState();
+  const [signin_pass, setsignin_pass] = useState('');
+  const [confirm, setconfirm_pass] = useState('');
 
   const [signin_ShowPassword, setsignin_ShowPassword] = useState(true);
   const [signin_ConfirmShowPassword, setsignin_ConfirmShowPassword] = useState(true);
@@ -164,7 +191,6 @@ const ResetPassword = ({navigation}) => {
     }, 3000);
   };
 
-
   //--------------------------\\
 
   
@@ -178,6 +204,97 @@ const ResetPassword = ({navigation}) => {
   const handleBlurConfirmPassword = () => {
     setIsConfirmPasswordActive(false);
   };
+
+
+  const goTOScreen = () => {
+    console.log('clicked', signin_pass);
+
+    const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+
+    setPasswordError(false);
+    setConfirmPasswordError(false)  
+
+
+
+    if (signin_pass === '' && confirm === '') {
+       setPasswordError(true)
+       setConfirmPasswordError(true)
+    } else if (signin_pass === '') {
+      setPasswordError(false);
+    } else if (confirm === '') {
+      setConfirmPasswordError(false)
+    } else {
+      setIsLoading(true);
+
+      setPasswordError(false);
+      setConfirmPasswordError(false)
+  
+      setTimeout(() => {
+        //setIsLoading(false);
+        handleResetPassword()
+
+        // Replace 'YourTargetScreen' with the screen you want to navigate to
+      }, 2000);
+    }
+
+    /* setTimeout(() => {
+      navigation.navigate('BottomTabNavigation');
+
+      setIsLoading(false);
+
+      // Replace 'YourTargetScreen' with the screen you want to navigate to
+    }, 2000); // Adjust the loading duration as needed */
+  };
+
+
+  const verifyOTPEndpoint =
+    'https://watch-gotcha-be.mtechub.com/user/reset_password'; // Replace with your actual API endpoint
+
+  const handleResetPassword = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(verifyOTPEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          password: signin_pass,
+          confirmPassword: confirm,
+          id:userId
+        }),
+      });
+
+      const data = await response.json();
+
+      console.log('error data sign in', data);
+
+      if (data.statusCode === 200) {
+        setIsLoading(false);
+
+          handleUpdatePassword()
+        // Assuming there's at least one result
+        
+      } else {
+        setIsLoading(false);
+        console.error('No results found.', data.response.result);
+      }
+
+      setIsLoading(false);
+      // Reset the input fields
+      //setEmail('');
+      // navigation.navigate('SelectGender');
+    } catch (error) {
+      //console.error('Error:');
+      //showAlert();
+      setIsLoading(false);
+    }
+  };
+
+  
+
+
+
 
   return (
     <ScrollView style={styles.bg} contentContainerStyle={{flexGrow: 1}}>
@@ -249,6 +366,18 @@ const ResetPassword = ({navigation}) => {
           </TouchableOpacity>
         </View>
 
+         {passwordError === true ? (
+              <Text
+                style={{
+                  color: 'red',
+                  marginLeft: wp(-35),
+                  marginTop: hp(1.8),
+                  fontSize: hp(1.8),
+                }}>
+                 Please Enter Your Password
+              </Text>
+            ) : null}
+
 
 
 
@@ -296,6 +425,18 @@ const ResetPassword = ({navigation}) => {
             </Text>
           </TouchableOpacity>
         </View>
+
+        {confirmPasswordError === true ? (
+              <Text
+                style={{
+                  color: 'red',
+                  marginLeft: wp(-21),
+                  marginTop: hp(1.8),
+                  fontSize: hp(1.8),
+                }}>
+                 Please Enter Your Confirm Password
+              </Text>
+            ) : null}
  
 
         <View style={{marginTop: '25%', alignSelf: 'center'}}>
@@ -304,7 +445,7 @@ const ResetPassword = ({navigation}) => {
             load={loading}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-              handleUpdatePassword()
+             goTOScreen()
             }}
           />
         </View>
