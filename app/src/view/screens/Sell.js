@@ -179,6 +179,11 @@ export default function Sell({navigation}) {
   const dismissSnackbar = () => {
     setsnackbarVisible(false);
   };
+  
+  const navigateToScreen=()=>{
+    ref_RBSendOffer.current.close();
+    navigation.navigate("Signin_signup")
+  }
 
   const handleUpdatePassword = async () => {
     // Perform the password update logic here
@@ -582,10 +587,33 @@ export default function Sell({navigation}) {
             </Text>
           </View>
 
-          <View style={{flexDirection:'row', width:'80%',  justifyContent:'space-around', alignItems:'center',borderWidth:3,height:hp(8),marginHorizontal: wp(5)}}>
-            <View style={{width:wp(12), borderWidth:3, height:hp(5)}}>
+          <View style={{flexDirection:'row', width:'100%',  justifyContent:'space-around', alignItems:'center',height:hp(8),marginHorizontal: wp(5)}}>
+            <TouchableOpacity onPress={()=>ref_RBSendOffer.current.close()} style={{width:wp(30), borderRadius:wp(5), justifyContent:'center', alignItems:'center', borderColor:'#FACA4E', borderWidth:1, height:hp(5)}}>
+            <Text
+              style={{
+                color: '#FACA4E',
+                textAlign: 'center',
+                fontSize: hp(1.8),
+                fontWeight:'bold',
+                fontFamily: 'Inter',
+              }}>
+               Cancel
+            </Text>
+            </TouchableOpacity>
 
-            </View>
+
+            <TouchableOpacity onPress={()=>navigateToScreen()} style={{width:wp(30), borderRadius:wp(5), justifyContent:'center', alignItems:'center', backgroundColor:'#FACA4E', height:hp(5)}}>
+            <Text
+              style={{
+                color: '#000000',
+                textAlign: 'center',
+                fontSize: hp(1.8),
+                fontWeight:'bold',
+                fontFamily: 'Inter',
+              }}>
+               Sign Up
+            </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </RBSheet>

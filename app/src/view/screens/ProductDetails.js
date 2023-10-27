@@ -52,7 +52,7 @@ export default function ProductDetails({navigation}) {
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarVisibleAlert, setSnackbarVisibleAlert] = useState(false);
   const [snackbarVisibleSaved, setSnackbarVisibleSaved] = useState(false);
-  
+
   const ref_RBSendOffer = useRef(null);
   const ref_RBSendOffer2 = useRef(null);
 
@@ -92,7 +92,6 @@ export default function ProductDetails({navigation}) {
       console.error('Error sharing via WhatsApp:', error.message);
     }
   };
-
 
   const renderAvailableApps = item => {
     console.log('Items', item);
@@ -144,7 +143,6 @@ export default function ProductDetails({navigation}) {
     ref_RBSendOffer2.current.open();
   };
 
-
   const handleUpdatePassword = async () => {
     // Perform the password update logic here
     // For example, you can make an API request to update the password
@@ -184,6 +182,7 @@ export default function ProductDetails({navigation}) {
     }, 3000);
   };
 
+  
   return (
     <View style={styles.container}>
       <StatusBar
@@ -200,24 +199,22 @@ export default function ProductDetails({navigation}) {
         />
       </View>
 
-      <ScrollView style={{flex:1}}>
+      <ScrollView style={{flex: 1}}>
+        <View style={{height: hp(25), marginTop: hp(5)}}>
+          <HeaderImageSlider
+            data={details}
+            paginationStyleItemActiveStyle={{
+              width: 18,
+              height: 7,
+              borderRadius: 7 / 2,
+            }}
+            paginationStyleItemInactive={{
+              backgroundColor: '#D4D4D4',
+              borderWidth: 0,
+            }}
+          />
 
-
-      <View style={{height: hp(25), marginTop: hp(5)}}>
-        <HeaderImageSlider
-          data={details}
-          paginationStyleItemActiveStyle={{
-            width: 18,
-            height: 7,
-            borderRadius: 7 / 2,
-          }}
-          paginationStyleItemInactive={{
-            backgroundColor: '#D4D4D4',
-            borderWidth: 0,
-          }}
-        />
-
-        {/* <SwiperFlatList
+          {/* <SwiperFlatList
       autoplay
       autoplayDelay={2}
       autoplayLoop
@@ -227,7 +224,7 @@ export default function ProductDetails({navigation}) {
       renderItem={renderAvailableApps}
     /> */}
 
-        {/* <SwiperFlatList
+          {/* <SwiperFlatList
       data={availableApps}
       autoplay
       autoplayDelay={2}
@@ -241,266 +238,257 @@ export default function ProductDetails({navigation}) {
       paginationDefaultColor={'gray'} // Change this to your default dot color
       renderPagination={({ index, currentIndex }) => renderDot(index, currentIndex)}
     /> */}
-      </View>
-
-      <View
-        style={{
-          flex: 1,
-          marginTop: hp(19),
-          marginHorizontal: wp(8),
-        }}>
-        <Text
-          style={{
-            color: '#595959',
-            fontFamily: 'Inter',
-            fontWeight: '800',
-            fontSize: hp(2.4),
-          }}>
-          Classic Lens
-        </Text>
-
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}>
-          <Text
-            style={{
-              color: '#77838F',
-              marginTop: hp(1.3),
-              fontFamily: 'Inter',
-              fontWeight: '400',
-              fontSize: hp(2),
-            }}>
-            Item
-          </Text>
-
-          <Text
-            style={{
-              color: '#77838F',
-              marginTop: hp(1.3),
-              fontFamily: 'Inter',
-              fontWeight: '400',
-              fontSize: hp(2),
-            }}>
-            $ 456
-          </Text>
         </View>
 
         <View
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            marginTop: hp(1.8),
-            height: hp(5),
+            flex: 1,
+            marginTop: hp(19),
+            marginHorizontal: wp(8),
           }}>
-          <Location width={15} height={15} />
-
           <Text
             style={{
-              color: '#77838F',
+              color: '#595959',
               fontFamily: 'Inter',
-              marginLeft: wp(3),
-              fontWeight: '400',
-              fontSize: hp(2),
+              fontWeight: '800',
+              fontSize: hp(2.4),
             }}>
-            123 Main Street Cityville, USA
+            Classic Lens
           </Text>
-        </View>
 
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          style={{marginTop: hp(3), height: hp(23)}}>
-          <Text
+          <View
             style={{
-              color: '#77838F',
-              fontFamily: 'Inter',
-              textAlign: 'justify',
-              lineHeight: hp(2.7),
-              //fontWeight: '400',
-              fontSize: hp(1.8),
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
             }}>
-            Our Classic Lens offers a timeless touch to your photography.
-            Crafted with precision and a nod to vintage aesthetics, this lens is
-            perfect for capturing moments with a hint of nostalgia. Whether
-            you're shooting portraits, landscapes, or street photography, the
-            Classic Lens delivers stunning results with its soft focus and
-            beautiful bokeh.
-          </Text>
-        </ScrollView>
+            <Text
+              style={{
+                color: '#77838F',
+                marginTop: hp(1.3),
+                fontFamily: 'Inter',
+                fontWeight: '400',
+                fontSize: hp(2),
+              }}>
+              Item
+            </Text>
 
-        <View
-          style={{
-            flexDirection: 'row',
-            height: hp(8),
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}>
-          <View style={{flexDirection: 'row', width: wp(60)}}>
-            <TouchableOpacity style={styles.circleBox}>
-              {imageUri == null ? (
-                <Image
+            <Text
+              style={{
+                color: '#77838F',
+                marginTop: hp(1.3),
+                fontFamily: 'Inter',
+                fontWeight: '400',
+                fontSize: hp(2),
+              }}>
+              $ 456
+            </Text>
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginTop: hp(1.8),
+              height: hp(5),
+            }}>
+            <Location width={15} height={15} />
+
+            <Text
+              style={{
+                color: '#77838F',
+                fontFamily: 'Inter',
+                marginLeft: wp(3),
+                fontWeight: '400',
+                fontSize: hp(2),
+              }}>
+              123 Main Street Cityville, USA
+            </Text>
+          </View>
+
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            style={{marginTop: hp(3), height: hp(23)}}>
+            <Text
+              style={{
+                color: '#77838F',
+                fontFamily: 'Inter',
+                textAlign: 'justify',
+                lineHeight: hp(2.7),
+                //fontWeight: '400',
+                fontSize: hp(1.8),
+              }}>
+              Our Classic Lens offers a timeless touch to your photography.
+              Crafted with precision and a nod to vintage aesthetics, this lens
+              is perfect for capturing moments with a hint of nostalgia. Whether
+              you're shooting portraits, landscapes, or street photography, the
+              Classic Lens delivers stunning results with its soft focus and
+              beautiful bokeh.
+            </Text>
+          </ScrollView>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              height: hp(8),
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+            <View style={{flexDirection: 'row', width: wp(60)}}>
+              <TouchableOpacity style={styles.circleBox}>
+                {imageUri == null ? (
+                  <Image
+                    style={{
+                      flex: 1,
+                      width: '100%',
+                      height: '100%',
+                      borderRadius: wp(12) / 2, // Half of the width (25/2)
+                      resizeMode: 'contain',
+                    }}
+                    source={appImages.profileImg}
+                  />
+                ) : (
+                  <Image
+                    style={{
+                      flex: 1,
+                      width: '100%',
+                      height: '100%',
+                      borderRadius: wp(12) / 2, // Half of the width (25/2)
+                      resizeMode: 'contain',
+                    }}
+                    source={{uri: imageUri}}
+                  />
+                )}
+              </TouchableOpacity>
+
+              <View>
+                <Text
                   style={{
-                    flex: 1,
-                    width: '100%',
-                    height: '100%',
-                    borderRadius: wp(12) / 2, // Half of the width (25/2)
-                    resizeMode: 'contain',
-                  }}
-                  source={appImages.profileImg}
-                />
-              ) : (
-                <Image
+                    color: '#FACA4E',
+                    fontFamily: 'Inter',
+                    marginLeft: wp(3),
+                    fontWeight: '400',
+                    fontSize: hp(2),
+                  }}>
+                  John Doe
+                </Text>
+
+                <Text
                   style={{
-                    flex: 1,
-                    width: '100%',
-                    height: '100%',
-                    borderRadius: wp(12) / 2, // Half of the width (25/2)
-                    resizeMode: 'contain',
-                  }}
-                  source={{uri: imageUri}}
-                />
-              )}
+                    color: '#77838F',
+                    fontFamily: 'Inter',
+                    marginLeft: wp(3),
+                    fontSize: hp(2),
+                  }}>
+                  johndoe@gmail.com
+                </Text>
+              </View>
+            </View>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Conversation')}>
+              <SendMessage width={39} height={39} />
+            </TouchableOpacity>
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+
+              height: hp(8),
+            }}>
+            <TouchableOpacity
+              onPress={() => ref_RBSendOffer.current.open()}
+              style={{
+                width: wp(21),
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}>
+              <SendMail />
+
+              <Text
+                style={{
+                  color: '#4C4C4C',
+                  fontFamily: 'Inter',
+                  fontWeight: 'bold',
+                  fontSize: hp(1.8),
+                }}>
+                Send Offer
+              </Text>
             </TouchableOpacity>
 
-            <View>
-              <Text
-                style={{
-                  color: '#FACA4E',
-                  fontFamily: 'Inter',
-                  marginLeft: wp(3),
-                  fontWeight: '400',
-                  fontSize: hp(2),
-                }}>
-                John Doe
-              </Text>
+            <View
+              style={{
+                width: wp(21),
+                height: hp(7.5),
+                //borderWidth:3,
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}>
+              <TouchableOpacity onPress={() => handleUpdateAlert()}>
+                <BellAlert style={{marginTop: hp(1)}} width={21} height={21} />
+              </TouchableOpacity>
 
               <Text
                 style={{
-                  color: '#77838F',
+                  color: '#4C4C4C',
                   fontFamily: 'Inter',
-                  marginLeft: wp(3),
-                  fontSize: hp(2),
+                  fontWeight: 'bold',
+                  fontSize: hp(1.8),
                 }}>
-                johndoe@gmail.com
+                Alert
+              </Text>
+            </View>
+
+            <View
+              style={{
+                width: wp(21),
+                alignItems: 'center',
+                height: hp(7.5),
+                justifyContent: 'space-between',
+              }}>
+              <TouchableOpacity onPress={() => handleUpdateSaved()}>
+                <BookMark style={{marginTop: hp(1)}} width={21} height={21} />
+              </TouchableOpacity>
+
+              <Text
+                style={{
+                  color: '#4C4C4C',
+                  fontFamily: 'Inter',
+                  fontWeight: 'bold',
+                  fontSize: hp(1.8),
+                }}>
+                Book Mark
+              </Text>
+            </View>
+
+            <View
+              style={{
+                width: wp(21),
+                alignItems: 'center',
+                height: hp(7.5),
+                justifyContent: 'space-between',
+              }}>
+              <TouchableOpacity onPress={() => shareViaWhatsApp()}>
+                <Share style={{marginTop: hp(1)}} width={18} height={18} />
+              </TouchableOpacity>
+
+              <Text
+                style={{
+                  color: '#4C4C4C',
+                  fontFamily: 'Inter',
+                  fontWeight: 'bold',
+
+                  fontSize: hp(1.8),
+                }}>
+                Share
               </Text>
             </View>
           </View>
-
-          <TouchableOpacity onPress={()=>navigation.navigate("Conversation")}>
-
-          <SendMessage width={39} height={39} />
-
-          </TouchableOpacity>
         </View>
-
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-
-            height: hp(8),
-          }}>
-          <TouchableOpacity
-            onPress={() => ref_RBSendOffer.current.open()}
-            style={{
-              width: wp(21),
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}>
-            <SendMail />
-
-            <Text
-              style={{
-                color: '#4C4C4C',
-                fontFamily: 'Inter',
-                fontWeight: 'bold',
-                fontSize: hp(1.8),
-              }}>
-              Send Offer
-            </Text>
-          </TouchableOpacity>
-
-          <View
-            style={{
-              width: wp(21),
-              height: hp(7.5),
-              //borderWidth:3,
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}>
-              <TouchableOpacity onPress={()=>handleUpdateAlert()}>
-
-            <BellAlert style={{marginTop: hp(1)}} width={21} height={21} />
-
-              </TouchableOpacity>
-
-            <Text
-              style={{
-                color: '#4C4C4C',
-                fontFamily: 'Inter',
-                fontWeight: 'bold',
-                fontSize: hp(1.8),
-              }}>
-              Alert
-            </Text>
-          </View>
-
-          <View
-            style={{
-              width: wp(21),
-              alignItems: 'center',
-              height: hp(7.5),
-              justifyContent: 'space-between',
-            }}>
-              <TouchableOpacity onPress={()=>handleUpdateSaved()}>
-
-            <BookMark style={{marginTop: hp(1)}} width={21} height={21} />
-              </TouchableOpacity>
-
-            <Text
-              style={{
-                color: '#4C4C4C',
-                fontFamily: 'Inter',
-                fontWeight: 'bold',
-                fontSize: hp(1.8),
-              }}>
-              Book Mark
-            </Text>
-          </View>
-
-          <View
-            style={{
-              width: wp(21),
-              alignItems: 'center',
-              height: hp(7.5),
-              justifyContent: 'space-between',
-            }}>
-
-              <TouchableOpacity onPress={()=>shareViaWhatsApp()}>
-
-            <Share style={{marginTop: hp(1)}} width={18} height={18} />
-
-              </TouchableOpacity>
-
-            <Text
-              style={{
-                color: '#4C4C4C',
-                fontFamily: 'Inter',
-                fontWeight: 'bold',
-
-                fontSize: hp(1.8),
-              }}>
-              Share
-            </Text>
-          </View>
-        </View>
-      </View>
-
       </ScrollView>
-
 
       <RBSheet
         ref={ref_RBSendOffer}
@@ -683,7 +671,7 @@ export default function ProductDetails({navigation}) {
         </View>
 
         <TouchableOpacity
-        onPress={()=>changeModal()}
+          onPress={() => changeModal()}
           style={{
             height: hp(5),
             marginTop: hp(1.9),

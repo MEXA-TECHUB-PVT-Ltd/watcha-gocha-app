@@ -6,10 +6,11 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
+  ActivityIndicator,
   Text,
   View,
 } from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP,
@@ -27,11 +28,143 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 export default function Video({navigation}) {
-  const [selectedItemId, setSelectedItemId] = useState(null);
+  const [selectedItemId, setSelectedItemId] = useState(6);
+
+  const [loading, setLoading] = useState(false);
+
+  const [searchesData, setSearches] = useState('');
 
   const [selectedItem, setSelectedItem] = useState('');
 
+  const [data, setData] = useState([]);
+
+
+  const [dataLatestVideos, setDataLatestVideos] = useState([]);
+
+  const [dataMostViewedVideos, setMostViewedVideos] = useState([]);
+
+  const [dataMostCommentedVideos, setMostCommentedVideos] = useState([]);
+
   const ref_RBSheetCamera = useRef(null);
+
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchVideos()
+  }, []);
+
+  const fetchVideos = async () => {
+    // Simulate loading
+    setLoading(true);
+  
+    // Fetch data one by one
+    await fetchCategory()
+    await fetchTrendingVideos();
+    await fetchLatestVideos();
+    await fetchMostViewedVideos();
+    await fetchMostCommentedVideos();
+  
+    // Once all data is fetched, set loading to false
+    setLoading(false);
+  };
+
+
+  const fetchTrendingVideos = async () => {
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE2OTgzMTI3NDUsImV4cCI6MTcwMDkwNDc0NX0.YsFwjW-luPHnhb4R3nAyuyHDV58PoehhrsMdMttJd08';
+
+    try {
+      const response = await fetch(`https://watch-gotcha-be.mtechub.com/xpi/getTrendingVideosByCategory/${selectedItemId}?page=1&limit=5`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const result = await response.json();
+      console.log("Resultings", result.Videos)
+      setData(result.Videos); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+
+  const fetchLatestVideos = async () => {
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE2OTgzMTI3NDUsImV4cCI6MTcwMDkwNDc0NX0.YsFwjW-luPHnhb4R3nAyuyHDV58PoehhrsMdMttJd08';
+
+    try {
+      const response = await fetch(`https://watch-gotcha-be.mtechub.com/xpi/getAllRecentVideosByCategory/${selectedItemId}?page=1&limit=2`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const result = await response.json();
+      console.log("Resultings", result.Videos)
+      setDataLatestVideos(result.Videos); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const fetchMostViewedVideos = async () => {
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE2OTgzMTI3NDUsImV4cCI6MTcwMDkwNDc0NX0.YsFwjW-luPHnhb4R3nAyuyHDV58PoehhrsMdMttJd08';
+
+    try {
+      const response = await fetch(`https://watch-gotcha-be.mtechub.com/xpi/getMostViewedVideosByCategory/${selectedItemId}?page=1&limit=5`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const result = await response.json();
+      console.log("Resultings", result.Videos)
+      setMostViewedVideos(result.Videos); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+
+  const fetchMostCommentedVideos = async () => {
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE2OTgzMTI3NDUsImV4cCI6MTcwMDkwNDc0NX0.YsFwjW-luPHnhb4R3nAyuyHDV58PoehhrsMdMttJd08';
+
+    try {
+      const response = await fetch(`https://watch-gotcha-be.mtechub.com/xpi/getMostCommentedVideosByCategory/${selectedItemId}?page=1&limit=5`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const result = await response.json();
+      console.log("Resultings", result.Videos)
+      setMostCommentedVideos(result.Videos); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const fetchCategory = async () => {
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE2OTgzMTI3NDUsImV4cCI6MTcwMDkwNDc0NX0.YsFwjW-luPHnhb4R3nAyuyHDV58PoehhrsMdMttJd08';
+
+    try {
+      const response = await fetch('https://watch-gotcha-be.mtechub.com/videoCategory/getAllVideoCategories?page=1&limit=5', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const result = await response.json();
+      console.log("Search Results", result.AllCategories)
+      setSearches(result.AllCategories); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
 
   const takePhotoFromCamera = value => {
     ref_RBSheetCamera.current.close();
@@ -222,7 +355,7 @@ export default function Video({navigation}) {
               borderRadius: wp(1),
               resizeMode: 'cover',
             }}
-            source={item.image}
+            source={item.video}
           />
         </View>
         <View
@@ -239,7 +372,7 @@ export default function Video({navigation}) {
               color: '#000000',
               width: wp(23),
             }}>
-            {item.title}
+            {item.description}
           </Text>
 
           <Entypo name={'dots-three-vertical'} size={14} color={'#4A4A4A'} />
@@ -269,7 +402,7 @@ export default function Video({navigation}) {
             styles.textSearchDetails,
             {color: isSelected ? '#232323' : '#939393'},
           ]}>
-          {item.title}
+          {item.name}
         </Text>
       </TouchableOpacity>
     );
@@ -324,7 +457,7 @@ export default function Video({navigation}) {
             contentContainerStyle={{alignItems: 'center'}}
             showsHorizontalScrollIndicator={false}
             horizontal
-            data={searches}
+            data={searchesData}
             keyExtractor={item => item.id.toString()}
             renderItem={({item}) => renderSearches(item)}
           />
@@ -415,14 +548,26 @@ export default function Video({navigation}) {
           </Text>
 
           <View style={{marginTop: hp(1), height: '100%'}}>
-            <FlatList
+            {loading===true?(
+            <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ActivityIndicator size="large" color="#FACA4E" />
+        </View>):(<FlatList
               style={{flex: 1,}}
               showsVerticalScrollIndicator={false}
-              data={availableAppsVideo}
+              data={data}
               horizontal
-              keyExtractor={item => item.id.toString()}
+              //keyExtractor={item => item.id.toString()}
               renderItem={({item}) => renderAvailableAppsVideo(item)}
-            />
+            />)}
           </View>
         </TouchableOpacity>
 
@@ -439,14 +584,30 @@ export default function Video({navigation}) {
           </Text>
 
           <View style={{marginTop: hp(1), height: '100%'}}>
-            <FlatList
-              style={{flex: 1}}
-              showsVerticalScrollIndicator={false}
-              data={availableAppsVideo}
-              horizontal
-              keyExtractor={item => item.id.toString()}
-              renderItem={({item}) => renderAvailableAppsVideo(item)}
-            />
+
+          {loading===true?(
+            <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ActivityIndicator size="large" color="#FACA4E" />
+        </View>):(
+          <FlatList
+            style={{flex: 1}}
+            showsVerticalScrollIndicator={false}
+            data={dataLatestVideos}
+            horizontal
+           // keyExtractor={item => item.id.toString()}
+            renderItem={({item}) => renderAvailableAppsVideo(item)}
+          />
+        )
+}
           </View>
         </View>
 
@@ -463,14 +624,31 @@ export default function Video({navigation}) {
           </Text>
 
           <View style={{marginTop: hp(1), height: '100%'}}>
-            <FlatList
-              style={{flex: 1}}
-              showsVerticalScrollIndicator={false}
-              data={availableAppsVideo}
-              horizontal
-              keyExtractor={item => item.id.toString()}
-              renderItem={({item}) => renderAvailableAppsVideo(item)}
-            />
+
+          {loading===true?(
+            <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ActivityIndicator size="large" color="#FACA4E" />
+        </View>):(
+
+          <FlatList
+            style={{flex: 1}}
+            showsVerticalScrollIndicator={false}
+            data={dataMostViewedVideos}
+            horizontal
+            //keyExtractor={item => item.id.toString()}
+            renderItem={({item}) => renderAvailableAppsVideo(item)}
+          />
+
+        )}
           </View>
         </View>
 
@@ -487,14 +665,32 @@ export default function Video({navigation}) {
           </Text>
 
           <View style={{marginTop: hp(1), height: '100%'}}>
-            <FlatList
-              style={{flex: 1}}
-              showsVerticalScrollIndicator={false}
-              data={availableAppsVideo}
-              horizontal
-              keyExtractor={item => item.id.toString()}
-              renderItem={({item}) => renderAvailableAppsVideo(item)}
-            />
+
+          {loading===true?(
+            <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ActivityIndicator size="large" color="#FACA4E" />
+        </View>):(
+
+          <FlatList
+            style={{flex: 1}}
+            showsVerticalScrollIndicator={false}
+            data={dataMostCommentedVideos}
+            horizontal
+            //keyExtractor={item => item.id.toString()}
+            renderItem={({item}) => renderAvailableAppsVideo(item)}
+          />
+
+        )
+}
           </View>
         </View>
       </ScrollView>
