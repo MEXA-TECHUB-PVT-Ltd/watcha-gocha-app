@@ -7,6 +7,7 @@ import {
   Platform,
   TextInput,
   StatusBar,
+  PermissionsAndroid,
   ImageBackground,
   View,
   TouchableOpacity,
@@ -44,13 +45,20 @@ import IonIcons from 'react-native-vector-icons/Ionicons';
 
 import ButtonSend from '../../../assets/svg/ButtonSend.svg';
 
+import Video from 'react-native-video';
+
 import SmileEmoji from '../../../assets/svg/SmileEmoji.svg';
+
+import RNFetchBlob from 'rn-fetch-blob';
 
 import Entypo from 'react-native-vector-icons/Entypo';
 import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
 
 export default function ViewVideo({navigation}) {
   const [showFullContent, setShowFullContent] = useState(false);
+
+  const [pastedURL, setPastedURL] = useState('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4');
+
 
   const [showReply, setShowReply] = useState(false);
 
@@ -70,7 +78,6 @@ export default function ViewVideo({navigation}) {
 
   const [commentText, setCommentText] = useState(null); // State variable to hold the text
 
-
   var details =
     'Hold onto your seats and get ready to be mesmerized by the beauty and grandeur of the Hold onto your seats';
 
@@ -85,8 +92,8 @@ export default function ViewVideo({navigation}) {
   const shareViaWhatsApp = async () => {
     const shareOptions = {
       title: 'Share via',
-      message: 'Hey! Check out this cool app!',
-      url: 'https://play.google.com/store/apps/details?id=your.app.package',
+      message: 'Hey! Check out this video!',
+      url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
       //social: Share.Social,
     };
 
@@ -111,17 +118,40 @@ export default function ViewVideo({navigation}) {
     // Automatically hide the Snackbar after 3 seconds
     setTimeout(() => {
       setsnackbarVisible(false);
-      navigation.goBack();
+ 
+        if (pastedURL !== '') {
+          requestStoragePermission();
+        } else {
+          console.log("Please Add Video Url")
+        }
+      
+      //navigation.goBack();
     }, 3000);
   };
 
   const clearTextInput = () => {
-    console.log("came to logssssss", commentText)
+    console.log('came to logssssss', commentText);
     // Clear the text in the TextInput
     setCommentText(null);
   };
 
+  const copyAssetVideo = async () => {
+    try {
+      const videoAssetPath = '../../../assets/images/DummyVideo.mp4'; // Adjust the path to your asset
+      const videoFileName = 'CopiedVideo.mp4'; // Choose a name for the copied video
   
+      const assetData = RNFetchBlob.asset(videoAssetPath);
+      const destinationPath = `${RNFetchBlob.fs.dirs.DownloadDir}/${videoFileName}`;
+  
+      await assetData.copyFile(destinationPath);
+  
+      //ToastAndroid.show('Video copied successfully', ToastAndroid.SHORT);
+      console.log('Copied video path:', destinationPath);
+    } catch (error) {
+      console.error('Error copying asset video:', error);
+      //ToastAndroid.show('Failed to copy video', ToastAndroid.LONG);
+    }
+  };
 
   const chats = [
     {
@@ -351,9 +381,73 @@ export default function ViewVideo({navigation}) {
     );
   };
 
+  const videos = require('../../../assets/images/DummyVideo.mp4'); // Reference your asset file here
+
+
+  const requestStoragePermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        {
+          title: 'Downloader App Storage Permission',
+          message:
+            'Downloader App needs access to your storage ' +
+            'so you can download files',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        downloadFile();
+      } else {
+        console.log('storage permission denied');
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+
+  const downloadFile = () => {
+    const {config, fs} = RNFetchBlob;
+    const date = new Date();
+    const fileDir = fs.dirs.DownloadDir;
+    config({
+      // add this option that makes response data to be stored as a file,
+      // this is much more performant.
+      fileCache: true,
+      addAndroidDownloads: {
+        useDownloadManager: true,
+        notification: true,
+        path:
+          fileDir +
+          '/download_' +
+          Math.floor(date.getDate() + date.getSeconds() / 2) +
+          '.mp4',
+        description: 'file download',
+      },
+    })
+      .fetch('GET', pastedURL, {
+        //some headers ..
+      })
+      .then(res => {
+        // the temp file path
+        console.log('The file saved to ', res.path());
+        alert('file downloaded successfully ');
+      });
+  };
+
+
   return (
     <GestureHandlerRootView style={{flex: 1}}>
-      <ImageBackground source={appImages.videoBG} style={{flex: 1}}>
+      <View style={{flex: 1}}>
+        <View style={styles.backgroundVideo}>
+          <Video
+                  resizeMode="cover" // Use "cover" to make it cover the entire screen
+                  repeat={true} // You can set other video props as needed
+
+                  source={videos} style={{height: '100%', width: '100%'}} />
+        </View>
         <StatusBar
           translucent={true}
           backgroundColor="transparent"
@@ -745,7 +839,7 @@ export default function ViewVideo({navigation}) {
                 style={{flex: 1, marginLeft: wp(1)}}
               />
 
-              <TouchableOpacity onPress={()=>clearTextInput()}>
+              <TouchableOpacity onPress={() => clearTextInput()}>
                 <ButtonSend />
               </TouchableOpacity>
             </View>
@@ -775,14 +869,14 @@ export default function ViewVideo({navigation}) {
             </TouchableOpacity>
 
             <TextInput
-               value={commentText} // Bind the value to the state variable
-               onChangeText={text => setCommentText(text)} // Update state on text change
-               placeholderTextColor={'#848484'}
-               placeholder="Write Comment Here"
+              value={commentText} // Bind the value to the state variable
+              onChangeText={text => setCommentText(text)} // Update state on text change
+              placeholderTextColor={'#848484'}
+              placeholder="Write Comment Here"
               style={{flex: 1, marginLeft: wp(1)}}
             />
 
-            <TouchableOpacity onPress={()=>clearTextInput()}>
+            <TouchableOpacity onPress={() => clearTextInput()}>
               <ButtonSend />
             </TouchableOpacity>
           </View>
@@ -814,13 +908,13 @@ export default function ViewVideo({navigation}) {
                 style={{flex: 1, marginLeft: wp(1)}}
               />
 
-              <TouchableOpacity onPress={()=>clearTextInput()}>
+              <TouchableOpacity onPress={() => clearTextInput()}>
                 <ButtonSend />
               </TouchableOpacity>
             </View>
           )
         )}
-      </ImageBackground>
+      </View>
     </GestureHandlerRootView>
   );
 }
@@ -848,5 +942,13 @@ const styles = StyleSheet.create({
     marginLeft: wp(3),
     fontFamily: 'Inter',
     fontWeight: 'bold',
+  },
+  backgroundVideo: {
+    position: 'absolute',
+    flex: 1,
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
   },
 });

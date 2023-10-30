@@ -223,7 +223,7 @@ export default function VerifyAccount({navigation, route}) {
              Please Enter Your Otp First
           </Text>
         ) : null}
-            </View>
+          </View>
 
 {/* <View style={{width: wp(90), flex: 1, zIndex: 999}}>
             <OTPInputView

@@ -6,11 +6,12 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   StatusBar,
+  ActivityIndicator,
   ImageBackground,
   View,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 import {Button, Divider, TextInput} from 'react-native-paper';
@@ -44,9 +45,12 @@ import Fontiso from 'react-native-vector-icons/Fontisto';
 
 import IonIcons from 'react-native-vector-icons/Ionicons';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import {SelectCountry, Dropdown} from 'react-native-element-dropdown';
 import CPaperInput from '../../../assets/Custom/CPaperInput';
 
+import CustomDialog from '../../../assets/Custom/CustomDialog';
 const Category = [
   {label: 'Item 1', value: '1'},
   {label: 'Item 2', value: '2'},
@@ -58,20 +62,127 @@ export default function UploadUpdateScreen({navigation}) {
 
   const [profileName, setProfileName] = useState('');
 
-  const [snackbarVisible, setsnackbarVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
 
+
+  const [snackbarVisible, setsnackbarVisible] = useState(false);
 
   const [isTextInputActive, setIsTextInputActive] = useState(false);
 
   const [category, setCategory] = useState('');
 
+  const [categoryId, setCategoryId] = useState('');
+
+  const [userId, setUserId] = useState('');
+
+
+
+  const [categoriesSelect, setCategorySelect] = useState([]);
+
+
   const [description, setDescription] = useState('');
 
   const [imageUri, setImageUri] = useState(null);
 
+  const [imageInfo, setImageInfo] = useState(null);
+
+
   const [isFocus, setIsFocus] = useState(false);
 
+  const [modalVisible, setModalVisible] = useState(false);
+
+
   const ref_RBSheetCamera = useRef(null);
+
+  
+
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchVideos()
+  }, []);
+
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
+  const performAction = () => {
+    setModalVisible(false);
+  };
+
+  const fetchVideos = async () => {
+    // Simulate loading
+    setLoading(true);
+  
+    await getUserID()
+    // Fetch data one by one
+    await fetchCategory()
+  
+    // Once all data is fetched, set loading to false
+    setLoading(false);
+  };
+
+  const getUserID = async () => {
+    console.log("Id's");
+    try {
+      const result = await AsyncStorage.getItem('userId ');
+      if (result !== null) {
+        setUserId(result);
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
+
+  const upload =async ()=>{
+       if(imageInfo!==null && profileName!=='' && categoryId!=='' && description!==''){
+          uploadVideo()
+       }else{
+         setModalVisible(true)
+       }
+  }
+
+
+  const uploadVideo = async () => {
+    try {
+      // Construct the request data as FormData
+      const formData = new FormData();
+      formData.append('name', profileName);
+      formData.append('description', description);
+      formData.append('video_category', categoryId);
+      formData.append('user_id', userId);
+
+  
+      if (imageInfo) {
+        // Append the video file to the FormData
+        formData.append('video', {
+          uri: imageInfo.uri,
+          type: imageInfo.type,
+          name: imageInfo.fileName,
+        });
+        // Perform the upload using the Fetch API
+        const response = await fetch('https://watch-gotcha-be.mtechub.com/xpi/createXpiVideo', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE2OTgzMTI3NDUsImV4cCI6MTcwMDkwNDc0NX0.YsFwjW-luPHnhb4R3nAyuyHDV58PoehhrsMdMttJd08',
+          },
+          body: formData,
+        });
+  
+        if (response.ok) {
+          console.log('Video uploaded successfully');
+        } else {
+          console.error('Failed to upload video:', response.status, response.statusText);
+        }
+      }
+    } catch (error) {
+      console.error('Error while picking a video:', error);
+    }
+  };
+  
+
 
   const handleFocus = () => {
     setIsTextInputActive(true);
@@ -115,6 +226,8 @@ export default function UploadUpdateScreen({navigation}) {
           if (response.assets && response.assets.length > 0) {
             setImageUri(response.assets[0].uri);
             console.log('response', response.assets[0].uri);
+            setImageInfo(response.assets[0]);
+
           } else if (response.uri) {
             // Handle the case when no assets are present (e.g., for videos)
             setImageUri(response.uri);
@@ -131,15 +244,16 @@ export default function UploadUpdateScreen({navigation}) {
     launchImageLibrary({mediaType: 'video'}, response => {
       console.log('image here', response);
       if (!response.didCancel && response.assets.length > 0) {
+        console.log("Response",response.assets[0])
         setImageUri(response.assets[0].uri);
+        setImageInfo(response.assets[0]);
       }
 
-      console.log('response', imageUri);
+      console.log('response', imageInfo);
 
       ref_RBSheetCamera.current.close();
     });
   };
-
 
   const handleUpdatePassword = async () => {
     // Perform the password update logic here
@@ -151,12 +265,53 @@ export default function UploadUpdateScreen({navigation}) {
     // Automatically hide the Snackbar after 3 seconds
     setTimeout(() => {
       setsnackbarVisible(false);
-      navigation.navigate("Home")
+      //handleUpload()
+      //navigation.navigate('Home');
     }, 3000);
   };
 
+  const handleUpload=()=>{
+    console.log("Id", categoryId)
+  }
+
   const dismissSnackbar = () => {
     setsnackbarVisible(false);
+  };
+
+  const fetchCategory = async () => {
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE2OTgzMTI3NDUsImV4cCI6MTcwMDkwNDc0NX0.YsFwjW-luPHnhb4R3nAyuyHDV58PoehhrsMdMttJd08';
+
+    try {
+      const response = await fetch(
+        'https://watch-gotcha-be.mtechub.com/videoCategory/getAllVideoCategories?page=1&limit=5',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+  
+        // Use the data from the API to set the categories
+        const categories = data.AllCategories.map((category) => ({
+          label: category.name, // Use the "name" property as the label
+          value: category.id.toString(), // Convert "id" to a string for the value
+        }));
+  
+        setCategorySelect(categories); // Update the state with the formatted category data
+
+        console.log("Data Categories", categoriesSelect);
+
+      } else {
+        console.error('Failed to fetch categories:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   return (
@@ -238,7 +393,7 @@ export default function UploadUpdateScreen({navigation}) {
           )}
         </View>
 
-        <View style={{marginRight:wp(2)}}>
+        <View style={{marginRight: wp(2)}}>
           <TextInput
             mode="outlined"
             label="Video Name"
@@ -282,7 +437,7 @@ export default function UploadUpdateScreen({navigation}) {
             // inputSearchStyle={styles.inputSearchStyle}
             // iconStyle={styles.iconStyle}
             value={category}
-            data={Category}
+            data={categoriesSelect}
             search={false}
             maxHeight={200}
             labelField="label"
@@ -292,7 +447,8 @@ export default function UploadUpdateScreen({navigation}) {
             onFocus={() => setIsFocus(true)}
             onBlur={() => setIsFocus(false)}
             onChange={item => {
-              setCategory(item.value);
+              setCategory(item.label);
+              setCategoryId(item.value);
               setIsFocus(false);
             }}
             renderRightIcon={() => (
@@ -333,7 +489,8 @@ export default function UploadUpdateScreen({navigation}) {
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-              handleUpdatePassword()
+               upload()
+              //handleUpdatePassword();
               //navigation.navigate('Profile_image');
             }}
           />
@@ -425,7 +582,25 @@ export default function UploadUpdateScreen({navigation}) {
         visible={snackbarVisible}
       />
 
-      
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+       { loading && <ActivityIndicator size="large" color="#FACA4E" />}
+      </View>
+
+      <CustomDialog
+        visible={modalVisible}
+        onClose={closeModal}
+        onAction={performAction}
+        imageURL="URL_TO_YOUR_IMAGE"
+      />
     </KeyboardAvoidingView>
   );
 }

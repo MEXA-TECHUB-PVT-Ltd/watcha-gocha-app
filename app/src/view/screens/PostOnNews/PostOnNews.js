@@ -5,12 +5,13 @@ import {
   Image,
   KeyboardAvoidingView,
   ScrollView,
+  ActivityIndicator,
   StatusBar,
   ImageBackground,
   View,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 import {Button, Divider, TextInput} from 'react-native-paper';
@@ -41,6 +42,7 @@ import {
 } from 'react-native-responsive-screen';
 
 import Fontiso from 'react-native-vector-icons/Fontisto';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import IonIcons from 'react-native-vector-icons/Ionicons';
 
@@ -48,6 +50,7 @@ import CPaperInput from '../../../assets/Custom/CPaperInput';
 import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
 
 import {SelectCountry, Dropdown} from 'react-native-element-dropdown';
+import CustomDialog from '../../../assets/Custom/CustomDialog';
 
 const Category = [
   {label: 'Item 1', value: '1'},
@@ -62,6 +65,10 @@ export default function PostOnNews({navigation}) {
 
   const [profileName, setProfileName] = useState('');
 
+  const [loading, setLoading] = useState(false);
+
+  const [modalVisible, setModalVisible] = useState(false);
+
   const [isTextInputActive, setIsTextInputActive] = useState(false);
 
   const [category, setCategory] = useState('');
@@ -70,11 +77,168 @@ export default function PostOnNews({navigation}) {
 
   const [comment, setComment] = useState('');
 
+  const [imageInfo, setImageInfo] = useState(null);
+
+  const [categoryId, setCategoryId] = useState('');
+
+  const [userId, setUserId] = useState('');
+
+  const [userName, setName] = useState('');
+
+  const [categoriesSelect, setCategorySelect] = useState([]);
+
   const [imageUri, setImageUri] = useState(null);
 
   const [isFocus, setIsFocus] = useState(false);
 
   const ref_RBSheetCamera = useRef(null);
+
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchVideos();
+  }, []);
+
+  const fetchVideos = async () => {
+    // Simulate loading
+    setLoading(true);
+
+    await getUserID();
+    // Fetch data one by one
+    await fetchCategory();
+
+    // Once all data is fetched, set loading to false
+    setLoading(false);
+  };
+
+  const getUserID = async () => {
+    console.log("Id's");
+    try {
+      const result = await AsyncStorage.getItem('userId ');
+      if (result !== null) {
+        setUserId(result);
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+
+    try {
+      const result = await AsyncStorage.getItem('userName');
+      if (result !== null) {
+        setName(result);
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
+
+  const fetchCategory = async () => {
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE2OTgzMTI3NDUsImV4cCI6MTcwMDkwNDc0NX0.YsFwjW-luPHnhb4R3nAyuyHDV58PoehhrsMdMttJd08';
+
+    try {
+      const response = await fetch(
+        'http://192.168.18.172:5000/discCategory/getAllDiscCategories?page=1&limit=5',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+
+        // Use the data from the API to set the categories
+        const categories = data.AllCategories.map(category => ({
+          label: category.name, // Use the "name" property as the label
+          value: category.id.toString(), // Convert "id" to a string for the value
+        }));
+
+        console.log("Categories", categories)
+
+        setCategorySelect(categories); // Update the state with the formatted category data
+
+        console.log('Data Categories', categoriesSelect);
+      } else {
+        console.error(
+          'Failed to fetch categories:',
+          response.status,
+          response.statusText,
+        );
+      }
+    } catch (error) {
+      console.error('Errors:', error);
+    }
+  };
+
+  const upload = async () => {
+    if (imageUri !== null && comment !== '' && categoryId !== '') {
+      uploadVideo();
+    } else {
+      setModalVisible(true);
+    }
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
+  const performAction = () => {
+    setModalVisible(false);
+  };
+
+  const uploadVideo = async () => {
+    setLoading(true)
+    console.log("Image Uri",imageUri)
+    console.log("Id", categoryId )
+    try {
+      // Construct the request data as FormData
+      const formData = new FormData();
+      formData.append('description', description);
+      formData.append('disc_category', categoriesSelect);
+      formData.append('user_id', userId);
+
+      if (imageUri) {
+        formData.append('image', imageUri);
+
+        // Append the video file to the FormData
+        /* formData.append('image', {
+          uri: imageUri,
+        }); */
+        // Perform the upload using the Fetch API
+        const response = await fetch(
+          'http://192.168.18.172:5000/news/createNews',
+          {
+            method: 'POST',
+            headers: {
+              Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE2OTgzMTI3NDUsImV4cCI6MTcwMDkwNDc0NX0.YsFwjW-luPHnhb4R3nAyuyHDV58PoehhrsMdMttJd08',
+            },
+            body: formData,
+          },
+        );
+
+        if (response.ok) {
+          console.log('News uploaded successfully');
+          setLoading(false)
+          handleUpdatePassword();
+        } else {
+          setLoading(false);
+          console.error(
+            'Failed to upload news:',
+            response.status,
+            response.statusText,
+          );
+        }
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error('Error while picking a video:', error);
+    }
+  };
 
   const handleFocus = () => {
     setIsTextInputActive(true);
@@ -143,9 +307,6 @@ export default function PostOnNews({navigation}) {
     });
   };
 
-
-
-
   const handleUpdatePassword = async () => {
     // Perform the password update logic here
     // For example, you can make an API request to update the password
@@ -172,9 +333,7 @@ export default function PostOnNews({navigation}) {
     {label: 'Tech', value: 'Tech'},
     {label: 'Health', value: 'Health'},
     {label: 'Culture', value: 'Culture'},
-
   ];
-
 
   return (
     <KeyboardAvoidingView
@@ -182,16 +341,12 @@ export default function PostOnNews({navigation}) {
       behavior="height" // You can use ‘height’ as well, depending on your preference
       enabled>
       <View style={styles.header}>
-        <TouchableOpacity onPress={()=>navigation.goBack()}>
-
-        <IonIcons name={'chevron-back'} color={'#282828'} size={25} />
-
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <IonIcons name={'chevron-back'} color={'#282828'} size={25} />
         </TouchableOpacity>
 
         <Text style={styles.headerText}>Post On News</Text>
       </View>
-
-
 
       <ScrollView
         keyboardShouldPersistTaps="always"
@@ -225,7 +380,7 @@ export default function PostOnNews({navigation}) {
               fontFamily: 'Inter',
               fontWeight: 'bold',
             }}>
-            John Doe
+            {userName}
           </Text>
         </View>
 
@@ -246,12 +401,12 @@ export default function PostOnNews({navigation}) {
         </View>
 
         <TouchableOpacity
-        onPress={() => ref_RBSheetCamera.current.open()}
+          onPress={() => ref_RBSheetCamera.current.open()}
           style={{
             flexDirection: 'row',
             height: hp(5),
-            width:wp(35),
-            alignItems:'center',
+            width: wp(35),
+            alignItems: 'center',
             marginTop: hp(3),
             marginHorizontal: wp(8),
           }}>
@@ -274,7 +429,7 @@ export default function PostOnNews({navigation}) {
           <View
             style={{
               marginTop: hp(5),
-              height: hp(35),
+              height: hp(27),
               borderRadius: wp(3),
               marginHorizontal: wp(20),
             }}>
@@ -310,8 +465,7 @@ export default function PostOnNews({navigation}) {
           </View>
         ) : null}
 
-
-<View style={{marginLeft:wp(8), marginRight:wp(7)}}>
+        <View style={{marginLeft: wp(8), marginRight: wp(7)}}>
           <Dropdown
             style={styles.textInputCategoryNonSelected}
             containerStyle={{
@@ -334,7 +488,7 @@ export default function PostOnNews({navigation}) {
             // inputSearchStyle={styles.inputSearchStyle}
             // iconStyle={styles.iconStyle}
             value={category}
-            data={Category}
+            data={categoriesSelect}
             search={false}
             maxHeight={200}
             labelField="label"
@@ -344,7 +498,8 @@ export default function PostOnNews({navigation}) {
             onFocus={() => setIsFocus(true)}
             onBlur={() => setIsFocus(false)}
             onChange={item => {
-              setCategory(item.value);
+              setCategory(item.label);
+              setCategoryId(item.value);
               setIsFocus(false);
             }}
             renderRightIcon={() => (
@@ -357,20 +512,24 @@ export default function PostOnNews({navigation}) {
             )}
           />
         </View>
-
-        
       </ScrollView>
 
-      <View style={{height:hp(12),marginBottom:hp(3),justifyContent:'flex-end', alignSelf: 'center'}}>
-           <CustomButton
-            title="Post"
-            load={false}
-            // checkdisable={inn == '' && cm == '' ? true : false}
-            customClick={() => {
-              handleUpdatePassword()
-            }}
-          /> 
-        </View>
+      <View
+        style={{
+          height: hp(12),
+          marginBottom: hp(3),
+          justifyContent: 'flex-end',
+          alignSelf: 'center',
+        }}>
+        <CustomButton
+          title="Post"
+          load={false}
+          // checkdisable={inn == '' && cm == '' ? true : false}
+          customClick={() => {
+            upload();
+          }}
+        />
+      </View>
 
       <RBSheet
         ref={ref_RBSheetCamera}
@@ -449,6 +608,26 @@ export default function PostOnNews({navigation}) {
           </TouchableOpacity>
         </View>
       </RBSheet>
+
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {loading && <ActivityIndicator size="large" color="#FACA4E" />}
+      </View>
+
+      <CustomDialog
+        visible={modalVisible}
+        onClose={closeModal}
+        onAction={performAction}
+        imageURL="URL_TO_YOUR_IMAGE"
+      />
 
       <CustomSnackbar
         message={'Success'}

@@ -377,7 +377,7 @@ const App = ({navigation}) => {
 
 
   const signInEndpoint =
-    'https://watch-gotcha-be.mtechub.com/user/login'; // Replace with your actual API endpoint
+    'http://192.168.18.172:5000/user/login'; // Replace with your actual API endpoint
 
   const handleSignIn = async () => {
     setIsLoading(true)
@@ -388,8 +388,8 @@ const App = ({navigation}) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: signin_email,
-          password: signin_pass,
+          email: 'rafaymuhammad245@gmail.com',
+          password: '123456',
           role: 'user',
         }),
       });
