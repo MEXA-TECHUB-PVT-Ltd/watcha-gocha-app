@@ -1,13 +1,15 @@
 import {
   StyleSheet,
   FlatList,
+  ActivityIndicator,
   Text,
   Image,
   TextInput,
   View,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Back from '../../assets/svg/back.svg';
 import {appImages} from '../../assets/utilities/index';
 import {
@@ -16,12 +18,72 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 
+import axios from 'axios';
+
 import Fontiso from 'react-native-vector-icons/Fontisto';
 
 export default function SearchScreen({navigation}) {
   const [selectedItemId, setSelectedItemId] = useState(null);
 
-  const searches = [
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searches, setSearches] = useState([]);
+
+  const [data, setData] = useState([]);
+
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchAll();
+  }, []);
+
+  const fetchAll = async () => {
+    // Simulate loading
+    setLoading(true);
+    // Fetch data one by one
+    await fetchTrendingVideos();
+
+    await loadSearchesFromStorage();
+
+    // Once all data is fetched, set loading to false
+    setLoading(false);
+  };
+
+  const fetchTrendingVideos = async () => {
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/xpi/getTrendingVideosByCategory/6?page=1&limit=5`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('Resultings', result.Videos);
+      setData(result.Videos); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const loadSearchesFromStorage = async () => {
+    try {
+      const savedSearches = await AsyncStorage.getItem('searches');
+      if (savedSearches) {
+        setSearches(JSON.parse(savedSearches));
+      }
+    } catch (error) {
+      console.error('Error loading searches from storage:', error);
+    }
+  };
+
+  const search = [
     {id: 1, title: 'John Doe'},
     {id: 2, title: 'Olivia'},
     {id: 3, title: 'Wiliam'},
@@ -35,16 +97,66 @@ export default function SearchScreen({navigation}) {
   ];
 
   const availableApps = [
-    {id: 1, title: 'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......', image: appImages.topSearches1},
-    {id: 2, title: 'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......', image: appImages.topSearches2},
-    {id: 3, title: 'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......', image: appImages.topSearches3},
-    {id: 4, title: 'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......', image: appImages.topSearches4},
-    {id: 5, title: 'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......', image: appImages.topSearches1},
-    {id: 6, title: 'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......', image: appImages.topSearches2},
-    {id: 7, title: 'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......', image: appImages.topSearches3},
-    {id: 8, title: 'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......', image: appImages.topSearches4},
-    {id: 9, title: 'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......', image: appImages.topSearches1},
-    {id: 10, title: 'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......', image: appImages.topSearches2},
+    {
+      id: 1,
+      title:
+        'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......',
+      image: appImages.topSearches1,
+    },
+    {
+      id: 2,
+      title:
+        'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......',
+      image: appImages.topSearches2,
+    },
+    {
+      id: 3,
+      title:
+        'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......',
+      image: appImages.topSearches3,
+    },
+    {
+      id: 4,
+      title:
+        'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......',
+      image: appImages.topSearches4,
+    },
+    {
+      id: 5,
+      title:
+        'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......',
+      image: appImages.topSearches1,
+    },
+    {
+      id: 6,
+      title:
+        'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......',
+      image: appImages.topSearches2,
+    },
+    {
+      id: 7,
+      title:
+        'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......',
+      image: appImages.topSearches3,
+    },
+    {
+      id: 8,
+      title:
+        'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......',
+      image: appImages.topSearches4,
+    },
+    {
+      id: 9,
+      title:
+        'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......',
+      image: appImages.topSearches1,
+    },
+    {
+      id: 10,
+      title:
+        'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......',
+      image: appImages.topSearches2,
+    },
   ];
 
   const renderSearches = item => {
@@ -103,33 +215,49 @@ export default function SearchScreen({navigation}) {
               height: null,
               resizeMode: 'contain',
             }}
-            source={item.image}
+            source={item.userimage}
           />
         </View>
 
         <Text
           style={{
             marginLeft: wp(3),
-            fontSize:hp(1.6),
-            lineHeight:18,
-            marginTop:hp(1.5),
+            fontSize: hp(1.6),
+            lineHeight: 18,
+            marginTop: hp(1.5),
             flex: 1,
             color: '#000000',
             fontFamily: 'Inter-Medium',
           }}>
-          {item.title}
+          {item.description}
         </Text>
       </View>
     );
   };
 
+  const saveSearchTerm = async () => {
+    if (searchTerm.trim() === '') {
+      return;
+    }
+
+    try {
+      const newSearchTerm = {id: searches.length + 1, title: searchTerm};
+      const updatedSearches = [...searches, newSearchTerm];
+
+      await AsyncStorage.setItem('searches', JSON.stringify(updatedSearches));
+      setSearches(updatedSearches);
+      setSearchTerm(''); // Clear the input field
+      fetchAll()
+    } catch (error) {
+      console.error('Error saving search term:', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.searchHeader}>
-        <TouchableOpacity onPress={()=>navigation.goBack()}>
-
-        <Back width={20} height={20} style={{marginLeft: '1%'}} />
-
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Back width={20} height={20} style={{marginLeft: '1%'}} />
         </TouchableOpacity>
 
         <View style={styles.searchBar}>
@@ -142,6 +270,14 @@ export default function SearchScreen({navigation}) {
           <TextInput
             style={{flex: 1, marginLeft: wp(3)}}
             placeholder="Search here"
+            value={searchTerm}
+            onChangeText={(text) => setSearchTerm(text)}
+            onSubmitEditing={() => {
+              saveSearchTerm()
+              // This code will execute when the "Okay" button is pressed
+              //console.log("Good", searchTerm);
+
+            }}
           />
         </View>
       </View>
@@ -149,15 +285,22 @@ export default function SearchScreen({navigation}) {
       <Text style={styles.latestSearch}>Latest Searches</Text>
 
       <View style={styles.latestSearchList}>
-        <FlatList
-          style={{flex: 1}}
-          contentContainerStyle={{alignItems: 'center'}}
-          showsHorizontalScrollIndicator={false}
-          horizontal
-          data={searches}
-          keyExtractor={item => item.id.toString()}
-          renderItem={({item}) => renderSearches(item)}
-        />
+        {searches.length > 0 ? (
+          <FlatList
+            style={{flex: 1}}
+            contentContainerStyle={{alignItems: 'center'}}
+            showsHorizontalScrollIndicator={false}
+            horizontal
+            data={searches}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({item}) => renderSearches(item)}
+          />
+        ) : (
+          <Text
+            style={{color: '#939393', fontSize: hp(1.8), alignSelf: 'center'}}>
+            No recent searches found.
+          </Text>
+        )}
       </View>
 
       <Text style={styles.latestSearch}>Top Searches</Text>
@@ -165,10 +308,23 @@ export default function SearchScreen({navigation}) {
       <FlatList
         style={{marginTop: hp(3), flex: 1}}
         showsVerticalScrollIndicator={false}
-        data={availableApps}
-        keyExtractor={item => item.id.toString()}
+        data={data}
+        keyExtractor={(item, index) => index.toString()}
         renderItem={({item}) => renderAvailableApps(item)}
       />
+
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {loading && <ActivityIndicator size="large" color="#FACA4E" />}
+      </View>
     </View>
   );
 }

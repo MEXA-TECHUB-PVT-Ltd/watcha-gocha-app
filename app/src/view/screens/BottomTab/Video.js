@@ -355,7 +355,7 @@ export default function Video({navigation}) {
               borderRadius: wp(1),
               resizeMode: 'cover',
             }}
-            source={item.video}
+            source={appImages.topSearches1}
           />
         </View>
         <View
