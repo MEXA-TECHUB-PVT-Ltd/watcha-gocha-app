@@ -5,6 +5,7 @@ import {
   Image,
   ScrollView,
   Platform,
+  ActivityIndicator,
   TextInput,
   StatusBar,
   PermissionsAndroid,
@@ -49,6 +50,8 @@ import Video from 'react-native-video';
 
 import SmileEmoji from '../../../assets/svg/SmileEmoji.svg';
 
+import axios from 'axios';
+
 import RNFetchBlob from 'rn-fetch-blob';
 
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -59,8 +62,12 @@ export default function ViewVideo({navigation}) {
 
   const [pastedURL, setPastedURL] = useState('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4');
 
+  const [comments, setComments] = useState([]);
 
   const [showReply, setShowReply] = useState(false);
+
+  const [loading, setLoading] = useState(false);
+
 
   const [showLikes, setShowLikes] = useState(false);
 
@@ -104,6 +111,49 @@ export default function ViewVideo({navigation}) {
     }
   };
 
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+      fetchAll()
+  }, []);
+
+  const fetchAll = async () => {
+    // Simulate loading
+    setLoading(true);
+    // Fetch data one by one
+    await fetchComments()
+  
+    // Once all data is fetched, set loading to false
+    setLoading(false);
+  };
+
+  const fetchComments = async () => {
+
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+
+    try {
+      const response = await fetch(
+        'https://watch-gotcha-be.mtechub.com/xpi/getAllCommentsByVideo/30',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json(); 
+        console.log("All Comments of usersssss", data.AllComents)  
+        setComments(data.AllComents)   
+
+      } else {
+        console.error('Failed to fetch categories:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
   const dismissSnackbar = () => {
     setsnackbarVisible(false);
   };
@@ -133,6 +183,7 @@ export default function ViewVideo({navigation}) {
     console.log('came to logssssss', commentText);
     // Clear the text in the TextInput
     setCommentText(null);
+    sendComment()
   };
 
   const copyAssetVideo = async () => {
@@ -158,7 +209,7 @@ export default function ViewVideo({navigation}) {
       id: 1,
       name: 'John Doe',
       message: 'The laughter in this video is contagious!',
-      reply: true,
+      reply: false,
     },
     {
       id: 2,
@@ -188,15 +239,53 @@ export default function ViewVideo({navigation}) {
     },
   ];
 
+  const sendComment = async () => {
+    setLoading(true)
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U'; // Replace with your actual token
+  
+    try {
+      const axiosConfig = {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      };
+  
+      const commentData = {
+        video_id: '30',
+        user_id: '29',
+        comment: commentText,
+      };
+  
+      const response = await axios.post('https://watch-gotcha-be.mtechub.com/xpi/sendComment', commentData, axiosConfig);
+  
+      console.log("Response", response);
+  
+      if (response.status === 200) {
+        setLoading(false)
+        console.log('Comment sent successfully');
+        fetchAll()
+      } else {
+        setLoading(false)
+        fetchAll()
+        console.error('Failed to send comment:', response.status, response.statusText);
+      }
+    } catch (error) {
+      setLoading(false)
+      console.error('Error:', error);
+    }
+  };
+  
   const renderComments = item => {
-    console.log('Items', item);
+    console.log('Items of comments', item);
     return (
       <View>
         <View
           style={{
-            height: hp(14),
+            height: hp(10),
             //borderWidth:3,
             paddingHorizontal: wp(5),
+            alignItems:'center',
             flexDirection: 'row',
             width: '100%',
           }}>
@@ -216,9 +305,10 @@ export default function ViewVideo({navigation}) {
 
           <View
             style={{
-              flex: 1,
+              //flex: 1,
               marginLeft: wp(3),
-              marginTop: hp(3),
+              height:hp(5),
+              //marginTop: hp(1),
               //borderWidth:3,
               justifyContent: 'space-around',
             }}>
@@ -228,19 +318,20 @@ export default function ViewVideo({navigation}) {
                 fontFamily: 'Inter-Medium',
                 fontSize: hp(2.1),
               }}>
-              John Doe
+              {item.username}
             </Text>
 
             <Text
               style={{
                 color: '#4C4C4C',
                 fontFamily: 'Inter-Regular',
+                marginTop:hp(2.1),
                 fontSize: hp(1.6),
               }}>
-              I wish I had a friend group like this. You all are incredible!
+              {item.comment}
             </Text>
 
-            {item.reply && (
+            {false && (
               <TouchableOpacity
                 onPress={() => setShowReply(!showReply)}
                 style={{
@@ -777,9 +868,10 @@ export default function ViewVideo({navigation}) {
 
           <View style={{marginTop: hp(1), flex: 1}}>
             <BottomSheetFlatList
-              data={chats}
+              data={comments}
               keyExtractor={(item, index) => index.toString()}
               renderItem={({item}) => renderComments(item)}
+              extraData={loading}
             />
           </View>
 
@@ -809,7 +901,7 @@ export default function ViewVideo({navigation}) {
                 style={{flex: 1, marginLeft: wp(1)}}
               />
 
-              <TouchableOpacity onPress={clearTextInput}>
+              <TouchableOpacity onPress={()=>clearTextInput}>
                 <ButtonSend />
               </TouchableOpacity>
             </View>
@@ -914,6 +1006,19 @@ export default function ViewVideo({navigation}) {
             </View>
           )
         )}
+      </View>
+
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+       { loading && <ActivityIndicator size="large" color="#FACA4E" />}
       </View>
     </GestureHandlerRootView>
   );

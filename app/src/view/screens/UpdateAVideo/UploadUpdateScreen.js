@@ -32,7 +32,8 @@ import CustomButton from '../../../assets/Custom/Custom_Button';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
-
+import axios from 'axios';
+import cloudinary from 'cloudinary-core';
 import Share from 'react-native-share';
 
 import {
@@ -64,7 +65,6 @@ export default function UploadUpdateScreen({navigation}) {
 
   const [loading, setLoading] = useState(false);
 
-
   const [snackbarVisible, setsnackbarVisible] = useState(false);
 
   const [isTextInputActive, setIsTextInputActive] = useState(false);
@@ -75,32 +75,27 @@ export default function UploadUpdateScreen({navigation}) {
 
   const [userId, setUserId] = useState('');
 
-
-
   const [categoriesSelect, setCategorySelect] = useState([]);
-
 
   const [description, setDescription] = useState('');
 
   const [imageUri, setImageUri] = useState(null);
 
-  const [imageInfo, setImageInfo] = useState(null);
+  const [videoUrl, setVideoUrl] = useState(null);
 
+
+  const [imageInfo, setImageInfo] = useState(null);
 
   const [isFocus, setIsFocus] = useState(false);
 
   const [modalVisible, setModalVisible] = useState(false);
 
-
   const ref_RBSheetCamera = useRef(null);
-
-  
 
   useEffect(() => {
     // Make the API request and update the 'data' state
-    fetchVideos()
+    fetchVideos();
   }, []);
-
 
   const closeModal = () => {
     setModalVisible(false);
@@ -113,11 +108,11 @@ export default function UploadUpdateScreen({navigation}) {
   const fetchVideos = async () => {
     // Simulate loading
     setLoading(true);
-  
-    await getUserID()
+
+    await getUserID();
     // Fetch data one by one
-    await fetchCategory()
-  
+    await fetchCategory();
+
     // Once all data is fetched, set loading to false
     setLoading(false);
   };
@@ -136,53 +131,230 @@ export default function UploadUpdateScreen({navigation}) {
     }
   };
 
-  const upload =async ()=>{
-       if(imageInfo!==null && profileName!=='' && categoryId!=='' && description!==''){
-          uploadVideo()
-       }else{
-         setModalVisible(true)
-       }
-  }
+  const upload = async () => {
+    if (
+      imageInfo !== null &&
+      profileName !== '' &&
+      categoryId !== '' &&
+      description !== ''
+    ) {
+      //uploadVideo()
+      //uploadVideos()
+      const uri = imageInfo.uri;
+      const type = imageInfo.type;
+      const name = imageInfo.fileName;
+      const source = {uri, type, name};
+      console.log(source);
+      handleUploadVideo(source);
+
+      //uploadVideoCloudinary(imageInfo.uri)
+    } else {
+      setModalVisible(true);
+    }
+  };
+
+  /* const cloudinaryCore = new cloudinary.Cloudinary({ cloud_name: 'dxfdrtxi3' });
+
+  const uploadVideoCloudinary = (videoUri) => {
+    cloudinaryCore.openUploadWidget(
+      {
+        cloud_name: 'dxfdrtxi3',
+        upload_preset: 'e6zfilan',
+        sources: ['local', 'url', 'camera'],
+        resource_type: 'video',
+        files: [videoUri], // Pass the videoUri here
+      },
+      (error, result) => {
+        if (!error && result && result.event === 'success') {
+          // The URL path of the uploaded video is in result.info.secure_url
+          const videoURL = result.info.secure_url;
+          console.log('Video URL:', videoURL);
+        }
+      }
+    );
+  };
+ */
+
+  const handleUploadVideo = video => {
+    const data = new FormData();
+    data.append('file', video);
+    data.append('upload_preset', 'e6zfilan'); // Use your Cloudinary upload preset
+    data.append('cloud_name', 'dxfdrtxi3'); // Use your Cloudinary cloud name
+
+    fetch('https://api.cloudinary.com/v1_1/dxfdrtxi3/video/upload', {
+      method: 'POST',
+      body: data,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        setVideoUrl(data.url); // Store the Cloudinary video URL in your state
+        uploadVideo(data.url)
+        console.log(data);
+      })
+      .catch(err => {
+        Alert.alert('Error While Uploading Video');
+      });
+  };
+
+  const handleUpdata = photo => {
+    const data = new FormData();
+    data.append('file', photo);
+    data.append('upload_preset', '_DemoEmployee');
+    data.append('cloud_name', 'italyqb');
+    fetch('https://api.cloudinary.com/v1_1/italyqb/image/upload', {
+      method: 'POST',
+      body: data,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        setPicture(data.url);
+        setModal(false);
+        console.log(data);
+      })
+      .catch(err => {
+        Alert.alert('Error While Uploading');
+      });
+  };
 
 
-  const uploadVideo = async () => {
+  const uploadVideoData = async (video) => {
+    setLoading(true)
+    console.log("Image Uri",video)
+    //console.log("Id", categoryId )
     try {
       // Construct the request data as FormData
       const formData = new FormData();
-      formData.append('name', profileName);
-      formData.append('description', description);
-      formData.append('video_category', categoryId);
+      formData.append('name', );
+      formData.append('disc_category', categoriesSelect);
       formData.append('user_id', userId);
 
-  
-      if (imageInfo) {
+      
+        formData.append('image', imageUri);
+
         // Append the video file to the FormData
-        formData.append('video', {
-          uri: imageInfo.uri,
-          type: imageInfo.type,
-          name: imageInfo.fileName,
-        });
+        /* formData.append('image', {
+          uri: imageUri,
+        }); */
         // Perform the upload using the Fetch API
-        const response = await fetch('https://watch-gotcha-be.mtechub.com/xpi/createXpiVideo', {
-          method: 'POST',
-          headers: {
-            'Authorization': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE2OTgzMTI3NDUsImV4cCI6MTcwMDkwNDc0NX0.YsFwjW-luPHnhb4R3nAyuyHDV58PoehhrsMdMttJd08',
+        const response = await fetch(
+          'http://192.168.18.172:5000/news/createNews',
+          {
+            method: 'POST',
+            headers: {
+              Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE2OTgzMTI3NDUsImV4cCI6MTcwMDkwNDc0NX0.YsFwjW-luPHnhb4R3nAyuyHDV58PoehhrsMdMttJd08',
+            },
+            body: formData,
           },
-          body: formData,
-        });
-  
+        );
+
         if (response.ok) {
-          console.log('Video uploaded successfully');
+          console.log('News uploaded successfully');
+          setLoading(false)
+          handleUpdatePassword();
         } else {
-          console.error('Failed to upload video:', response.status, response.statusText);
+          setLoading(false);
+          console.error(
+            'Failed to upload news:',
+            response.status,
+            response.statusText,
+          );
         }
-      }
+    
     } catch (error) {
+      setLoading(false);
       console.error('Error while picking a video:', error);
     }
   };
-  
 
+  const uploadVideo = async (data) => {
+    //console.log("Uri",imageInfo.uri )
+    try {
+      // Construct the request data as FormData
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('description', 'ajkbch');
+      formData.append('video_category', '6');
+      formData.append('video', data);
+      formData.append('user_id', '29');
+
+      const response = await fetch(
+        'http://192.168.18.172:5000/xpi/createXpiVideo',
+        {
+          method: 'POST',
+          headers: {
+            Authorization:
+              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U',
+            'Content-Type': 'multipart/form-data',
+          },
+          body: formData,
+        },
+      );
+      console.log('Response', response.data);
+      if (response.ok) {
+        console.log('Video uploaded successfully');
+      } else {
+        console.error(
+          'Failed to upload video:',
+          response.status,
+          response.statusText,
+        );
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const uploadVideos = async () => {
+    try {
+      // Construct the request data as FormData
+      const formData = new FormData();
+      formData.append('name', 'ghsvgxv');
+      formData.append('description', 'ajkbch');
+      formData.append('video_category', '6');
+      formData.append('user_id', '29');
+
+      // Set up the Axios request
+      const axiosConfig = {
+        headers: {
+          Authorization:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U',
+        },
+      };
+
+      // Perform the upload using Axios
+      const response = await axios.post(
+        'http://192.168.18.172:5000/xpi/createXpiVideo',
+        formData,
+        axiosConfig,
+      );
+
+      console.log('Response', response);
+
+      if (response.status === 404) {
+        console.error(
+          'Failed to upload video:',
+          response.status,
+          response.data,
+        );
+      } else {
+        console.error(
+          'Failed to upload video:',
+          response.status,
+          response.statusText,
+        );
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleFocus = () => {
     setIsTextInputActive(true);
@@ -227,7 +399,6 @@ export default function UploadUpdateScreen({navigation}) {
             setImageUri(response.assets[0].uri);
             console.log('response', response.assets[0].uri);
             setImageInfo(response.assets[0]);
-
           } else if (response.uri) {
             // Handle the case when no assets are present (e.g., for videos)
             setImageUri(response.uri);
@@ -244,7 +415,7 @@ export default function UploadUpdateScreen({navigation}) {
     launchImageLibrary({mediaType: 'video'}, response => {
       console.log('image here', response);
       if (!response.didCancel && response.assets.length > 0) {
-        console.log("Response",response.assets[0])
+        console.log('Response', response.assets[0]);
         setImageUri(response.assets[0].uri);
         setImageInfo(response.assets[0]);
       }
@@ -270,9 +441,9 @@ export default function UploadUpdateScreen({navigation}) {
     }, 3000);
   };
 
-  const handleUpload=()=>{
-    console.log("Id", categoryId)
-  }
+  const handleUpload = () => {
+    console.log('Id', categoryId);
+  };
 
   const dismissSnackbar = () => {
     setsnackbarVisible(false);
@@ -280,11 +451,11 @@ export default function UploadUpdateScreen({navigation}) {
 
   const fetchCategory = async () => {
     const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE2OTgzMTI3NDUsImV4cCI6MTcwMDkwNDc0NX0.YsFwjW-luPHnhb4R3nAyuyHDV58PoehhrsMdMttJd08';
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
 
     try {
       const response = await fetch(
-        'https://watch-gotcha-be.mtechub.com/videoCategory/getAllVideoCategories?page=1&limit=5',
+        'http://192.168.18.172:5000/videoCategory/getAllVideoCategories?page=1&limit=5',
         {
           method: 'GET',
           headers: {
@@ -295,19 +466,24 @@ export default function UploadUpdateScreen({navigation}) {
 
       if (response.ok) {
         const data = await response.json();
-  
+
+        console.log('Data ', data);
+
         // Use the data from the API to set the categories
-        const categories = data.AllCategories.map((category) => ({
+        const categories = data.AllCategories.map(category => ({
           label: category.name, // Use the "name" property as the label
           value: category.id.toString(), // Convert "id" to a string for the value
         }));
-  
+
         setCategorySelect(categories); // Update the state with the formatted category data
 
-        console.log("Data Categories", categoriesSelect);
-
+        console.log('Data Categories', categoriesSelect);
       } else {
-        console.error('Failed to fetch categories:', response.status, response.statusText);
+        console.error(
+          'Failed to fetch categories:',
+          response.status,
+          response.statusText,
+        );
       }
     } catch (error) {
       console.error('Error:', error);
@@ -489,7 +665,7 @@ export default function UploadUpdateScreen({navigation}) {
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-               upload()
+              upload();
               //handleUpdatePassword();
               //navigation.navigate('Profile_image');
             }}
@@ -592,7 +768,7 @@ export default function UploadUpdateScreen({navigation}) {
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-       { loading && <ActivityIndicator size="large" color="#FACA4E" />}
+        {loading && <ActivityIndicator size="large" color="#FACA4E" />}
       </View>
 
       <CustomDialog

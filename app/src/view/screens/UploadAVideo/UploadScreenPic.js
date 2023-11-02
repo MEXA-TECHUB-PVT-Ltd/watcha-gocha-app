@@ -17,7 +17,7 @@ import {Button, Divider, TextInput} from 'react-native-paper';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-
+import axios from 'axios';
 import Back from '../../../assets/svg/back.svg';
 import {appImages} from '../../../assets/utilities/index';
 import Slider from '@react-native-community/slider';
@@ -154,6 +154,40 @@ export default function UploadScreenPic({navigation}) {
       navigation.navigate("Home")
     }, 3000);
   };
+
+  const uploadVideos = async () => {
+    try {
+      console.log("Image Uri", imageUri)
+      // Construct the request data as FormData
+      const formData = new FormData();
+      formData.append('name', 'ghsvgxv');
+      formData.append('description', 'ajkbch');
+      formData.append('pic_category', '5');
+      formData.append('user_id', '29');
+  
+      // Set up the Axios request
+      const axiosConfig = {
+        headers: {
+          'Authorization': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U',
+        },
+      };
+  
+      // Perform the upload using Axios
+      const response = await axios.post('http://192.168.18.172:5000/picTour/createPicTour', formData, axiosConfig);
+  
+      console.log("Response", response);
+  
+      if (response.status === 404) {
+        console.error('Failed to upload video:', response.status, response.data);
+
+      } else {
+        console.error('Failed to upload video:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
 
   const dismissSnackbar = () => {
     setsnackbarVisible(false);
@@ -333,7 +367,9 @@ export default function UploadScreenPic({navigation}) {
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-              handleUpdatePassword()
+              //handleUpdatePassword()
+              console.log("Upload Pics")
+              uploadVideos()
               //navigation.navigate('Profile_image');
             }}
           />
