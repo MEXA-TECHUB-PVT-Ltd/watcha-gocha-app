@@ -22,6 +22,8 @@ import Headers from '../../../assets/Custom/Headers';
 import Approved from '../../../assets/svg/Approved';
 import Chat from '../../../assets/svg/Chat.svg';
 
+import { InstalledApps } from 'react-native-launcher-kit';
+
 import {appImages} from '../../../assets/utilities';
 
 export default function Dashboard({navigation}) {
@@ -1215,7 +1217,8 @@ style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(18)}}>
             Favourite Apps
           </Text>
 
-          <View
+          <TouchableOpacity
+            onPress={()=>navigation.navigate("InstlApps")}
             style={{
               borderWidth: 1,
               marginHorizontal: wp(2.3),
@@ -1232,7 +1235,7 @@ style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(18)}}>
               numColumns={5} // Set the number of columns to 3
               renderItem={({item}) => renderFavouriteApps(item)}
             />
-          </View>
+          </TouchableOpacity>
         </View>
 
         <View style={{marginTop: hp(8), height: hp(20)}}>

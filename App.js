@@ -90,6 +90,7 @@ import Notification from './app/src/view/screens/Notification';
 import HelpScreen from './app/src/view/screens/HelpScreen';
 import SplashScreen from './app/src/view/screens/SplashScreen';
 import RateApp from './app/src/view/screens/RateApp';
+import InstlApps from './app/src/view/screens/InstalledApps/InstlApps';
 
 //------------------\\
 
@@ -103,20 +104,23 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-
-      <Stack.Screen
+        <Stack.Screen
           name="SpashScreen"
           component={SplashScreen}
           options={{headerShown: false}}
         />
 
-      <Stack.Screen
+        <Stack.Screen
+          name="InstlApps"
+          component={InstlApps}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
           name="ResetPassword"
           component={ResetPassword}
           options={{headerShown: false}}
         />
-
-        
 
         <Stack.Screen
           name="RateApp"
@@ -495,8 +499,6 @@ const App = () => {
           component={PhoneBase}
           options={{headerShown: false}}
         />
-
-       
 
         <Stack.Screen
           name="ForgetPassword"
