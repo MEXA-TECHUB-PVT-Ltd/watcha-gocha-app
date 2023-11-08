@@ -40,6 +40,7 @@ const appImages = {
   UploadBanner:require(IMAGES_DIR + 'UploadBanner.png'),
   logoWhite: require(IMAGES_DIR + 'LogoWhite.png'),
   LogoBlack: require(IMAGES_DIR + 'LogoBlack.png'),
+  galleryPlaceHolder:require(IMAGES_DIR + 'galleryPlaceHolder.png'),
   LogOut:require(IMAGES_DIR + 'Logout.png')
 
 

@@ -124,6 +124,8 @@ export default function UploadUpdateScreen({navigation}) {
       if (result !== null) {
         setUserId(result);
         console.log('user id retrieved:', result);
+      }else{
+        console.log('result is null', result);
       }
     } catch (error) {
       // Handle errors here
@@ -176,6 +178,7 @@ export default function UploadUpdateScreen({navigation}) {
  */
 
   const handleUploadVideo = video => {
+    setLoading(true);
     const data = new FormData();
     data.append('file', video);
     data.append('upload_preset', 'e6zfilan'); // Use your Cloudinary upload preset
@@ -192,7 +195,8 @@ export default function UploadUpdateScreen({navigation}) {
       .then(res => res.json())
       .then(data => {
         setVideoUrl(data.url); // Store the Cloudinary video URL in your state
-        uploadVideo(data.url)
+        //uploadVideo(data.url)
+        uploadXpiVideo(data.url);
         console.log(data);
       })
       .catch(err => {
@@ -274,19 +278,75 @@ export default function UploadUpdateScreen({navigation}) {
     }
   };
 
+  const uploadXpiVideo = async (data) => {
+    console.log("Video Uri", data)
+    console.log("Profile Name", profileName)
+    console.log("Description", description)
+    console.log("user id", userId)
+    console.log("category id", categoryId)
+
+
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U'
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/xpi/createXpiVideo';
+  
+    const requestData = {
+      name: profileName,
+      description: description,
+      video_category: categoryId,
+      video: data,
+      user_id: userId
+    };
+  
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`, // Use the provided token
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData)
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data);
+        setLoading(false);
+        handleUpdatePassword()
+
+
+        // Handle the response data as needed
+      } else {
+        setLoading(false);
+
+        console.error(
+          'Failed to upload video:',
+          response.status,
+          response.statusText
+        );
+        // Handle the error
+      }
+    } catch (error) {
+      console.error('API Request Error:', error);
+      setLoading(false);
+
+      // Handle the error
+    }
+  };
+  
+
   const uploadVideo = async (data) => {
     //console.log("Uri",imageInfo.uri )
     try {
       // Construct the request data as FormData
       const formData = new FormData();
-      formData.append('name', name);
-      formData.append('description', 'ajkbch');
-      formData.append('video_category', '6');
+      formData.append('name', profileName);
+      formData.append('description', description);
+      formData.append('video_category', categoryId);
       formData.append('video', data);
-      formData.append('user_id', '29');
+      formData.append('user_id', userId);
 
       const response = await fetch(
-        'http://192.168.18.172:5000/xpi/createXpiVideo',
+        'https://watch-gotcha-be.mtechub.com/xpi/createXpiVideo',
         {
           method: 'POST',
           headers: {
@@ -300,6 +360,7 @@ export default function UploadUpdateScreen({navigation}) {
       console.log('Response', response.data);
       if (response.ok) {
         console.log('Video uploaded successfully');
+        handleUpdatePassword()
       } else {
         console.error(
           'Failed to upload video:',
@@ -455,7 +516,7 @@ export default function UploadUpdateScreen({navigation}) {
 
     try {
       const response = await fetch(
-        'http://192.168.18.172:5000/videoCategory/getAllVideoCategories?page=1&limit=5',
+        'https://watch-gotcha-be.mtechub.com/videoCategory/getAllVideoCategories?page=1&limit=5',
         {
           method: 'GET',
           headers: {

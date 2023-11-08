@@ -20,7 +20,6 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-
 import {appImages} from '../../../assets/utilities/index';
 import {Button, Divider, TextInput} from 'react-native-paper';
 import {
@@ -237,6 +236,7 @@ const App = ({navigation}) => {
     } else {
       setIsLoading(true);
       setTimeout(() => {
+
         handleSignIn()
         //setIsLoading(false);
 
@@ -363,7 +363,6 @@ const App = ({navigation}) => {
       setsignup_cpass('');
       setusername('');
 
-      
       // navigation.navigate('SelectGender');
     } catch (error) {
       //console.error('Error:');
@@ -377,7 +376,7 @@ const App = ({navigation}) => {
 
 
   const signInEndpoint =
-    'http://192.168.18.172:5000/user/login'; // Replace with your actual API endpoint
+    'https://watch-gotcha-be.mtechub.com/user/login'; // Replace with your actual API endpoint
 
   const handleSignIn = async () => {
     setIsLoading(true)
@@ -388,8 +387,8 @@ const App = ({navigation}) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: 'rafaymuhammad245@gmail.com',
-          password: '123456',
+          email: signin_email,
+          password: signin_pass,
           role: 'user',
         }),
       });

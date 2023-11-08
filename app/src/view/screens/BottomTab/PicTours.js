@@ -6,10 +6,11 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
+  ActivityIndicator,
   Text,
   View,
 } from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP,
@@ -32,20 +33,168 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default function PicTours({navigation}) {
-  const [selectedItemId, setSelectedItemId] = useState(null);
-
   const [selectedItemVideoId, setSelectedItemVideoId] = useState(null);
 
   const [selectedItemDiscId, setSelectedItemDiscId] = useState(null);
 
-  const [selectedItemPicsId, setSelectedItemPicsId] = useState(null);
+  const [selectedItemPicsId, setSelectedItemPicsId] = useState(9);
 
   const [selectedItemMarketId, setSelectedItemMarketId] = useState(null);
 
+  //pic
+  const [selectedItemId, setSelectedItemId] = useState(8);
+
+  const [loading, setLoading] = useState(false);
+
+  const [searchesData, setSearches] = useState('');
+
   const [selectedItem, setSelectedItem] = useState('');
+
+  const [data, setData] = useState([]);
+
+  const [dataLatestVideos, setDataLatestVideos] = useState([]);
+
+  const [dataMostViewedVideos, setMostViewedVideos] = useState([]);
+
+  const [dataMostCommentedVideos, setMostCommentedVideos] = useState([]);
 
   const ref_RBSheetCamera = useRef(null);
 
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchVideos();
+  }, []);
+
+  const fetchVideos = async () => {
+    // Simulate loading
+    setLoading(true);
+
+    // Fetch data one by one
+    await fetchCategory();
+    await fetchTrendingVideos();
+    await fetchLatestVideos();
+    await fetchMostViewedVideos();
+    await fetchMostCommentedVideos();
+
+    // Once all data is fetched, set loading to false
+    setLoading(false);
+  };
+
+  const fetchTrendingVideos = async () => {
+
+    console.log("selected id trending videos", selectedItemPicsId)
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/picTour/getAllTrendingToursByCategory/${selectedItemPicsId}?page=1&limit=5`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('Resultings Pics Tourzs', result.Tours);
+      setData(result.Tours); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error Trending:', error);
+    }
+  };
+
+  const fetchLatestVideos = async () => {
+    const token =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/picTour/getAllRecentVideosByCategory/${selectedItemPicsId}?page=1&limit=5`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('Resultings', result.Tours);
+      setDataLatestVideos(result.Tours); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const fetchMostViewedVideos = async () => {
+    const token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/picTour/getMostViewedToursByCategory/${selectedItemPicsId}?page=1&limit=5`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('Resultings Most Viewed', result.Tours);
+      setMostViewedVideos(result.Tours); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const fetchMostCommentedVideos = async () => {
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/picTour/getMostCommentedToursByCategory/${selectedItemPicsId}?page=1&limit=5`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('Resultings', result.Tours);
+      setMostCommentedVideos(result.Tours); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const fetchCategory = async () => {
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY5ODAzOTAyNywiZXhwIjoxNzAwNjMxMDI3fQ.JSki1amX9VPEP9uCsJ5vPiCl2P4EcBqW6CQyY_YdLsk';
+
+    try {
+      const response = await fetch(
+        'https://watch-gotcha-be.mtechub.com/picCategory/getAllPicCategories?page=1&limit=5',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('Search Results', result.AllCategories);
+      setSearches(result.AllCategories); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
 
   const takePhotoFromCamera = value => {
     ref_RBSheetCamera.current.close();
@@ -58,7 +207,6 @@ export default function PicTours({navigation}) {
     setSelectedItem(value);
     navigation.navigate('UploadUpdatePic');
   };
-
 
   //pics search
 
@@ -83,7 +231,7 @@ export default function PicTours({navigation}) {
             styles.textSearchDetails,
             {color: isSelected ? '#232323' : '#939393'},
           ]}>
-          {item.title}
+          {item.name}
         </Text>
       </TouchableOpacity>
     );
@@ -106,10 +254,10 @@ export default function PicTours({navigation}) {
   ];
 
   const renderAvailableAppsVideo = item => {
-    console.log('Items', item);
+    console.log('Items of Pics', item);
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate('ViewVideo')}
+        onPress={() =>  navigation.navigate('PicDetails', { picData: item })}
         style={{width: wp(27), margin: 5}}>
         <View>
           <Image
@@ -125,7 +273,7 @@ export default function PicTours({navigation}) {
               borderRadius: wp(1),
               resizeMode: 'cover',
             }}
-            source={item.image}
+            source={appImages.topSearches1}
           />
         </View>
         <View
@@ -142,7 +290,7 @@ export default function PicTours({navigation}) {
               color: '#000000',
               width: wp(23),
             }}>
-            {item.title}
+            {item.name}
           </Text>
 
           <Entypo name={'dots-three-vertical'} size={14} color={'#4A4A4A'} />
@@ -205,9 +353,6 @@ export default function PicTours({navigation}) {
   ];
   return (
     <View style={styles.container}>
-
-
-
       <StatusBar
         translucent={true}
         backgroundColor="transparent"
@@ -218,12 +363,11 @@ export default function PicTours({navigation}) {
         <Headers
           onPress={() => navigation.goBack()}
           showSearch={true}
-          onPressSearch={()=>navigation.navigate("SearchScreen")}
+          onPressSearch={() => navigation.navigate('SearchScreen')}
           showText={true}
-          onPressListings={()=>navigation.openDrawer()}
+          onPressListings={() => navigation.openDrawer()}
           showListings={true}
           text={'Pic Tour'}
-
         />
       </View>
 
@@ -267,7 +411,7 @@ export default function PicTours({navigation}) {
             contentContainerStyle={{alignItems: 'center'}}
             showsHorizontalScrollIndicator={false}
             horizontal
-            data={searchesPics}
+            data={searchesData}
             keyExtractor={item => item.id.toString()}
             renderItem={({item}) => renderSearchesPic(item)}
           />
@@ -275,7 +419,7 @@ export default function PicTours({navigation}) {
         <View
           style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(18)}}>
           <TouchableOpacity
-            onPress={() => navigation.navigate('ViewVideo')}
+            onPress={() => navigation.navigate('PicDetails')}
             style={{
               width: wp(35),
               marginLeft: wp(2.5),
@@ -351,14 +495,29 @@ export default function PicTours({navigation}) {
           </Text>
 
           <View style={{marginTop: hp(1), height: '100%'}}>
-            <FlatList
-              style={{flex: 1}}
-              showsVerticalScrollIndicator={false}
-              data={availableAppsVideo}
-              horizontal
-              keyExtractor={item => item.id.toString()}
-              renderItem={({item}) => renderAvailableAppsVideo(item)}
-            />
+            {loading === true ? (
+              <View
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <ActivityIndicator size="large" color="#FACA4E" />
+              </View>
+            ) : (
+              <FlatList
+                style={{flex: 1}}
+                showsHorizontalScrollIndicator={false}
+                data={data}
+                horizontal
+                //keyExtractor={item => item.id.toString()}
+                renderItem={({item}) => renderAvailableAppsVideo(item)}
+              />
+            )}
           </View>
         </View>
 
@@ -375,14 +534,29 @@ export default function PicTours({navigation}) {
           </Text>
 
           <View style={{marginTop: hp(1), height: '100%'}}>
-            <FlatList
-              style={{flex: 1}}
-              showsVerticalScrollIndicator={false}
-              data={availableAppsVideo}
-              horizontal
-              keyExtractor={item => item.id.toString()}
-              renderItem={({item}) => renderAvailableAppsVideo(item)}
-            />
+            {loading === true ? (
+              <View
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <ActivityIndicator size="large" color="#FACA4E" />
+              </View>
+            ) : (
+              <FlatList
+                style={{flex: 1}}
+                showsHorizontalScrollIndicator={false}
+                data={dataLatestVideos}
+                horizontal
+                // keyExtractor={item => item.id.toString()}
+                renderItem={({item}) => renderAvailableAppsVideo(item)}
+              />
+            )}
           </View>
         </View>
 
@@ -399,14 +573,29 @@ export default function PicTours({navigation}) {
           </Text>
 
           <View style={{marginTop: hp(1), height: '100%'}}>
-            <FlatList
-              style={{flex: 1}}
-              showsVerticalScrollIndicator={false}
-              data={availableAppsVideo}
-              horizontal
-              keyExtractor={item => item.id.toString()}
-              renderItem={({item}) => renderAvailableAppsVideo(item)}
-            />
+            {loading === true ? (
+              <View
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <ActivityIndicator size="large" color="#FACA4E" />
+              </View>
+            ) : (
+              <FlatList
+                style={{flex: 1}}
+                showsHorizontalScrollIndicator={false}
+                data={dataMostViewedVideos}
+                horizontal
+                //keyExtractor={item => item.id.toString()}
+                renderItem={({item}) => renderAvailableAppsVideo(item)}
+              />
+            )}
           </View>
         </View>
 
@@ -423,18 +612,32 @@ export default function PicTours({navigation}) {
           </Text>
 
           <View style={{marginTop: hp(1), height: '100%'}}>
-            <FlatList
-              style={{flex: 1}}
-              showsVerticalScrollIndicator={false}
-              data={availableAppsVideo}
-              horizontal
-              keyExtractor={item => item.id.toString()}
-              renderItem={({item}) => renderAvailableAppsVideo(item)}
-            />
+            {loading === true ? (
+              <View
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <ActivityIndicator size="large" color="#FACA4E" />
+              </View>
+            ) : (
+              <FlatList
+                style={{flex: 1}}
+                showsHorizontalScrollIndicator={false}
+                data={dataMostCommentedVideos}
+                horizontal
+                //keyExtractor={item => item.id.toString()}
+                renderItem={({item}) => renderAvailableAppsVideo(item)}
+              />
+            )}
           </View>
         </View>
       </ScrollView>
-
 
       <RBSheet
         ref={ref_RBSheetCamera}
@@ -549,6 +752,7 @@ const styles = StyleSheet.create({
   textSearchDetails: {
     fontFamily: 'Inter',
     fontWeight: '700',
+    textAlign:'center',
     fontSize: hp(1.8),
   },
 
