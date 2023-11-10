@@ -478,7 +478,7 @@ export default function ViewVideoPicProfile({navigation}) {
                 </Text>
               </TouchableOpacity>
             </ScrollView>
-            <View
+           {/*  <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
@@ -511,7 +511,7 @@ export default function ViewVideoPicProfile({navigation}) {
               </Text>
               <VolumeUp height={14} width={14} />
             </View>
-
+ */}
             <View
               style={{
                 flexDirection: 'row',

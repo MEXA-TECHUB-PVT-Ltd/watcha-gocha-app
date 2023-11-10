@@ -2,6 +2,7 @@ import {
   StyleSheet,
   FlatList,
   Text,
+  ActivityIndicator,
   Image,
   KeyboardAvoidingView,
   ScrollView,
@@ -10,7 +11,7 @@ import {
   View,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 import {Button, Divider, TextInput} from 'react-native-paper';
@@ -44,6 +45,8 @@ import Fontiso from 'react-native-vector-icons/Fontisto';
 
 import IonIcons from 'react-native-vector-icons/Ionicons';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import {SelectCountry, Dropdown} from 'react-native-element-dropdown';
 import CPaperInput from '../../../assets/Custom/CPaperInput';
 
@@ -58,12 +61,19 @@ export default function UploadScreenPic({navigation}) {
 
   const [profileName, setProfileName] = useState('');
 
-  const [snackbarVisible, setsnackbarVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
 
+  const [snackbarVisible, setsnackbarVisible] = useState(false);
 
   const [isTextInputActive, setIsTextInputActive] = useState(false);
 
   const [category, setCategory] = useState('');
+
+  const [userId, setUserId] = useState('');
+
+  const [categoriesSelect, setCategorySelect] = useState([]);
+
+  const [categoryId, setCategoryId] = useState('');
 
   const [description, setDescription] = useState('');
 
@@ -72,6 +82,87 @@ export default function UploadScreenPic({navigation}) {
   const [isFocus, setIsFocus] = useState(false);
 
   const ref_RBSheetCamera = useRef(null);
+
+  const ref_RBSendOffer = useRef(null);
+
+  const navigateToScreen = () => {
+    ref_RBSendOffer.current.close();
+    navigation.navigate('Signin_signup');
+  };
+
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchVideos();
+  }, []);
+
+  const fetchVideos = async () => {
+    // Simulate loading
+    setLoading(true);
+
+    await getUserID();
+    // Fetch data one by one
+    await fetchCategory();
+
+    // Once all data is fetched, set loading to false
+    setLoading(false);
+  };
+
+  const getUserID = async () => {
+    console.log("Id's");
+    try {
+      const result = await AsyncStorage.getItem('userId ');
+      if (result !== null) {
+        setUserId(result);
+        console.log('user id retrieved:', result);
+      } else {
+        console.log('result is null', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
+
+  const fetchCategory = async () => {
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY5ODAzOTAyNywiZXhwIjoxNzAwNjMxMDI3fQ.JSki1amX9VPEP9uCsJ5vPiCl2P4EcBqW6CQyY_YdLsk';
+
+    try {
+      const response = await fetch(
+        'https://watch-gotcha-be.mtechub.com/picCategory/getAllPicCategories?page=1&limit=5',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+
+        console.log('Data ', data);
+
+        // Use the data from the API to set the categories
+        const categories = data.AllCategories.map(category => ({
+          label: category.name, // Use the "name" property as the label
+          value: category.id.toString(), // Convert "id" to a string for the value
+        }));
+
+        setCategorySelect(categories); // Update the state with the formatted category data
+
+        console.log('Data Categories', categoriesSelect);
+      } else {
+        console.error(
+          'Failed to fetch categories:',
+          response.status,
+          response.statusText,
+        );
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
 
   const handleFocus = () => {
     setIsTextInputActive(true);
@@ -140,7 +231,6 @@ export default function UploadScreenPic({navigation}) {
     });
   };
 
-
   const handleUpdatePassword = async () => {
     // Perform the password update logic here
     // For example, you can make an API request to update the password
@@ -151,43 +241,62 @@ export default function UploadScreenPic({navigation}) {
     // Automatically hide the Snackbar after 3 seconds
     setTimeout(() => {
       setsnackbarVisible(false);
-      navigation.navigate("Home")
+      navigation.navigate('Home');
     }, 3000);
   };
 
   const uploadVideos = async () => {
     try {
-      console.log("Image Uri", imageUri)
+      console.log('Image Uri', imageUri);
+      console.log('name', profileName);
+      console.log('description', description);
+      console.log('user_id', userId);
+      console.log('pic_category', categoryId);
+
+
+
       // Construct the request data as FormData
       const formData = new FormData();
-      formData.append('name', 'ghsvgxv');
-      formData.append('description', 'ajkbch');
-      formData.append('pic_category', '5');
-      formData.append('user_id', '29');
-  
+      formData.append('name', profileName);
+      formData.append('description', description);
+      formData.append('pic_category', categoryId);
+      formData.append('user_id', userId);
+      formData.append('image', 'ruvv');
+
       // Set up the Axios request
       const axiosConfig = {
         headers: {
-          'Authorization': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U',
+          Authorization:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U',
         },
       };
-  
-      // Perform the upload using Axios
-      const response = await axios.post('http://192.168.18.172:5000/picTour/createPicTour', formData, axiosConfig);
-  
-      console.log("Response", response);
-  
-      if (response.status === 404) {
-        console.error('Failed to upload video:', response.status, response.data);
 
+      // Perform the upload using Axios
+      const response = await axios.post(
+        'https://watch-gotcha-be.mtechub.com/picTour/createPicTour',
+        formData,
+        axiosConfig,
+      );
+
+      console.log('Response', response);
+
+      if (response.status === 404) {
+        console.error(
+          'Failed to upload video:',
+          response.status,
+          response.data,
+        );
       } else {
-        console.error('Failed to upload video:', response.status, response.statusText);
+        console.error(
+          'Failed to upload video:',
+          response.status,
+          response.statusText,
+        );
       }
     } catch (error) {
       console.error(error);
     }
   };
-  
 
   const dismissSnackbar = () => {
     setsnackbarVisible(false);
@@ -203,7 +312,7 @@ export default function UploadScreenPic({navigation}) {
           <IonIcons name={'chevron-back'} color={'#282828'} size={25} />
         </TouchableOpacity>
 
-        <Text style={styles.headerText}>Upload Video</Text>
+        <Text style={styles.headerText}>Upload Pic</Text>
       </View>
 
       <ScrollView
@@ -272,7 +381,7 @@ export default function UploadScreenPic({navigation}) {
           )}
         </View>
 
-        <View style={{marginRight:wp(2)}}>
+        <View style={{marginRight: wp(2)}}>
           <TextInput
             mode="outlined"
             label="Pic Name"
@@ -316,7 +425,7 @@ export default function UploadScreenPic({navigation}) {
             // inputSearchStyle={styles.inputSearchStyle}
             // iconStyle={styles.iconStyle}
             value={category}
-            data={Category}
+            data={categoriesSelect}
             search={false}
             maxHeight={200}
             labelField="label"
@@ -326,7 +435,8 @@ export default function UploadScreenPic({navigation}) {
             onFocus={() => setIsFocus(true)}
             onBlur={() => setIsFocus(false)}
             onChange={item => {
-              setCategory(item.value);
+              setCategory(item.label);
+              setCategoryId(item.value);
               setIsFocus(false);
             }}
             renderRightIcon={() => (
@@ -368,8 +478,12 @@ export default function UploadScreenPic({navigation}) {
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
               //handleUpdatePassword()
-              console.log("Upload Pics")
-              uploadVideos()
+              console.log('Upload Pics');
+              if (userId !== null) {
+                uploadVideos();
+              } else {
+                ref_RBSendOffer.current.open();
+              }
               //navigation.navigate('Profile_image');
             }}
           />
@@ -461,7 +575,137 @@ export default function UploadScreenPic({navigation}) {
         visible={snackbarVisible}
       />
 
-      
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {loading && <ActivityIndicator size="large" color="#FACA4E" />}
+      </View>
+
+      <RBSheet
+        ref={ref_RBSendOffer}
+        closeOnDragDown={true}
+        closeOnPressMask={false}
+        animationType="fade"
+        minClosingHeight={0}
+        customStyles={{
+          wrapper: {
+            backgroundColor: 'rgba(52, 52, 52, 0.5)',
+          },
+          draggableIcon: {
+            backgroundColor: 'white',
+          },
+          container: {
+            borderTopLeftRadius: wp(10),
+            borderTopRightRadius: wp(10),
+            height: hp(51),
+          },
+        }}>
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            marginHorizontal: wp(8),
+            justifyContent: 'space-evenly',
+          }}>
+          <Image
+            source={appImages.alert}
+            style={{
+              width: wp(30),
+              marginTop: hp(-10),
+              height: hp(30),
+              resizeMode: 'contain',
+            }}
+          />
+
+          <View style={{marginTop: hp(-5), height: hp(8)}}>
+            <Text
+              style={{
+                color: '#333333',
+                textAlign: 'center',
+                fontSize: hp(2.3),
+                fontWeight: 'bold',
+                fontFamily: 'Inter',
+              }}>
+              Join Us Today
+            </Text>
+
+            <Text
+              style={{
+                color: '#9597A6',
+                marginTop: hp(0.5),
+                textAlign: 'center',
+                fontSize: hp(1.8),
+                marginTop: hp(1.5),
+                //fontWeight:'bold',
+                fontFamily: 'Inter',
+              }}>
+              We invite you to become a part of our community
+            </Text>
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              width: '100%',
+              justifyContent: 'space-around',
+              alignItems: 'center',
+              height: hp(8),
+              marginHorizontal: wp(5),
+            }}>
+            <TouchableOpacity
+              onPress={() => ref_RBSendOffer.current.close()}
+              style={{
+                width: wp(30),
+                borderRadius: wp(5),
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderColor: '#FACA4E',
+                borderWidth: 1,
+                height: hp(5),
+              }}>
+              <Text
+                style={{
+                  color: '#FACA4E',
+                  textAlign: 'center',
+                  fontSize: hp(1.8),
+                  fontWeight: 'bold',
+                  fontFamily: 'Inter',
+                }}>
+                Cancel
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigateToScreen()}
+              style={{
+                width: wp(30),
+                borderRadius: wp(5),
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#FACA4E',
+                height: hp(5),
+              }}>
+              <Text
+                style={{
+                  color: '#000000',
+                  textAlign: 'center',
+                  fontSize: hp(1.8),
+                  fontWeight: 'bold',
+                  fontFamily: 'Inter',
+                }}>
+                Sign Up
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </RBSheet>
     </KeyboardAvoidingView>
   );
 }
