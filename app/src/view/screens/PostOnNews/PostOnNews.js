@@ -65,6 +65,7 @@ export default function PostOnNews({navigation}) {
 
   const [profileName, setProfileName] = useState('');
 
+
   const [loading, setLoading] = useState(false);
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -136,11 +137,11 @@ export default function PostOnNews({navigation}) {
   };
 
   const fetchCategory = async () => {
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE2OTgzMTI3NDUsImV4cCI6MTcwMDkwNDc0NX0.YsFwjW-luPHnhb4R3nAyuyHDV58PoehhrsMdMttJd08';
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY5ODAzOTAyNywiZXhwIjoxNzAwNjMxMDI3fQ.JSki1amX9VPEP9uCsJ5vPiCl2P4EcBqW6CQyY_YdLsk';
 
     try {
       const response = await fetch(
-        'http://192.168.18.172:5000/discCategory/getAllDiscCategories?page=1&limit=5',
+        'https://watch-gotcha-be.mtechub.com/discCategory/getAllDiscCategories?page=1&limit=5',
         {
           method: 'GET',
           headers: {
@@ -192,51 +193,65 @@ export default function PostOnNews({navigation}) {
   };
 
   const uploadVideo = async () => {
-    setLoading(true)
-    console.log("Image Uri",imageUri)
-    console.log("Id", categoryId )
+    console.log('Image Uri', imageInfo.uri);
+    console.log('Image file Type', imageInfo.type);
+    console.log('Image file Type', imageInfo.fileName);
+
+    console.log('name', profileName);
+    console.log('description', description);
+    console.log('user_id', userId);
+    console.log('pic_category', categoryId);
+
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/picTour/createPicTour';
+
+    // Construct the request data as FormData
+    const formData = new FormData();
+
+    formData.append('name', profileName);
+    formData.append('description', description);
+    formData.append('pic_category', categoryId);
+    formData.append('user_id', userId);
+    //formData.append('image', imageUri);
+
+    console.log('Form Data Entry', formData);
+
+      formData.append('image', {
+      uri: imageInfo.uri,
+      type: imageInfo.type, // Adjust the type based on the video file type
+      name: imageInfo.fileName, // Adjust the name based on the video file name
+    });
+
     try {
-      // Construct the request data as FormData
-      const formData = new FormData();
-      formData.append('description', description);
-      formData.append('disc_category', categoriesSelect);
-      formData.append('user_id', userId);
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`, // Use the provided token
+          'Content-Type': 'multipart/form-data', // Set the content type to FormData
+        },
+        body: formData,
+      });
 
-      if (imageUri) {
-        formData.append('image', imageUri);
-
-        // Append the video file to the FormData
-        /* formData.append('image', {
-          uri: imageUri,
-        }); */
-        // Perform the upload using the Fetch API
-        const response = await fetch(
-          'http://192.168.18.172:5000/news/createNews',
-          {
-            method: 'POST',
-            headers: {
-              Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE2OTgzMTI3NDUsImV4cCI6MTcwMDkwNDc0NX0.YsFwjW-luPHnhb4R3nAyuyHDV58PoehhrsMdMttJd08',
-            },
-            body: formData,
-          },
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log('API Response:', responseData);
+        setLoading(false);
+        handleUpdatePassword();
+        // Handle the response data as needed
+      } else {
+        setLoading(false);
+        console.error(
+          'Failed to upload video:',
+          response.status,
+          response.statusText,
         );
-
-        if (response.ok) {
-          console.log('News uploaded successfully');
-          setLoading(false)
-          handleUpdatePassword();
-        } else {
-          setLoading(false);
-          console.error(
-            'Failed to upload news:',
-            response.status,
-            response.statusText,
-          );
-        }
+        // Handle the error
       }
     } catch (error) {
+      console.error('API Request Error:', error);
       setLoading(false);
-      console.error('Error while picking a video:', error);
+      // Handle the error
     }
   };
 
@@ -280,12 +295,13 @@ export default function PostOnNews({navigation}) {
         console.log('image here', response);
         if (!response.didCancel) {
           if (response.assets && response.assets.length > 0) {
+            setImageInfo(response.assets[0]);
             setImageUri(response.assets[0].uri);
-            console.log('response', response.assets[0].uri);
+            console.log('response', response.assets[0]);
           } else if (response.uri) {
             // Handle the case when no assets are present (e.g., for videos)
-            setImageUri(response.uri);
-            console.log('response', response.uri);
+            setImageInfo(response.assets[0]);
+
           }
         }
         ref_RBSheetCamera.current.close();
@@ -298,10 +314,16 @@ export default function PostOnNews({navigation}) {
     launchImageLibrary({mediaType: 'Photo'}, response => {
       console.log('image here', response);
       if (!response.didCancel && response.assets.length > 0) {
+
+        setImageInfo(response.assets[0]);
         setImageUri(response.assets[0].uri);
+        console.log('response', response.assets[0]);
       }
 
-      console.log('response', imageUri);
+      console.log('response of image', response.assets[0]);
+
+      setImageInfo(response.assets[0]);
+
 
       ref_RBSheetCamera.current.close();
     });
@@ -498,7 +520,7 @@ export default function PostOnNews({navigation}) {
             onFocus={() => setIsFocus(true)}
             onBlur={() => setIsFocus(false)}
             onChange={item => {
-              setCategory(item.label);
+              //setCategory(item.label);
               setCategoryId(item.value);
               setIsFocus(false);
             }}

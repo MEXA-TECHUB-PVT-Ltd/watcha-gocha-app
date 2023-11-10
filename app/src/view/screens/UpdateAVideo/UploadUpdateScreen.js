@@ -52,14 +52,17 @@ import {SelectCountry, Dropdown} from 'react-native-element-dropdown';
 import CPaperInput from '../../../assets/Custom/CPaperInput';
 
 import CustomDialog from '../../../assets/Custom/CustomDialog';
+
 const Category = [
   {label: 'Item 1', value: '1'},
   {label: 'Item 2', value: '2'},
   {label: 'Item 3', value: '3'},
 ];
 
-export default function UploadUpdateScreen({navigation}) {
+export default function UploadUpdateScreen({navigation, route}) {
   const [selectedItem, setSelectedItem] = useState('');
+
+  const [selectedItemThumbnial, setSelectedItemThumbnial] = useState('');
 
   const [profileName, setProfileName] = useState('');
 
@@ -81,16 +84,27 @@ export default function UploadUpdateScreen({navigation}) {
 
   const [imageUri, setImageUri] = useState(null);
 
+  const [imageUrl, setImageUrl] = useState(null);
+
+  const [thumbnailImageUri, setThumbnailImageUri] = useState(null);
+
   const [videoUrl, setVideoUrl] = useState(null);
 
-
   const [imageInfo, setImageInfo] = useState(null);
+
+  const [imageInfoThumbnail, setImageInfoThumbnail] = useState(null);
 
   const [isFocus, setIsFocus] = useState(false);
 
   const [modalVisible, setModalVisible] = useState(false);
 
   const ref_RBSheetCamera = useRef(null);
+
+  const ref_RBSheetThumbnail = useRef(null);
+
+  const receivedData = route.params?.Video;
+
+  console.log("Recieved Data", receivedData)
 
   useEffect(() => {
     // Make the API request and update the 'data' state
@@ -124,7 +138,7 @@ export default function UploadUpdateScreen({navigation}) {
       if (result !== null) {
         setUserId(result);
         console.log('user id retrieved:', result);
-      }else{
+      } else {
         console.log('result is null', result);
       }
     } catch (error) {
@@ -138,7 +152,8 @@ export default function UploadUpdateScreen({navigation}) {
       imageInfo !== null &&
       profileName !== '' &&
       categoryId !== '' &&
-      description !== ''
+      description !== '' &&
+      imageInfoThumbnail !== null
     ) {
       //uploadVideo()
       //uploadVideos()
@@ -146,7 +161,7 @@ export default function UploadUpdateScreen({navigation}) {
       const type = imageInfo.type;
       const name = imageInfo.fileName;
       const source = {uri, type, name};
-      console.log(source);
+      console.log("Video Source",source);
       handleUploadVideo(source);
 
       //uploadVideoCloudinary(imageInfo.uri)
@@ -194,13 +209,53 @@ export default function UploadUpdateScreen({navigation}) {
     })
       .then(res => res.json())
       .then(data => {
+        console.log("Video Url is" ,data)
         setVideoUrl(data.url); // Store the Cloudinary video URL in your state
         //uploadVideo(data.url)
-        uploadXpiVideo(data.url);
+
+        handleUploadImage(data.url);
+        //uploadXpiVideo(data.url);
         console.log(data);
       })
       .catch(err => {
-        Alert.alert('Error While Uploading Video');
+        //Alert.alert('Error While Uploading Video');
+        console.log("Error While Uploading Video", err)
+        setLoading(false)
+      });
+  };
+
+  const handleUploadImage = (data) => {
+    setLoading(true);
+    const uri = imageInfoThumbnail.uri;
+    const type = imageInfoThumbnail.type;
+    const name = imageInfoThumbnail.fileName;
+    const sourceImage = {uri, type, name};
+    console.log("Source Image",sourceImage);
+    const dataImage = new FormData();
+    dataImage.append('file', sourceImage);
+    dataImage.append('upload_preset', 'e6zfilan'); // Use your Cloudinary upload preset
+    dataImage.append('cloud_name', 'dxfdrtxi3'); // Use your Cloudinary cloud name
+
+    fetch('https://api.cloudinary.com/v1_1/dxfdrtxi3/image/upload', {
+      method: 'POST',
+      body: dataImage,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        setImageUrl(data.url); // Store the Cloudinary video URL in your state
+        //uploadVideo(data.url)
+        //uploadXpiVideo(data.url);
+        console.log("Image Url",data);
+        uploadXpiVideo(data.url,data)
+
+      })
+      .catch(err => {
+        setLoading(false)
+        console.log('Error While Uploading Video', err);
       });
   };
 
@@ -228,91 +283,90 @@ export default function UploadUpdateScreen({navigation}) {
       });
   };
 
-
-  const uploadVideoData = async (video) => {
-    setLoading(true)
-    console.log("Image Uri",video)
+  const uploadVideoData = async video => {
+    setLoading(true);
+    console.log('Image Uri', video);
     //console.log("Id", categoryId )
     try {
       // Construct the request data as FormData
       const formData = new FormData();
-      formData.append('name', );
+      formData.append('name');
       formData.append('disc_category', categoriesSelect);
       formData.append('user_id', userId);
 
-      
-        formData.append('image', imageUri);
+      formData.append('image', imageUri);
 
-        // Append the video file to the FormData
-        /* formData.append('image', {
+      // Append the video file to the FormData
+      /* formData.append('image', {
           uri: imageUri,
         }); */
-        // Perform the upload using the Fetch API
-        const response = await fetch(
-          'http://192.168.18.172:5000/news/createNews',
-          {
-            method: 'POST',
-            headers: {
-              Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE2OTgzMTI3NDUsImV4cCI6MTcwMDkwNDc0NX0.YsFwjW-luPHnhb4R3nAyuyHDV58PoehhrsMdMttJd08',
-            },
-            body: formData,
+      // Perform the upload using the Fetch API
+      const response = await fetch(
+        'http://192.168.18.172:5000/news/createNews',
+        {
+          method: 'POST',
+          headers: {
+            Authorization:
+              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE2OTgzMTI3NDUsImV4cCI6MTcwMDkwNDc0NX0.YsFwjW-luPHnhb4R3nAyuyHDV58PoehhrsMdMttJd08',
           },
-        );
+          body: formData,
+        },
+      );
 
-        if (response.ok) {
-          console.log('News uploaded successfully');
-          setLoading(false)
-          handleUpdatePassword();
-        } else {
-          setLoading(false);
-          console.error(
-            'Failed to upload news:',
-            response.status,
-            response.statusText,
-          );
-        }
-    
+      if (response.ok) {
+        console.log('News uploaded successfully');
+        setLoading(false);
+        handleUpdatePassword();
+      } else {
+        setLoading(false);
+        console.error(
+          'Failed to upload news:',
+          response.status,
+          response.statusText,
+        );
+      }
     } catch (error) {
       setLoading(false);
       console.error('Error while picking a video:', error);
     }
   };
 
-  const uploadXpiVideo = async (data) => {
-    console.log("Video Uri", data)
-    console.log("Profile Name", profileName)
-    console.log("Description", description)
-    console.log("user id", userId)
-    console.log("category id", categoryId)
+  const uploadXpiVideo = async (data,data1) => {
+    console.log('Image Uri', data);
+    console.log('Video Uri', data1);
+    console.log('Profile Name', profileName);
+    console.log('Description', description);
+    console.log('user id', userId);
+    console.log('category id', categoryId);
 
-
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U'
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
     const apiUrl = 'https://watch-gotcha-be.mtechub.com/xpi/createXpiVideo';
-  
+
     const requestData = {
       name: profileName,
       description: description,
       video_category: categoryId,
-      video: data,
-      user_id: userId
+      video: data1,
+      thumbnail: data,
+      user_id: userId,
     };
-  
+
     try {
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`, // Use the provided token
+          Authorization: `Bearer ${token}`, // Use the provided token
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(requestData)
+        body: JSON.stringify(requestData),
       });
-  
+
       if (response.ok) {
         const data = await response.json();
         console.log('API Response:', data);
         setLoading(false);
-        handleUpdatePassword()
-
+        handleUpdatePassword();
 
         // Handle the response data as needed
       } else {
@@ -321,7 +375,7 @@ export default function UploadUpdateScreen({navigation}) {
         console.error(
           'Failed to upload video:',
           response.status,
-          response.statusText
+          response.statusText,
         );
         // Handle the error
       }
@@ -332,9 +386,8 @@ export default function UploadUpdateScreen({navigation}) {
       // Handle the error
     }
   };
-  
 
-  const uploadVideo = async (data) => {
+  const uploadVideo = async data => {
     //console.log("Uri",imageInfo.uri )
     try {
       // Construct the request data as FormData
@@ -360,7 +413,7 @@ export default function UploadUpdateScreen({navigation}) {
       console.log('Response', response.data);
       if (response.ok) {
         console.log('Video uploaded successfully');
-        handleUpdatePassword()
+        handleUpdatePassword();
       } else {
         console.error(
           'Failed to upload video:',
@@ -487,6 +540,47 @@ export default function UploadUpdateScreen({navigation}) {
     });
   };
 
+  const takePhotoFromCameraThumbnail = async value => {
+    setSelectedItemThumbnial(value);
+    launchCamera(
+      {
+        mediaType: 'photo',
+        videoQuality: 'medium',
+      },
+      response => {
+        console.log('image here', response);
+        if (!response.didCancel) {
+          if (response.assets && response.assets.length > 0) {
+            setThumbnailImageUri(response.assets[0].uri);
+            console.log('response', response.assets[0].uri);
+            setImageInfoThumbnail(response.assets[0]);
+          } else if (response.uri) {
+            // Handle the case when no assets are present (e.g., for videos)
+            setThumbnailImageUri(response.uri);
+            console.log('response', response.uri);
+          }
+        }
+        ref_RBSheetThumbnail.current.close();
+      },
+    );
+  };
+
+  const choosePhotoFromLibraryThumbnail = value => {
+    setSelectedItemThumbnial(value);
+    launchImageLibrary({mediaType: 'Photo'}, response => {
+      console.log('image here', response);
+      if (!response.didCancel && response.assets.length > 0) {
+        console.log('Response', response.assets[0]);
+        setThumbnailImageUri(response.assets[0].uri);
+        setImageInfoThumbnail(response.assets[0]);
+      }
+
+      console.log('response', imageInfo);
+
+      ref_RBSheetThumbnail.current.close();
+    });
+  };
+
   const handleUpdatePassword = async () => {
     // Perform the password update logic here
     // For example, you can make an API request to update the password
@@ -539,6 +633,8 @@ export default function UploadUpdateScreen({navigation}) {
         setCategorySelect(categories); // Update the state with the formatted category data
 
         console.log('Data Categories', categoriesSelect);
+
+        setImageInfo(receivedData)
       } else {
         console.error(
           'Failed to fetch categories:',
@@ -568,14 +664,17 @@ export default function UploadUpdateScreen({navigation}) {
         keyboardShouldPersistTaps="always"
         showsVerticalScrollIndicator={false}
         style={{flex: 1}}>
+
+          <View style={{height:hp(30), flexDirection:'row', alignItems:'center', justifyContent:'space-around',  marginHorizontal:wp(8)}}>
+
         <View
           style={{
-            marginTop: hp(5),
-            height: hp(30),
+            height: hp(20),
+            width:wp(39),
             borderRadius: wp(8),
             marginHorizontal: wp(23),
           }}>
-          {imageUri !== null && (
+          {imageInfo !== null && (
             <Image
               style={{
                 position: 'absolute',
@@ -588,7 +687,7 @@ export default function UploadUpdateScreen({navigation}) {
                 borderRadius: wp(8),
                 resizeMode: 'contain',
               }}
-              source={{uri: imageUri}}
+              source={{uri: imageInfo.uri}}
             />
           )}
           <TouchableOpacity
@@ -596,7 +695,7 @@ export default function UploadUpdateScreen({navigation}) {
             style={{
               position: 'absolute',
               top: 10,
-              left: 8,
+              left: 48,
               height: hp(3),
               width: wp(21),
               borderRadius: wp(3),
@@ -615,7 +714,7 @@ export default function UploadUpdateScreen({navigation}) {
               Change Video
             </Text>
           </TouchableOpacity>
-          {imageUri == null && (
+          {imageInfo == null && (
             <Image
               style={{
                 flex: 1,
@@ -630,6 +729,63 @@ export default function UploadUpdateScreen({navigation}) {
           )}
         </View>
 
+        <TouchableOpacity
+        onPress={() => ref_RBSheetThumbnail.current.open()}
+          style={{
+            height: hp(20),
+            width:wp(39),
+            borderRadius: wp(8),
+            borderStyle: 'dotted',
+            borderWidth: 3, // Use 'dotted' for dotted border
+            borderColor: '#FACA4E',
+            marginHorizontal: wp(23),
+          }}>
+          {thumbnailImageUri !== null && (
+            <Image
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                zIndex: 1, // Ensure it's on top of other elements
+                flex: 1,
+                width: '100%',
+                height: '100%',
+                borderRadius: wp(8),
+                resizeMode: 'contain',
+              }}
+              source={{uri: thumbnailImageUri}}
+            />
+          )}
+          <TouchableOpacity
+            onPress={() => ref_RBSheetThumbnail.current.open()}
+            style={{
+              position: 'absolute',
+              top: 10,
+              left: 39,
+              height: hp(3),
+              width: wp(25),
+              borderRadius: wp(3),
+              backgroundColor: '#FACA4E',
+              justifyContent: 'center',
+              alignItems: 'center',
+              zIndex: 2, // Ensure it's on top
+            }}>
+            <Text
+              style={{
+                fontSize: hp(1.3),
+                fontFamily: 'Inter',
+                color: '#232323',
+                fontWeight: '700',
+              }}>
+              Change Thumbnail
+            </Text>
+          </TouchableOpacity>
+          {thumbnailImageUri == null && null}
+        </TouchableOpacity>
+
+          </View>
+
+        
         <View style={{marginRight: wp(2)}}>
           <TextInput
             mode="outlined"
@@ -684,7 +840,7 @@ export default function UploadUpdateScreen({navigation}) {
             onFocus={() => setIsFocus(true)}
             onBlur={() => setIsFocus(false)}
             onChange={item => {
-              setCategory(item.label);
+              //setCategory(item.label);
               setCategoryId(item.value);
               setIsFocus(false);
             }}
@@ -812,13 +968,94 @@ export default function UploadUpdateScreen({navigation}) {
         </View>
       </RBSheet>
 
+      <RBSheet
+        ref={ref_RBSheetThumbnail}
+        closeOnDragDown={true}
+        closeOnPressMask={false}
+        animationType="fade"
+        minClosingHeight={0}
+        customStyles={{
+          wrapper: {
+            backgroundColor: 'rgba(52, 52, 52, 0.5)',
+          },
+          draggableIcon: {
+            backgroundColor: 'white',
+          },
+          container: {
+            borderTopLeftRadius: wp(10),
+            borderTopRightRadius: wp(10),
+            height: hp(25),
+          },
+        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginHorizontal: wp(8),
+            alignItems: 'center',
+          }}>
+          <Text style={styles.maintext}>Select an option</Text>
+          <TouchableOpacity
+            onPress={() => ref_RBSheetThumbnail.current.close()}>
+            <Ionicons
+              name="close"
+              size={22}
+              color={'#303030'}
+              onPress={() => ref_RBSheetThumbnail.current.close()}
+            />
+          </TouchableOpacity>
+        </View>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-evenly',
+            alignItems: 'center',
+            marginTop: hp(3),
+          }}>
+          <TouchableOpacity
+            onPress={() => takePhotoFromCameraThumbnail('camera')}
+            style={
+              selectedItemThumbnial === 'camera'
+                ? styles.selectedItems
+                : styles.nonselectedItems
+            }>
+            <Ionicons
+              color={selectedItemThumbnial === 'camera' ? '#FACA4E' : '#888888'}
+              name="camera"
+              size={25}
+            />
+
+            <Text style={{color: '#333333'}}>From camera</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => choosePhotoFromLibraryThumbnail('gallery')}
+            style={
+              selectedItemThumbnial === 'gallery'
+                ? styles.selectedItems
+                : styles.nonselectedItems
+            }>
+            <MaterialCommunityIcons
+              color={
+                selectedItemThumbnial === 'gallery' ? '#FACA4E' : '#888888'
+              }
+              name="image"
+              size={25}
+            />
+
+            <Text style={{color: '#333333'}}>From gallery</Text>
+          </TouchableOpacity>
+        </View>
+      </RBSheet>
+
       <CustomSnackbar
         message={'success'}
         messageDescription={'Upload Video successfully'}
         onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackbarVisible}
       />
-
+{loading &&
       <View
         style={{
           position: 'absolute',
@@ -828,9 +1065,12 @@ export default function UploadUpdateScreen({navigation}) {
           right: 0,
           justifyContent: 'center',
           alignItems: 'center',
+          backgroundColor: 'rgba(255, 255, 255, 0.5)', // Semi-transparent white
+
         }}>
-        {loading && <ActivityIndicator size="large" color="#FACA4E" />}
+         <ActivityIndicator size="large" color="#FACA4E" />
       </View>
+}
 
       <CustomDialog
         visible={modalVisible}

@@ -46,6 +46,7 @@ import Fontiso from 'react-native-vector-icons/Fontisto';
 
 import FontAwsome from 'react-native-vector-icons/FontAwesome';
 
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 import IonIcons from 'react-native-vector-icons/Ionicons';
 
@@ -55,7 +56,7 @@ import Video from 'react-native-video';
 
 import SmileEmoji from '../../../assets/svg/SmileEmoji.svg';
 
-import EmojiPicker from 'rn-emoji-keyboard'
+import EmojiPicker from 'rn-emoji-keyboard';
 
 import axios from 'axios';
 
@@ -63,11 +64,14 @@ import RNFetchBlob from 'rn-fetch-blob';
 
 import Entypo from 'react-native-vector-icons/Entypo';
 import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function ViewVideo({navigation, route}) {
   const [showFullContent, setShowFullContent] = useState(false);
-  
-  const [pastedURL, setPastedURL] = useState('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4');
+
+  const [pastedURL, setPastedURL] = useState(
+    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+  );
 
   const [comments, setComments] = useState([]);
 
@@ -78,9 +82,6 @@ export default function ViewVideo({navigation, route}) {
   const [paused, setPaused] = useState(false);
 
   const [isOpen, setIsOpen] = useState(false);
-
-
-
 
   const [commentsCount, setCommentsCount] = useState(null);
 
@@ -96,13 +97,13 @@ export default function ViewVideo({navigation, route}) {
 
   const [progress, setProgress] = useState(0);
 
+  const [totalDuration, setTotalDuration] = useState('');
 
   const [isBottomSheetExpanded, setIsBottomSheetExpanded] = useState(false);
 
   const ref_Comments = useRef(null);
 
   const refSlide = useRef();
-
 
   const bottomSheetRef = useRef(null);
   // variables
@@ -112,12 +113,25 @@ export default function ViewVideo({navigation, route}) {
 
   const [commentText, setCommentText] = useState(null); // State variable to hold the text
 
+  useEffect(() => {
+    // This code will run whenever progress state changes
+    if (progress && progress.seekableDuration !== undefined) {
+      // Assuming progress.seekableDuration is the duration in seconds
+      const formattedDuration = formatDuration(progress.seekableDuration);
+      // Do something with formattedDuration, such as setting it in another state
+      // setFormattedDuration(formattedDuration);
+      console.log('Formatted Duration:', formattedDuration);
+
+      setTotalDuration(formattedDuration);
+    }
+  }, [progress]); // The effect will re-run whenever the progress state changes
+
   const receivedData = route.params?.videoData;
 
-  //console.log("Data Recieved on", receivedData)
+  console.log('Data Recieved on', receivedData);
 
-  var details = receivedData.description
-    /* 'Hold onto your seats and get ready to be mesmerized by the beauty and grandeur of the Hold onto your seats'; */
+  var details = receivedData.description;
+  /* 'Hold onto your seats and get ready to be mesmerized by the beauty and grandeur of the Hold onto your seats'; */
 
   const toggleContent = () => {
     setShowFullContent(!showFullContent);
@@ -125,20 +139,19 @@ export default function ViewVideo({navigation, route}) {
 
   const toggleContentLike = () => {
     setShowLikes(!showLikes);
-    sendLikes()
+    sendLikes();
   };
 
   const openEmoji = () => {
-    console.log("Is Open")
-    setIsOpen(true)
-    console.log("Is Open", isOpen)
-
+    console.log('Is Open');
+    setIsOpen(true);
+    console.log('Is Open', isOpen);
   };
 
   const toggleMute = () => {
     setMute(!mute);
   };
-  
+
   const togglePaused = () => {
     setPaused(!paused);
   };
@@ -159,7 +172,7 @@ export default function ViewVideo({navigation, route}) {
 
   useEffect(() => {
     // Make the API request and update the 'data' state
-      fetchAll()
+    fetchAll();
   }, []);
 
   const fetchAll = async () => {
@@ -167,11 +180,11 @@ export default function ViewVideo({navigation, route}) {
     setLoading(true);
     // Fetch data one by one
 
-    await getUserID()
-    await fetchComments()
-    await fetchLikes()
-    await fetchCommentsCounts()
-  
+    await getUserID();
+    await fetchComments();
+    await fetchLikes();
+    await fetchCommentsCounts();
+
     // Once all data is fetched, set loading to false
     setLoading(false);
   };
@@ -183,9 +196,8 @@ export default function ViewVideo({navigation, route}) {
       if (result !== null) {
         setUserId(result);
         console.log('user id retrieved:', result);
-      }else{
+      } else {
         console.log('user id null:', result);
-
       }
     } catch (error) {
       // Handle errors here
@@ -194,8 +206,8 @@ export default function ViewVideo({navigation, route}) {
   };
 
   const fetchComments = async () => {
-
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
 
     try {
       const response = await fetch(
@@ -209,22 +221,24 @@ export default function ViewVideo({navigation, route}) {
       );
 
       if (response.ok) {
-        const data = await response.json(); 
-        //console.log("All Comments of usersssss", data.AllComents)  
-        setComments(data.AllComents)   
-        
+        const data = await response.json();
+        //console.log("All Comments of usersssss", data.AllComents)
+        setComments(data.AllComents);
       } else {
-        console.error('Failed to fetch categories:', response.status, response.statusText);
+        console.error(
+          'Failed to fetch categories:',
+          response.status,
+          response.statusText,
+        );
       }
     } catch (error) {
       console.error('Error:', error);
     }
   };
 
-
   const fetchLikes = async () => {
-
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
 
     try {
       const response = await fetch(
@@ -238,12 +252,15 @@ export default function ViewVideo({navigation, route}) {
       );
 
       if (response.ok) {
-        const data = await response.json(); 
-        console.log("All Likes", data.totalLikes);
-        setLikes(data.totalLikes);   
-
+        const data = await response.json();
+        console.log('All Likes', data.totalLikes);
+        setLikes(data.totalLikes);
       } else {
-        console.error('Failed to fetch categories:', response.status, response.statusText);
+        console.error(
+          'Failed to fetch categories:',
+          response.status,
+          response.statusText,
+        );
       }
     } catch (error) {
       console.error('Error:', error);
@@ -251,8 +268,8 @@ export default function ViewVideo({navigation, route}) {
   };
 
   const fetchCommentsCounts = async () => {
-
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
 
     try {
       const response = await fetch(
@@ -266,18 +283,20 @@ export default function ViewVideo({navigation, route}) {
       );
 
       if (response.ok) {
-        const data = await response.json(); 
-        console.log("All Comments", data.totalComments);
-        setCommentsCount(data.totalComments);   
-
+        const data = await response.json();
+        //console.log("All Comments", data.totalComments);
+        setCommentsCount(data.totalComments);
       } else {
-        console.error('Failed to fetch categories:', response.status, response.statusText);
+        console.error(
+          'Failed to fetch categories:',
+          response.status,
+          response.statusText,
+        );
       }
     } catch (error) {
       console.error('Error:', error);
     }
   };
-
 
   const dismissSnackbar = () => {
     setsnackbarVisible(false);
@@ -293,36 +312,36 @@ export default function ViewVideo({navigation, route}) {
     // Automatically hide the Snackbar after 3 seconds
     setTimeout(() => {
       setsnackbarVisible(false);
- 
-        if (pastedURL !== '') {
-          requestStoragePermission();
-        } else {
-          console.log("Please Add Video Url")
-        }
-      
+
+      if (pastedURL !== '') {
+        requestStoragePermission();
+      } else {
+        //console.log("Please Add Video Url")
+      }
+
       //navigation.goBack();
     }, 3000);
   };
 
   const clearTextInput = () => {
-    console.log('came to logssssss', commentText);
+    //console.log('came to logssssss', commentText);
     // Clear the text in the TextInput
     setCommentText(null);
-    sendComment()
+    sendComment();
   };
 
   const copyAssetVideo = async () => {
     try {
       const videoAssetPath = '../../../assets/images/DummyVideo.mp4'; // Adjust the path to your asset
       const videoFileName = 'CopiedVideo.mp4'; // Choose a name for the copied video
-  
+
       const assetData = RNFetchBlob.asset(videoAssetPath);
       const destinationPath = `${RNFetchBlob.fs.dirs.DownloadDir}/${videoFileName}`;
-  
+
       await assetData.copyFile(destinationPath);
-  
+
       //ToastAndroid.show('Video copied successfully', ToastAndroid.SHORT);
-      console.log('Copied video path:', destinationPath);
+      //console.log('Copied video path:', destinationPath);
     } catch (error) {
       console.error('Error copying asset video:', error);
       //ToastAndroid.show('Failed to copy video', ToastAndroid.LONG);
@@ -364,10 +383,10 @@ export default function ViewVideo({navigation, route}) {
     },
   ];
 
-  const handlePick = (emojiObject) => {
-    console.log("Emoji Object",emojiObject)
+  const handlePick = emojiObject => {
+    console.log('Emoji Object', emojiObject);
     //setIsOpen(false)
-      setCommentText(emojiObject.emoji)
+    setCommentText(emojiObject.emoji);
 
     /* example emojiObject = {
         "emoji": "❤️",
@@ -376,84 +395,99 @@ export default function ViewVideo({navigation, route}) {
         "unicode_version": "0.6",
       }
     */
-  }
+  };
 
   const sendComment = async () => {
-    setLoading(true)
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U'; // Replace with your actual token
-  
+    setLoading(true);
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U'; // Replace with your actual token
+
     try {
       const axiosConfig = {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       };
-  
+
       const commentData = {
-        video_id: receivedData.video_id ,
+        video_id: receivedData.video_id,
         user_id: userId,
         comment: commentText,
       };
-  
-      const response = await axios.post('https://watch-gotcha-be.mtechub.com/xpi/sendComment', commentData, axiosConfig);
-  
-      console.log("Response", response);
-  
+
+      const response = await axios.post(
+        'https://watch-gotcha-be.mtechub.com/xpi/sendComment',
+        commentData,
+        axiosConfig,
+      );
+
+      console.log('Response', response);
+
       if (response.status === 200) {
-        setLoading(false)
+        setLoading(false);
         console.log('Comment sent successfully');
-        fetchAll()
+        fetchAll();
       } else {
-        setLoading(false)
-        fetchAll()
-        console.error('Failed to send comment:', response.status, response.statusText);
+        setLoading(false);
+        fetchAll();
+        console.error(
+          'Failed to send comment:',
+          response.status,
+          response.statusText,
+        );
       }
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       console.error('Error:', error);
     }
   };
 
-
   const sendLikes = async () => {
-    setLoading(true)
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U'; // Replace with your actual token
-  
+    setLoading(true);
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U'; // Replace with your actual token
+
     try {
       const axiosConfig = {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       };
-  
+
       const commentData = {
-        video_id: receivedData.video_id ,
+        video_id: receivedData.video_id,
         user_id: userId,
       };
-  
-      const response = await axios.post('https://watch-gotcha-be.mtechub.com/xpi/likeUnlikeVideo', commentData, axiosConfig);
-  
-      console.log("Response", response);
-  
+
+      const response = await axios.post(
+        'https://watch-gotcha-be.mtechub.com/xpi/likeUnlikeVideo',
+        commentData,
+        axiosConfig,
+      );
+
+      console.log('Response', response);
+
       if (response.status === 200) {
-        setLoading(false)
+        setLoading(false);
         console.log('Video Liked  successfully');
-        fetchAll()
+        fetchAll();
       } else {
-        setLoading(false)
-        fetchAll()
-        console.error('Failed to send comment:', response.status, response.statusText);
+        setLoading(false);
+        fetchAll();
+        console.error(
+          'Failed to send comment:',
+          response.status,
+          response.statusText,
+        );
       }
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       console.error('Error:', error);
     }
   };
-  
 
-  
   const renderComments = item => {
     //console.log('Items of comments', item);
     return (
@@ -463,7 +497,7 @@ export default function ViewVideo({navigation, route}) {
             height: hp(10),
             //borderWidth:3,
             paddingHorizontal: wp(5),
-            alignItems:'center',
+            alignItems: 'center',
             flexDirection: 'row',
             width: '100%',
           }}>
@@ -475,17 +509,24 @@ export default function ViewVideo({navigation, route}) {
               width: wp(14),
               borderRadius: wp(14),
             }}>
-            <Image
+            <MaterialCommunityIcons
+              style={{marginTop: hp(0.5)}}
+              name={'account-circle'}
+              size={50}
+              color={'#FACA4E'}
+            />
+
+            {/* <Image
               style={{width: '100%', borderRadius: wp(2.1), height: '100%'}}
               source={appImages.profileImg}
-            />
+            /> */}
           </View>
 
           <View
             style={{
               //flex: 1,
               marginLeft: wp(3),
-              height:hp(5),
+              height: hp(5),
               //marginTop: hp(1),
               //borderWidth:3,
               justifyContent: 'space-around',
@@ -503,7 +544,7 @@ export default function ViewVideo({navigation, route}) {
               style={{
                 color: '#4C4C4C',
                 fontFamily: 'Inter-Regular',
-                marginTop:hp(2.1),
+                marginTop: hp(2.1),
                 fontSize: hp(1.6),
               }}>
               {item.comment}
@@ -652,7 +693,6 @@ export default function ViewVideo({navigation, route}) {
 
   const videos = require('../../../assets/images/DummyVideo.mp4'); // Reference your asset file here
 
-
   const requestStoragePermission = async () => {
     try {
       const granted = await PermissionsAndroid.request(
@@ -676,6 +716,23 @@ export default function ViewVideo({navigation, route}) {
       console.warn(err);
     }
   };
+
+  function formatDuration(durationInSeconds) {
+    const minutes = Math.floor(durationInSeconds / 60);
+    const seconds = Math.floor(durationInSeconds % 60);
+
+    const formattedMinutes = String(minutes).padStart(2, '0');
+    const formattedSeconds = String(seconds).padStart(2, '0');
+
+    return `${formattedMinutes}:${formattedSeconds}`;
+  }
+
+  const openComments=()=>{
+    setPaused(!paused);
+    
+    setIsBottomSheetExpanded(!isBottomSheetExpanded);
+    
+  }
 
   const downloadFile = () => {
     const {config, fs} = RNFetchBlob;
@@ -706,24 +763,40 @@ export default function ViewVideo({navigation, route}) {
       });
   };
 
-
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <View style={{flex: 1}}>
-        <TouchableOpacity onPress={()=> togglePaused()} style={styles.backgroundVideo}>
+        {/* Add a parent View */}
+
+        {/* Existing components go here */}
+
+        {/* Add the play button View */}
+        {paused === true ? (
+          <View
+            style={{position: 'absolute', top: '50%', left: '48%', zIndex: 2}}>
+            {/* Adjust the marginLeft and marginTop based on the size of your play button image */}
+            <AntDesign name={'pause'} size={35} color={'#FACA4E'} />
+          </View>
+        ) : null}
+
+        <TouchableOpacity
+          onPress={() => togglePaused()}
+          style={styles.backgroundVideo}>
           <Video
-                  resizeMode="cover" // Use "cover" to make it cover the entire screen
-                  repeat={true} // You can set other video props as needed
-                  ref={refSlide}
-                  muted={mute}
-                  paused={paused}
-                  source={{
-                    uri: receivedData.video,
-                  }} style={{height: '100%', width: '100%'}}
-                  onProgress={x => {
-                    //console.log("Current Progress",x);
-                    setProgress(x);
-                  }} />
+            resizeMode="cover" // Use "cover" to make it cover the entire screen
+            repeat={true} // You can set other video props as needed
+            ref={refSlide}
+            muted={mute}
+            paused={paused}
+            source={{
+              uri: receivedData.video,
+            }}
+            style={{height: '100%', width: '100%'}}
+            onProgress={x => {
+              console.log('Current Progress', x);
+              setProgress(x);
+            }}
+          />
         </TouchableOpacity>
         <StatusBar
           translucent={true}
@@ -762,9 +835,18 @@ export default function ViewVideo({navigation, route}) {
                   width: wp(10),
                   borderRadius: wp(8),
                   marginLeft: wp(3),
+                  //borderWidth:1,
+                  justifyContent: 'center',
                   overflow: 'hidden',
                 }}>
-                <Image
+                <MaterialCommunityIcons
+                  style={{marginTop: hp(0.5)}}
+                  name={'account-circle'}
+                  size={30}
+                  color={'#FACA4E'}
+                />
+
+                {/*  <Image
                   style={{
                     flex: 1,
                     width: null,
@@ -772,15 +854,17 @@ export default function ViewVideo({navigation, route}) {
                     resizeMode: 'contain',
                   }}
                   source={appImages.profileImg}
-                />
+                /> */}
               </View>
 
-              <Text style={styles.textProfileName}>{receivedData.username}</Text>
+              <Text style={styles.textProfileName}>
+                {receivedData.username}
+              </Text>
             </View>
 
             <ScrollView
               showsVerticalScrollIndicator={false} // Hide vertical scroll indicator
-              style={{flex: 1, marginTop: hp(1)}}
+              style={{flex: 1, marginLeft:wp(5), marginTop: hp(1)}}
               contentContainerStyle={{verticalLine: false}}>
               <Text
                 style={{
@@ -832,24 +916,35 @@ export default function ViewVideo({navigation, route}) {
                   maximumValue={progress.seekableDuration}
                   minimumTrackTintColor={'#FACA4E'}
                   maximumTrackTintColor={'#F6F6F6'}
-                  onValueChange={(x)=>{
+                  onValueChange={x => {
                     refSlide.current.seek(x);
                   }}
                 />
               </View>
 
-              <Text
+              {totalDuration !== '' ? (
+                <Text
+                  style={{
+                    fontFamily: 'Inter',
+                    fontSize: hp(1.5),
+                    color: '#FFFFFF',
+                  }}>
+                  {totalDuration}
+                </Text>
+              ) : null}
+              <TouchableOpacity
                 style={{
-                  fontFamily: 'Inter',
-                  fontSize: hp(1.5),
-                  color: '#FFFFFF',
-                }}>
-                02:14
-              </Text>
-              <TouchableOpacity onPress={()=> toggleMute()}>
-
-            { mute===false? <FontAwsome name={'volume-up'} size={30} color={'#FACA4E'}/>:
-            <FontAwsome name={'volume-off'} size={30} color={'#FACA4E'}/>}
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: hp(5),
+                  width: wp(5),
+                }}
+                onPress={() => toggleMute()}>
+                {mute === false ? (
+                  <FontAwsome name={'volume-up'} size={18} color={'#FACA4E'} />
+                ) : (
+                  <FontAwsome name={'volume-off'} size={18} color={'#FACA4E'} />
+                )}
               </TouchableOpacity>
             </View>
 
@@ -881,7 +976,7 @@ export default function ViewVideo({navigation, route}) {
                   style={{
                     fontFamily: 'Inter-Regular',
                     fontSize: hp(1.7),
-                    marginRight:wp(3),
+                    marginRight: wp(3),
                     color: '#FFFFFF',
                   }}>
                   {likes}
@@ -889,7 +984,7 @@ export default function ViewVideo({navigation, route}) {
               </View>
 
               <TouchableOpacity
-                onPress={() => setIsBottomSheetExpanded(!isBottomSheetExpanded)}
+                onPress={() => openComments()}
                 style={{
                   flexDirection: 'row',
                   justifyContent: 'space-between',
@@ -897,7 +992,10 @@ export default function ViewVideo({navigation, route}) {
                   width: wp(15),
                   height: hp(5),
                 }}>
-                <TouchableOpacity onPress={() => setIsBottomSheetExpanded(!isBottomSheetExpanded)}>
+                <TouchableOpacity
+                  onPress={() =>
+                     openComments()
+                  }>
                   <Comment height={21} width={21} />
                 </TouchableOpacity>
 
@@ -907,7 +1005,7 @@ export default function ViewVideo({navigation, route}) {
                     fontSize: hp(1.7),
                     color: '#FFFFFF',
                   }}>
-                 { commentsCount }
+                  {commentsCount}
                 </Text>
               </TouchableOpacity>
 
@@ -1094,7 +1192,7 @@ export default function ViewVideo({navigation, route}) {
                 style={{flex: 1, marginLeft: wp(1)}}
               />
 
-              <TouchableOpacity onPress={()=>clearTextInput}>
+              <TouchableOpacity onPress={() => clearTextInput}>
                 <ButtonSend />
               </TouchableOpacity>
             </View>
@@ -1107,7 +1205,7 @@ export default function ViewVideo({navigation, route}) {
                 height: hp(8),
               }}>
               <View
-                onpress={()=>setIsOpen(true)}
+                onpress={() => setIsOpen(true)}
                 style={{
                   height: hp(8),
                   justifyContent: 'center',
@@ -1131,8 +1229,13 @@ export default function ViewVideo({navigation, route}) {
             </View>
           )}
         </BottomSheet>
-       { isOpen===true? <EmojiPicker onEmojiSelected={handlePick} open={true} onClose={() => setIsOpen(false)} />:null}
-
+        {isOpen === true ? (
+          <EmojiPicker
+            onEmojiSelected={handlePick}
+            open={true}
+            onClose={() => setIsOpen(false)}
+          />
+        ) : null}
 
         {isBottomSheetExpanded && showReply === false ? (
           <View
@@ -1147,7 +1250,7 @@ export default function ViewVideo({navigation, route}) {
               height: hp(8),
             }}>
             <TouchableOpacity
-            onPress={()=>openEmoji()}
+              onPress={() => openEmoji()}
               style={{
                 height: hp(8),
                 justifyContent: 'center',
@@ -1165,7 +1268,9 @@ export default function ViewVideo({navigation, route}) {
               style={{flex: 1, marginLeft: wp(1)}}
             />
 
-            <TouchableOpacity style={{marginRight:wp(3)}} onPress={() => clearTextInput()}>
+            <TouchableOpacity
+              style={{marginRight: wp(3)}}
+              onPress={() => clearTextInput()}>
               <ButtonSend />
             </TouchableOpacity>
           </View>
@@ -1215,7 +1320,7 @@ export default function ViewVideo({navigation, route}) {
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-       { loading && <ActivityIndicator size="large" color="#FACA4E" />}
+        {loading && <ActivityIndicator size="large" color="#FACA4E" />}
       </View>
     </GestureHandlerRootView>
   );

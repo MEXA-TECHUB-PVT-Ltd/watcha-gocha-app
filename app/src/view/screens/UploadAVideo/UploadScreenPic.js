@@ -79,6 +79,8 @@ export default function UploadScreenPic({navigation}) {
 
   const [imageUri, setImageUri] = useState(null);
 
+  const [imageInfo, setImageInfo] = useState(null);
+
   const [isFocus, setIsFocus] = useState(false);
 
   const ref_RBSheetCamera = useRef(null);
@@ -204,12 +206,19 @@ export default function UploadScreenPic({navigation}) {
         console.log('image here', response);
         if (!response.didCancel) {
           if (response.assets && response.assets.length > 0) {
+            //setImageUri(response.assets[0].uri);
+            // setImageUri(response.assets[0])
+            setImageInfo(response.assets[0]);
             setImageUri(response.assets[0].uri);
-            console.log('response', response.assets[0].uri);
+            console.log('response', response.assets[0]);
           } else if (response.uri) {
             // Handle the case when no assets are present (e.g., for videos)
-            setImageUri(response.uri);
-            console.log('response', response.uri);
+            // setImageUri(response.uri);
+            console.log('response of image', response.assets[0]);
+
+            setImageInfo(response.assets[0]);
+      
+            //console.log('response', response.uri);
           }
         }
         ref_RBSheetCamera.current.close();
@@ -222,10 +231,15 @@ export default function UploadScreenPic({navigation}) {
     launchImageLibrary({mediaType: 'photo'}, response => {
       console.log('image here', response);
       if (!response.didCancel && response.assets.length > 0) {
+        setImageInfo(response.assets[0]);
         setImageUri(response.assets[0].uri);
+        console.log('response', response.assets[0]);
       }
+      console.log('response', response.assets[0]);
 
-      console.log('response', imageUri);
+      setImageInfo(response.assets[0]);
+
+      //console.log('response', imageUri);
 
       ref_RBSheetCamera.current.close();
     });
@@ -253,21 +267,19 @@ export default function UploadScreenPic({navigation}) {
       console.log('user_id', userId);
       console.log('pic_category', categoryId);
 
-
-
       // Construct the request data as FormData
       const formData = new FormData();
       formData.append('name', profileName);
       formData.append('description', description);
       formData.append('pic_category', categoryId);
       formData.append('user_id', userId);
-      formData.append('image', 'ruvv');
+      formData.append('image', imageUri);
 
       // Set up the Axios request
       const axiosConfig = {
         headers: {
           Authorization:
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U',
+            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U',
         },
       };
 
@@ -281,11 +293,7 @@ export default function UploadScreenPic({navigation}) {
       console.log('Response', response);
 
       if (response.status === 404) {
-        console.error(
-          'Failed to upload video:',
-          response.status,
-          response.data,
-        );
+        console.error('Failed to upload video:', response.status, response);
       } else {
         console.error(
           'Failed to upload video:',
@@ -294,7 +302,70 @@ export default function UploadScreenPic({navigation}) {
         );
       }
     } catch (error) {
-      console.error(error);
+      console.error('Error of axios', error.message);
+    }
+  };
+
+  const createPicTour = async () => {
+    console.log('Image Uri', imageInfo.uri);
+    console.log('Image file Type', imageInfo.type);
+    console.log('Image file Type', imageInfo.fileName);
+
+    console.log('name', profileName);
+    console.log('description', description);
+    console.log('user_id', userId);
+    console.log('pic_category', categoryId);
+
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/picTour/createPicTour';
+
+    // Construct the request data as FormData
+    const formData = new FormData();
+
+    formData.append('name', profileName);
+    formData.append('description', description);
+    formData.append('pic_category', categoryId);
+    formData.append('user_id', userId);
+    //formData.append('image', imageUri);
+
+    console.log('Form Data Entry', formData);
+
+      formData.append('image', {
+      uri: imageInfo.uri,
+      type: imageInfo.type, // Adjust the type based on the video file type
+      name: imageInfo.fileName, // Adjust the name based on the video file name
+    });
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`, // Use the provided token
+          'Content-Type': 'multipart/form-data', // Set the content type to FormData
+        },
+        body: formData,
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log('API Response:', responseData);
+        setLoading(false);
+        handleUpdatePassword();
+        // Handle the response data as needed
+      } else {
+        setLoading(false);
+        console.error(
+          'Failed to upload video:',
+          response.status,
+          response.statusText,
+        );
+        // Handle the error
+      }
+    } catch (error) {
+      console.error('API Request Error:', error);
+      setLoading(false);
+      // Handle the error
     }
   };
 
@@ -479,8 +550,9 @@ export default function UploadScreenPic({navigation}) {
             customClick={() => {
               //handleUpdatePassword()
               console.log('Upload Pics');
-              if (userId !== null) {
-                uploadVideos();
+              if (userId !== '') {
+                //uploadVideos();
+                createPicTour();
               } else {
                 ref_RBSendOffer.current.open();
               }
