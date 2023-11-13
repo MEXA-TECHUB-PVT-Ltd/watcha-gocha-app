@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import React, {useState, useEffect, useRef} from 'react';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP,
@@ -35,6 +36,8 @@ export default function Video({navigation}) {
   const [loading, setLoading] = useState(false);
 
   const [searchesData, setSearches] = useState('');
+
+  const [imageInfo, setImageInfo] = useState(null);
 
   const [selectedItem, setSelectedItem] = useState('');
 
@@ -183,7 +186,7 @@ export default function Video({navigation}) {
     }
   };
 
-  const takePhotoFromCamera = value => {
+ /*  const takePhotoFromCamera = value => {
     ref_RBSheetCamera.current.close();
     setSelectedItem(value);
     navigation.navigate('UploadUpdateVideo');
@@ -193,6 +196,67 @@ export default function Video({navigation}) {
     ref_RBSheetCamera.current.close();
     setSelectedItem(value);
     navigation.navigate('UploadUpdateVideo');
+  }; */
+
+
+  const takePhotoFromCamera = async value => {
+    setSelectedItem(value);
+    launchCamera(
+      {
+        mediaType: 'video',
+        videoQuality: 'medium',
+      },
+      response => {
+        console.log('image here', response);
+        if (!response.didCancel) {
+          if (response.assets && response.assets.length > 0) {
+            setLoading(true)
+            setImageInfo(response.assets[0]);
+            ref_RBSheetCamera.current.close();
+            setLoading(false)
+    
+            navigation.navigate('UploadUpdateVideo', { Video: response.assets[0] });
+    
+          } else if (response.uri) {
+            console.log('response', imageInfo);
+            ref_RBSheetCamera.current.close();
+            setLoading(false)
+      
+            navigation.navigate('UploadUpdateVideo', { Video:response.assets[0] });
+          }
+        }
+        console.log('response', imageInfo);
+        ref_RBSheetCamera.current.close();
+        setLoading(false)
+  
+        navigation.navigate('UploadUpdateVideo', { Video:response.assets[0] });
+      },
+    );
+  };
+
+  const choosePhotoFromLibrary = value => {
+    setSelectedItem(value);
+    launchImageLibrary({mediaType: 'video'}, response => {
+      console.log('image here', response);
+      if (!response.didCancel && response.assets.length > 0) {
+       /*  console.log('Response', response.assets[0]);
+        setImageUri(response.assets[0].uri);
+        setImageInfo(response.assets[0]); */
+        setLoading(true)
+        setImageInfo(response.assets[0]);
+        ref_RBSheetCamera.current.close();
+        setLoading(false)
+
+        navigation.navigate('UploadUpdateVideo', { Video: response.assets[0] });
+
+      }
+
+      console.log('response', imageInfo);
+      ref_RBSheetCamera.current.close();
+      setLoading(false)
+
+      navigation.navigate('UploadUpdateVideo', { Video:response.assets[0] });
+    });
   };
 
   const availableAppsVideo = [
