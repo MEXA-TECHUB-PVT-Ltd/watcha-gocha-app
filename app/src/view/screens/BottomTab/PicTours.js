@@ -363,7 +363,7 @@ export default function PicTours({navigation}) {
         <Headers
           onPress={() => navigation.goBack()}
           showSearch={true}
-          onPressSearch={() => navigation.navigate('SearchScreen')}
+          onPressSearch={() => navigation.navigate('SearchScreenPicTours')}
           showText={true}
           onPressListings={() => navigation.openDrawer()}
           showListings={true}

@@ -91,6 +91,7 @@ import HelpScreen from './app/src/view/screens/HelpScreen';
 import SplashScreen from './app/src/view/screens/SplashScreen';
 import RateApp from './app/src/view/screens/RateApp';
 import InstlApps from './app/src/view/screens/InstalledApps/InstlApps';
+import SearchScreenPicTours from './app/src/view/screens/SearchScreenPicTours';
 
 //------------------\\
 
@@ -461,6 +462,12 @@ const App = () => {
         <Stack.Screen
           name="PrivacyPolicy"
           component={PrivacyPolicy}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="SearchScreenPicTours"
+          component={SearchScreenPicTours}
           options={{headerShown: false}}
         />
 

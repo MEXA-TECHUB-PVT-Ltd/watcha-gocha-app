@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   TextInput,
   StatusBar,
+  PermissionsAndroid,
   ImageBackground,
   View,
   TouchableOpacity,
@@ -613,7 +614,7 @@ export default function ViewVideo({navigation, route}) {
         description: 'file download',
       },
     })
-      .fetch('GET', pastedURL, {
+      .fetch('GET', 'https://watch-gotcha-be.mtechub.com/'+receivedData.image, {
         //some headers ..
       })
       .then(res => {
@@ -623,8 +624,6 @@ export default function ViewVideo({navigation, route}) {
       });
   };
 
-  var details =
-    'Hold onto your seats and get ready to be mesmerized by the beauty and grandeur of the Hold onto your seats';
 
   const toggleContent = () => {
     setShowFullContent(!showFullContent);
@@ -637,7 +636,10 @@ export default function ViewVideo({navigation, route}) {
 
   const receivedData = route.params?.picData;
 
-  console.log('Data Recieved on', receivedData);
+  console.log('Data Recieved on pics', receivedData);
+
+  var details = receivedData.description;
+
 
   const shareViaWhatsApp = async () => {
     const shareOptions = {
@@ -656,7 +658,7 @@ export default function ViewVideo({navigation, route}) {
 
   return (
     <GestureHandlerRootView style={{flex: 1}}>
-      <ImageBackground source={appImages.videoBG} style={{flex: 1}}>
+      <ImageBackground source={{uri:'https://watch-gotcha-be.mtechub.com/'+receivedData.image}} style={{flex: 1}}>
         <StatusBar
           translucent={true}
           backgroundColor="transparent"
@@ -806,7 +808,7 @@ export default function ViewVideo({navigation, route}) {
                   width: wp(10),
                   height: hp(5),
                 }}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={()=>shareViaWhatsApp()}>
                   <Send height={21} width={21} />
                 </TouchableOpacity>
               </View>
@@ -819,7 +821,7 @@ export default function ViewVideo({navigation, route}) {
                   width: wp(10),
                   height: hp(5),
                 }}>
-                <TouchableOpacity onPress={() => shareViaWhatsApp()}>
+                <TouchableOpacity onPress={() => handleUpdatePassword()}>
                   <Download height={21} width={21} />
                 </TouchableOpacity>
               </View>

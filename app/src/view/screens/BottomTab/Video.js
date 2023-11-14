@@ -54,7 +54,7 @@ export default function Video({navigation}) {
   useEffect(() => {
     // Make the API request and update the 'data' state
     fetchVideos();
-  }, []);
+  }, [selectedItemId]);
 
   const fetchVideos = async () => {
     // Simulate loading
@@ -72,6 +72,7 @@ export default function Video({navigation}) {
   };
 
   const fetchTrendingVideos = async () => {
+    console.log("Categry in id", selectedItemId)
     const token =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE2OTgzMTI3NDUsImV4cCI6MTcwMDkwNDc0NX0.YsFwjW-luPHnhb4R3nAyuyHDV58PoehhrsMdMttJd08';
 
