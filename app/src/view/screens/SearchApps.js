@@ -3,13 +3,18 @@ import {
   FlatList,
   Text,
   Image,
+  ActivityIndicator,
   TextInput,
   View,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import Back from '../../assets/svg/back.svg';
 import {appImages} from '../../assets/utilities/index';
+import {InstalledApps} from 'react-native-launcher-kit';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP,
@@ -21,7 +26,72 @@ import Fontiso from 'react-native-vector-icons/Fontisto';
 export default function SearchApps({navigation}) {
   const [selectedItemId, setSelectedItemId] = useState(null);
 
-  const searches = [
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const [searches, setSearches] = useState([]);
+
+  const [data, setData] = useState([]);
+
+  const [filteredData, setFilteredData] = useState([]);
+
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchAll();
+  }, []);
+
+  const fetchAll = async () => {
+    // Simulate loading
+    setLoading(true);
+    // Fetch data one by one
+    await loadSearchesFromStorage();
+
+    // Once all data is fetched, set loading to false
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      const installedApps = InstalledApps.getSortedApps();
+      const packageNames = installedApps.map(app => app.label);
+      const packageImages = installedApps.map(app => app.icon);
+
+      const packageDataArray = packageNames.map((packageName, index) => ({
+        label: packageName,
+        image: packageImages[index],
+      }));
+
+      setData(packageDataArray);
+      setFilteredData(packageDataArray); // Initialize filteredData with all data
+
+      setLoading(false);
+    };
+
+    fetchData();
+  }, []);
+
+  const handleSearch = text => {
+    const searchTerm = text.toLowerCase();
+    const filteredApps = data.filter(app =>
+      app.label.toLowerCase().includes(searchTerm),
+    );
+    setFilteredData(filteredApps);
+  };
+
+  const loadSearchesFromStorage = async () => {
+    try {
+      const savedSearches = await AsyncStorage.getItem('searchesApps');
+      if (savedSearches) {
+        setSearches(JSON.parse(savedSearches));
+      }
+    } catch (error) {
+      console.error('Error loading searches from storage:', error);
+    }
+  };
+
+  /* const searches = [
     {id: 1, title: 'SnapChat'},
     {id: 2, title: 'Gmail'},
     {id: 3, title: 'Pinterest'},
@@ -32,10 +102,10 @@ export default function SearchApps({navigation}) {
     {id: 8, title: 'Pinterest'},
     {id: 9, title: 'LinkedIn'},
     {id: 10, title: 'SnapChat'},
-  ];
+  ]; */
 
   const availableApps = [
-    {id: 1, title: 'SnapChat', image: appImages.snapchat },
+    {id: 1, title: 'SnapChat', image: appImages.snapchat},
     {id: 2, title: 'Gmail', image: appImages.gmail},
     {id: 3, title: 'Pinterest', image: appImages.pinterest},
     {id: 4, title: 'LinkedIn', image: appImages.linkedIn},
@@ -47,10 +117,30 @@ export default function SearchApps({navigation}) {
     {id: 10, title: 'SnapChat', image: appImages.snapchat},
   ];
 
+  const saveSearchTerm = async () => {
+
+    console.log("Search Term", searchTerm)
+    if (searchTerm.trim() === '') {
+      return;
+    }
+
+    try {
+      const newSearchTerm = {id: searches.length + 1, title: searchTerm};
+      const updatedSearches = [...searches, newSearchTerm];
+
+      await AsyncStorage.setItem('searchesApps', JSON.stringify(updatedSearches));
+      setSearches(updatedSearches);
+      setSearchTerm(''); // Clear the input field
+      fetchAll();
+    } catch (error) {
+      console.error('Error saving search term:', error);
+    }
+  };
+
   const renderSearches = item => {
     console.log('Items', item);
     const isSelected = selectedItemId === item.id;
-
+    
     return (
       <TouchableOpacity
         style={[
@@ -61,7 +151,12 @@ export default function SearchApps({navigation}) {
         ]}
         onPress={() => {
           setSelectedItemId(item.id);
+          
           console.log('Selected item:', item.title);
+
+          // Filter data based on the selected search term
+        const selectedApps = data.filter(app => app.label === item.title);
+        setFilteredData(selectedApps);
         }}>
         <Text
           style={[
@@ -80,8 +175,8 @@ export default function SearchApps({navigation}) {
       <View
         style={{
           height: hp(8),
-          marginTop:hp(1),
-          marginBottom:hp(1.5),
+          marginTop: hp(1),
+          marginBottom: hp(1.5),
           flexDirection: 'row',
           alignItems: 'center',
           marginHorizontal: wp(7),
@@ -90,28 +185,29 @@ export default function SearchApps({navigation}) {
           borderColor: '#00000017',
         }}>
         <Image
-          source={item.image}
-          style={{width: 30, height: 80, marginLeft:wp(5)}}
+          source={{uri: `data:image/png;base64,${item.image}`}}
+          style={{width: 30, height: 80, marginLeft: wp(5)}}
           resizeMode="contain"
         />
 
-        <Text style={{marginLeft:wp(3), flex:1, color:'#333333',fontFamily:'Inter'}}>
-            {item.title}
+        <Text
+          style={{
+            marginLeft: wp(3),
+            flex: 1,
+            color: '#333333',
+            fontFamily: 'Inter',
+          }}>
+          {item.label}
         </Text>
-        
       </View>
     );
   };
 
-
   return (
     <View style={styles.container}>
       <View style={styles.searchHeader}>
-
-        <TouchableOpacity onPress={()=>navigation.goBack()}>
-
-        <Back width={20} height={20} style={{marginLeft: '1%'}} />
-
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Back width={20} height={20} style={{marginLeft: '1%'}} />
         </TouchableOpacity>
 
         <View style={styles.searchBar}>
@@ -124,6 +220,16 @@ export default function SearchApps({navigation}) {
           <TextInput
             style={{flex: 1, marginLeft: wp(3)}}
             placeholder="Search here"
+            value={searchTerm}
+            onChangeText={text => {
+              setSearchTerm(text);
+              handleSearch(text);
+            }}
+            onSubmitEditing={() => {
+              saveSearchTerm();
+              // This code will execute when the "Okay" button is pressed
+              //console.log("Good", searchTerm);
+            }}
           />
         </View>
       </View>
@@ -131,26 +237,48 @@ export default function SearchApps({navigation}) {
       <Text style={styles.latestSearch}>Latest Search</Text>
 
       <View style={styles.latestSearchList}>
-        <FlatList
-          style={{flex: 1}}
-          contentContainerStyle={{alignItems: 'center'}}
-          showsHorizontalScrollIndicator={false}
-          horizontal
-          data={searches}
-          keyExtractor={item => item.id.toString()}
-          renderItem={({item}) => renderSearches(item)}
-        />
+        {searches.length > 0 ? (
+          <FlatList
+            style={{flex: 1}}
+            contentContainerStyle={{alignItems: 'center'}}
+            showsHorizontalScrollIndicator={false}
+            horizontal
+            data={searches}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({item}) => renderSearches(item)}
+          />
+        ) : (
+          <Text
+            style={{color: '#939393', fontSize: hp(1.8), alignSelf: 'center'}}>
+            No recent searches found.
+          </Text>
+        )}
       </View>
 
       <Text style={styles.latestSearch}>Available Apps</Text>
 
       <FlatList
-        style={{marginTop: hp(3), flex:1}}
+        style={{marginTop: hp(3), flex: 1}}
         showsVerticalScrollIndicator={false}
-        data={availableApps}
-        keyExtractor={item => item.id.toString()}
+        data={filteredData} 
+        //keyExtractor={item => item.id.toString()}
         renderItem={({item}) => renderAvailableApps(item)}
       />
+
+      {loading ? (
+        <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ActivityIndicator size="large" color="#FACA4E" />
+        </View>
+      ) : null}
     </View>
   );
 }

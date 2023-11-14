@@ -2,9 +2,12 @@ import {
   StyleSheet,
   FlatList,
   Text,
+  ActivityIndicator,
   StatusBar,
+  PermissionsAndroid,
   KeyboardAvoidingView,
   Image,
+  Platform,
   View,
   TouchableOpacity,
   ScrollView,
@@ -28,32 +31,19 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SelectCountry, Dropdown} from 'react-native-element-dropdown';
 
+import Geolocation from 'react-native-geolocation-service';
+
+import Geocoding from 'react-native-geocoding';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import RBSheet from 'react-native-raw-bottom-sheet';
 import CustomSnackbar from '../../assets/Custom/CustomSnackBar';
 
 export default function Sell({navigation}) {
-  
   const [userId, setUserId] = useState('');
 
-  useEffect(() => {
-    const getUserID = async () => {
-      console.log("Id's");
-      try {
-        const result = await AsyncStorage.getItem('userId ');
-        if (result !== null) {
-          setUserId(result);
-          console.log('user id retrieved:', result);
-        }
-      } catch (error) {
-        // Handle errors here
-        console.error('Error retrieving user ID:', error);
-      }
-    };
-
-    getUserID();
-  }, []);
+  const [imageUris, setImageUris] = useState([]);
 
   const [selectedItem, setSelectedItem] = useState('');
 
@@ -63,7 +53,15 @@ export default function Sell({navigation}) {
 
   const [snackbarVisible, setsnackbarVisible] = useState(false);
 
+  const [snackbarVisibleAlert, setsnackbarVisibleAlert] = useState(false);
+
   const [price, setPrice] = useState('');
+
+  const [location, setLocation] = useState(null);
+
+  const [locationName, setLocationName] = useState('');
+
+  const [region, setRegion] = useState('');
 
   const [isTextInputActive, setIsTextInputActive] = useState(false);
 
@@ -74,15 +72,215 @@ export default function Sell({navigation}) {
 
   const [isChecked, setIsChecked] = useState(false);
 
+  const [description, setDescription] = useState('');
+
+  const [condition, setCondition] = useState('');
+
+  const [loading, setLoading] = useState(false);
+
   const [category, setCategory] = useState('');
 
-  const [description, setDescription] = useState('');
+  const [categoryId, setCategoryId] = useState('');
+
+  const [categoriesSelect, setCategorySelect] = useState([]);
 
   const [imageUri, setImageUri] = useState(null);
 
   const [isFocus, setIsFocus] = useState(false);
 
+  const [isFocusCondition, setIsFocusCondition] = useState(false);
+
   const ref_RBSheetCamera = useRef(null);
+
+  useEffect(() => {
+    // Check and request location permission
+
+    const requestLocationPermission = async () => {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: 'Downloader App Location Permission',
+            message:
+              'Downloader App needs access to your location ' +
+              'so you can download files based on your location',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          },
+        );
+
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          console.log(
+            'Location permission granted. Downloading file based on location...',
+          );
+          fetchLocation();
+        } else {
+          console.log('Location permission denied');
+          // You can show a message to the user or take other actions if needed
+        }
+      } catch (err) {
+        console.error('Error requesting location permission:', err);
+        // Handle the error appropriately (e.g., show an error message to the user)
+      }
+    };
+
+    requestLocationPermission();
+  }, []);
+
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchVideos();
+  }, []);
+
+  const fetchVideos = async () => {
+    // Simulate loading
+    setLoading(true);
+
+    await getUserID();
+    // Fetch data one by one
+    await fetchCategory();
+
+    //await requestLocationPermission();
+
+    // Once all data is fetched, set loading to false
+    setLoading(false);
+  };
+
+  const getUserID = async () => {
+    console.log("Id's");
+    try {
+      const result = await AsyncStorage.getItem('userId ');
+      if (result !== null) {
+        setUserId(result);
+        console.log('user id retrieved:', result);
+      } else {
+        console.log('result is null', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
+
+  const fetchCategory = async () => {
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY5ODAzOTAyNywiZXhwIjoxNzAwNjMxMDI3fQ.JSki1amX9VPEP9uCsJ5vPiCl2P4EcBqW6CQyY_YdLsk';
+
+    try {
+      const response = await fetch(
+        'https://watch-gotcha-be.mtechub.com/itemCategory/getAllItemCategories?page=1&limit=5',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+
+        console.log('Data ', data);
+
+        // Use the data from the API to set the categories
+        const categories = data.AllCategories.map(category => ({
+          label: category.name, // Use the "name" property as the label
+          value: category.id.toString(), // Convert "id" to a string for the value
+        }));
+
+        setCategorySelect(categories); // Update the state with the formatted category data
+
+        console.log('Data Categories', categoriesSelect);
+      } else {
+        console.error(
+          'Failed to fetch categories:',
+          response.status,
+          response.statusText,
+        );
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const requestLocationPermission = async () => {
+    if (Platform.OS === 'android') {
+      const status = await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      );
+
+      if (status !== PermissionsAndroid.RESULTS.GRANTED) {
+        try {
+          const result = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          );
+
+          if (result === PermissionsAndroid.RESULTS.GRANTED) {
+            console.log('Location permission granted. Fetching location...');
+            // Permission granted, now fetch the location
+            fetchLocation();
+          } else {
+            console.warn('Location permission denied.');
+          }
+        } catch (error) {
+          console.error('Error requesting location permission:', error);
+        }
+      } else {
+        console.log(
+          'Location permission already granted. Fetching location...',
+        );
+        // Permission already granted, fetch the location
+        fetchLocation();
+      }
+    }
+  };
+
+  const fetchLocation = async () => {
+    console.log('Fetch Location called');
+
+    Geocoding.init('AIzaSyD2gv4DJD2-xSnjvdfPmdyjhbhFyPgqMrI');
+
+    // Get current location
+    Geolocation.getCurrentPosition(
+      async position => {
+        const {latitude, longitude} = position.coords;
+        setLocation({latitude, longitude});
+
+        // Reverse geocoding to get location name and region
+        try {
+          const response = await Geocoding.from({latitude, longitude});
+          const address = response.results[0].formatted_address;
+          setLocationName(address);
+
+          console.log('Address', address);
+
+          // Extract region from address components
+          const regionComponent = response.results[0].address_components.find(
+            component =>
+              component.types.includes('administrative_area_level_1'),
+          );
+          const regionName = regionComponent ? regionComponent.long_name : '';
+
+          console.log('Address', regionName);
+
+          setRegion(regionName);
+        } catch (error) {
+          console.error('Error fetching location and region:', error);
+        }
+      },
+      error => console.error(error),
+      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+    );
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
+  const performAction = () => {
+    setModalVisible(false);
+  };
 
   const handleFocus = () => {
     setIsTextInputActive(true);
@@ -112,10 +310,11 @@ export default function Sell({navigation}) {
     setIsChecked(!isChecked);
   };
 
-  const Category = [
-    {label: 'Item 1', value: '1'},
-    {label: 'Item 2', value: '2'},
-    {label: 'Item 3', value: '3'},
+  const Condition = [
+    {label: 'new', value: 'new'},
+    {label: 'used_Like_new', value: 'used_Like_new'},
+    {label: 'used_Good', value: 'used_Good'},
+    {label: 'used_Fair', value: 'used_Fair'},
   ];
 
   const TakeImageFromCamera = () => {
@@ -138,25 +337,18 @@ export default function Sell({navigation}) {
       })
       .catch(error => console.log(error));
   };
-
   const takePhotoFromCamera = async value => {
     setSelectedItem(value);
     launchCamera(
       {
         mediaType: 'photo',
-        // videoQuality: 'medium',
       },
       response => {
-        console.log('image here', response);
         if (!response.didCancel) {
-          if (response.assets && response.assets.length > 0) {
-            setImageUri(response.assets[0].uri);
-            console.log('response', response.assets[0].uri);
-          } else if (response.uri) {
-            // Handle the case when no assets are present (e.g., for videos)
-            setImageUri(response.uri);
-            console.log('response', response.uri);
-          }
+          const newImageUri = response.assets
+            ? response.assets[0]
+            : response.uri;
+          updateImageUris(newImageUri);
         }
         ref_RBSheetCamera.current.close();
       },
@@ -166,24 +358,219 @@ export default function Sell({navigation}) {
   const choosePhotoFromLibrary = value => {
     setSelectedItem(value);
     launchImageLibrary({mediaType: 'photo'}, response => {
-      console.log('image here', response);
-      if (!response.didCancel && response.assets.length > 0) {
-        setImageUri(response.assets[0].uri);
+      if (
+        !response.didCancel &&
+        response.assets &&
+        response.assets.length > 0
+      ) {
+        const newImageUri = response.assets[0];
+        updateImageUris(newImageUri);
       }
-      console.log('response', imageUri);
-
       ref_RBSheetCamera.current.close();
     });
   };
 
+  const updateImageUris = newImageUri => {
+    if (imageUris.length < 10) {
+      setImageUris(prevImageUris => [...prevImageUris, newImageUri]);
+    } else {
+      // Handle the case when the limit exceeds (e.g., show a message)
+      console.log('Image limit exceeded');
+    }
+  };
+
+  const handleUploadImage = data => {
+    setLoading(true);
+    const uri = imageInfoThumbnail.uri;
+    const type = imageInfoThumbnail.type;
+    const name = imageInfoThumbnail.fileName;
+    const sourceImage = {uri, type, name};
+    console.log('Source Image', sourceImage);
+    const dataImage = new FormData();
+    dataImage.append('file', sourceImage);
+    dataImage.append('upload_preset', 'e6zfilan'); // Use your Cloudinary upload preset
+    dataImage.append('cloud_name', 'dxfdrtxi3'); // Use your Cloudinary cloud name
+
+    fetch('https://api.cloudinary.com/v1_1/dxfdrtxi3/image/upload', {
+      method: 'POST',
+      body: dataImage,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        setImageUrl(data.url); // Store the Cloudinary video URL in your state
+        //uploadVideo(data.url)
+        //uploadXpiVideo(data.url);
+        console.log('Image Url', data);
+        uploadXpiVideo(data.url, data);
+      })
+      .catch(err => {
+        setLoading(false);
+        console.log('Error While Uploading Video', err);
+      });
+  };
+
+  const upload = async () => {
+
+    if (
+      imageUris.length !== 0 &&
+      title !== '' &&
+      categoryId !== '' &&
+      condition!=='' &&
+      description !== '' &&
+      price !== '' &&
+      locationName !== '' &&
+      region !== ''
+    ) {
+      handleUploadImages(imageUris);
+      //console.log('All');
+      //uploadVideoCloudinary(imageInfo.uri)
+    } else {
+      handleUpdatePasswordAlert();
+      //setModalVisible(true);
+    }
+  };
+
+  const handleUploadImages = async imageArray => {
+    setLoading(true);
+
+    const uploadPromises = imageArray.map(async imageInfo => {
+      const uri = imageInfo.uri;
+      const type = imageInfo.type;
+      const name = imageInfo.fileName;
+      const sourceImage = {uri, type, name};
+      const dataImage = new FormData();
+      dataImage.append('file', sourceImage);
+      dataImage.append('upload_preset', 'e6zfilan');
+      dataImage.append('cloud_name', 'dxfdrtxi3');
+
+      try {
+        const response = await fetch(
+          'https://api.cloudinary.com/v1_1/dxfdrtxi3/image/upload',
+          {
+            method: 'POST',
+            body: dataImage,
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'multipart/form-data',
+            },
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error('Image upload failed');
+        }
+
+        const data = await response.json();
+        console.log('Image Url', data.url);
+
+        // Assuming you have a function like uploadXpiVideo, you can call it here
+        //uploadXpiVideo(data.url, data);
+
+        return data.url;
+      } catch (error) {
+        console.log('Error While Uploading Image', error);
+        throw error; // Rethrow the error so that the Promise.all catches it
+      }
+    });
+
+    try {
+      const imageUrls = await Promise.all(uploadPromises);
+      console.log('All images uploaded successfully:', imageUrls);
+
+      sellItem(imageUrls);
+
+      // Do something with the imageUrls array, e.g., store it in state or send it to the server
+    } catch (error) {
+      console.log('Error uploading images:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+ 
+
+    const sellItem = async (data) => {
+      console.log('user Id', userId );
+      console.log('condition', condition );
+      console.log('imageUri', data);
+      console.log('title', title);
+      console.log('categoryId ', categoryId);
+      console.log('description ', description);
+      console.log('price ', price);
+      console.log('paid Status ', isChecked);
+      console.log('location ', locationName);
+      console.log('region ', region);
+  
+      const token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U'
+      const apiUrl = 'https://watch-gotcha-be.mtechub.com/item/sellItem';
+  
+      const requestData = {
+        "user_id": userId,
+        "item_category": categoryId,
+        "images":data,
+        "title": title,
+        "description": description,
+        "price": price,
+        "condition": condition,
+        "location": locationName,
+        "paid_status": isChecked,
+        "region": region
+      };
+  
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`, // Use the provided token
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestData),
+        });
+  
+        if (response.ok) {
+          const data = await response.json();
+          console.log('API Response:', data);
+          setLoading(false);
+          handleUpdatePassword();
+  
+          // Handle the response data as needed
+        } else {
+          setLoading(false);
+  
+          console.error(
+            'Failed to upload pic',
+            response.status,
+            response.statusText,
+          );
+          // Handle the error
+        }
+      } catch (error) {
+        console.error('API Request Error:', error);
+        setLoading(false);
+  
+        // Handle the error
+      }
+    };
+  
+
+  // Call the function wherever you need to trigger the API request
+
   const dismissSnackbar = () => {
     setsnackbarVisible(false);
   };
-  
-  const navigateToScreen=()=>{
+
+  const dismissSnackbarAlert = () => {
+    setsnackbarVisibleAlert(false);
+  };
+
+  const navigateToScreen = () => {
     ref_RBSendOffer.current.close();
-    navigation.navigate("Signin_signup")
-  }
+    navigation.navigate('Signin_signup');
+  };
 
   const handleUpdatePassword = async () => {
     // Perform the password update logic here
@@ -198,6 +585,21 @@ export default function Sell({navigation}) {
       navigation.goBack();
     }, 3000);
   };
+
+  const handleUpdatePasswordAlert = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setsnackbarVisibleAlert(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setsnackbarVisibleAlert(false);
+      //navigation.goBack();
+    }, 3000);
+  };
+
   return (
     <KeyboardAvoidingView
       style={{flex: 1, backgroundColor: 'white'}}
@@ -252,7 +654,17 @@ export default function Sell({navigation}) {
         </TouchableOpacity>
 
         {/* //-------------------\\ */}
-
+        <FlatList
+          data={imageUris}
+          keyExtractor={(item, index) => index.toString()}
+          numColumns={3} // Set the number of columns to 3
+          renderItem={({item}) => (
+            <View style={styles.imageContainer}>
+              <Image source={{uri: item.uri}} style={styles.image} />
+            </View>
+          )}
+        />
+        {/* 
         {imageUri !== null ? (
           <View
             style={{
@@ -291,7 +703,7 @@ export default function Sell({navigation}) {
               />
             )}
           </View>
-        ) : null}
+        ) : null} */}
 
         <TextInput
           mode="outlined"
@@ -349,7 +761,7 @@ export default function Sell({navigation}) {
             // inputSearchStyle={styles.inputSearchStyle}
             // iconStyle={styles.iconStyle}
             value={category}
-            data={Category}
+            data={categoriesSelect}
             search={false}
             maxHeight={200}
             labelField="label"
@@ -359,8 +771,62 @@ export default function Sell({navigation}) {
             onFocus={() => setIsFocus(true)}
             onBlur={() => setIsFocus(false)}
             onChange={item => {
-              setCategory(item.value);
+              setCategoryId(item.value);
               setIsFocus(false);
+            }}
+            renderRightIcon={() => (
+              <AntDesign
+                style={styles.icon}
+                color={isFocus ? '#FACA4E' : '#C4C4C4'}
+                name="down"
+                size={15}
+              />
+            )}
+          />
+        </View>
+
+        <View style={{}}>
+          <Dropdown
+            style={
+              isFocusCondition
+                ? styles.textInputSelectedCategory
+                : styles.textInputCategoryNonSelected
+            }
+            containerStyle={{
+              marginTop: 3,
+              alignSelf: 'center',
+              borderRadius: wp(3),
+              width: '100%',
+            }}
+            // dropdownPosition="top"
+            // mode="modal"
+            placeholderStyle={{
+              color: '#121420',
+              //   fontWeight: '400',
+              fontFamily: 'Inter',
+              fontSize: hp(1.8),
+            }}
+            iconStyle={
+              isFocusCondition ? styles.iconStyle : styles.iconStyleInactive
+            }
+            itemTextStyle={{color: '#000000'}}
+            selectedTextStyle={{fontSize: 16, color: '#000000'}}
+            // inputSearchStyle={styles.inputSearchStyle}
+            // iconStyle={styles.iconStyle}
+            value={condition}
+            data={Condition}
+            search={false}
+            maxHeight={200}
+            labelField="label"
+            valueField="value"
+            placeholder={'Select Condition'}
+            searchPlaceholder="Search..."
+            onFocus={() => setIsFocusCondition(true)}
+            onBlur={() => setIsFocusCondition(false)}
+            onChange={item => {
+              setCondition(item.label);
+              //console.log("Condition", item.label)
+              setIsFocusCondition(false);
             }}
             renderRightIcon={() => (
               <AntDesign
@@ -425,15 +891,14 @@ export default function Sell({navigation}) {
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-              if (userId === '') {
+              if (userId !== '') {
+                //handleUpdatePassword();
 
-                handleUpdatePassword();
-               
+                //console.log("found")
+
+                upload();
               } else {
-                
                 ref_RBSendOffer.current.open();
-
-
               }
               //navigation.navigate('Profile_image');
             }}
@@ -525,6 +990,13 @@ export default function Sell({navigation}) {
         onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackbarVisible}
       />
+
+      <CustomSnackbar
+        message={'Alert'}
+        messageDescription={'Kindly Fill All Fields'}
+        onDismiss={dismissSnackbarAlert} // Make sure this function is defined
+        visible={snackbarVisibleAlert}
+      />
       <RBSheet
         ref={ref_RBSendOffer}
         closeOnDragDown={true}
@@ -587,36 +1059,78 @@ export default function Sell({navigation}) {
             </Text>
           </View>
 
-          <View style={{flexDirection:'row', width:'100%',  justifyContent:'space-around', alignItems:'center',height:hp(8),marginHorizontal: wp(5)}}>
-            <TouchableOpacity onPress={()=>ref_RBSendOffer.current.close()} style={{width:wp(30), borderRadius:wp(5), justifyContent:'center', alignItems:'center', borderColor:'#FACA4E', borderWidth:1, height:hp(5)}}>
-            <Text
+          <View
+            style={{
+              flexDirection: 'row',
+              width: '100%',
+              justifyContent: 'space-around',
+              alignItems: 'center',
+              height: hp(8),
+              marginHorizontal: wp(5),
+            }}>
+            <TouchableOpacity
+              onPress={() => ref_RBSendOffer.current.close()}
               style={{
-                color: '#FACA4E',
-                textAlign: 'center',
-                fontSize: hp(1.8),
-                fontWeight:'bold',
-                fontFamily: 'Inter',
+                width: wp(30),
+                borderRadius: wp(5),
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderColor: '#FACA4E',
+                borderWidth: 1,
+                height: hp(5),
               }}>
-               Cancel
-            </Text>
+              <Text
+                style={{
+                  color: '#FACA4E',
+                  textAlign: 'center',
+                  fontSize: hp(1.8),
+                  fontWeight: 'bold',
+                  fontFamily: 'Inter',
+                }}>
+                Cancel
+              </Text>
             </TouchableOpacity>
 
-
-            <TouchableOpacity onPress={()=>navigateToScreen()} style={{width:wp(30), borderRadius:wp(5), justifyContent:'center', alignItems:'center', backgroundColor:'#FACA4E', height:hp(5)}}>
-            <Text
+            <TouchableOpacity
+              onPress={() => navigateToScreen()}
               style={{
-                color: '#000000',
-                textAlign: 'center',
-                fontSize: hp(1.8),
-                fontWeight:'bold',
-                fontFamily: 'Inter',
+                width: wp(30),
+                borderRadius: wp(5),
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#FACA4E',
+                height: hp(5),
               }}>
-               Sign Up
-            </Text>
+              <Text
+                style={{
+                  color: '#000000',
+                  textAlign: 'center',
+                  fontSize: hp(1.8),
+                  fontWeight: 'bold',
+                  fontFamily: 'Inter',
+                }}>
+                Sign Up
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
       </RBSheet>
+
+      {loading && (
+        <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(255, 255, 255, 0.5)', // Semi-transparent white
+          }}>
+          <ActivityIndicator size="large" color="#FACA4E" />
+        </View>
+      )}
     </KeyboardAvoidingView>
   );
 }
@@ -718,5 +1232,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderColor: '#C4C4C4',
+  },
+  imageContainer: {
+    flex: 1,
+    margin: 5,
+  },
+  image: {
+    width: '100%',
+    height: 100,
+    aspectRatio: 1, // Maintain the aspect ratio of the image
   },
 });

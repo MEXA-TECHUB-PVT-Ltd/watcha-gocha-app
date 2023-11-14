@@ -29,6 +29,9 @@ import {appImages} from '../../../assets/utilities';
 
 import RBSheet from 'react-native-raw-bottom-sheet';
 
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+
+
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -38,6 +41,8 @@ export default function PicTours({navigation}) {
   const [selectedItemDiscId, setSelectedItemDiscId] = useState(null);
 
   const [selectedItemPicsId, setSelectedItemPicsId] = useState(9);
+
+  const [imageInfo, setImageInfo] = useState(null);
 
   const [selectedItemMarketId, setSelectedItemMarketId] = useState(null);
 
@@ -196,18 +201,7 @@ export default function PicTours({navigation}) {
     }
   };
 
-  const takePhotoFromCamera = value => {
-    ref_RBSheetCamera.current.close();
-    setSelectedItem(value);
-    navigation.navigate('UploadUpdatePic');
-  };
-
-  const choosePhotoFromLibrary = value => {
-    ref_RBSheetCamera.current.close();
-    setSelectedItem(value);
-    navigation.navigate('UploadUpdatePic');
-  };
-
+  
   //pics search
 
   const renderSearchesPic = item => {
@@ -260,7 +254,22 @@ export default function PicTours({navigation}) {
         onPress={() =>  navigation.navigate('PicDetails', { picData: item })}
         style={{width: wp(27), margin: 5}}>
         <View>
-          <Image
+
+        <Image
+             style={{
+               position: 'absolute',
+               top: 0,
+               left: 0,
+               zIndex: 1, // Ensure it's on top of other elements
+               //flex: 1,
+               width: '100%',
+               height: hp(12),
+               borderRadius: wp(1),
+               resizeMode: 'cover',
+             }}
+             source={appImages.galleryPlaceHolder}
+           />
+          {/* <Image
             style={{
               position: 'absolute',
               top: 0,
@@ -274,7 +283,7 @@ export default function PicTours({navigation}) {
               resizeMode: 'cover',
             }}
             source={appImages.topSearches1}
-          />
+          /> */}
         </View>
         <View
           style={{
@@ -297,6 +306,66 @@ export default function PicTours({navigation}) {
         </View>
       </TouchableOpacity>
     );
+  };
+
+  const takePhotoFromCamera = async value => {
+    setSelectedItem(value);
+    launchCamera(
+      {
+        mediaType: 'Photo',
+        //videoQuality: 'medium',
+      },
+      response => {
+        console.log('image here', response);
+        if (!response.didCancel) {
+          if (response.assets && response.assets.length > 0) {
+            setLoading(true)
+            setImageInfo(response.assets[0]);
+            ref_RBSheetCamera.current.close();
+            setLoading(false)
+    
+            navigation.navigate('UploadUpdatePic', { Video: response.assets[0] });
+    
+          } else if (response.uri) {
+            console.log('response', imageInfo);
+            ref_RBSheetCamera.current.close();
+            setLoading(false)
+      
+            navigation.navigate('UploadUpdatePic', { Video:response.assets[0] });
+          }
+        }
+        console.log('response', imageInfo);
+        ref_RBSheetCamera.current.close();
+        setLoading(false)
+  
+        navigation.navigate('UploadUpdatePic', { Video:response.assets[0] });
+      },
+    );
+  };
+
+  const choosePhotoFromLibrary = value => {
+    setSelectedItem(value);
+    launchImageLibrary({mediaType: 'Photo'}, response => {
+      console.log('image here', response);
+      if (!response.didCancel && response.assets.length > 0) {
+       /*  console.log('Response', response.assets[0]);
+        setImageUri(response.assets[0].uri);
+        setImageInfo(response.assets[0]); */
+        setLoading(true)
+        setImageInfo(response.assets[0]);
+        ref_RBSheetCamera.current.close();
+        setLoading(false)
+
+        navigation.navigate('UploadUpdatePic', { Video: response.assets[0] });
+
+      }
+
+      console.log('response', imageInfo);
+      ref_RBSheetCamera.current.close();
+      setLoading(false)
+
+      navigation.navigate('UploadUpdatePic', { Video:response.assets[0] });
+    });
   };
 
   const availableAppsVideo = [
