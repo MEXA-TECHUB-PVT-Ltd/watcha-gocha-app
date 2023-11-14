@@ -363,18 +363,18 @@ const App = ({navigation}) => {
       setsignup_cpass('');
       setusername('');
 
+      //navigation.navigate("Profile_image");
+
+      navigation.navigate("BottomTabNavigation")
+
       // navigation.navigate('SelectGender');
     } catch (error) {
-      //console.error('Error:');
-      showAlert();
+      console.error('Error is on sign up:', error);
+      //showAlert();
       setIsLoading(false);
     }
   };
-
-
-
-
-
+   
   const signInEndpoint =
     'https://watch-gotcha-be.mtechub.com/user/login'; // Replace with your actual API endpoint
 

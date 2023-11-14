@@ -32,6 +32,7 @@ import Back from '../../../assets/svg/back.svg';
 
 import RBSheet from 'react-native-raw-bottom-sheet';
 
+
 import CustomButton from '../../../assets/Custom/Custom_Button';
 import {useIsFocused} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -48,23 +49,60 @@ const App = ({navigation}) => {
   useEffect(() => {}, [isFocused]);
 
   const [signin_email, setsignin_email] = useState();
+   
+  const [userId, setUserId] = useState('');
 
   const [selectedItem, setSelectedItem] = useState('');
+
+  const [imageUrl, setImageUrl] = useState(null);
 
   const [openModel, setOpenModel] = useState(false);
   const [openGallery, setOpenGallery] = useState(false);
   const [userName, setUserName] = useState('');
   const [imageUri, setImageUri] = useState(null);
+  const [imageInfo, setimageInfo] = useState(null);
+
   const ref_RBSheet = useRef(null);
   const ref_RBSheetCamera = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchVideos();
+  }, []);
+
+  const fetchVideos = async () => {
+    // Simulate loading
+    setIsLoading(true);
+
+    await getUserID();
+
+    // Once all data is fetched, set loading to false
+    setIsLoading(false);
+  };
+
+  const getUserID = async () => {
+    console.log("Id's");
+    try {
+      const result = await AsyncStorage.getItem('userId ');
+      if (result !== null) {
+        setUserId(result);
+        console.log('user id retrieved:', result);
+      } else {
+        console.log('result is null', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
 
   const takePhotoFromCamera = async value => {
     setSelectedItem(value);
     launchCamera(
       {
         mediaType: 'Photo',
-        //videoQuality: 'medium',
+        videoQuality: 'medium',
       },
       response => {
         console.log('image here', response);
@@ -72,6 +110,7 @@ const App = ({navigation}) => {
           if (response.assets && response.assets.length > 0) {
             setImageUri(response.assets[0].uri);
             console.log('response', response.assets[0].uri);
+            setimageInfo(response.assets[0]);
           } else if (response.uri) {
             // Handle the case when no assets are present (e.g., for videos)
             setImageUri(response.uri);
@@ -88,14 +127,120 @@ const App = ({navigation}) => {
     launchImageLibrary({mediaType: 'Photo'}, response => {
       console.log('image here', response);
       if (!response.didCancel && response.assets.length > 0) {
+        console.log('Response', response.assets[0]);
         setImageUri(response.assets[0].uri);
+        setimageInfo(response.assets[0]);
       }
 
-      console.log('response', imageUri);
+      console.log('response', imageInfo);
 
       ref_RBSheetCamera.current.close();
     });
   };
+
+
+
+  const upload = async () => {
+    if (
+      imageInfo !== null
+    ) {
+      //uploadVideo()
+      //uploadVideos()
+      const uri = imageInfo.uri;
+      const type = imageInfo.type;
+      const name = imageInfo.fileName;
+      const source = {uri, type, name};
+      console.log("Video Source",source);
+      handleUploadImage(source);
+
+      //uploadVideoCloudinary(imageInfo.uri)
+    } else {
+      //setModalVisible(true);
+    }
+  };
+
+  const handleUploadImage = (data) => {
+    //setIsLoading(true);
+   
+    const dataImage = new FormData();
+    dataImage.append('file', data);
+    dataImage.append('upload_preset', 'e6zfilan'); // Use your Cloudinary upload preset
+    dataImage.append('cloud_name', 'dxfdrtxi3'); // Use your Cloudinary cloud name
+
+    fetch('https://api.cloudinary.com/v1_1/dxfdrtxi3/image/upload', {
+      method: 'POST',
+      body: dataImage,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        setImageUrl(data.url); // Store the Cloudinary video URL in your state
+        //uploadVideo(data.url)
+        //uploadXpiVideo(data.url);
+        console.log("Image Url",data);
+        uploadXpiVideo(data.url)
+
+      })
+      .catch(err => {
+        setIsLoading(false)
+        console.log('Error While Uploading Video', err);
+      });
+  };
+
+
+  const uploadXpiVideo = async data => {
+    console.log('Image Url', data);
+    //console.log('Image file Type', imageInfo.type);
+    //console.log('Image file Type', imageInfo.fileName);
+
+    console.log('id', userId);
+    
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/user/uploadImage';
+
+    // Construct the request data as FormData
+    const formData = new FormData();
+
+    formData.append('userId', userId);
+    formData.append('image', data);
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`, // Use the provided token
+          'Content-Type': 'multipart/form-data', // Set the content type to FormData
+        },
+        body: formData,
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log('API Response:', responseData);
+        setIsLoading(false);
+        navigation.navigate("BottomTabNavigation")
+        // Handle the response data as needed
+      } else {
+        setIsLoading(false);
+        console.error(
+          'Failed to upload image:',
+          response.status,
+          response.statusText,
+        );
+        // Handle the error
+      }
+    } catch (error) {
+      console.error('API Request Error:', error);
+      setIsLoading(false);
+      // Handle the error
+    }
+  };
+
+
 
   return (
     <ScrollView style={styles.bg} contentContainerStyle={{flexGrow: 1}}>
@@ -152,11 +297,12 @@ const App = ({navigation}) => {
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
               setIsLoading(true);
-              setTimeout(() => {
-                navigation.navigate('BottomTabNavigation');
-                setIsLoading(false);
+              //setTimeout(() => {
+                //navigation.navigate('BottomTabNavigation');
+                upload()
+                //setIsLoading(false);
                 // Replace 'YourTargetScreen' with the screen you want to navigate to
-              }, 2000);
+              //}, 2000);
             }}
           />
         </View>
