@@ -12,6 +12,7 @@ import {
   LogBox,
   Animated,
   ImageBackground,
+  ActivityIndicator,
   Pressable,
   StatusBar,
 } from 'react-native';
@@ -277,7 +278,7 @@ export default function VerifyAccount({navigation, route}) {
         <View style={{marginTop: '15%', alignSelf: 'center'}}>
           <CustomButton
             title="Verify"
-            load={loading}
+            //load={loading}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
              goTOScreen()
@@ -352,6 +353,18 @@ export default function VerifyAccount({navigation, route}) {
           </View>
         </View>
       </RBSheet>
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {loading && <ActivityIndicator size="large" color="#FACA4E" />}
+      </View>
     </ScrollView>
   );
 }

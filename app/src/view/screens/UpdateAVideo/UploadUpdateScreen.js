@@ -224,7 +224,7 @@ export default function UploadUpdateScreen({navigation, route}) {
       });
   };
 
-  const handleUploadImage = (data) => {
+  const handleUploadImage = (data1) => {
     setLoading(true);
     const uri = imageInfoThumbnail.uri;
     const type = imageInfoThumbnail.type;
@@ -250,7 +250,7 @@ export default function UploadUpdateScreen({navigation, route}) {
         //uploadVideo(data.url)
         //uploadXpiVideo(data.url);
         console.log("Image Url",data);
-        uploadXpiVideo(data.url,data)
+        uploadXpiVideo(data.url,data1)
 
       })
       .catch(err => {
@@ -339,8 +339,7 @@ export default function UploadUpdateScreen({navigation, route}) {
     console.log('user id', userId);
     console.log('category id', categoryId);
 
-    const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
     const apiUrl = 'https://watch-gotcha-be.mtechub.com/xpi/createXpiVideo';
 
     const requestData = {
@@ -364,7 +363,7 @@ export default function UploadUpdateScreen({navigation, route}) {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('API Response:', data);
+        console.log('API Response of Videos:', data);
         setLoading(false);
         handleUpdatePassword();
 
@@ -592,7 +591,7 @@ export default function UploadUpdateScreen({navigation, route}) {
     setTimeout(() => {
       setsnackbarVisible(false);
       //handleUpload()
-      //navigation.navigate('Home');
+      navigation.navigate('Videos');
     }, 3000);
   };
 

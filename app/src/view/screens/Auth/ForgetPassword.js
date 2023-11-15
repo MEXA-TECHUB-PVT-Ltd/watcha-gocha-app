@@ -3,6 +3,7 @@ import {
   SafeAreaView,
   StyleSheet,
   Dimensions,
+  ActivityIndicator,
   ScrollView,
   View,
   FlatList,
@@ -193,7 +194,7 @@ const ForgetPassword = ({navigation}) => {
         <View style={{marginTop: '25%', alignSelf: 'center'}}>
           <CustomButton
             title="Send Code"
-            load={loading}
+            //load={loading}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
                goTOScreen()
@@ -201,6 +202,18 @@ const ForgetPassword = ({navigation}) => {
             }}
           />
         </View>
+      </View>
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {loading && <ActivityIndicator size="large" color="#FACA4E" />}
       </View>
     </ScrollView>
   );

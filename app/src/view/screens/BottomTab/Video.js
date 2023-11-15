@@ -467,6 +467,8 @@ export default function Video({navigation}) {
             marginTop: hp(12.5),
           }}>
           <Text
+           numberOfLines={1}
+           ellipsizeMode='tail'
             style={{
               fontSize: hp(1.5),
               fontFamily: 'Inter-Regular',
