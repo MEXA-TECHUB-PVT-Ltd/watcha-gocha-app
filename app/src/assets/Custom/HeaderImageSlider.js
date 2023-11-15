@@ -85,7 +85,7 @@ import {
             return (
               <View style={styles.imageCard}>
                 <Image
-                   source={item.image}
+                   source={{uri:item.image}}
                   //source={item}
                   style={{
                     width: '100%',

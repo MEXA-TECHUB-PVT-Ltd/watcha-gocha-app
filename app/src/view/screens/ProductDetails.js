@@ -3,13 +3,14 @@ import {
   FlatList,
   Text,
   ScrollView,
+  ActivityIndicator,
   StatusBar,
   Image,
   TextInput,
   View,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {SwiperFlatList} from 'react-native-swiper-flatlist';
 import Back from '../../assets/svg/back.svg';
 import {appImages} from '../../assets/utilities/index';
@@ -19,6 +20,8 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 import CustomButton from '../../assets/Custom/Custom_Button';
+
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import Fontiso from 'react-native-vector-icons/Fontisto';
 import Location from '../../assets/svg/Location.svg';
@@ -46,12 +49,81 @@ import CustomSnackbar from '../../assets/Custom/CustomSnackBar';
 
 import Shares from 'react-native-share';
 
-export default function ProductDetails({navigation}) {
+export default function ProductDetails({navigation, route}) {
   const [imageUri, setImageUri] = useState(null);
+  const [userId, setUserId] = useState('');
+
   const [selectedValueListView, setSelectedValueListView] = useState('');
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarVisibleAlert, setSnackbarVisibleAlert] = useState(false);
   const [snackbarVisibleSaved, setSnackbarVisibleSaved] = useState(false);
+  const [snackbarVisiblePrice, setSnackbarVisiblePrice] = useState(false);
+
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const receivedData = route.params?.ProductDetails;
+
+  console.log('Recieved Data', receivedData);
+
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchVideos();
+  }, []);
+
+  const fetchVideos = async () => {
+    // Simulate loading
+    setLoading(true);
+
+    // Fetch data one by one
+    await fetchAll();
+
+    await getUserID();
+
+    // Once all data is fetched, set loading to false
+    setLoading(false);
+  };
+
+  const fetchAll = async () => {
+    //console.log("Categry in id", selectedItemId)
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/user/getUser/${receivedData.user_id}`,
+
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('AllItems of user', result.user);
+      setUserData(result.user); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error Trending:', error);
+    }
+  };
+
+  const getUserID = async () => {
+    console.log("Id's");
+    try {
+      const result = await AsyncStorage.getItem('userId ');
+      if (result !== null) {
+        setUserId(result);
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+
+  };
+
 
   const ref_RBSendOffer = useRef(null);
   const ref_RBSendOffer2 = useRef(null);
@@ -131,11 +203,71 @@ export default function ProductDetails({navigation}) {
     //console.log("first",item)
     setSelectedValueListView(item);
     //await AsyncStorage.setItem('distance', token);
-    ref_RBSendOffer.current.close();
+    //ref_RBSendOffer.current.close();
+  };
+
+  const detectOffer = () => {
+    if (selectedValueListView == '') {
+      handleUpdatePasswordPrice()
+    }
+    else
+    {
+       sendOffer()
+    }
+  };
+
+  const sendOffer = async () => {
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/item/sendOffer';
+
+    const requestData = {
+      item_id: receivedData.id,
+      sender_id: userId,
+      price: receivedData.price,
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`, // Use the provided token
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data);
+        setLoading(false);
+        handleUpdatePassword();
+
+        // Handle the response data as needed
+      } else {
+        setLoading(false);
+
+        console.error(
+          'Failed to upload video:',
+          response.status,
+          response.statusText,
+        );
+        // Handle the error
+      }
+    } catch (error) {
+      console.error('API Request Error:', error);
+      setLoading(false);
+
+      // Handle the error
+    }
   };
 
   const dismissSnackbar = () => {
     setSnackbarVisible(true);
+  };
+
+  const dismissSnackbarPrice = () => {
+    setSnackbarVisiblePrice(true);
   };
 
   const changeModal = () => {
@@ -182,7 +314,19 @@ export default function ProductDetails({navigation}) {
     }, 3000);
   };
 
-  
+  const handleUpdatePasswordPrice = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setSnackbarVisiblePrice(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setSnackbarVisiblePrice(false);
+    }, 3000);
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar
@@ -202,7 +346,7 @@ export default function ProductDetails({navigation}) {
       <ScrollView style={{flex: 1}}>
         <View style={{height: hp(25), marginTop: hp(5)}}>
           <HeaderImageSlider
-            data={details}
+            data={receivedData.images}
             paginationStyleItemActiveStyle={{
               width: 18,
               height: 7,
@@ -253,7 +397,7 @@ export default function ProductDetails({navigation}) {
               fontWeight: '800',
               fontSize: hp(2.4),
             }}>
-            Classic Lens
+            {receivedData.title}
           </Text>
 
           <View
@@ -270,7 +414,7 @@ export default function ProductDetails({navigation}) {
                 fontWeight: '400',
                 fontSize: hp(2),
               }}>
-              Item
+              {receivedData.item_category_name}
             </Text>
 
             <Text
@@ -281,7 +425,7 @@ export default function ProductDetails({navigation}) {
                 fontWeight: '400',
                 fontSize: hp(2),
               }}>
-              $ 456
+              $ {receivedData.price}
             </Text>
           </View>
 
@@ -302,7 +446,7 @@ export default function ProductDetails({navigation}) {
                 fontWeight: '400',
                 fontSize: hp(2),
               }}>
-              123 Main Street Cityville, USA
+              {receivedData.location}
             </Text>
           </View>
 
@@ -318,12 +462,13 @@ export default function ProductDetails({navigation}) {
                 //fontWeight: '400',
                 fontSize: hp(1.8),
               }}>
-              Our Classic Lens offers a timeless touch to your photography.
+              {receivedData.description}
+              {/*  Our Classic Lens offers a timeless touch to your photography.
               Crafted with precision and a nod to vintage aesthetics, this lens
               is perfect for capturing moments with a hint of nostalgia. Whether
               you're shooting portraits, landscapes, or street photography, the
               Classic Lens delivers stunning results with its soft focus and
-              beautiful bokeh.
+              beautiful bokeh. */}
             </Text>
           </ScrollView>
 
@@ -336,16 +481,12 @@ export default function ProductDetails({navigation}) {
             }}>
             <View style={{flexDirection: 'row', width: wp(60)}}>
               <TouchableOpacity style={styles.circleBox}>
-                {imageUri == null ? (
-                  <Image
-                    style={{
-                      flex: 1,
-                      width: '100%',
-                      height: '100%',
-                      borderRadius: wp(12) / 2, // Half of the width (25/2)
-                      resizeMode: 'contain',
-                    }}
-                    source={appImages.profileImg}
+                {receivedData.image == null ? (
+                  <MaterialCommunityIcons
+                    style={{marginTop: hp(0.5)}}
+                    name={'account-circle'}
+                    size={35}
+                    color={'#FACA4E'}
                   />
                 ) : (
                   <Image
@@ -370,7 +511,7 @@ export default function ProductDetails({navigation}) {
                     fontWeight: '400',
                     fontSize: hp(2),
                   }}>
-                  John Doe
+                  {receivedData.username}
                 </Text>
 
                 <Text
@@ -380,7 +521,7 @@ export default function ProductDetails({navigation}) {
                     marginLeft: wp(3),
                     fontSize: hp(2),
                   }}>
-                  johndoe@gmail.com
+                  {userData?.email}
                 </Text>
               </View>
             </View>
@@ -579,7 +720,7 @@ export default function ProductDetails({navigation}) {
 
                 fontSize: hp(2),
               }}>
-              Item Name
+              {receivedData?.title}
             </Text>
 
             <View style={{flexDirection: 'row'}}>
@@ -591,7 +732,7 @@ export default function ProductDetails({navigation}) {
 
                   fontSize: hp(2),
                 }}>
-                $ 456
+                ${receivedData.price}
               </Text>
             </View>
 
@@ -603,9 +744,9 @@ export default function ProductDetails({navigation}) {
                   fontFamily: 'Inter',
                   fontWeight: '300',
 
-                  fontSize: hp(1.7),
+                  fontSize: hp(1.4),
                 }}>
-                123 Main Street Cityville, USA
+                {receivedData.location}
               </Text>
             </View>
           </View>
@@ -703,7 +844,8 @@ export default function ProductDetails({navigation}) {
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
               ref_RBSendOffer.current.close();
-              handleUpdatePassword();
+              detectOffer();
+              //handleUpdatePassword();
               //navigation.navigate('Profile_image');
             }}
           />
@@ -908,6 +1050,26 @@ export default function ProductDetails({navigation}) {
         onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackbarVisibleSaved}
       />
+
+      <CustomSnackbar
+        message={'Alert'}
+        messageDescription={'Kindly Select Price First'}
+        onDismiss={dismissSnackbarPrice} // Make sure this function is defined
+        visible={snackbarVisiblePrice}
+      />
+
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {loading && <ActivityIndicator size="large" color="#FACA4E" />}
+      </View>
     </View>
   );
 }

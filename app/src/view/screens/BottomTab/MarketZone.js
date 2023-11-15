@@ -2,6 +2,7 @@ import {
   StyleSheet,
   FlatList,
   Image,
+  ActivityIndicator,
   StatusBar,
   TouchableOpacity,
   ScrollView,
@@ -9,7 +10,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP,
@@ -26,9 +27,53 @@ import Add from '../../../assets/svg/AddMainScreen.svg';
 export default function MarketZone({navigation}) {
   const [selectedItemId, setSelectedItemId] = useState(null);
 
+  const [data, setData] = useState(null);
+
+  const [loading, setLoading] = useState(false);
+
   const [snackBarVisible, setSnackbarVisible] = useState(false);
 
   const ref_RBSheetCamera = useRef(null);
+
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchVideos();
+  }, [1]);
+
+  const fetchVideos = async () => {
+    // Simulate loading
+    setLoading(true);
+
+    // Fetch data one by one
+    await fetchAll();
+
+    // Once all data is fetched, set loading to false
+    setLoading(false);
+  };
+
+  const fetchAll = async () => {
+    //console.log("Categry in id", selectedItemId)
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+
+    try {
+      const response = await fetch(
+        'https://watch-gotcha-be.mtechub.com/item/getAllItems?page=1&limit=2',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('AllItems', result.AllItems);
+      setData(result.AllItems); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error Trending:', error);
+    }
+  };
+
 
   const availableApps = [
     {
@@ -112,8 +157,60 @@ export default function MarketZone({navigation}) {
     navigation.navigate('Sell')
   }
 
+  const renderAvailableAppsMarket = item => {
+    console.log('Items of market zone', item.images[1].image);
+    return (
+      <TouchableOpacity
+        onPress={() => navigation.navigate('ProductDetails', {ProductDetails:item})}
+        style={{width: wp(25.5), margin: 5}}>
+        <View>
+          <Image
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+
+              zIndex: 1, // Ensure it's on top of other elements
+              //flex: 1,
+              width: '100%',
+              height: hp(16),
+              borderRadius: wp(2.5),
+              resizeMode: 'cover',
+            }}
+            source={{uri:item.images[1].image}}
+          />
+        </View>
+
+        <View
+          style={{
+            position: 'absolute',
+            top: hp(12),
+            left: 7,
+            //height: hp(3),
+            //width: wp(21),
+            //borderRadius: wp(3),
+            //backgroundColor: '#FACA4E',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 2, // Ensure it's on top
+          }}>
+          <Text
+            style={{
+              fontSize: hp(1.7),
+              fontFamily: 'Inter',
+              color: '#FFFFFF',
+              fontWeight: '700',
+            }}>
+            {item.title}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+
   const renderAvailableApps = item => {
-    console.log('Items', item);
+    console.log('Items of market zone', item.images);
     return (
       <TouchableOpacity
         onPress={() => navigation.navigate('ProductDetails')}
@@ -252,8 +349,7 @@ export default function MarketZone({navigation}) {
         </View>
         <View
           style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(16)}}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('ProductDetails')}
+          <View
             style={{width: wp(43), height: '100%', borderRadius: wp(5)}}>
             <Image
               style={{
@@ -293,7 +389,7 @@ export default function MarketZone({navigation}) {
                 Name
               </Text>
             </View>
-          </TouchableOpacity>
+          </View>
 
           <View style={{justifyContent: 'flex-end', width: '50%'}}>
             <Text
@@ -325,14 +421,29 @@ export default function MarketZone({navigation}) {
           </Text>
 
           <View style={{marginTop: hp(1), height: '100%'}}>
-            <FlatList
+          {loading === true ? (
+              <View
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <ActivityIndicator size="large" color="#FACA4E" />
+              </View>
+            ):
+            (<FlatList
               style={{flex: 1}}
               showsVerticalScrollIndicator={false}
-              data={availableApps}
+              data={data}
               horizontal
               keyExtractor={item => item.id.toString()}
-              renderItem={({item}) => renderAvailableApps(item)}
-            />
+              renderItem={({item}) => renderAvailableAppsMarket(item)}
+            />)
+}
           </View>
         </View>
 

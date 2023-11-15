@@ -33,9 +33,13 @@ import Fontiso from 'react-native-vector-icons/Fontisto';
 
 import IonIcons from 'react-native-vector-icons/Ionicons';
 
-export default function UploadUpdatePic({navigation}) {
+export default function UploadUpdatePic({navigation, route}) {
+
+  const receivedData = route.params?.Video;
+
+  console.log("Recieved Data", receivedData)
   return (
-    <ImageBackground source={appImages.videoBG} style={{flex: 1}}>
+    <ImageBackground source={{uri:receivedData.uri}} style={{flex: 1}}>
       <StatusBar
         translucent={true}
         backgroundColor="transparent"
@@ -62,7 +66,7 @@ export default function UploadUpdatePic({navigation}) {
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-              navigation.navigate("UploadScreenPic")
+              navigation.navigate("UploadScreenPic", { Video: receivedData })
               //navigation.navigate('Profile_image');
             }}
           />
