@@ -24,6 +24,7 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 import Headers from '../../../assets/Custom/Headers';
 import {appImages} from '../../../assets/utilities';
 import Add from '../../../assets/svg/AddMainScreen.svg';
+
 export default function MarketZone({navigation}) {
   const [selectedItemId, setSelectedItemId] = useState(null);
 
@@ -35,8 +36,7 @@ export default function MarketZone({navigation}) {
 
   const [dataClothing, setDataClothing] = useState(null);
 
-
-
+  const [regions, setRegions] = useState(null);
 
   const [loading, setLoading] = useState(false);
 
@@ -49,14 +49,15 @@ export default function MarketZone({navigation}) {
   useEffect(() => {
     // Make the API request and update the 'data' state
     fetchVideos();
-  }, []);
+  }, [selectedItemId]);
 
   const fetchVideos = async () => {
     // Simulate loading
     setLoading(true);
-
     // Fetch data one by one
     await fetchAll();
+
+    await fetchRegion();
 
     await fetchCategory();
 
@@ -65,9 +66,6 @@ export default function MarketZone({navigation}) {
     await fetchVehicles();
 
     await fetchClothing();
-
-    
-
     // Once all data is fetched, set loading to false
     setLoading(false);
   };
@@ -97,13 +95,13 @@ export default function MarketZone({navigation}) {
   };
 
   const fetchElectronics = async () => {
-    //console.log("Categry in id", selectedItemId)
+    console.log('Categry in id', selectedItemId);
     const token =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
 
     try {
       const response = await fetch(
-        'https://watch-gotcha-be.mtechub.com/item/getAllItemByCategory/5?page=1&limit=5',
+        `https://watch-gotcha-be.mtechub.com/item/getAllItemByCategory/5?page=1&limit=5&region=${selectedItemId}`,
         {
           method: 'GET',
           headers: {
@@ -127,7 +125,7 @@ export default function MarketZone({navigation}) {
 
     try {
       const response = await fetch(
-        'https://watch-gotcha-be.mtechub.com/item/getAllItemByCategory/5?page=1&limit=5',
+        `https://watch-gotcha-be.mtechub.com/item/getAllItemByCategory/5?page=1&limit=5&region=${selectedItemId}`,
         {
           method: 'GET',
           headers: {
@@ -151,7 +149,7 @@ export default function MarketZone({navigation}) {
 
     try {
       const response = await fetch(
-        'https://watch-gotcha-be.mtechub.com/item/getAllItemByCategory/5?page=1&limit=5',
+        `https://watch-gotcha-be.mtechub.com/item/getAllItemByCategory/5?page=1&limit=5&region=${selectedItemId}`,
         {
           method: 'GET',
           headers: {
@@ -167,7 +165,6 @@ export default function MarketZone({navigation}) {
       console.error('Error Trending:', error);
     }
   };
-
 
   const fetchCategory = async () => {
     const token =
@@ -207,6 +204,30 @@ export default function MarketZone({navigation}) {
       }
     } catch (error) {
       console.error('Error:', error);
+    }
+  };
+
+  const fetchRegion = async () => {
+    //console.log("Categry in id", selectedItemId)
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+
+    try {
+      const response = await fetch(
+        'https://watch-gotcha-be.mtechub.com/region/getAllRegion',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('AllItems', result.allRegion);
+      setRegions(result.allRegion); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error Trending:', error);
     }
   };
 
@@ -399,8 +420,8 @@ export default function MarketZone({navigation}) {
   };
 
   const renderSearches = item => {
-    console.log('Items', item);
-    const isSelected = selectedItemId === item.id;
+    console.log('Regions', item);
+    const isSelected = selectedItemId === item;
 
     return (
       <TouchableOpacity
@@ -411,15 +432,15 @@ export default function MarketZone({navigation}) {
           },
         ]}
         onPress={() => {
-          setSelectedItemId(item.id);
-          console.log('Selected item:', item.title);
+          setSelectedItemId(item);
+          console.log('Selected item:', item);
         }}>
         <Text
           style={[
             styles.textSearchDetails,
             {color: isSelected ? '#232323' : '#939393'},
           ]}>
-          {item.title}
+          {item}
         </Text>
       </TouchableOpacity>
     );
@@ -480,8 +501,8 @@ export default function MarketZone({navigation}) {
             contentContainerStyle={{alignItems: 'center'}}
             showsHorizontalScrollIndicator={false}
             horizontal
-            data={searches}
-            keyExtractor={item => item.id.toString()}
+            data={regions}
+            //keyExtractor={item => item.id.toString()}
             renderItem={({item}) => renderSearches(item)}
           />
         </View>
@@ -558,7 +579,7 @@ export default function MarketZone({navigation}) {
           </Text>
 
           <View style={{marginTop: hp(1), height: '100%'}}>
-          {loading === true ? (
+            {loading === true ? (
               <View
                 style={{
                   position: 'absolute',
@@ -572,14 +593,27 @@ export default function MarketZone({navigation}) {
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
             ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsHorizontalScrollIndicator={false}
-                data={dataElectronics}
-                horizontal
-                keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableApps(item)}
-              />
+              <>
+                {dataElectronics?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight:'bold', fontSize:hp(2.1)}}>No data available</Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsHorizontalScrollIndicator={false}
+                    data={dataElectronics}
+                    horizontal
+                    keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableApps(item)}
+                  />
+                )}
+              </>
             )}
           </View>
         </View>
@@ -611,14 +645,27 @@ export default function MarketZone({navigation}) {
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
             ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsHorizontalScrollIndicator={false}
-                data={dataVehicles}
-                horizontal
-                keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableAppsMarket(item)}
-              />
+              <>
+                {dataVehicles?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight:'bold', fontSize:hp(2.1)}}>No data available</Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsHorizontalScrollIndicator={false}
+                    data={dataVehicles}
+                    horizontal
+                    keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableAppsMarket(item)}
+                  />
+                )}
+              </>
             )}
           </View>
         </View>
@@ -650,14 +697,27 @@ export default function MarketZone({navigation}) {
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
             ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsHorizontalScrollIndicator={false}
-                data={dataClothing}
-                horizontal
-                keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableApps(item)}
-              />
+              <>
+                {dataClothing?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight:'bold', fontSize:hp(2.1)}}>No data available</Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsHorizontalScrollIndicator={false}
+                    data={dataClothing}
+                    horizontal
+                    keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableApps(item)}
+                  />
+                )}
+              </>
             )}
           </View>
         </View>
@@ -675,7 +735,7 @@ export default function MarketZone({navigation}) {
           </Text>
 
           <View style={{marginTop: hp(1), height: '100%'}}>
-            {loading === true ? (
+          {loading === true ? (
               <View
                 style={{
                   position: 'absolute',
@@ -689,14 +749,27 @@ export default function MarketZone({navigation}) {
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
             ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsHorizontalScrollIndicator={false}
-                data={data}
-                horizontal
-                keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableAppsMarket(item)}
-              />
+              <>
+                {data?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight:'bold', fontSize:hp(2.1)}}>No data available</Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsHorizontalScrollIndicator={false}
+                    data={data}
+                    horizontal
+                    keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableAppsMarket(item)}
+                  />
+                )}
+              </>
             )}
           </View>
         </View>

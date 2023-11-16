@@ -3,6 +3,7 @@ import {
   FlatList,
   Text,
   Image,
+  ActivityIndicator,
   KeyboardAvoidingView,
   ScrollView,
   StatusBar,
@@ -10,7 +11,7 @@ import {
   View,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 import {Button, Divider, TextInput} from 'react-native-paper';
@@ -71,6 +72,93 @@ const availableApps = [
 export default function Notification({navigation}) {
     const [selectedRide, setSelectedRide] = useState(null);
 
+    const [imageUri, setImageUri] = useState(null);
+    const [userId, setUserId] = useState('');
+    const [userToken, setUserToken] = useState(null);
+  
+    const [priceOffer, setPriceOffer] = useState('');
+  
+    const [selectedValueListView, setSelectedValueListView] = useState('');
+    const [snackbarVisible, setSnackbarVisible] = useState(false);
+    const [snackbarVisibleAlert, setSnackbarVisibleAlert] = useState(false);
+    const [snackbarVisibleSaved, setSnackbarVisibleSaved] = useState(false);
+    const [snackbarVisiblePrice, setSnackbarVisiblePrice] = useState(false);
+  
+    const [showAlert, setShowAlert] = useState(false);
+  
+    const [userData, setUserData] = useState(null);
+    const [loading, setLoading] = useState(false);
+    
+    useEffect(() => {
+      // Make the API request and update the 'data' state
+      fetchVideos();
+    }, []);
+  
+    const fetchVideos = async () => {
+      // Simulate loading
+      setLoading(true);
+
+      await getUserID();
+  
+      // Fetch data one by one
+      await fetchAll();
+  
+     
+  
+      // Once all data is fetched, set loading to false
+      setLoading(false);
+    };
+  
+    const fetchAll = async () => {
+      //console.log("Categry in id", selectedItemId)
+      const token =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+  
+      try {
+        const response = await fetch(
+          `https://watch-gotcha-be.mtechub.com/notification/getAllNotificationsByUser/${userId}?page=1&limit=2`,
+  
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+  
+        const result = await response.json();
+        console.log('AllItems of user', result.user);
+        setUserData(result.user); // Update the state with the fetched data
+      } catch (error) {
+        console.error('Error Trending:', error);
+      }
+    };
+  
+    const getUserID = async () => {
+      console.log("Id's");
+      try {
+        const result = await AsyncStorage.getItem('userId ');
+        if (result !== null) {
+          setUserId(result);
+          console.log('user id retrieved:', result);
+        }
+      } catch (error) {
+        // Handle errors here
+        console.error('Error retrieving user ID:', error);
+      }
+  
+      try {
+        const result = await AsyncStorage.getItem('UserToken');
+        if (result !== null) {
+          setUserToken(result);
+          console.log('user token retrieved:', result);
+        }
+      } catch (error) {
+        // Handle errors here
+        console.error('Error retrieving user ID:', error);
+      }
+    };
+  
     const handleSelected = (item) => {
       if (selectedRide === item) {
         setSelectedRide(null); // Deselect the item if it's already selected
@@ -145,7 +233,7 @@ export default function Notification({navigation}) {
   return (
     <View style={styles.container}>
       <StatusBar barStyle={'dark-content'} backgroundColor={'white'} />
-      <View style={{marginTop: hp(1)}}>
+      <View style={{marginTop: hp(1.8)}}>
         <Headers
           onPress={() => navigation.goBack()}
           showText={true}
@@ -159,6 +247,19 @@ export default function Notification({navigation}) {
         renderItem={renderItems}
         keyExtractor={(item) => item.id.toString()}
       />
+
+<View
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {loading && <ActivityIndicator size="large" color="#FACA4E" />}
+      </View>
     </View>
   );
 }

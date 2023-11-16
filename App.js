@@ -1,10 +1,11 @@
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import messaging from '@react-native-firebase/messaging';
 LogBox.ignoreAllLogs();
 
 import {
@@ -92,6 +93,7 @@ import SplashScreen from './app/src/view/screens/SplashScreen';
 import RateApp from './app/src/view/screens/RateApp';
 import InstlApps from './app/src/view/screens/InstalledApps/InstlApps';
 import SearchScreenPicTours from './app/src/view/screens/SearchScreenPicTours';
+import { getToken,notificationListener, requestUserPermission } from './app/src/assets/utilities/CommonUtils';
 
 //------------------\\
 
@@ -102,6 +104,19 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const App = () => {
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+    });
+
+    return unsubscribe;
+  }, []);
+
+   useEffect(() => {
+    requestUserPermission()
+    notificationListener()
+    getToken()
+  }, []); 
   return (
     <NavigationContainer>
       <Stack.Navigator>

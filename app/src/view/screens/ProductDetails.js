@@ -51,11 +51,14 @@ import HeaderImageSlider from '../../assets/Custom/HeaderImageSlider';
 
 import CustomSnackbar from '../../assets/Custom/CustomSnackBar';
 
+import axios from 'axios';
+
 import Shares from 'react-native-share';
 
 export default function ProductDetails({navigation, route}) {
   const [imageUri, setImageUri] = useState(null);
   const [userId, setUserId] = useState('');
+  const [userToken, setUserToken] = useState(null);
 
   const [priceOffer, setPriceOffer] = useState('');
 
@@ -66,7 +69,6 @@ export default function ProductDetails({navigation, route}) {
   const [snackbarVisiblePrice, setSnackbarVisiblePrice] = useState(false);
 
   const [showAlert, setShowAlert] = useState(false);
-
 
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -125,6 +127,17 @@ export default function ProductDetails({navigation, route}) {
       if (result !== null) {
         setUserId(result);
         console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+
+    try {
+      const result = await AsyncStorage.getItem('UserToken');
+      if (result !== null) {
+        setUserToken(result);
+        console.log('user token retrieved:', result);
       }
     } catch (error) {
       // Handle errors here
@@ -236,9 +249,12 @@ export default function ProductDetails({navigation, route}) {
       handleUpdatePasswordPrice();
     } else {
       sendOffer();
+
+      //sendNotification();
     }
   };
 
+  
   const sendOffer = async () => {
     console.log('Id', receivedData.id);
     console.log('userId', userId);
@@ -267,7 +283,10 @@ export default function ProductDetails({navigation, route}) {
         const data = await response.json();
         console.log('API Response:', data);
         setLoading(false);
-        handleUpdatePassword();
+        //sendNotification()
+
+        createNotification()
+        //handleUpdatePassword();
 
         // Handle the response data as needed
       } else {
@@ -288,6 +307,46 @@ export default function ProductDetails({navigation, route}) {
     }
   };
 
+  const sendNotification = async () => {
+    console.log("User Token is-----", userToken)
+    const serverKey = 'AAAAoTTOTQU:APA91bE2b0B9Iz7SB2TWDafHN89doM8rHik0YRJ9x7QmBZhP0kJExSihD0tqPR8gTkm2Uz31e6ihPqxgLWCNz8GdlqbyLJiFwsxRk-r-Dg6ht9HqMoWbCPyFxmAAKmIO6-Gy7uDHlN6F'; // Replace with your actual server key
+    const token = userToken.replace(/"/g, '');
+    //'f5scnV4jSJ6j2QMOLYUAYI:APA91bEQOL6umubg_n73gGvXxwM8lF9UdkiIcQC2qnHeH2Axi54RQM6Ny6wXnz8RxdvCiMOOR5KBrzGUp4d59cf9oBq3stokRw4HzMwWkQ-74ON57phpSKkrMAGASmRbvNbflqav1GSF'; // Replace with the device token
+    const data = {
+      to: token,
+      notification: {
+        body: 'New Offer',
+        title: 'Offer!',
+        subtitle: 'New offer is recieved',
+      },
+    };
+  
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `key=${serverKey}`,
+    };
+  
+    try {
+      const response = await fetch('https://fcm.googleapis.com/fcm/send', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(data),
+      });
+  
+      console.log('Status Code:', response.status);
+  
+      const responseText = await response.text();
+      console.log('Response Text:', responseText);
+  
+      const result = JSON.parse(responseText);
+      console.log('Parsed JSON Result:', result);
+
+      handleUpdatePassword()
+    } catch (error) {
+      console.error('Error sending notification:', error);
+    }
+  };
+  
   const sendOfferPrice = async () => {
     console.log('Id', receivedData.id);
     console.log('userId', userId);
@@ -316,7 +375,9 @@ export default function ProductDetails({navigation, route}) {
         const data = await response.json();
         console.log('API Response:', data);
         setLoading(false);
-        handleUpdatePassword();
+        //handleUpdatePassword();
+        //sendNotification()
+        createNotification()
 
         // Handle the response data as needed
       } else {
@@ -335,18 +396,72 @@ export default function ProductDetails({navigation, route}) {
 
       // Handle the error
     }
+
+  };
+
+  const createNotification = async () => {
+    console.log('receiver_id', receivedData.user_id);
+    console.log('sender_id', userId);
+    console.log('title', userId);
+    console.log('user name', receivedData.username);
+
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY5ODAzOTAyNywiZXhwIjoxNzAwNjMxMDI3fQ.JSki1amX9VPEP9uCsJ5vPiCl2P4EcBqW6CQyY_YdLsk';
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/notification/createNotification';
+
+    const requestData = {
+      sender_id: userId,
+      receiver_id: receivedData.user_id,
+      type:7,
+      title:'Offer Received',
+      content: receivedData.username+"Give You An Offer",
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`, // Use the provided token
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data);
+        //handleUpdatePassword();
+        sendNotification()
+
+        // Handle the response data as needed
+      } else {
+        setLoading(false);
+
+        console.error(
+          'Failed to send notifications:',
+          response.status,
+          response.statusText,
+        );
+        // Handle the error
+      }
+    } catch (error) {
+      console.error('API Request Error:', error);
+      setLoading(false);
+
+      // Handle the error
+    }
   };
 
   const sendBookMark = async () => {
     console.log('Id', receivedData.id);
     console.log('userId', userId);
     console.log('price', receivedData.price);
-    const token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
     const apiUrl = 'https://watch-gotcha-be.mtechub.com/item/saveItem';
 
     const requestData = {
       item_id: receivedData.id,
-      user_id: userId
+      user_id: userId,
     };
 
     try {
@@ -363,7 +478,7 @@ export default function ProductDetails({navigation, route}) {
         const data = await response.json();
         console.log('API Response:', data);
         setLoading(false);
-        handleUpdateSaved()
+        handleUpdateSaved();
 
         // Handle the response data as needed
       } else {
@@ -428,7 +543,7 @@ export default function ProductDetails({navigation, route}) {
     // Automatically hide the Snackbar after 3 seconds
     setTimeout(() => {
       setSnackbarVisibleAlert(false);
-      setShowAlert(true)
+      setShowAlert(true);
     }, 3000);
   };
 
@@ -701,20 +816,21 @@ export default function ProductDetails({navigation, route}) {
               }}>
               <TouchableOpacity onPress={() => handleUpdateAlert()}>
                 {/*  <BellAlert style={{marginTop: hp(1)}} width={21} height={21} /> */}
-                {showAlert===true?
+                {showAlert === true ? (
                   <MaterialIcons
                     style={{marginTop: hp(0.5)}}
                     name="notifications-active"
                     size={28}
                     color={'#FACA4E'}
-                  />:
+                  />
+                ) : (
                   <MaterialIcons
-                  style={{marginTop: hp(0.5)}}
-                  name="notifications"
-                  size={28}
-                  color={'#FACA4E'}
-                />
-                }
+                    style={{marginTop: hp(0.5)}}
+                    name="notifications"
+                    size={28}
+                    color={'#FACA4E'}
+                  />
+                )}
               </TouchableOpacity>
 
               <Text
@@ -989,7 +1105,7 @@ export default function ProductDetails({navigation, route}) {
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
               ref_RBSendOffer.current.close();
-              detectOffer();
+              detectOffer(); //this is currently used
               //handleUpdatePassword();
               //navigation.navigate('Profile_image');
             }}
