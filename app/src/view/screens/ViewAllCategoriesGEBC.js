@@ -24,7 +24,7 @@ import Headers from '../../assets/Custom/Headers';
 import {appImages} from '../../assets/utilities';
 import Add from '../../assets/svg/AddMainScreen.svg';
 
-export default function ViewAllCategories({navigation}) {
+export default function ViewAllCategoriesGEBC({navigation}) {
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
@@ -87,7 +87,7 @@ export default function ViewAllCategories({navigation}) {
     //Alert.alert('Categories', item);
 
     setSelectedItemId(item);
-    navigation.navigate("Mail", {NewsCategory:item ,Type:'NEWS'})
+    navigation.navigate("Mail", {NewsCategory:item, Type:'GEBC' })
   }
 
   const renderSearches = item => {

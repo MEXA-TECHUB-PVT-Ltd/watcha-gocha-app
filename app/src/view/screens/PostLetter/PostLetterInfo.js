@@ -3,6 +3,7 @@ import {
   FlatList,
   Text,
   Image,
+  ActivityIndicator,
   KeyboardAvoidingView,
   ScrollView,
   StatusBar,
@@ -10,7 +11,7 @@ import {
   View,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import Entypo from 'react-native-vector-icons/Entypo';
 
@@ -36,6 +37,8 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import PublicLetter from '../../../assets/svg/PublicLetter.svg';
 import PrivateLetter from '../../../assets/svg/PrivateLetter.svg';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import Share from 'react-native-share';
 
 import {
@@ -57,21 +60,24 @@ export default function PostLetterInfo({navigation}) {
   const [address, setAddress] = useState('');
   const [contact, setContact] = useState('');
   const [email, setEmail] = useState('');
+  const [categoryId, setCategoryId] = useState('');
+
+  const [categoryPublicType, setCategoryPublicType] = useState('');
+
+  const [categoriesSelect, setCategorySelect] = useState([]);
 
   const [isFocus, setIsFocus] = useState(false);
 
-  const [loading, setIsLoading] = useState(false);
+  const [isFocusPublicType, setIsFocusPublicType] = useState(false);
+
+  const [loading, setLoading] = useState(false);
 
   const [category, setCategory] = useState('');
 
-
-
   const [isTextInputActive, setIsTextInputActive] = useState(false);
-  const [isTextInputActiveAddress, setIsTextInputActiveAddress] =
-    useState(false);
+  const [isTextInputActiveAddress, setIsTextInputActiveAddress] = useState(false);
 
-  const [isTextInputActiveContact, setIsTextInputActiveContact] =
-    useState(false);
+  const [isTextInputActiveContact, setIsTextInputActiveContact] = useState(false);
 
   const [isTextInputActiveEmail, setIsTextInputActiveEmail] = useState(false);
 
@@ -82,6 +88,111 @@ export default function PostLetterInfo({navigation}) {
 
   const [postLetter, setPostLetter] = useState('');
   const [letterType, setLetterTypes] = useState('Public');
+
+  //statrs
+
+  const [selectedItem, setSelectedItem] = useState('');
+
+  const [snackbarVisible, setsnackbarVisible] = useState(false);
+
+  const [profileName, setProfileName] = useState('');
+
+  const [imageUrl, setImageUrl] = useState('');
+
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const [description, setDescription] = useState('');
+
+  const [comment, setComment] = useState('');
+
+  const [imageInfo, setImageInfo] = useState(null);
+
+  const [userId, setUserId] = useState('');
+
+  const [imageUri, setImageUri] = useState(null);
+
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchVideos();
+  }, []);
+
+  const fetchVideos = async () => {
+    // Simulate loading
+    setLoading(true);
+
+    await getUserID();
+    // Fetch data one by one
+    await fetchCategory();
+
+    // Once all data is fetched, set loading to false
+    setLoading(false);
+  };
+
+  const getUserID = async () => {
+    console.log("Id's");
+    try {
+      const result = await AsyncStorage.getItem('userId ');
+      if (result !== null) {
+        setUserId(result);
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+
+    try {
+      const result = await AsyncStorage.getItem('userName');
+      if (result !== null) {
+        setName(result);
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
+
+  const fetchCategory = async () => {
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY5ODAzOTAyNywiZXhwIjoxNzAwNjMxMDI3fQ.JSki1amX9VPEP9uCsJ5vPiCl2P4EcBqW6CQyY_YdLsk';
+
+    try {
+      const response = await fetch(
+        'https://watch-gotcha-be.mtechub.com/discCategory/getAllDiscCategories?page=1&limit=5',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+
+        // Use the data from the API to set the categories
+        const categories = data.AllCategories.map(category => ({
+          label: category.name, // Use the "name" property as the label
+          value: category.id.toString(), // Convert "id" to a string for the value
+        }));
+
+        console.log('Categories', categories);
+
+        setCategorySelect(categories); // Update the state with the formatted category data
+
+        console.log('Data Categories', categoriesSelect);
+      } else {
+        console.error(
+          'Failed to fetch categories:',
+          response.status,
+          response.statusText,
+        );
+      }
+    } catch (error) {
+      console.error('Errors:', error);
+    }
+  };
 
   const handleFocus = () => {
     setIsTextInputActive(true);
@@ -123,7 +234,7 @@ export default function PostLetterInfo({navigation}) {
     {id: 5, title: 'Greetings'},
   ];
 
-  const Category = [
+  /* const Category = [
     {label: 'Politics', value: 'Politics'},
     {label: 'Sports', value: 'Sports'},
     {label: 'Business', value: 'Business'},
@@ -132,6 +243,11 @@ export default function PostLetterInfo({navigation}) {
     {label: 'Health', value: 'Health'},
     {label: 'Culture', value: 'Culture'},
 
+  ]; */
+
+  const CategoryPublicType = [
+    {label: 'general', value: 'general'},
+    {label: 'Authorities', value: '(to authorities, celebrities, leaders)'},
   ];
 
   const setLetterType = value => {
@@ -139,15 +255,13 @@ export default function PostLetterInfo({navigation}) {
     ref_RBSheetCamera.current.close();
   };
 
-  const setType= ()=>{
+  const setType = () => {
     ref_RBSheetCamera.current.close();
 
     setLetterType('Private Letter');
 
     ref_RBSendOffer.current.open();
-
-  }
-
+  };
 
   const renderSearches = item => {
     console.log('Items', item);
@@ -192,74 +306,72 @@ export default function PostLetterInfo({navigation}) {
         />
       </View>
 
-      <ScrollView style={{flexGrow:1}}>
-
-      
-      <View
-        style={{
-          flexDirection: 'row',
-          marginHorizontal: wp(8),
-          alignItems: 'center',
-          marginTop: hp(3),
-          height: hp(8),
-        }}>
+      <ScrollView style={{flexGrow: 1}}>
         <View
           style={{
-            width: wp(12),
-            marginLeft: wp(0.5),
-            height: wp(12),
-            borderRadius: wp(12) / 2,
+            flexDirection: 'row',
+            marginHorizontal: wp(8),
+            alignItems: 'center',
+            marginTop: hp(3),
+            height: hp(8),
           }}>
-          <Image
-            source={appImages.profileImg}
-            style={{width: '100%', height: '100%', resizeMode: 'cover'}}
-          />
+          <View
+            style={{
+              width: wp(12),
+              marginLeft: wp(0.5),
+              height: wp(12),
+              borderRadius: wp(12) / 2,
+            }}>
+            <Image
+              source={appImages.profileImg}
+              style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+            />
+          </View>
+
+          <TouchableOpacity
+            onPress={() => ref_RBSheetCamera.current.open()}
+            style={{
+              flexDirection: 'row',
+              marginLeft: wp(5),
+              height: hp(5),
+              width: wp(33),
+              borderWidth: 0.5,
+              borderColor: '#FACA4E',
+              borderRadius: wp(5),
+              alignItems: 'center',
+              justifyContent: 'space-around',
+            }}>
+            <Text style={{color: '#FACA4E', fontFamily: 'Inter-Regular'}}>
+              {letterType}
+            </Text>
+
+            <Ionicons name="chevron-down" size={21} color="#FACA4E" />
+          </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          onPress={() => ref_RBSheetCamera.current.open()}
+        <Text
           style={{
-            flexDirection: 'row',
-            marginLeft: wp(5),
-            height: hp(5),
-            width: wp(33),
-            borderWidth: 0.5,
-            borderColor: '#FACA4E',
-            borderRadius: wp(5),
-            alignItems: 'center',
-            justifyContent: 'space-around',
+            color: '#FACA4E',
+            fontFamily: 'Inter-Medium',
+            fontSize: hp(2.3),
+            marginTop: hp(3),
+            marginLeft: wp(8),
           }}>
-          <Text style={{color: '#FACA4E', fontFamily: 'Inter-Regular'}}>
-            {letterType}
-          </Text>
+          Sender's Information
+        </Text>
 
-          <Ionicons name="chevron-down" size={21} color="#FACA4E" />
-        </TouchableOpacity>
-      </View>
-
-      <Text
-        style={{
-          color: '#FACA4E',
-          fontFamily: 'Inter-Medium',
-          fontSize: hp(2.3),
-          marginTop: hp(3),
-          marginLeft: wp(8),
-        }}>
-        Sender's Information
-      </Text>
-
-      <TextInput
-        mode="outlined"
-        label="Name"
-        onChangeText={text => setName(text)}
-        style={[styles.ti,{marginTop:'5%'}]}
-        outlineColor="#0000001F"
-        placeholderTextColor={'#404040'}
-        activeOutlineColor="#FACA4E"
-        autoCapitalize="none"
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        /* left={
+        <TextInput
+          mode="outlined"
+          label="Name"
+          onChangeText={text => setName(text)}
+          style={[styles.ti, {marginTop: '5%'}]}
+          outlineColor="#0000001F"
+          placeholderTextColor={'#404040'}
+          activeOutlineColor="#FACA4E"
+          autoCapitalize="none"
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          /* left={
             <TextInput.Icon
               icon={() => (
                 <MaterialCommunityIcons
@@ -270,21 +382,21 @@ export default function PostLetterInfo({navigation}) {
               )}
             />
           } */
-        // left={isTextInputActive ? <Oemail /> : <Gemail />}
-      />
+          // left={isTextInputActive ? <Oemail /> : <Gemail />}
+        />
 
-      <TextInput
-        mode="outlined"
-        label="Address"
-        onChangeText={text => setAddress(text)}
-        style={[styles.ti,{marginTop:'5%'}]}
-        outlineColor="#0000001F"
-        placeholderTextColor={'#404040'}
-        activeOutlineColor="#FACA4E"
-        autoCapitalize="none"
-        onFocus={handleFocusAddress}
-        onBlur={handleBlurAddress}
-        /* left={
+        <TextInput
+          mode="outlined"
+          label="Address"
+          onChangeText={text => setAddress(text)}
+          style={[styles.ti, {marginTop: '5%'}]}
+          outlineColor="#0000001F"
+          placeholderTextColor={'#404040'}
+          activeOutlineColor="#FACA4E"
+          autoCapitalize="none"
+          onFocus={handleFocusAddress}
+          onBlur={handleBlurAddress}
+          /* left={
             <TextInput.Icon
               icon={() => (
                 <MaterialCommunityIcons
@@ -295,21 +407,21 @@ export default function PostLetterInfo({navigation}) {
               )}
             />
           } */
-        // left={isTextInputActive ? <Oemail /> : <Gemail />}
-      />
+          // left={isTextInputActive ? <Oemail /> : <Gemail />}
+        />
 
-      <TextInput
-        mode="outlined"
-        label="Contact Number"
-        onChangeText={text => setContact(text)}
-        style={[styles.ti,{marginTop:'5%'}]}
-        outlineColor="#0000001F"
-        placeholderTextColor={'#404040'}
-        activeOutlineColor="#FACA4E"
-        autoCapitalize="none"
-        onFocus={handleFocusContact}
-        onBlur={handleBlurContact}
-        /* left={
+        <TextInput
+          mode="outlined"
+          label="Contact Number"
+          onChangeText={text => setContact(text)}
+          style={[styles.ti, {marginTop: '5%'}]}
+          outlineColor="#0000001F"
+          placeholderTextColor={'#404040'}
+          activeOutlineColor="#FACA4E"
+          autoCapitalize="none"
+          onFocus={handleFocusContact}
+          onBlur={handleBlurContact}
+          /* left={
             <TextInput.Icon
               icon={() => (
                 <MaterialCommunityIcons
@@ -320,21 +432,21 @@ export default function PostLetterInfo({navigation}) {
               )}
             />
           } */
-        // left={isTextInputActive ? <Oemail /> : <Gemail />}
-      />
+          // left={isTextInputActive ? <Oemail /> : <Gemail />}
+        />
 
-      <TextInput
-        mode="outlined"
-        label="Email Address"
-        onChangeText={text => setEmail(text)}
-        style={[styles.ti,{marginTop:'5%'}]}
-        outlineColor="#0000001F"
-        placeholderTextColor={'#404040'}
-        activeOutlineColor="#FACA4E"
-        autoCapitalize="none"
-        onFocus={handleFocusEmail}
-        onBlur={handleBlurEmail}
-        /* left={
+        <TextInput
+          mode="outlined"
+          label="Email Address"
+          onChangeText={text => setEmail(text)}
+          style={[styles.ti, {marginTop: '5%'}]}
+          outlineColor="#0000001F"
+          placeholderTextColor={'#404040'}
+          activeOutlineColor="#FACA4E"
+          autoCapitalize="none"
+          onFocus={handleFocusEmail}
+          onBlur={handleBlurEmail}
+          /* left={
             <TextInput.Icon
               icon={() => (
                 <MaterialCommunityIcons
@@ -345,10 +457,10 @@ export default function PostLetterInfo({navigation}) {
               )}
             />
           } */
-        // left={isTextInputActive ? <Oemail /> : <Gemail />}
-      />
+          // left={isTextInputActive ? <Oemail /> : <Gemail />}
+        />
 
-<View style={{marginLeft:wp(8), marginRight:wp(7)}}>
+        <View style={{marginLeft: wp(8), marginRight: wp(8)}}>
           <Dropdown
             style={styles.textInputCategoryNonSelected}
             containerStyle={{
@@ -371,7 +483,7 @@ export default function PostLetterInfo({navigation}) {
             // inputSearchStyle={styles.inputSearchStyle}
             // iconStyle={styles.iconStyle}
             value={category}
-            data={Category}
+            data={categoriesSelect}
             search={false}
             maxHeight={200}
             labelField="label"
@@ -381,7 +493,8 @@ export default function PostLetterInfo({navigation}) {
             onFocus={() => setIsFocus(true)}
             onBlur={() => setIsFocus(false)}
             onChange={item => {
-              setCategory(item.value);
+              //setCategory(item.label);
+              setCategoryId(item.value);
               setIsFocus(false);
             }}
             renderRightIcon={() => (
@@ -395,21 +508,66 @@ export default function PostLetterInfo({navigation}) {
           />
         </View>
 
+         <View style={{marginLeft: wp(8), marginRight: wp(8)}}>
+          <Dropdown
+            style={styles.textInputCategoryNonSelected}
+            containerStyle={{
+              marginTop: 3,
+              alignSelf: 'center',
+              borderRadius: wp(3),
+              width: '100%',
+            }}
+            // dropdownPosition="top"
+            // mode="modal"
+            placeholderStyle={{
+              color: '#121420',
+              //   fontWeight: '400',
+              fontFamily: 'Inter',
+              fontSize: hp(1.8),
+            }}
+            iconStyle={isFocus ? styles.iconStyle : styles.iconStyleInactive}
+            itemTextStyle={{color: '#000000'}}
+            selectedTextStyle={{fontSize: 16, color: '#000000'}}
+            // inputSearchStyle={styles.inputSearchStyle}
+            // iconStyle={styles.iconStyle}
+            value={categoryPublicType}
+            data={CategoryPublicType}
+            search={false}
+            maxHeight={200}
+            labelField="label"
+            valueField="value"
+            placeholder={'Select Type'}
+            searchPlaceholder="Search..."
+            onFocus={() => setIsFocusPublicType(true)}
+            onBlur={() => setIsFocusPublicType(false)}
+            onChange={item => {
+              //setCategory(item.label);
+              setCategoryPublicType(item.value);
+              setIsFocusPublicType(false);
+            }}
+            renderRightIcon={() => (
+              <AntDesign
+                style={styles.icon}
+                color={isFocus ? '#000000' : '#000000'}
+                name="down"
+                size={15}
+              />
+            )}
+          />
+        </View> 
 
-      <View style={{marginTop: '30%', alignSelf: 'center'}}>
-        <CustomButton
-          title="Next"
-          load={loading}
-          // checkdisable={inn == '' && cm == '' ? true : false}
-          customClick={() => {
-            navigation.navigate('PostLetter');
-            //navigation.navigate('Profile_image');
-          }}
-        />
-      </View>
-
+        <View style={{marginTop: '30%', alignSelf: 'center'}}>
+          <CustomButton
+            title="Next"
+            //load={loading}
+            // checkdisable={inn == '' && cm == '' ? true : false}
+            customClick={() => {
+              navigation.navigate('PostLetter');
+              //navigation.navigate('Profile_image');
+            }}
+          />
+        </View>
       </ScrollView>
-
 
       <RBSheet
         ref={ref_RBSheetCamera}
@@ -485,7 +643,9 @@ export default function PostLetterInfo({navigation}) {
               marginHorizontal: wp(8),
               marginTop: hp(3),
               backgroundColor: '#00000012',
-            }}></View>
+            }}>
+              
+            </View>
 
           <TouchableOpacity
             onPress={() => setType()}
@@ -508,7 +668,6 @@ export default function PostLetterInfo({navigation}) {
           </TouchableOpacity>
         </View>
       </RBSheet>
-
 
       <RBSheet
         ref={ref_RBSendOffer}
@@ -575,28 +734,37 @@ export default function PostLetterInfo({navigation}) {
             />
           </View>
 
-
-          <TouchableOpacity onPress={()=>ref_RBSendOffer.current.close()}>
-
-          <Text
-            style={{
-              color: '#9597A6',
-              marginLeft: wp(1),
-              marginBottom: hp(3),
-              fontSize: hp(2),
-              textAlign: 'center',
-              lineHeight: hp(3),
-              //textDecorationLine:'underline',
-              fontFamily: 'Inter-Regular',
-              //fontWeight: 'bold',
-            }}>
-            Maybe later
-          </Text>
-
+          <TouchableOpacity onPress={() => ref_RBSendOffer.current.close()}>
+            <Text
+              style={{
+                color: '#9597A6',
+                marginLeft: wp(1),
+                marginBottom: hp(3),
+                fontSize: hp(2),
+                textAlign: 'center',
+                lineHeight: hp(3),
+                //textDecorationLine:'underline',
+                fontFamily: 'Inter-Regular',
+                //fontWeight: 'bold',
+              }}>
+              Maybe later
+            </Text>
           </TouchableOpacity>
         </View>
       </RBSheet>
 
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {loading && <ActivityIndicator size="large" color="#FACA4E" />}
+      </View>
     </View>
   );
 }
@@ -632,7 +800,5 @@ const styles = StyleSheet.create({
   },
   iconStyleInactive: {
     color: '#FACA4E',
-  }
-
-
+  },
 });
