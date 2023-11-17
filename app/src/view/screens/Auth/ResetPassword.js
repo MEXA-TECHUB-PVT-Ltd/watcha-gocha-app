@@ -3,6 +3,7 @@ import {
   SafeAreaView,
   StyleSheet,
   Dimensions,
+  ActivityIndicator,
   ScrollView,
   View,
   FlatList,
@@ -43,22 +44,17 @@ import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
 LogBox.ignoreAllLogs();
 
 const ResetPassword = ({navigation}) => {
-
-
   const [userId, setUserId] = useState('');
 
   const [passwordError, setPasswordError] = useState(false);
 
   const [confirmPasswordError, setConfirmPasswordError] = useState(false);
 
-
-
   const isFocused = useIsFocused();
 
   useEffect(() => {
-
     const getUserID = async () => {
-      console.log("Id's")
+      console.log("Id's");
       try {
         const result = await AsyncStorage.getItem('userId ');
         if (result !== null) {
@@ -71,7 +67,7 @@ const ResetPassword = ({navigation}) => {
       }
     };
 
-    getUserID()
+    getUserID();
   }, [isFocused]);
 
   const [newPassword, setNewPassword] = useState('');
@@ -93,7 +89,8 @@ const ResetPassword = ({navigation}) => {
   const [confirm, setconfirm_pass] = useState('');
 
   const [signin_ShowPassword, setsignin_ShowPassword] = useState(true);
-  const [signin_ConfirmShowPassword, setsignin_ConfirmShowPassword] = useState(true);
+  const [signin_ConfirmShowPassword, setsignin_ConfirmShowPassword] =
+    useState(true);
 
   const [signin_ShowPassword1, setsignin_ShowPassword1] = useState(true);
   const [signin_ShowPassword2, setsignin_ShowPassword2] = useState(true);
@@ -109,7 +106,8 @@ const ResetPassword = ({navigation}) => {
   const [isTextInputActive4, setIsTextInputActive4] = useState(false);
   const [isTextInputActive5, setIsTextInputActive5] = useState(false);
 
-  const [isTextInputActiveConfirmPass, setIsTextInputActiveConfirmPass] = useState(false);
+  const [isTextInputActiveConfirmPass, setIsTextInputActiveConfirmPass] =
+    useState(false);
 
   const handleFocus = () => {
     setIsTextInputActive(true);
@@ -128,12 +126,11 @@ const ResetPassword = ({navigation}) => {
   };
 
   const handleFocus2 = () => {
-    setIsTextInputActiveConfirmPass(true)
+    setIsTextInputActiveConfirmPass(true);
   };
 
   const handleBlur2 = () => {
-    setIsTextInputActiveConfirmPass(false)
-
+    setIsTextInputActiveConfirmPass(false);
   };
   const handleFocus3 = () => {
     setIsTextInputActive3(true);
@@ -187,15 +184,13 @@ const ResetPassword = ({navigation}) => {
     // Automatically hide the Snackbar after 3 seconds
     setTimeout(() => {
       setSnackbarVisible(false);
-      navigation.navigate("Signin_signup")
+      navigation.navigate('Signin_signup');
     }, 3000);
   };
 
   //--------------------------\\
 
-  
   //----------------------------\\
-
 
   const dismissSnackbar = () => {
     setSnackbarVisible(true);
@@ -205,33 +200,30 @@ const ResetPassword = ({navigation}) => {
     setIsConfirmPasswordActive(false);
   };
 
-
   const goTOScreen = () => {
     console.log('clicked', signin_pass);
 
     const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
     setPasswordError(false);
-    setConfirmPasswordError(false)  
-
-
+    setConfirmPasswordError(false);
 
     if (signin_pass === '' && confirm === '') {
-       setPasswordError(true)
-       setConfirmPasswordError(true)
+      setPasswordError(true);
+      setConfirmPasswordError(true);
     } else if (signin_pass === '') {
       setPasswordError(false);
     } else if (confirm === '') {
-      setConfirmPasswordError(false)
+      setConfirmPasswordError(false);
     } else {
       setIsLoading(true);
 
       setPasswordError(false);
-      setConfirmPasswordError(false)
-  
+      setConfirmPasswordError(false);
+
       setTimeout(() => {
         //setIsLoading(false);
-        handleResetPassword()
+        handleResetPassword();
 
         // Replace 'YourTargetScreen' with the screen you want to navigate to
       }, 2000);
@@ -245,7 +237,6 @@ const ResetPassword = ({navigation}) => {
       // Replace 'YourTargetScreen' with the screen you want to navigate to
     }, 2000); // Adjust the loading duration as needed */
   };
-
 
   const verifyOTPEndpoint =
     'https://watch-gotcha-be.mtechub.com/user/reset_password'; // Replace with your actual API endpoint
@@ -261,7 +252,7 @@ const ResetPassword = ({navigation}) => {
         body: JSON.stringify({
           password: signin_pass,
           confirmPassword: confirm,
-          id:userId
+          id: userId,
         }),
       });
 
@@ -272,9 +263,8 @@ const ResetPassword = ({navigation}) => {
       if (data.statusCode === 200) {
         setIsLoading(false);
 
-          handleUpdatePassword()
+        handleUpdatePassword();
         // Assuming there's at least one result
-        
       } else {
         setIsLoading(false);
         console.error('No results found.', data.response.result);
@@ -290,11 +280,6 @@ const ResetPassword = ({navigation}) => {
       setIsLoading(false);
     }
   };
-
-  
-
-
-
 
   return (
     <ScrollView style={styles.bg} contentContainerStyle={{flexGrow: 1}}>
@@ -366,20 +351,17 @@ const ResetPassword = ({navigation}) => {
           </TouchableOpacity>
         </View>
 
-         {passwordError === true ? (
-              <Text
-                style={{
-                  color: 'red',
-                  marginLeft: wp(-35),
-                  marginTop: hp(1.8),
-                  fontSize: hp(1.8),
-                }}>
-                 Please Enter Your Password
-              </Text>
-            ) : null}
-
-
-
+        {passwordError === true ? (
+          <Text
+            style={{
+              color: 'red',
+              marginLeft: wp(-35),
+              marginTop: hp(1.8),
+              fontSize: hp(1.8),
+            }}>
+            Please Enter Your Password
+          </Text>
+        ) : null}
 
         <View>
           <TextInput
@@ -427,25 +409,24 @@ const ResetPassword = ({navigation}) => {
         </View>
 
         {confirmPasswordError === true ? (
-              <Text
-                style={{
-                  color: 'red',
-                  marginLeft: wp(-21),
-                  marginTop: hp(1.8),
-                  fontSize: hp(1.8),
-                }}>
-                 Please Enter Your Confirm Password
-              </Text>
-            ) : null}
- 
+          <Text
+            style={{
+              color: 'red',
+              marginLeft: wp(-21),
+              marginTop: hp(1.8),
+              fontSize: hp(1.8),
+            }}>
+            Please Enter Your Confirm Password
+          </Text>
+        ) : null}
 
         <View style={{marginTop: '25%', alignSelf: 'center'}}>
           <CustomButton
             title="Reset"
-            load={loading}
+            //load={loading}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-             goTOScreen()
+              goTOScreen();
             }}
           />
         </View>
@@ -457,6 +438,19 @@ const ResetPassword = ({navigation}) => {
         onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackbarVisible}
       />
+
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {loading && <ActivityIndicator size="large" color="#FACA4E" />}
+      </View>
     </ScrollView>
   );
 };

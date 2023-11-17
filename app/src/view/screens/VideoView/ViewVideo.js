@@ -727,12 +727,11 @@ export default function ViewVideo({navigation, route}) {
     return `${formattedMinutes}:${formattedSeconds}`;
   }
 
-  const openComments=()=>{
+  const openComments = () => {
     setPaused(!paused);
-    
+
     setIsBottomSheetExpanded(!isBottomSheetExpanded);
-    
-  }
+  };
 
   const downloadFile = () => {
     const {config, fs} = RNFetchBlob;
@@ -864,7 +863,7 @@ export default function ViewVideo({navigation, route}) {
 
             <ScrollView
               showsVerticalScrollIndicator={false} // Hide vertical scroll indicator
-              style={{flex: 1, marginLeft:wp(5), marginTop: hp(1)}}
+              style={{flex: 1, marginLeft: wp(5), marginTop: hp(1)}}
               contentContainerStyle={{verticalLine: false}}>
               <Text
                 style={{
@@ -992,10 +991,7 @@ export default function ViewVideo({navigation, route}) {
                   width: wp(15),
                   height: hp(5),
                 }}>
-                <TouchableOpacity
-                  onPress={() =>
-                     openComments()
-                  }>
+                <TouchableOpacity onPress={() => openComments()}>
                   <Comment height={21} width={21} />
                 </TouchableOpacity>
 
@@ -1158,12 +1154,29 @@ export default function ViewVideo({navigation, route}) {
           </View>
 
           <View style={{marginTop: hp(1), flex: 1}}>
-            <BottomSheetFlatList
+            {/* <BottomSheetFlatList
               data={comments}
               keyExtractor={(item, index) => index.toString()}
               renderItem={({item}) => renderComments(item)}
               extraData={loading}
-            />
+            /> */}
+            {comments.length === 0 || comments === null ? (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Text>No Comments Yet</Text>
+              </View>
+            ) : (
+              <BottomSheetFlatList
+                data={comments}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({item}) => renderComments(item)}
+                extraData={loading}
+              />
+            )}
           </View>
 
           {showReply === false ? (

@@ -21,6 +21,8 @@ import {
 } from 'react-native-responsive-screen';
 import CustomButton from '../../assets/Custom/Custom_Button';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import Fontiso from 'react-native-vector-icons/Fontisto';
@@ -35,6 +37,8 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+
 import Headers from '../../assets/Custom/Headers';
 
 import RadioForm, {
@@ -47,17 +51,24 @@ import HeaderImageSlider from '../../assets/Custom/HeaderImageSlider';
 
 import CustomSnackbar from '../../assets/Custom/CustomSnackBar';
 
+import axios from 'axios';
+
 import Shares from 'react-native-share';
 
 export default function ProductDetails({navigation, route}) {
   const [imageUri, setImageUri] = useState(null);
   const [userId, setUserId] = useState('');
+  const [userToken, setUserToken] = useState(null);
+
+  const [priceOffer, setPriceOffer] = useState('');
 
   const [selectedValueListView, setSelectedValueListView] = useState('');
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarVisibleAlert, setSnackbarVisibleAlert] = useState(false);
   const [snackbarVisibleSaved, setSnackbarVisibleSaved] = useState(false);
   const [snackbarVisiblePrice, setSnackbarVisiblePrice] = useState(false);
+
+  const [showAlert, setShowAlert] = useState(false);
 
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -122,8 +133,17 @@ export default function ProductDetails({navigation, route}) {
       console.error('Error retrieving user ID:', error);
     }
 
+    try {
+      const result = await AsyncStorage.getItem('UserToken');
+      if (result !== null) {
+        setUserToken(result);
+        console.log('user token retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
   };
-
 
   const ref_RBSendOffer = useRef(null);
   const ref_RBSendOffer2 = useRef(null);
@@ -194,9 +214,18 @@ export default function ProductDetails({navigation, route}) {
   };
 
   const radioButtonsGridView = [
-    {label: '$ 400', value: '400'},
-    {label: '$ 390', value: '390'},
-    {label: '$ 380', value: '380'},
+    {
+      label: '$ ' + parseInt(receivedData.price - 10),
+      value: receivedData.price - 10,
+    },
+    {
+      label: '$ ' + parseInt(receivedData.price - 20),
+      value: receivedData.price - 20,
+    },
+    {
+      label: '$ ' + parseInt(receivedData.price - 30),
+      value: receivedData.price - 30,
+    },
   ];
 
   const onPressChangeView = async item => {
@@ -206,17 +235,30 @@ export default function ProductDetails({navigation, route}) {
     //ref_RBSendOffer.current.close();
   };
 
-  const detectOffer = () => {
-    if (selectedValueListView == '') {
-      handleUpdatePasswordPrice()
-    }
-    else
-    {
-       sendOffer()
+  const detectOfferPrice = () => {
+    ref_RBSendOffer2.current.close();
+    if (priceOffer == '') {
+      handleUpdatePasswordPrice();
+    } else {
+      sendOfferPrice();
     }
   };
 
+  const detectOffer = () => {
+    if (selectedValueListView == '') {
+      handleUpdatePasswordPrice();
+    } else {
+      sendOffer();
+
+      //sendNotification();
+    }
+  };
+
+  
   const sendOffer = async () => {
+    console.log('Id', receivedData.id);
+    console.log('userId', userId);
+    console.log('price', receivedData.price);
     const token =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
     const apiUrl = 'https://watch-gotcha-be.mtechub.com/item/sendOffer';
@@ -241,7 +283,202 @@ export default function ProductDetails({navigation, route}) {
         const data = await response.json();
         console.log('API Response:', data);
         setLoading(false);
-        handleUpdatePassword();
+        //sendNotification()
+
+        createNotification()
+        //handleUpdatePassword();
+
+        // Handle the response data as needed
+      } else {
+        setLoading(false);
+
+        console.error(
+          'Failed to upload video:',
+          response.status,
+          response.statusText,
+        );
+        // Handle the error
+      }
+    } catch (error) {
+      console.error('API Request Error:', error);
+      setLoading(false);
+
+      // Handle the error
+    }
+  };
+
+  const sendNotification = async () => {
+    console.log("User Token is-----", userToken)
+    const serverKey = 'AAAAoTTOTQU:APA91bE2b0B9Iz7SB2TWDafHN89doM8rHik0YRJ9x7QmBZhP0kJExSihD0tqPR8gTkm2Uz31e6ihPqxgLWCNz8GdlqbyLJiFwsxRk-r-Dg6ht9HqMoWbCPyFxmAAKmIO6-Gy7uDHlN6F'; // Replace with your actual server key
+    const token = userToken.replace(/"/g, '');
+    //'f5scnV4jSJ6j2QMOLYUAYI:APA91bEQOL6umubg_n73gGvXxwM8lF9UdkiIcQC2qnHeH2Axi54RQM6Ny6wXnz8RxdvCiMOOR5KBrzGUp4d59cf9oBq3stokRw4HzMwWkQ-74ON57phpSKkrMAGASmRbvNbflqav1GSF'; // Replace with the device token
+    const data = {
+      to: token,
+      notification: {
+        body: 'New Offer',
+        title: 'Offer!',
+        subtitle: 'New offer is recieved',
+      },
+    };
+  
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `key=${serverKey}`,
+    };
+  
+    try {
+      const response = await fetch('https://fcm.googleapis.com/fcm/send', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(data),
+      });
+  
+      console.log('Status Code:', response.status);
+  
+      const responseText = await response.text();
+      console.log('Response Text:', responseText);
+  
+      const result = JSON.parse(responseText);
+      console.log('Parsed JSON Result:', result);
+
+      handleUpdatePassword()
+    } catch (error) {
+      console.error('Error sending notification:', error);
+    }
+  };
+  
+  const sendOfferPrice = async () => {
+    console.log('Id', receivedData.id);
+    console.log('userId', userId);
+    console.log('price', priceOffer);
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/item/sendOffer';
+
+    const requestData = {
+      item_id: receivedData.id,
+      sender_id: userId,
+      price: receivedData.price,
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`, // Use the provided token
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data);
+        setLoading(false);
+        //handleUpdatePassword();
+        //sendNotification()
+        createNotification()
+
+        // Handle the response data as needed
+      } else {
+        setLoading(false);
+
+        console.error(
+          'Failed to upload video:',
+          response.status,
+          response.statusText,
+        );
+        // Handle the error
+      }
+    } catch (error) {
+      console.error('API Request Error:', error);
+      setLoading(false);
+
+      // Handle the error
+    }
+
+  };
+
+  const createNotification = async () => {
+    console.log('receiver_id', receivedData.user_id);
+    console.log('sender_id', userId);
+    console.log('title', userId);
+    console.log('user name', receivedData.username);
+
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY5ODAzOTAyNywiZXhwIjoxNzAwNjMxMDI3fQ.JSki1amX9VPEP9uCsJ5vPiCl2P4EcBqW6CQyY_YdLsk';
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/notification/createNotification';
+
+    const requestData = {
+      sender_id: userId,
+      receiver_id: receivedData.user_id,
+      type:7,
+      title:'Offer Received',
+      content: receivedData.username+"Give You An Offer",
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`, // Use the provided token
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data);
+        //handleUpdatePassword();
+        sendNotification()
+
+        // Handle the response data as needed
+      } else {
+        setLoading(false);
+
+        console.error(
+          'Failed to send notifications:',
+          response.status,
+          response.statusText,
+        );
+        // Handle the error
+      }
+    } catch (error) {
+      console.error('API Request Error:', error);
+      setLoading(false);
+
+      // Handle the error
+    }
+  };
+
+  const sendBookMark = async () => {
+    console.log('Id', receivedData.id);
+    console.log('userId', userId);
+    console.log('price', receivedData.price);
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/item/saveItem';
+
+    const requestData = {
+      item_id: receivedData.id,
+      user_id: userId,
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`, // Use the provided token
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data);
+        setLoading(false);
+        handleUpdateSaved();
 
         // Handle the response data as needed
       } else {
@@ -263,11 +500,19 @@ export default function ProductDetails({navigation, route}) {
   };
 
   const dismissSnackbar = () => {
-    setSnackbarVisible(true);
+    setSnackbarVisible(false);
+  };
+
+  const dismissSnackbarAlert = () => {
+    setSnackbarVisibleAlert(false);
+  };
+
+  const dismissSnackbarSaved = () => {
+    setSnackbarVisibleSaved(false);
   };
 
   const dismissSnackbarPrice = () => {
-    setSnackbarVisiblePrice(true);
+    setSnackbarVisiblePrice(false);
   };
 
   const changeModal = () => {
@@ -298,6 +543,7 @@ export default function ProductDetails({navigation, route}) {
     // Automatically hide the Snackbar after 3 seconds
     setTimeout(() => {
       setSnackbarVisibleAlert(false);
+      setShowAlert(true);
     }, 3000);
   };
 
@@ -569,7 +815,22 @@ export default function ProductDetails({navigation, route}) {
                 justifyContent: 'space-between',
               }}>
               <TouchableOpacity onPress={() => handleUpdateAlert()}>
-                <BellAlert style={{marginTop: hp(1)}} width={21} height={21} />
+                {/*  <BellAlert style={{marginTop: hp(1)}} width={21} height={21} /> */}
+                {showAlert === true ? (
+                  <MaterialIcons
+                    style={{marginTop: hp(0.5)}}
+                    name="notifications-active"
+                    size={28}
+                    color={'#FACA4E'}
+                  />
+                ) : (
+                  <MaterialIcons
+                    style={{marginTop: hp(0.5)}}
+                    name="notifications"
+                    size={28}
+                    color={'#FACA4E'}
+                  />
+                )}
               </TouchableOpacity>
 
               <Text
@@ -590,7 +851,7 @@ export default function ProductDetails({navigation, route}) {
                 height: hp(7.5),
                 justifyContent: 'space-between',
               }}>
-              <TouchableOpacity onPress={() => handleUpdateSaved()}>
+              <TouchableOpacity onPress={() => sendBookMark()}>
                 <BookMark style={{marginTop: hp(1)}} width={21} height={21} />
               </TouchableOpacity>
 
@@ -844,7 +1105,7 @@ export default function ProductDetails({navigation, route}) {
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
               ref_RBSendOffer.current.close();
-              detectOffer();
+              detectOffer(); //this is currently used
               //handleUpdatePassword();
               //navigation.navigate('Profile_image');
             }}
@@ -941,7 +1202,7 @@ export default function ProductDetails({navigation, route}) {
 
                 fontSize: hp(2),
               }}>
-              Item Name
+              {receivedData?.title}
             </Text>
 
             <View style={{flexDirection: 'row'}}>
@@ -953,7 +1214,7 @@ export default function ProductDetails({navigation, route}) {
 
                   fontSize: hp(2),
                 }}>
-                $ 456
+                $ {receivedData?.price}
               </Text>
             </View>
 
@@ -965,9 +1226,9 @@ export default function ProductDetails({navigation, route}) {
                   fontFamily: 'Inter',
                   fontWeight: '300',
 
-                  fontSize: hp(1.7),
+                  fontSize: hp(1.2),
                 }}>
-                123 Main Street Cityville, USA
+                {receivedData?.location}
               </Text>
             </View>
           </View>
@@ -980,7 +1241,7 @@ export default function ProductDetails({navigation, route}) {
             justifyContent: 'space-evenly',
             alignItems: 'center',
           }}>
-          <Text
+          {/* <Text
             style={{
               color: '#333333',
               fontFamily: 'Inter',
@@ -989,7 +1250,16 @@ export default function ProductDetails({navigation, route}) {
               fontSize: hp(4.3),
             }}>
             $ 435
-          </Text>
+          </Text> */}
+
+          <TextInput
+            placeholderTextColor={'#848484'}
+            keyboardType="numeric"
+            value={priceOffer} // Bind the value to the state variable
+            onChangeText={text => setPriceOffer(text)} // Update state on text change
+            placeholder="Please Enter Your Price Here"
+            style={{flex: 1, marginLeft: wp(1)}}
+          />
 
           <View
             style={{
@@ -1006,7 +1276,7 @@ export default function ProductDetails({navigation, route}) {
 
               fontSize: hp(2.5),
             }}>
-            Listed Price $456
+            Listed Price $ {receivedData?.price}
           </Text>
         </View>
 
@@ -1022,7 +1292,8 @@ export default function ProductDetails({navigation, route}) {
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-              ref_RBSendOffer2.current.close();
+              //ref_RBSendOffer2.current.close();
+              detectOfferPrice();
               //ref_RBSendOffer.current.open();
               //navigation.navigate('Profile_image');
             }}
@@ -1040,14 +1311,14 @@ export default function ProductDetails({navigation, route}) {
       <CustomSnackbar
         message={'Success'}
         messageDescription={'You will get notified to the relevant feed'}
-        onDismiss={dismissSnackbar} // Make sure this function is defined
+        onDismiss={dismissSnackbarAlert} // Make sure this function is defined
         visible={snackbarVisibleAlert}
       />
 
       <CustomSnackbar
         message={'Success'}
         messageDescription={'Item saved successfully'}
-        onDismiss={dismissSnackbar} // Make sure this function is defined
+        onDismiss={dismissSnackbarSaved} // Make sure this function is defined
         visible={snackbarVisibleSaved}
       />
 

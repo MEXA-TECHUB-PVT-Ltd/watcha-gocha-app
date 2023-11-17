@@ -8,7 +8,7 @@ import {
   View,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import Back from '../../assets/svg/back.svg';
 import {appImages} from '../../assets/utilities/index';
 import {
@@ -16,13 +16,23 @@ import {
   widthPercentageToDP,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Fontiso from 'react-native-vector-icons/Fontisto';
 
 export default function SearchProducts({navigation}) {
   const [selectedItemId, setSelectedItemId] = useState(null);
 
-  const searches = [
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const [searches, setSearches] = useState([]);
+
+  const [data, setData] = useState([]);
+
+  const [filteredData, setFilteredData] = useState([]);
+
+  const [loading, setLoading] = useState(false);
+
+  const searchess = [
     {id: 1, title: 'Lense'},
     {id: 2, title: 'Shoes'},
     {id: 3, title: 'HeadPhones'},
@@ -47,12 +57,95 @@ export default function SearchProducts({navigation}) {
     {id: 9, title: 'Shoes', image: appImages.shoes},
     //{id: 10, title: 'Printer', image: appImages.printer},
     
-    
   ];
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchAll();
+  }, []);
+
+  const fetchAll = async () => {
+    // Simulate loading
+    setLoading(true);
+    // Fetch data one by one
+    await loadSearchesFromStorage();
+
+    // Once all data is fetched, set loading to false
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/item/searchItems?name=${selectedItemId}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('AllItems', result.letters);
+      setData(result.letters); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error Trending:', error);
+    }
+    };
+
+    fetchData();
+  }, [selectedItemId]);
+
+  const handleSearch = text => {
+    console.log("data Search", data)
+    const searchTerm = text.toLowerCase();
+
+    const filteredApps = data.filter(app =>
+      app.title.toLowerCase().includes(searchTerm),
+    );
+    setFilteredData(filteredApps);
+  };
+
+  const loadSearchesFromStorage = async () => {
+    try {
+      const savedSearches = await AsyncStorage.getItem('searchesProducts');
+      if (savedSearches) {
+        setSearches(JSON.parse(savedSearches));
+      }
+    } catch (error) {
+      console.error('Error loading searches from storage:', error);
+    }
+  };
+
+
+  const saveSearchTerm = async () => {
+
+    console.log("Search Term", searchTerm)
+    if (searchTerm.trim() === '') {
+      return;
+    }
+
+    try {
+      const newSearchTerm = {id: searches.length + 1, title: searchTerm};
+      const updatedSearches = [...searches, newSearchTerm];
+
+      await AsyncStorage.setItem('searchesProducts', JSON.stringify(updatedSearches));
+      setSearches(updatedSearches);
+      setSearchTerm(''); // Clear the input field
+      fetchAll();
+    } catch (error) {
+      console.error('Error saving search term:', error);
+    }
+  };
+
+
 
   const renderSearches = item => {
-    console.log('Items', item);
-    const isSelected = selectedItemId === item.id;
+    const isSelected = selectedItemId === item.title;
 
     return (
       <TouchableOpacity
@@ -63,7 +156,7 @@ export default function SearchProducts({navigation}) {
           },
         ]}
         onPress={() => {
-          setSelectedItemId(item.id);
+          setSelectedItemId(item.title);
           console.log('Selected item:', item.title);
         }}>
         <Text
@@ -78,7 +171,8 @@ export default function SearchProducts({navigation}) {
   };
 
   const renderAvailableApps = item => {
-    console.log('Items', item);
+    console.log('Items images', item.images[0].image);
+
     return (
       <View
         style={{
@@ -97,9 +191,9 @@ export default function SearchProducts({navigation}) {
             width: '100%',
             height: '100%',
             borderRadius: wp(3),
-            resizeMode: 'contain',
+            resizeMode: 'cover',
           }}
-          source={item.image}
+          source={{uri:'https://watch-gotcha-be.mtechub.com/'+ item.images[0].image}}
         />
         <View
             style={{
@@ -149,6 +243,17 @@ export default function SearchProducts({navigation}) {
           <TextInput
             style={{flex: 1, marginLeft: wp(3)}}
             placeholder="Search here"
+            value={searchTerm}
+            onChangeText={text => {
+              setSearchTerm(text);
+              //setSelectedItemId(text)
+              handleSearch(text);
+            }}
+            onSubmitEditing={() => {
+              saveSearchTerm();
+              // This code will execute when the "Okay" button is pressed
+              //console.log("Good", searchTerm);
+            }}
           />
         </View>
       </View>
@@ -172,7 +277,7 @@ export default function SearchProducts({navigation}) {
       <FlatList
         style={{marginTop: hp(3), marginHorizontal:wp(5), flex: 1}}
         showsVerticalScrollIndicator={false}
-        data={availableApps}
+        data={data}
         keyExtractor={item => item.id.toString()}
         numColumns={3} // Set the number of columns to 3
         renderItem={({item}) => renderAvailableApps(item)}

@@ -24,12 +24,23 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 import Headers from '../../../assets/Custom/Headers';
 import {appImages} from '../../../assets/utilities';
 import Add from '../../../assets/svg/AddMainScreen.svg';
+
 export default function MarketZone({navigation}) {
   const [selectedItemId, setSelectedItemId] = useState(null);
 
   const [data, setData] = useState(null);
 
+  const [dataElectronics, setDataElectronics] = useState(null);
+
+  const [dataVehicles, setDataVehicles] = useState(null);
+
+  const [dataClothing, setDataClothing] = useState(null);
+
+  const [regions, setRegions] = useState(null);
+
   const [loading, setLoading] = useState(false);
+
+  const [categoriesSelect, setCategorySelect] = useState([]);
 
   const [snackBarVisible, setSnackbarVisible] = useState(false);
 
@@ -38,22 +49,31 @@ export default function MarketZone({navigation}) {
   useEffect(() => {
     // Make the API request and update the 'data' state
     fetchVideos();
-  }, [1]);
+  }, [selectedItemId]);
 
   const fetchVideos = async () => {
     // Simulate loading
     setLoading(true);
-
     // Fetch data one by one
     await fetchAll();
 
+    await fetchRegion();
+
+    await fetchCategory();
+
+    await fetchElectronics();
+
+    await fetchVehicles();
+
+    await fetchClothing();
     // Once all data is fetched, set loading to false
     setLoading(false);
   };
 
   const fetchAll = async () => {
     //console.log("Categry in id", selectedItemId)
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
 
     try {
       const response = await fetch(
@@ -74,6 +94,142 @@ export default function MarketZone({navigation}) {
     }
   };
 
+  const fetchElectronics = async () => {
+    console.log('Categry in id', selectedItemId);
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/item/getAllItemByCategory/5?page=1&limit=5&region=${selectedItemId}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('AllItems', result.AllItems);
+      setDataElectronics(result.AllItems); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error Trending:', error);
+    }
+  };
+
+  const fetchVehicles = async () => {
+    //console.log("Categry in id", selectedItemId)
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/item/getAllItemByCategory/5?page=1&limit=5&region=${selectedItemId}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('AllItems', result.AllItems);
+      setDataVehicles(result.AllItems); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error Trending:', error);
+    }
+  };
+
+  const fetchClothing = async () => {
+    //console.log("Categry in id", selectedItemId)
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/item/getAllItemByCategory/5?page=1&limit=5&region=${selectedItemId}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('AllItems', result.AllItems);
+      setDataClothing(result.AllItems); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error Trending:', error);
+    }
+  };
+
+  const fetchCategory = async () => {
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY5ODAzOTAyNywiZXhwIjoxNzAwNjMxMDI3fQ.JSki1amX9VPEP9uCsJ5vPiCl2P4EcBqW6CQyY_YdLsk';
+
+    try {
+      const response = await fetch(
+        'https://watch-gotcha-be.mtechub.com/itemCategory/getAllItemCategories?page=1&limit=5',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+
+        console.log('Data ', data);
+
+        // Use the data from the API to set the categories
+        const categories = data.AllCategories.map(category => ({
+          label: category.name, // Use the "name" property as the label
+          value: category.id.toString(), // Convert "id" to a string for the value
+        }));
+
+        setCategorySelect(categories); // Update the state with the formatted category data
+
+        console.log('Data Categories', categoriesSelect);
+      } else {
+        console.error(
+          'Failed to fetch categories:',
+          response.status,
+          response.statusText,
+        );
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const fetchRegion = async () => {
+    //console.log("Categry in id", selectedItemId)
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+
+    try {
+      const response = await fetch(
+        'https://watch-gotcha-be.mtechub.com/region/getAllRegion',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('AllItems', result.allRegion);
+      setRegions(result.allRegion); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error Trending:', error);
+    }
+  };
 
   const availableApps = [
     {
@@ -151,17 +307,19 @@ export default function MarketZone({navigation}) {
     }, 3000);
   };
 
-  const goToScreen=()=>{
-    ref_RBSheetCamera.current.close()
+  const goToScreen = () => {
+    ref_RBSheetCamera.current.close();
 
-    navigation.navigate('Sell')
-  }
+    navigation.navigate('Sell');
+  };
 
   const renderAvailableAppsMarket = item => {
-    console.log('Items of market zone', item.images[1].image);
+    console.log('Items of market zone', item?.images[1]?.image);
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate('ProductDetails', {ProductDetails:item})}
+        onPress={() =>
+          navigation.navigate('ProductDetails', {ProductDetails: item})
+        }
         style={{width: wp(25.5), margin: 5}}>
         <View>
           <Image
@@ -177,7 +335,7 @@ export default function MarketZone({navigation}) {
               borderRadius: wp(2.5),
               resizeMode: 'cover',
             }}
-            source={{uri:item.images[1].image}}
+            source={{uri: item?.images[1]?.image}}
           />
         </View>
 
@@ -201,19 +359,20 @@ export default function MarketZone({navigation}) {
               color: '#FFFFFF',
               fontWeight: '700',
             }}>
-            {item.title}
+            {item?.title}
           </Text>
         </View>
       </TouchableOpacity>
     );
   };
 
-
   const renderAvailableApps = item => {
-    console.log('Items of market zone', item.images);
+    console.log('Items of market zone', item?.images[1]?.image);
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate('ProductDetails')}
+        onPress={() =>
+          navigation.navigate('ProductDetails', {ProductDetails: item})
+        }
         style={{width: wp(25.5), margin: 5}}>
         <View>
           <Image
@@ -229,7 +388,7 @@ export default function MarketZone({navigation}) {
               borderRadius: wp(2.5),
               resizeMode: 'cover',
             }}
-            source={item.image}
+            source={{uri: item?.images[1]?.image}}
           />
         </View>
 
@@ -253,7 +412,7 @@ export default function MarketZone({navigation}) {
               color: '#FFFFFF',
               fontWeight: '700',
             }}>
-            {item.title}
+            {item?.title}
           </Text>
         </View>
       </TouchableOpacity>
@@ -261,8 +420,8 @@ export default function MarketZone({navigation}) {
   };
 
   const renderSearches = item => {
-    console.log('Items', item);
-    const isSelected = selectedItemId === item.id;
+    console.log('Regions', item);
+    const isSelected = selectedItemId === item;
 
     return (
       <TouchableOpacity
@@ -273,15 +432,15 @@ export default function MarketZone({navigation}) {
           },
         ]}
         onPress={() => {
-          setSelectedItemId(item.id);
-          console.log('Selected item:', item.title);
+          setSelectedItemId(item);
+          console.log('Selected item:', item);
         }}>
         <Text
           style={[
             styles.textSearchDetails,
             {color: isSelected ? '#232323' : '#939393'},
           ]}>
-          {item.title}
+          {item}
         </Text>
       </TouchableOpacity>
     );
@@ -342,15 +501,14 @@ export default function MarketZone({navigation}) {
             contentContainerStyle={{alignItems: 'center'}}
             showsHorizontalScrollIndicator={false}
             horizontal
-            data={searches}
-            keyExtractor={item => item.id.toString()}
+            data={regions}
+            //keyExtractor={item => item.id.toString()}
             renderItem={({item}) => renderSearches(item)}
           />
         </View>
         <View
           style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(16)}}>
-          <View
-            style={{width: wp(43), height: '100%', borderRadius: wp(5)}}>
+          <View style={{width: wp(43), height: '100%', borderRadius: wp(5)}}>
             <Image
               style={{
                 position: 'absolute',
@@ -386,7 +544,7 @@ export default function MarketZone({navigation}) {
                   color: '#FFFFFF',
                   fontWeight: '700',
                 }}>
-                Name
+                Data
               </Text>
             </View>
           </View>
@@ -417,7 +575,59 @@ export default function MarketZone({navigation}) {
               color: '#4A4A4A',
               fontWeight: 'bold',
             }}>
-            Phones and Entertainment
+            {categoriesSelect[0]?.label}
+          </Text>
+
+          <View style={{marginTop: hp(1), height: '100%'}}>
+            {loading === true ? (
+              <View
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <ActivityIndicator size="large" color="#FACA4E" />
+              </View>
+            ) : (
+              <>
+                {dataElectronics?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight:'bold', fontSize:hp(2.1)}}>No data available</Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsHorizontalScrollIndicator={false}
+                    data={dataElectronics}
+                    horizontal
+                    keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableApps(item)}
+                  />
+                )}
+              </>
+            )}
+          </View>
+        </View>
+
+        <View style={{marginTop: hp(2), height: hp(23)}}>
+          <Text
+            style={{
+              fontSize: hp(2.3),
+              marginLeft: wp(3),
+              fontFamily: 'Inter',
+              color: '#4A4A4A',
+              fontWeight: 'bold',
+            }}>
+            {categoriesSelect[1]?.label}
           </Text>
 
           <View style={{marginTop: hp(1), height: '100%'}}>
@@ -434,16 +644,29 @@ export default function MarketZone({navigation}) {
                 }}>
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
-            ):
-            (<FlatList
-              style={{flex: 1}}
-              showsVerticalScrollIndicator={false}
-              data={data}
-              horizontal
-              keyExtractor={item => item.id.toString()}
-              renderItem={({item}) => renderAvailableAppsMarket(item)}
-            />)
-}
+            ) : (
+              <>
+                {dataVehicles?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight:'bold', fontSize:hp(2.1)}}>No data available</Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsHorizontalScrollIndicator={false}
+                    data={dataVehicles}
+                    horizontal
+                    keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableAppsMarket(item)}
+                  />
+                )}
+              </>
+            )}
           </View>
         </View>
 
@@ -456,42 +679,46 @@ export default function MarketZone({navigation}) {
               color: '#4A4A4A',
               fontWeight: 'bold',
             }}>
-            Vehicle and parts
+            {categoriesSelect[2]?.label}
           </Text>
 
           <View style={{marginTop: hp(1), height: '100%'}}>
-            <FlatList
-              style={{flex: 1}}
-              showsVerticalScrollIndicator={false}
-              data={availableApps}
-              horizontal
-              keyExtractor={item => item.id.toString()}
-              renderItem={({item}) => renderAvailableApps(item)}
-            />
-          </View>
-        </View>
-
-        <View style={{marginTop: hp(2), height: hp(23)}}>
-          <Text
-            style={{
-              fontSize: hp(2.3),
-              marginLeft: wp(3),
-              fontFamily: 'Inter',
-              color: '#4A4A4A',
-              fontWeight: 'bold',
-            }}>
-            Clothing and related items
-          </Text>
-
-          <View style={{marginTop: hp(1), height: '100%'}}>
-            <FlatList
-              style={{flex: 1}}
-              showsVerticalScrollIndicator={false}
-              data={availableApps}
-              horizontal
-              keyExtractor={item => item.id.toString()}
-              renderItem={({item}) => renderAvailableApps(item)}
-            />
+          {loading === true ? (
+              <View
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <ActivityIndicator size="large" color="#FACA4E" />
+              </View>
+            ) : (
+              <>
+                {dataClothing?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight:'bold', fontSize:hp(2.1)}}>No data available</Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsHorizontalScrollIndicator={false}
+                    data={dataClothing}
+                    horizontal
+                    keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableApps(item)}
+                  />
+                )}
+              </>
+            )}
           </View>
         </View>
 
@@ -508,14 +735,42 @@ export default function MarketZone({navigation}) {
           </Text>
 
           <View style={{marginTop: hp(1), height: '100%'}}>
-            <FlatList
-              style={{flex: 1}}
-              showsVerticalScrollIndicator={false}
-              data={availableApps}
-              horizontal
-              keyExtractor={item => item.id.toString()}
-              renderItem={({item}) => renderAvailableApps(item)}
-            />
+          {loading === true ? (
+              <View
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <ActivityIndicator size="large" color="#FACA4E" />
+              </View>
+            ) : (
+              <>
+                {data?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight:'bold', fontSize:hp(2.1)}}>No data available</Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsHorizontalScrollIndicator={false}
+                    data={data}
+                    horizontal
+                    keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableAppsMarket(item)}
+                  />
+                )}
+              </>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -602,7 +857,11 @@ export default function MarketZone({navigation}) {
 
           <TouchableOpacity
             onPress={() => goToScreen()}
-            style={{flexDirection: 'row', marginTop:hp(1.8), marginHorizontal: wp(7)}}>
+            style={{
+              flexDirection: 'row',
+              marginTop: hp(1.8),
+              marginHorizontal: wp(7),
+            }}>
             <Text
               style={{
                 fontFamily: 'Inter-Regular',
@@ -624,7 +883,11 @@ export default function MarketZone({navigation}) {
 
           <TouchableOpacity
             onPress={() => goToScreen()}
-            style={{flexDirection: 'row', marginTop:hp(1.8), marginHorizontal: wp(7)}}>
+            style={{
+              flexDirection: 'row',
+              marginTop: hp(1.8),
+              marginHorizontal: wp(7),
+            }}>
             <Text
               style={{
                 fontFamily: 'Inter-Regular',
@@ -636,25 +899,31 @@ export default function MarketZone({navigation}) {
             </Text>
           </TouchableOpacity>
 
-
-          <View style={{height:hp(0.1), marginTop:hp(1.8), marginHorizontal:wp(8), marginTop:hp(3), backgroundColor:'#00000012'}}>
-
-          </View>
-
-          <TouchableOpacity onPress={()=>goToScreen()} style={{flexDirection: 'row', marginTop:hp(1.8), marginHorizontal:wp(7)}}>
-
-          <Text
+          <View
             style={{
-              fontFamily: 'Inter-Regular',
-              color: '#656565',
-              marginLeft:wp(3),
-              fontSize: hp(2.1),
+              height: hp(0.1),
+              marginTop: hp(1.8),
+              marginHorizontal: wp(8),
+              marginTop: hp(3),
+              backgroundColor: '#00000012',
+            }}></View>
+
+          <TouchableOpacity
+            onPress={() => goToScreen()}
+            style={{
+              flexDirection: 'row',
+              marginTop: hp(1.8),
+              marginHorizontal: wp(7),
             }}>
-
-           All other items
-
-          </Text>
-
+            <Text
+              style={{
+                fontFamily: 'Inter-Regular',
+                color: '#656565',
+                marginLeft: wp(3),
+                fontSize: hp(2.1),
+              }}>
+              All other items
+            </Text>
           </TouchableOpacity>
         </View>
       </RBSheet>

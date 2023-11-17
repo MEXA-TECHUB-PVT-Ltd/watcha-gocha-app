@@ -42,6 +42,7 @@ import {useIsFocused} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SwitchSelector from 'react-native-switch-selector';
 import styles from './styles';
+import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
 LogBox.ignoreAllLogs();
 
 const App = ({navigation}) => {
@@ -90,6 +91,45 @@ const App = ({navigation}) => {
 
   const [signUpConfirmPasswordError, setSignUpConfirmPasswordError] =
     useState(false);
+
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+
+  const [snackbarCorrectVisible, setSnackbarCorrectVisible] = useState(false);
+
+
+  const dismissSnackbar = () => {
+    setSnackbarVisible(false);
+  };
+
+  const dismissCorrectSnackbar = () => {
+    setSnackbarCorrectVisible(false);
+  };
+
+  const handleUpdatePassword = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setSnackbarVisible(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setSnackbarVisible(false);
+    }, 3000);
+  };
+
+  const handleUpdateCorrectPassword = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setSnackbarCorrectVisible(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setSnackbarCorrectVisible(false);
+    }, 3000);
+  };
 
   const handleFocus = () => {
     setIsTextInputActive(true);
@@ -190,7 +230,7 @@ const App = ({navigation}) => {
     //   setSignUpConfirmPasswordError(true);
     // }
     else {
-      handleSignup()
+      handleSignup();
       //navigation.navigate('Profile_image');
       //   setIsLoading(true);
       //   setTimeout(() => {
@@ -236,8 +276,7 @@ const App = ({navigation}) => {
     } else {
       setIsLoading(true);
       setTimeout(() => {
-
-        handleSignIn()
+        handleSignIn();
         //setIsLoading(false);
 
         // Replace 'YourTargetScreen' with the screen you want to navigate to
@@ -302,11 +341,10 @@ const App = ({navigation}) => {
     setsignin_ShowPassword2(!signin_ShowPassword2);
   };
 
-  const signupEndpoint =
-    'https://watch-gotcha-be.mtechub.com/user/register'; // Replace with your actual API endpoint
+  const signupEndpoint = 'https://watch-gotcha-be.mtechub.com/user/register'; // Replace with your actual API endpoint
 
   const handleSignup = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const response = await fetch(signupEndpoint, {
         method: 'POST',
@@ -326,16 +364,15 @@ const App = ({navigation}) => {
 
       console.log('error data', data.newUser.role);
 
-      if (data.newUser.role==='user') {
-
-        setIsLoading(false)
+      if (data.newUser.role === 'user') {
+        setIsLoading(false);
         // Assuming there's at least one result
         const firstResult = data.newUser;
         console.log('id', firstResult.id);
         console.log('email', firstResult.email);
         console.log('username', firstResult.username);
 
-         AsyncStorage.setItem('email', firstResult.email.toString(), () => {
+        AsyncStorage.setItem('email', firstResult.email.toString(), () => {
           console.log('user email saved successfully');
         });
 
@@ -351,7 +388,7 @@ const App = ({navigation}) => {
           console.log('user id saved successfully of signup');
         });
       } else {
-        setIsLoading(false)
+        setIsLoading(false);
         console.error('No results found.', data.response.result);
       }
 
@@ -365,21 +402,22 @@ const App = ({navigation}) => {
 
       //navigation.navigate("Profile_image");
 
-      navigation.navigate("BottomTabNavigation")
+      navigation.navigate('BottomTabNavigation');
 
       // navigation.navigate('SelectGender');
     } catch (error) {
       console.error('Error is on sign up:', error);
+      handleUpdatePassword();
+
       //showAlert();
       setIsLoading(false);
     }
   };
-   
-  const signInEndpoint =
-    'https://watch-gotcha-be.mtechub.com/user/login'; // Replace with your actual API endpoint
+
+  const signInEndpoint = 'https://watch-gotcha-be.mtechub.com/user/login'; // Replace with your actual API endpoint
 
   const handleSignIn = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const response = await fetch(signInEndpoint, {
         method: 'POST',
@@ -397,16 +435,15 @@ const App = ({navigation}) => {
 
       console.log('error data sign in', data);
 
-      if (data.statusCode===200) {
-
-        setIsLoading(false)
+      if (data.statusCode === 200) {
+        setIsLoading(false);
         // Assuming there's at least one result
         const firstResult = data.user;
         console.log('id', firstResult.id);
         console.log('email', firstResult.email);
         console.log('username', firstResult.username);
 
-         AsyncStorage.setItem('email', firstResult.email.toString(), () => {
+        AsyncStorage.setItem('email', firstResult.email.toString(), () => {
           console.log('user email saved successfully');
         });
 
@@ -424,13 +461,12 @@ const App = ({navigation}) => {
 
         AsyncStorage.setItem('email ', firstResult.email.toString(), () => {
           console.log('user email saved successfully of sign in');
-
         });
 
         navigation.navigate('BottomTabNavigation');
-
       } else {
-        setIsLoading(false)
+        setIsLoading(false);
+        handleUpdateCorrectPassword()
         console.error('No results found.', data.response.result);
       }
 
@@ -440,27 +476,25 @@ const App = ({navigation}) => {
       setsignin_email('');
       setsignin_pass('');
 
-      
       // navigation.navigate('SelectGender');
     } catch (error) {
+      handleUpdateCorrectPassword()
+
       //console.error('Error:');
       //showAlert();
       setIsLoading(false);
     }
   };
 
-  const skipforNow=()=>{
-    setIsLoading(true)
+  const skipforNow = () => {
+    setIsLoading(true);
 
-       setTimeout(() => {
+    setTimeout(() => {
+      setIsLoading(false);
 
-          setIsLoading(false);
-        
-          navigation.navigate("BottomTabNavigation")
-
+      navigation.navigate('BottomTabNavigation');
     }, 2000);
-  }
-
+  };
 
   return (
     <ScrollView style={styles.bg} contentContainerStyle={{flexGrow: 1}}>
@@ -650,19 +684,18 @@ const App = ({navigation}) => {
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() => skipforNow() }>
+            <TouchableOpacity onPress={() => skipforNow()}>
               <Text
                 style={{
                   color: '#FACA4E',
                   fontSize: wp(4),
-                  textDecorationLine:'underline',
+                  textDecorationLine: 'underline',
                   fontFamily: 'Inter-Bold',
                   marginRight: '5%',
                   alignSelf: 'center',
                   marginTop: '3%',
                 }}>
-                 Skip For Now
+                Skip For Now
               </Text>
             </TouchableOpacity>
 
@@ -918,6 +951,20 @@ const App = ({navigation}) => {
           <ActivityIndicator size="large" color="#FACA4E" />
         </View>
       )}
+
+      <CustomSnackbar
+        message={'Alert!'}
+        messageDescription={'This Email Is Already In Use'}
+        onDismiss={dismissSnackbar} // Make sure this function is defined
+        visible={snackbarVisible}
+      />
+
+      <CustomSnackbar
+        message={'Alert!'}
+        messageDescription={'Wrong Email Or Password'}
+        onDismiss={dismissCorrectSnackbar} // Make sure this function is defined
+        visible={snackbarCorrectVisible}
+      />
     </ScrollView>
   );
 };

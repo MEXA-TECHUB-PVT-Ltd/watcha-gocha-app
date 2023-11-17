@@ -845,7 +845,7 @@ export default function Sell({navigation}) {
           onChangeText={text => setDescription(text)}
           multiline={true} // Enable multiline input
           numberOfLines={3} // Set the initial number of lines
-          style={{height: hp(25), ...styles.ti}} // Adjust the height as needed
+          style={{height: hp(25), ...styles.ti, width:wp(82)}} // Adjust the height as needed
           outlineColor="#0000001F"
           placeholderTextColor="#646464"
           activeOutlineColor="#FACA4E"
@@ -1152,7 +1152,7 @@ const styles = StyleSheet.create({
   textInputSelectedCategory: {
     borderWidth: 1,
     borderRadius: wp(3),
-    width: '98%',
+    width: '98.8%',
     borderColor: '#FACA4E',
 
     paddingHorizontal: 20,
@@ -1163,7 +1163,7 @@ const styles = StyleSheet.create({
   textInputCategoryNonSelected: {
     borderWidth: 1,
     borderRadius: wp(3),
-    width: '98%',
+    width: '98.8%',
     borderColor: '#E7EAF2',
     paddingHorizontal: 20,
     paddingVertical: 6.8,

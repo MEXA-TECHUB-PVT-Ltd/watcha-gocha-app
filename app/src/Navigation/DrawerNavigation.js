@@ -1,5 +1,5 @@
 import {StyleSheet, Image, TouchableOpacity, Text, View} from 'react-native';
-import React,{useRef} from 'react';
+import React, {useRef} from 'react';
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
@@ -31,13 +31,12 @@ import {
 const Drawer = createDrawerNavigator();
 
 const DrawerNavigation = ({navigation}) => {
-
   const ref_RBSheetLogout = useRef(null);
 
-  const logOut=()=>{
+  const logOut = () => {
     ref_RBSheetLogout.current.close();
-    navigation.navigate("Signin_signup");
-  }
+    navigation.navigate('Signin_signup');
+  };
 
   const CustomDrawerContent = props => {
     const navigation = useNavigation();
@@ -188,6 +187,17 @@ const DrawerNavigation = ({navigation}) => {
               />
 
               <DrawerItem
+                label="Notification"
+                labelStyle={{
+                  color: '#333333',
+                  marginLeft: wp(-4.1),
+                  fontFamily: 'Inter-Medium',
+                }}
+                onPress={() => navigation.navigate('Notification')}
+                icon={focused => <ContactUsActive />}
+              />
+
+              <DrawerItem
                 label="Contact Us"
                 labelStyle={{
                   color: '#333333',
@@ -206,9 +216,8 @@ const DrawerNavigation = ({navigation}) => {
                 alignItems: 'center',
                 marginBottom: hp(5),
               }}>
-
               <TouchableOpacity
-              onPress={()=>ref_RBSheetLogout.current.open()}
+                onPress={() => ref_RBSheetLogout.current.open()}
                 style={{
                   width: wp(60),
                   height: 40,
@@ -235,20 +244,18 @@ const DrawerNavigation = ({navigation}) => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{flex: 1}}>
+      <Drawer.Navigator
+        screenOptions={{headerShown: false}}
+        drawerContent={props => <CustomDrawerContent {...props} />}>
+        {/* Drawer screens */}
+        {/* Define your drawer screens here */}
 
-    <Drawer.Navigator
-      screenOptions={{headerShown: false}}
-      drawerContent={props => <CustomDrawerContent {...props} />}>
-      {/* Drawer screens */}
-      {/* Define your drawer screens here */}
+        <Drawer.Screen name="Home" component={BottomtabNavigation} />
+        {/* Other drawer screens */}
+      </Drawer.Navigator>
 
-      <Drawer.Screen name="Home" component={BottomtabNavigation} />
-      {/* Other drawer screens */}
-    </Drawer.Navigator>
-
-
-    <RBSheet
+      <RBSheet
         ref={ref_RBSheetLogout}
         height={330}
         openDuration={250}
@@ -270,8 +277,7 @@ const DrawerNavigation = ({navigation}) => {
             backgroundColor: 'transparent',
           },
         }}>
-
-            <Image source={appImages.alert} style={{resizeMode:'contain'}}/>
+        <Image source={appImages.alert} style={{resizeMode: 'contain'}} />
         <Text
           style={[
             styles.txtNotification,
@@ -280,7 +286,7 @@ const DrawerNavigation = ({navigation}) => {
           Confirmation
         </Text>
 
-        <Text style={{marginTop:hp(2)}}>Do You Really Want To Logout?</Text>
+        <Text style={{marginTop: hp(2)}}>Do You Really Want To Logout?</Text>
 
         <View style={styles.buttonDirections}>
           <TouchableOpacity
@@ -303,7 +309,6 @@ const DrawerNavigation = ({navigation}) => {
 export default DrawerNavigation;
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     backgroundColor: 'white',
@@ -321,10 +326,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: hp(4.3),
-    width:'100%',
+    width: '100%',
     marginLeft: wp(5),
     justifyContent: 'space-evenly',
-  }, button: {
+  },
+  button: {
     borderColor: '#FACA4E',
     borderWidth: 0.8,
     borderRadius: wp(5),
@@ -332,15 +338,16 @@ const styles = StyleSheet.create({
     height: hp(5.5),
     justifyContent: 'center',
     alignItems: 'center',
-  }, textButton: {
+  },
+  textButton: {
     color: '#FACA4E',
     fontWeight: 'bold',
-  }, txtNotification: {
+  },
+  txtNotification: {
     fontWeight: '500',
     marginTop: hp(10),
     marginLeft: wp(5),
     fontSize: hp(2.3),
     color: '#0B0B0B',
-  }
-
+  },
 });
