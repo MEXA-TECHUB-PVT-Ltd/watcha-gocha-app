@@ -8,8 +8,9 @@ import {
   TextInput,
   Text,
   View,
+  Alert,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP,
@@ -25,8 +26,153 @@ import Approved from '../../../assets/svg/Approved';
 
 import NonVerified from '../../../assets/svg/NonVerified.svg';
 
-export default function Disc({navigation}) {
-  const [selectedItemId, setSelectedItemId] = useState(0);
+export default function Disc({navigation, route}) {
+  const [selectedItemId, setSelectedItemId] = useState(1);
+
+  const [categoryIdNews, setCategoryIdNews] = useState(3);
+
+  const [loading, setLoading] = useState(false);
+
+  const [newsData, setNewsData] = useState([]);
+
+  const [opensLettersData, setOpensLettersData] = useState([]);
+
+  const [qafiData, setQAFIData] = useState([]);
+
+  const [gebcData, setGEBCData] = useState([]);
+
+  const {NewsCategory, Type} = route?.params || {};
+
+  useEffect(() => {
+    const fetchData = async () => {
+      console.log('Received NewsCategory of:', NewsCategory);
+      console.log('Received Type of:', Type);
+
+      // Check if 'id' exists before using it
+      if (NewsCategory) {
+        console.log('Received id:', NewsCategory);
+        setCategoryIdNews(NewsCategory); // Uncomment this line if you want to use id to set selectedItemId
+
+        if (Type === 'NEWS') {
+          setLoading(true);
+          setSelectedItemId(1)
+          console.log('Category Id News is ', NewsCategory);
+          // Fetch data one by one
+          await fetchNews();
+
+          // Once all data is fetched, set loading to false
+          setLoading(false);
+        } else if(Type === 'QAFI'){
+          setLoading(true);
+          setSelectedItemId(3)
+          console.log('Category Id QAFI is ', NewsCategory);
+          // Fetch data one by one
+          await fetchQAFI();
+
+          // Once all data is fetched, set loading to false
+          setLoading(false);
+        }else if(Type === 'GEBC'){
+          setLoading(true);
+          setSelectedItemId(4)
+          console.log('Category Id QAFI is ', NewsCategory);
+          // Fetch data one by one
+          await fetchGEBC();
+
+          // Once all data is fetched, set loading to false
+          setLoading(false);
+        }
+      } else {
+        setLoading(true);
+        //setSelectedItemId(1)
+        console.log('Category Id News is ', NewsCategory);
+        // Fetch data one by one
+        await fetchNews();
+
+        // Once all data is fetched, set loading to false
+        setLoading(false);
+      }
+    };
+    fetchData(); // Call the async function
+  }, [NewsCategory]); // Include 'id' in the dependency array
+
+  const fetchNews = async () => {
+    console.log('Categry in id', categoryIdNews);
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY5ODAzOTAyNywiZXhwIjoxNzAwNjMxMDI3fQ.JSki1amX9VPEP9uCsJ5vPiCl2P4EcBqW6CQyY_YdLsk';
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/news/getAllNewsByCategory/${categoryIdNews}?page=1&limit=5`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('Resultings of QAFI', result);
+      //Alert.alert(result)
+
+      setNewsData(result.AllQAFIs); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error Trending:', error);
+    }
+  };
+
+  const fetchQAFI = async () => {
+    console.log('Categry in id', categoryIdNews);
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY5ODAzOTAyNywiZXhwIjoxNzAwNjMxMDI3fQ.JSki1amX9VPEP9uCsJ5vPiCl2P4EcBqW6CQyY_YdLsk';
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/qafi/getAllQafisByCategory/${categoryIdNews}?page=1&limit=5`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('Resultings of News', result.QAFIs);
+      //Alert.alert(result)
+
+      setQAFIData(result.QAFIs); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error Trending:', error);
+    }
+  };
+
+  const fetchGEBC = async () => {
+    console.log('Categry in id', categoryIdNews);
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/gebc/getAllGEBCsByCategory/${categoryIdNews}?page=1&limit=5`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('Resultings of News', result.GEBCs);
+      //Alert.alert(result)
+
+      setGEBCData(result.GEBCs); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error Trending:', error);
+    }
+  };
+  
 
   const goToScreen = () => {
     if (selectedItemId === 2) {
@@ -39,6 +185,9 @@ export default function Disc({navigation}) {
       navigation.navigate('GEBC');
     }
   };
+
+
+  
 
   const availableApps = [
     {
@@ -103,10 +252,10 @@ export default function Disc({navigation}) {
   ];
 
   const renderAvailableApps = item => {
-    console.log('Items', item);
+    console.log('Items of News', item);
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate('News')}
+        onPress={() => navigation.navigate('News', {News: item})}
         style={{width: wp(25.5), margin: 5}}>
         <View>
           <Image
@@ -122,7 +271,7 @@ export default function Disc({navigation}) {
               borderRadius: wp(1),
               resizeMode: 'cover',
             }}
-            source={item.image}
+            source={appImages.topSearches3}
           />
         </View>
 
@@ -155,7 +304,137 @@ export default function Disc({navigation}) {
               fontWeight: 'bold',
               fontFamily: 'Inter',
             }}>
-            John Doe
+            {item.username}
+          </Text>
+
+          <View style={{marginLeft: wp(1)}}>
+            <NonVerified />
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+
+
+  const renderAvailableAppsQAFI = item => {
+    console.log('Items of QAFI', item);
+    return (
+      <TouchableOpacity
+        onPress={() => navigation.navigate('News', {News: item})}
+        style={{width: wp(25.5), margin: 5}}>
+        <View>
+          <Image
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+
+              zIndex: 1, // Ensure it's on top of other elements
+              //flex: 1,
+              width: '100%',
+              height: hp(12),
+              borderRadius: wp(1),
+              resizeMode: 'cover',
+            }}
+            source={appImages.topSearches3}
+          />
+        </View>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginTop: hp(12),
+            height: hp(7),
+            width: wp(25),
+          }}>
+          <View
+            style={{
+              width: wp(7),
+              marginLeft: wp(0.5),
+              height: wp(7),
+              borderRadius: wp(7) / 2,
+            }}>
+            <Image
+              source={appImages.profileImg}
+              style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+            />
+          </View>
+
+          <Text
+            style={{
+              fontSize: hp(1.5),
+              marginLeft: wp(0.7),
+              color: '#000000',
+              fontWeight: 'bold',
+              fontFamily: 'Inter',
+            }}>
+            {item.username}
+          </Text>
+
+          <View style={{marginLeft: wp(1)}}>
+            <NonVerified />
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  const renderAvailableAppsGEBC = item => {
+    console.log('Items of News', item);
+    return (
+      <TouchableOpacity
+        onPress={() => navigation.navigate('News', {News: item})}
+        style={{width: wp(25.5), margin: 5}}>
+        <View>
+          <Image
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+
+              zIndex: 1, // Ensure it's on top of other elements
+              //flex: 1,
+              width: '100%',
+              height: hp(12),
+              borderRadius: wp(1),
+              resizeMode: 'cover',
+            }}
+            source={appImages.topSearches3}
+          />
+        </View>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginTop: hp(12),
+            height: hp(7),
+            width: wp(25),
+          }}>
+          <View
+            style={{
+              width: wp(7),
+              marginLeft: wp(0.5),
+              height: wp(7),
+              borderRadius: wp(7) / 2,
+            }}>
+            <Image
+              source={appImages.profileImg}
+              style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+            />
+          </View>
+
+          <Text
+            style={{
+              fontSize: hp(1.5),
+              marginLeft: wp(0.7),
+              color: '#000000',
+              fontWeight: 'bold',
+              fontFamily: 'Inter',
+            }}>
+            {item.username}
           </Text>
 
           <View style={{marginLeft: wp(1)}}>
@@ -184,7 +463,18 @@ export default function Disc({navigation}) {
           if (item.id === 1) {
             navigation.navigate('ViewAllCategories');
             console.log('Log screen');
-          } else if (item.id === 1) {
+          }
+          else if (item.id === 2) {
+           setSelectedItemId(2)
+           console.log("On Letter id", item.id)
+          }
+          
+          
+          
+          else if (item.id === 3) {
+            navigation.navigate('ViewAllCategoriesQAFI');
+          } else if (item.id === 4) {
+            navigation.navigate('ViewAllCategoriesGEBC');
           }
         }}>
         <Text
@@ -202,7 +492,7 @@ export default function Disc({navigation}) {
     return (
       <View style={{flex: 1}}>
         <View
-          style={{marginTop: hp(1.5),  flexDirection: 'row', height: hp(18)}}>
+          style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(18)}}>
           <TouchableOpacity
             onPress={() => navigation.navigate('News')}
             style={{width: wp(35), height: '100%', borderRadius: wp(5)}}>
@@ -285,9 +575,9 @@ export default function Disc({navigation}) {
             <FlatList
               style={{flex: 1}}
               showsVerticalScrollIndicator={false}
-              data={availableApps}
+              data={newsData}
               horizontal
-              keyExtractor={item => item.id.toString()}
+              //keyExtractor={item => item.id.toString()}
               renderItem={({item}) => renderAvailableApps(item)}
             />
           </View>
@@ -298,9 +588,9 @@ export default function Disc({navigation}) {
             <FlatList
               style={{flex: 1}}
               showsVerticalScrollIndicator={false}
-              data={availableApps}
+              data={newsData}
               horizontal
-              keyExtractor={item => item.id.toString()}
+              //keyExtractor={item => item.id.toString()}
               renderItem={({item}) => renderAvailableApps(item)}
             />
           </View>
@@ -311,9 +601,9 @@ export default function Disc({navigation}) {
             <FlatList
               style={{flex: 1}}
               showsVerticalScrollIndicator={false}
-              data={availableApps}
+              data={newsData}
               horizontal
-              keyExtractor={item => item.id.toString()}
+              //keyExtractor={item => item.id.toString()}
               renderItem={({item}) => renderAvailableApps(item)}
             />
           </View>
@@ -324,10 +614,285 @@ export default function Disc({navigation}) {
             <FlatList
               style={{flex: 1}}
               showsVerticalScrollIndicator={false}
-              data={availableApps}
+              data={newsData}
               horizontal
-              keyExtractor={item => item.id.toString()}
+              //keyExtractor={item => item.id.toString()}
               renderItem={({item}) => renderAvailableApps(item)}
+            />
+          </View>
+        </View>
+      </View>
+    );
+  };
+
+  const QAFI = () => {
+    console.log("Came to QAFI")
+    return (
+      <View style={{flex: 1}}>
+        <View
+          style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(18)}}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('News')}
+            style={{width: wp(35), height: '100%', borderRadius: wp(5)}}>
+            <Image
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+
+                zIndex: 1, // Ensure it's on top of other elements
+                //flex: 1,
+                width: '100%',
+                height: '100%',
+                borderRadius: wp(3),
+                resizeMode: 'cover',
+              }}
+              source={appImages.topSearches1}
+            />
+          </TouchableOpacity>
+
+          <View style={{justifyContent: 'flex-end', flex: 1}}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                height: hp(7),
+                width: wp(40),
+              }}>
+              <View
+                style={{
+                  width: wp(10),
+                  marginLeft: wp(3),
+                  height: wp(10),
+                  borderRadius: wp(10) / 2,
+                }}>
+                <Image
+                  source={appImages.profileImg}
+                  style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+                />
+              </View>
+
+              <Text
+                style={{
+                  fontSize: hp(1.6),
+                  marginLeft: wp(2),
+                  color: '#000000',
+                  fontWeight: 'bold',
+                  fontFamily: 'Inter',
+                }}>
+                John Doe
+              </Text>
+
+              <View style={{marginLeft: wp(1)}}>
+                <Approved />
+              </View>
+            </View>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                height: hp(7),
+                width: wp(35),
+              }}>
+              <Text
+                style={{
+                  fontSize: hp(1.5),
+                  marginLeft: wp(2.5),
+                  fontFamily: 'Inter-Regular',
+                  color: '#000000',
+                }}>
+                Explore the intricate web of global politics in this thought-
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={{marginTop: hp(2), height: hp(23)}}>
+          <View style={{marginTop: hp(1), height: '100%'}}>
+            <FlatList
+              style={{flex: 1}}
+              showsVerticalScrollIndicator={false}
+              data={qafiData}
+              horizontal
+              //keyExtractor={item => item.id.toString()}
+              renderItem={({item}) => renderAvailableAppsQAFI(item)}
+            />
+          </View>
+        </View>
+
+        <View style={{height: hp(23)}}>
+          <View style={{marginTop: hp(1), height: '100%'}}>
+          <FlatList
+              style={{flex: 1}}
+              showsVerticalScrollIndicator={false}
+              data={qafiData}
+              horizontal
+              //keyExtractor={item => item.id.toString()}
+              renderItem={({item}) => renderAvailableAppsQAFI(item)}
+            />
+          </View>
+        </View>
+
+        <View style={{height: hp(23)}}>
+          <View style={{marginTop: hp(1), height: '100%'}}>
+          <FlatList
+              style={{flex: 1}}
+              showsVerticalScrollIndicator={false}
+              data={qafiData}
+              horizontal
+              //keyExtractor={item => item.id.toString()}
+              renderItem={({item}) => renderAvailableAppsQAFI(item)}
+            />
+          </View>
+        </View>
+
+        <View style={{height: hp(23)}}>
+          <View style={{marginTop: hp(1), height: '100%'}}>
+          <FlatList
+              style={{flex: 1}}
+              showsVerticalScrollIndicator={false}
+              data={qafiData}
+              horizontal
+              //keyExtractor={item => item.id.toString()}
+              renderItem={({item}) => renderAvailableAppsQAFI(item)}
+            />
+          </View>
+        </View>
+      </View>
+    );
+  };
+
+  const GEBC = () => {
+    return (
+      <View style={{flex: 1}}>
+        <View
+          style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(18)}}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('News')}
+            style={{width: wp(35), height: '100%', borderRadius: wp(5)}}>
+            <Image
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+
+                zIndex: 1, // Ensure it's on top of other elements
+                //flex: 1,
+                width: '100%',
+                height: '100%',
+                borderRadius: wp(3),
+                resizeMode: 'cover',
+              }}
+              source={appImages.topSearches1}
+            />
+          </TouchableOpacity>
+
+          <View style={{justifyContent: 'flex-end', flex: 1}}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                height: hp(7),
+                width: wp(40),
+              }}>
+              <View
+                style={{
+                  width: wp(10),
+                  marginLeft: wp(3),
+                  height: wp(10),
+                  borderRadius: wp(10) / 2,
+                }}>
+                <Image
+                  source={appImages.profileImg}
+                  style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+                />
+              </View>
+
+              <Text
+                style={{
+                  fontSize: hp(1.6),
+                  marginLeft: wp(2),
+                  color: '#000000',
+                  fontWeight: 'bold',
+                  fontFamily: 'Inter',
+                }}>
+                John Doe
+              </Text>
+
+              <View style={{marginLeft: wp(1)}}>
+                <Approved />
+              </View>
+            </View>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                height: hp(7),
+                width: wp(35),
+              }}>
+              <Text
+                style={{
+                  fontSize: hp(1.5),
+                  marginLeft: wp(2.5),
+                  fontFamily: 'Inter-Regular',
+                  color: '#000000',
+                }}>
+                Explore the intricate web of global politics in this thought-
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={{marginTop: hp(2), height: hp(23)}}>
+          <View style={{marginTop: hp(1), height: '100%'}}>
+            <FlatList
+              style={{flex: 1}}
+              showsVerticalScrollIndicator={false}
+              data={gebcData}
+              horizontal
+              //keyExtractor={item => item.id.toString()}
+              renderItem={({item}) => renderAvailableAppsGEBC(item)}
+            />
+          </View>
+        </View>
+
+        <View style={{height: hp(23)}}>
+          <View style={{marginTop: hp(1), height: '100%'}}>
+            <FlatList
+              style={{flex: 1}}
+              showsVerticalScrollIndicator={false}
+              data={gebcData}
+              horizontal
+              //keyExtractor={item => item.id.toString()}
+              renderItem={({item}) => renderAvailableAppsGEBC(item)}
+            />
+          </View>
+        </View>
+
+        <View style={{height: hp(23)}}>
+          <View style={{marginTop: hp(1), height: '100%'}}>
+            <FlatList
+              style={{flex: 1}}
+              showsVerticalScrollIndicator={false}
+              data={gebcData}
+              horizontal
+              //keyExtractor={item => item.id.toString()}
+              renderItem={({item}) => renderAvailableAppsGEBC(item)}
+            />
+          </View>
+        </View>
+
+        <View style={{height: hp(23)}}>
+          <View style={{marginTop: hp(1), height: '100%'}}>
+            <FlatList
+              style={{flex: 1}}
+              showsVerticalScrollIndicator={false}
+              data={gebcData}
+              horizontal
+              //keyExtractor={item => item.id.toString()}
+              renderItem={({item}) => renderAvailableAppsGEBC(item)}
             />
           </View>
         </View>
@@ -476,8 +1041,8 @@ export default function Disc({navigation}) {
       <View style={{marginTop: hp(5)}}>
         <Headers
           showListings={true}
-          onPressListings={()=>navigation.openDrawer()}
-          onPressMenu={()=>navigation.openDrawer()}
+          onPressListings={() => navigation.openDrawer()}
+          onPressMenu={() => navigation.openDrawer()}
           onPressSearch={() => navigation.navigate('SearchAppsDisc')}
           showText={true}
           text={'Disc'}
@@ -525,12 +1090,16 @@ export default function Disc({navigation}) {
           marginTop: hp(1),
           marginHorizontal: wp(8),
         }}>
-        {selectedItemId === 0 ? (
+        {selectedItemId === 1 ? (
           <DiscScreen />
         ) : selectedItemId === 2 ? (
           <OpenLetters />
+        ) : selectedItemId === 3 ? (
+          <QAFI />
+        ) : selectedItemId === 4 ? (
+          <GEBC />
         ) : (
-          <DiscScreen />
+          null
         )}
       </ScrollView>
 

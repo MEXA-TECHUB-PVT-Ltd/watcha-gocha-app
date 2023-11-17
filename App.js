@@ -93,7 +93,13 @@ import SplashScreen from './app/src/view/screens/SplashScreen';
 import RateApp from './app/src/view/screens/RateApp';
 import InstlApps from './app/src/view/screens/InstalledApps/InstlApps';
 import SearchScreenPicTours from './app/src/view/screens/SearchScreenPicTours';
-import { getToken,notificationListener, requestUserPermission } from './app/src/assets/utilities/CommonUtils';
+import {
+  getToken,
+  notificationListener,
+  requestUserPermission,
+} from './app/src/assets/utilities/CommonUtils';
+import ViewAllCategoriesGEBC from './app/src/view/screens/ViewAllCategoriesGEBC';
+import ViewAllCategoriesQAFI from './app/src/view/screens/ViewAllCategoriesQAFI';
 
 //------------------\\
 
@@ -112,11 +118,11 @@ const App = () => {
     return unsubscribe;
   }, []);
 
-   useEffect(() => {
-    requestUserPermission()
-    notificationListener()
-    getToken()
-  }, []); 
+  useEffect(() => {
+    requestUserPermission();
+    notificationListener();
+    getToken();
+  }, []);
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -135,6 +141,18 @@ const App = () => {
         <Stack.Screen
           name="ResetPassword"
           component={ResetPassword}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ViewAllCategoriesGEBC"
+          component={ViewAllCategoriesGEBC}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ViewAllCategoriesQAFI"
+          component={ViewAllCategoriesQAFI}
           options={{headerShown: false}}
         />
 

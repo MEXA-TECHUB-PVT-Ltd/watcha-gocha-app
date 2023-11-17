@@ -5,12 +5,13 @@ import {
   Image,
   KeyboardAvoidingView,
   ScrollView,
+  ActivityIndicator,
   StatusBar,
   ImageBackground,
   View,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 import {Button, Divider, TextInput} from 'react-native-paper';
@@ -41,14 +42,15 @@ import {
 } from 'react-native-responsive-screen';
 
 import Fontiso from 'react-native-vector-icons/Fontisto';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import IonIcons from 'react-native-vector-icons/Ionicons';
 
-import {SelectCountry, Dropdown} from 'react-native-element-dropdown';
 import CPaperInput from '../../../assets/Custom/CPaperInput';
 import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
 
-
+import {SelectCountry, Dropdown} from 'react-native-element-dropdown';
+import CustomDialog from '../../../assets/Custom/CustomDialog';
 
 const Category = [
   {label: 'Item 1', value: '1'},
@@ -57,14 +59,18 @@ const Category = [
 ];
 
 export default function QAFI({navigation}) {
-
   const [selectedItem, setSelectedItem] = useState('');
 
-  
+  const [snackbarVisible, setsnackbarVisible] = useState(false);
 
   const [profileName, setProfileName] = useState('');
 
-  const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [imageUrl, setImageUrl] = useState('');
+
+
+  const [loading, setLoading] = useState(false);
+
+  const [modalVisible, setModalVisible] = useState(false);
 
   const [isTextInputActive, setIsTextInputActive] = useState(false);
 
@@ -74,29 +80,211 @@ export default function QAFI({navigation}) {
 
   const [comment, setComment] = useState('');
 
+  const [imageInfo, setImageInfo] = useState(null);
+
+  const [categoryId, setCategoryId] = useState('');
+
+  const [userId, setUserId] = useState('');
+
+  const [userName, setName] = useState('');
+
+  const [categoriesSelect, setCategorySelect] = useState([]);
+
   const [imageUri, setImageUri] = useState(null);
 
   const [isFocus, setIsFocus] = useState(false);
 
   const ref_RBSheetCamera = useRef(null);
 
-  const dismissSnackbar = () => {
-    setSnackbarVisible(true);
+  const ref_RBSendOffer = useRef(null);
+
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchVideos();
+  }, []);
+
+  const fetchVideos = async () => {
+    // Simulate loading
+    setLoading(true);
+
+    await getUserID();
+    // Fetch data one by one
+    await fetchCategory();
+
+    // Once all data is fetched, set loading to false
+    setLoading(false);
   };
 
-  const handleUpdatePassword = async () => {
-    // Perform the password update logic here
-    // For example, you can make an API request to update the password
+  const getUserID = async () => {
+    console.log("Id's");
+    try {
+      const result = await AsyncStorage.getItem('userId ');
+      if (result !== null) {
+        setUserId(result);
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
 
-    // Assuming the update was successful
-    setSnackbarVisible(true);
-
-    // Automatically hide the Snackbar after 3 seconds
-    setTimeout(() => {
-      setSnackbarVisible(false);
-      navigation.goBack();
-    }, 3000);
+    try {
+      const result = await AsyncStorage.getItem('userName');
+      if (result !== null) {
+        setName(result);
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
   };
+
+  const fetchCategory = async () => {
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY5ODAzOTAyNywiZXhwIjoxNzAwNjMxMDI3fQ.JSki1amX9VPEP9uCsJ5vPiCl2P4EcBqW6CQyY_YdLsk';
+
+    try {
+      const response = await fetch(
+        'https://watch-gotcha-be.mtechub.com/discCategory/getAllDiscCategories?page=1&limit=5',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+
+        // Use the data from the API to set the categories
+        const categories = data.AllCategories.map(category => ({
+          label: category.name, // Use the "name" property as the label
+          value: category.id.toString(), // Convert "id" to a string for the value
+        }));
+
+        console.log('Categories', categories);
+
+        setCategorySelect(categories); // Update the state with the formatted category data
+
+        console.log('Data Categories', categoriesSelect);
+      } else {
+        console.error(
+          'Failed to fetch categories:',
+          response.status,
+          response.statusText,
+        );
+      }
+    } catch (error) {
+      console.error('Errors:', error);
+    }
+  };
+
+  const upload = async () => {
+    if (imageUri !== null && comment !== '' && categoryId !== '') {
+         handleUploadImage()
+      //uploadVideo();
+    } else {
+      setModalVisible(true);
+    }
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
+  const performAction = () => {
+    setModalVisible(false);
+  };
+
+  const handleUploadImage = (data) => {
+    setLoading(true);
+    const uri = imageInfo.uri;
+    const type = imageInfo.type;
+    const name = imageInfo.fileName;
+    const sourceImage = {uri, type, name};
+    console.log("Source Image",sourceImage);
+    const dataImage = new FormData();
+    dataImage.append('file', sourceImage);
+    dataImage.append('upload_preset', 'e6zfilan'); // Use your Cloudinary upload preset
+    dataImage.append('cloud_name', 'dxfdrtxi3'); // Use your Cloudinary cloud name
+
+    fetch('https://api.cloudinary.com/v1_1/dxfdrtxi3/image/upload', {
+      method: 'POST',
+      body: dataImage,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        setImageUrl(data.url); // Store the Cloudinary video URL in your state
+        //uploadVideo(data.url)
+        //uploadXpiVideo(data.url);
+        console.log("Image Url",data);
+        //uploadXpiVideo(data.url,data)
+        uploadVideo(data.url)
+        
+
+      })
+      .catch(err => {
+        setLoading(false)
+        console.log('Error While Uploading Video', err);
+      });
+  };
+
+  const uploadVideo = async (data) => {
+    console.log('Image Uri', data);
+    console.log('disc category Id', categoryId);
+    console.log('Description', description);
+    console.log('user id', userId);
+
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/qafi/createQafi';
+
+    const requestData = {
+      description: description,
+      image: data,
+      disc_category: categoryId,
+      user_id: userId,
+      
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`, // Use the provided token
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data);
+        setLoading(false);
+        handleUpdatePassword();
+
+        // Handle the response data as needed
+      } else {
+        setLoading(false);
+
+        console.error(
+          'Failed to upload video:',
+          response.status,
+          response.statusText,
+        );
+        // Handle the error
+      }
+    } catch (error) {
+      console.error('API Request Error:', error);
+      setLoading(false);
+    }
+  };
+
 
   const handleFocus = () => {
     setIsTextInputActive(true);
@@ -127,6 +315,26 @@ export default function QAFI({navigation}) {
       .catch(error => console.log(error));
   };
 
+ 
+
+  const handleUpdatePassword = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setsnackbarVisible(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setsnackbarVisible(false);
+      navigation.navigate('BottomTabNavigation');
+    }, 3000);
+  };
+
+  const dismissSnackbar = () => {
+    setsnackbarVisible(false);
+  };
+
   const Category = [
     {label: 'Politics', value: 'Politics'},
     {label: 'Sports', value: 'Sports'},
@@ -135,9 +343,7 @@ export default function QAFI({navigation}) {
     {label: 'Tech', value: 'Tech'},
     {label: 'Health', value: 'Health'},
     {label: 'Culture', value: 'Culture'},
-
   ];
-
 
   const takePhotoFromCamera = async value => {
     setSelectedItem(value);
@@ -152,13 +358,18 @@ export default function QAFI({navigation}) {
           if (response.assets && response.assets.length > 0) {
             setImageUri(response.assets[0].uri);
             console.log('response', response.assets[0].uri);
+            setImageInfo(response.assets[0]);
+            ref_RBSendOffer.current.close();
+
           } else if (response.uri) {
             // Handle the case when no assets are present (e.g., for videos)
             setImageUri(response.uri);
             console.log('response', response.uri);
+            ref_RBSendOffer.current.close();
+
           }
         }
-        ref_RBSheetCamera.current.close();
+        ref_RBSendOffer.current.close();
       },
     );
   };
@@ -168,12 +379,16 @@ export default function QAFI({navigation}) {
     launchImageLibrary({mediaType: 'Photo'}, response => {
       console.log('image here', response);
       if (!response.didCancel && response.assets.length > 0) {
+        console.log('Response', response.assets[0]);
         setImageUri(response.assets[0].uri);
+        setImageInfo(response.assets[0]);
+        ref_RBSendOffer.current.close();
+
       }
 
-      console.log('response', imageUri);
+      console.log('response', imageInfo);
 
-      ref_RBSheetCamera.current.close();
+      ref_RBSendOffer.current.close();
     });
   };
 
@@ -183,7 +398,9 @@ export default function QAFI({navigation}) {
       behavior="height" // You can use ‘height’ as well, depending on your preference
       enabled>
       <View style={styles.header}>
-        <IonIcons name={'chevron-back'} color={'#282828'} size={25} />
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <IonIcons name={'chevron-back'} color={'#282828'} size={25} />
+        </TouchableOpacity>
 
         <Text style={styles.headerText}>Post QAFI</Text>
       </View>
@@ -220,7 +437,7 @@ export default function QAFI({navigation}) {
               fontFamily: 'Inter',
               fontWeight: 'bold',
             }}>
-            John Doe
+            {userName}
           </Text>
         </View>
 
@@ -228,10 +445,11 @@ export default function QAFI({navigation}) {
           style={{
             justifyContent: 'center',
             alignItems: 'center',
+            flex:1,
             marginTop: hp(-1),
           }}>
           <CPaperInput
-            multiline={true}
+            //multiline={true}
             placeholder={'Add a comment'}
             placeholderTextColor="#B0B0B0"
             value={comment}
@@ -240,10 +458,13 @@ export default function QAFI({navigation}) {
           />
         </View>
 
-        <View
+        <TouchableOpacity
+          onPress={() => ref_RBSheetCamera.current.open()}
           style={{
             flexDirection: 'row',
             height: hp(5),
+            width: wp(35),
+            alignItems: 'center',
             marginTop: hp(3),
             marginHorizontal: wp(8),
           }}>
@@ -260,13 +481,13 @@ export default function QAFI({navigation}) {
             }}>
             Add Image
           </Text>
-        </View>
+        </TouchableOpacity>
 
         {imageUri !== null ? (
           <View
             style={{
               marginTop: hp(5),
-              height: hp(35),
+              height: hp(27),
               borderRadius: wp(3),
               marginHorizontal: wp(20),
             }}>
@@ -302,8 +523,7 @@ export default function QAFI({navigation}) {
           </View>
         ) : null}
 
-
-<View style={{marginLeft:wp(8), marginRight:wp(7)}}>
+        <View style={{marginLeft: wp(8), marginRight: wp(7)}}>
           <Dropdown
             style={styles.textInputCategoryNonSelected}
             containerStyle={{
@@ -326,7 +546,7 @@ export default function QAFI({navigation}) {
             // inputSearchStyle={styles.inputSearchStyle}
             // iconStyle={styles.iconStyle}
             value={category}
-            data={Category}
+            data={categoriesSelect}
             search={false}
             maxHeight={200}
             labelField="label"
@@ -336,7 +556,8 @@ export default function QAFI({navigation}) {
             onFocus={() => setIsFocus(true)}
             onBlur={() => setIsFocus(false)}
             onChange={item => {
-              setCategory(item.value);
+              //setCategory(item.label);
+              setCategoryId(item.value);
               setIsFocus(false);
             }}
             renderRightIcon={() => (
@@ -349,20 +570,28 @@ export default function QAFI({navigation}) {
             )}
           />
         </View>
-
-
-
-        <View style={{marginTop: '2%', alignSelf: 'center'}}>
-          <CustomButton
-            title="Post"
-            load={false}
-            // checkdisable={inn == '' && cm == '' ? true : false}
-            customClick={() => {
-              handleUpdatePassword();
-            }}
-          />
-        </View>
       </ScrollView>
+
+      <View
+        style={{
+          height: hp(12),
+          marginBottom: hp(3),
+          justifyContent: 'flex-end',
+          alignSelf: 'center',
+        }}>
+        <CustomButton
+          title="Post"
+          load={false}
+          // checkdisable={inn == '' && cm == '' ? true : false}
+          customClick={() => {
+            if (userId !== '') {
+              upload();
+            } else {
+              ref_RBSendOffer.current.open();
+            }
+          }}
+        />
+      </View>
 
       <RBSheet
         ref={ref_RBSheetCamera}
@@ -442,14 +671,151 @@ export default function QAFI({navigation}) {
         </View>
       </RBSheet>
 
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {loading && <ActivityIndicator size="large" color="#FACA4E" />}
+      </View>
+
+      <CustomDialog
+        visible={modalVisible}
+        onClose={closeModal}
+        onAction={performAction}
+        imageURL="URL_TO_YOUR_IMAGE"
+      />
+
       <CustomSnackbar
         message={'Success'}
-        messageDescription={'Your Post Has Been Posted SuccessFully'}
+        messageDescription={'News Posted Successfully'}
         onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackbarVisible}
       />
 
-      
+      <RBSheet
+        ref={ref_RBSendOffer}
+        closeOnDragDown={true}
+        closeOnPressMask={false}
+        animationType="fade"
+        minClosingHeight={0}
+        customStyles={{
+          wrapper: {
+            backgroundColor: 'rgba(52, 52, 52, 0.5)',
+          },
+          draggableIcon: {
+            backgroundColor: 'white',
+          },
+          container: {
+            borderTopLeftRadius: wp(10),
+            borderTopRightRadius: wp(10),
+            height: hp(51),
+          },
+        }}>
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            marginHorizontal: wp(8),
+            justifyContent: 'space-evenly',
+          }}>
+          <Image
+            source={appImages.alert}
+            style={{
+              width: wp(30),
+              marginTop: hp(-10),
+              height: hp(30),
+              resizeMode: 'contain',
+            }}
+          />
+
+          <View style={{marginTop: hp(-5), height: hp(8)}}>
+            <Text
+              style={{
+                color: '#333333',
+                textAlign: 'center',
+                fontSize: hp(2.3),
+                fontWeight: 'bold',
+                fontFamily: 'Inter',
+              }}>
+              Join Us Today
+            </Text>
+
+            <Text
+              style={{
+                color: '#9597A6',
+                marginTop: hp(0.5),
+                textAlign: 'center',
+                fontSize: hp(1.8),
+                marginTop: hp(1.5),
+                //fontWeight:'bold',
+                fontFamily: 'Inter',
+              }}>
+              We invite you to become a part of our community
+            </Text>
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              width: '100%',
+              justifyContent: 'space-around',
+              alignItems: 'center',
+              height: hp(8),
+              marginHorizontal: wp(5),
+            }}>
+            <TouchableOpacity
+              onPress={() => ref_RBSendOffer.current.close()}
+              style={{
+                width: wp(30),
+                borderRadius: wp(5),
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderColor: '#FACA4E',
+                borderWidth: 1,
+                height: hp(5),
+              }}>
+              <Text
+                style={{
+                  color: '#FACA4E',
+                  textAlign: 'center',
+                  fontSize: hp(1.8),
+                  fontWeight: 'bold',
+                  fontFamily: 'Inter',
+                }}>
+                Cancel
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigateToScreen()}
+              style={{
+                width: wp(30),
+                borderRadius: wp(5),
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#FACA4E',
+                height: hp(5),
+              }}>
+              <Text
+                style={{
+                  color: '#000000',
+                  textAlign: 'center',
+                  fontSize: hp(1.8),
+                  fontWeight: 'bold',
+                  fontFamily: 'Inter',
+                }}>
+                Sign Up
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </RBSheet>
     </KeyboardAvoidingView>
   );
 }
@@ -549,23 +915,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#FACA4E',
   },
-  textInputCategoryNonSelected: {
-    borderWidth: 1,
-    borderRadius: wp(3),
-    width: '98%',
-    borderColor: '#E7EAF2',
-    paddingHorizontal: 20,
-    paddingVertical: 6.8,
-    marginBottom: 20,
-    marginTop: hp(3),
-  },
-  iconStyle: {
-    color: '#C4C4C4',
-    width: 20,
-    height: 20,
-  },
-  iconStyleInactive: {
-    color: '#FACA4E',
-  }
-
 });
