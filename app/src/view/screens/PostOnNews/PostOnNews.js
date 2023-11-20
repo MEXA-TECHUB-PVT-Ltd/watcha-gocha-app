@@ -67,7 +67,6 @@ export default function PostOnNews({navigation}) {
 
   const [imageUrl, setImageUrl] = useState('');
 
-
   const [loading, setLoading] = useState(false);
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -183,7 +182,7 @@ export default function PostOnNews({navigation}) {
 
   const upload = async () => {
     if (imageUri !== null && comment !== '' && categoryId !== '') {
-         handleUploadImage()
+      handleUploadImage();
       //uploadVideo();
     } else {
       setModalVisible(true);
@@ -198,13 +197,13 @@ export default function PostOnNews({navigation}) {
     setModalVisible(false);
   };
 
-  const handleUploadImage = (data) => {
+  const handleUploadImage = data => {
     setLoading(true);
     const uri = imageInfo.uri;
     const type = imageInfo.type;
     const name = imageInfo.fileName;
     const sourceImage = {uri, type, name};
-    console.log("Source Image",sourceImage);
+    console.log('Source Image', sourceImage);
     const dataImage = new FormData();
     dataImage.append('file', sourceImage);
     dataImage.append('upload_preset', 'e6zfilan'); // Use your Cloudinary upload preset
@@ -223,33 +222,31 @@ export default function PostOnNews({navigation}) {
         setImageUrl(data.url); // Store the Cloudinary video URL in your state
         //uploadVideo(data.url)
         //uploadXpiVideo(data.url);
-        console.log("Image Url",data);
+        console.log('Image Url', data);
         //uploadXpiVideo(data.url,data)
-        uploadVideo(data.url)
-        
-
+       // uploadVideo(data.url);
       })
       .catch(err => {
-        setLoading(false)
+        setLoading(false);
         console.log('Error While Uploading Video', err);
       });
   };
 
-  const uploadVideo = async (data) => {
+  const uploadVideo = async data => {
     console.log('Image Uri', data);
     console.log('disc category Id', categoryId);
-    console.log('Description', description);
+    console.log('Description', comment);
     console.log('user id', userId);
 
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
     const apiUrl = 'https://watch-gotcha-be.mtechub.com/news/createNews';
 
     const requestData = {
-      description: description,
+      description: comment,
       image: data,
       disc_category: categoryId,
       user_id: userId,
-      
     };
 
     try {
@@ -287,7 +284,6 @@ export default function PostOnNews({navigation}) {
     }
   };
 
-
   const handleFocus = () => {
     setIsTextInputActive(true);
   };
@@ -316,8 +312,6 @@ export default function PostOnNews({navigation}) {
       })
       .catch(error => console.log(error));
   };
-
- 
 
   const handleUpdatePassword = async () => {
     // Perform the password update logic here
@@ -356,18 +350,24 @@ export default function PostOnNews({navigation}) {
       },
       response => {
         console.log('image here', response);
+
         if (!response.didCancel) {
+          ref_RBSheetCamera.current.close()
           if (response.assets && response.assets.length > 0) {
             setImageUri(response.assets[0].uri);
             console.log('response', response.assets[0].uri);
             setImageInfo(response.assets[0]);
+            ref_RBSheetCamera.current.close()
+
           } else if (response.uri) {
             // Handle the case when no assets are present (e.g., for videos)
             setImageUri(response.uri);
-            console.log('response', response.uri);
+            console.log('response null', response.uri);
+            ref_RBSheetCamera.current.close()
+
           }
+
         }
-        ref_RBSendOffer.current.close();
       },
     );
   };
@@ -380,11 +380,15 @@ export default function PostOnNews({navigation}) {
         console.log('Response', response.assets[0]);
         setImageUri(response.assets[0].uri);
         setImageInfo(response.assets[0]);
+        ref_RBSheetCamera.current.close()
+
+       
+
       }
+      ref_RBSheetCamera.current.close()
 
       console.log('response', imageInfo);
 
-      ref_RBSendOffer.current.close();
     });
   };
 
@@ -421,9 +425,16 @@ export default function PostOnNews({navigation}) {
               height: wp(10),
               borderRadius: wp(10) / 2,
             }}>
-            <Image
+            {/*  <Image
               source={appImages.profileImg}
               style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+            /> */}
+
+            <MaterialCommunityIcons
+              style={{marginTop: hp(0.5)}}
+              name={'account-circle'}
+              size={35}
+              color={'#FACA4E'}
             />
           </View>
           <Text

@@ -22,6 +22,7 @@ import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 
 import Back from '../../../assets/svg/back.svg';
 import {appImages} from '../../../assets/utilities/index';
+
 import Slider from '@react-native-community/slider';
 import VolumeUp from '../../../assets/svg/VolumeUp.svg';
 import Like from '../../../assets/svg/Like.svg';
@@ -66,7 +67,6 @@ export default function GEBC({navigation}) {
   const [profileName, setProfileName] = useState('');
 
   const [imageUrl, setImageUrl] = useState('');
-
 
   const [loading, setLoading] = useState(false);
 
@@ -183,7 +183,7 @@ export default function GEBC({navigation}) {
 
   const upload = async () => {
     if (imageUri !== null && comment !== '' && categoryId !== '') {
-         handleUploadImage()
+      handleUploadImage();
       //uploadVideo();
     } else {
       setModalVisible(true);
@@ -198,13 +198,13 @@ export default function GEBC({navigation}) {
     setModalVisible(false);
   };
 
-  const handleUploadImage = (data) => {
+  const handleUploadImage = data => {
     setLoading(true);
     const uri = imageInfo.uri;
     const type = imageInfo.type;
     const name = imageInfo.fileName;
     const sourceImage = {uri, type, name};
-    console.log("Source Image",sourceImage);
+    console.log('Source Image', sourceImage);
     const dataImage = new FormData();
     dataImage.append('file', sourceImage);
     dataImage.append('upload_preset', 'e6zfilan'); // Use your Cloudinary upload preset
@@ -223,25 +223,24 @@ export default function GEBC({navigation}) {
         setImageUrl(data.url); // Store the Cloudinary video URL in your state
         //uploadVideo(data.url)
         //uploadXpiVideo(data.url);
-        console.log("Image Url",data);
+        console.log('Image Url', data);
         //uploadXpiVideo(data.url,data)
-        uploadVideo(data.url)
-        
-
+        uploadVideo(data.url);
       })
       .catch(err => {
-        setLoading(false)
+        setLoading(false);
         console.log('Error While Uploading Video', err);
       });
   };
 
-  const uploadVideo = async (data) => {
+  const uploadVideo = async data => {
     console.log('Image Uri', data);
     console.log('disc category Id', categoryId);
     console.log('Description', description);
     console.log('user id', userId);
 
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
     const apiUrl = 'https://watch-gotcha-be.mtechub.com/gebc/createGEBC';
 
     const requestData = {
@@ -249,7 +248,6 @@ export default function GEBC({navigation}) {
       image: data,
       disc_category: categoryId,
       user_id: userId,
-      
     };
 
     try {
@@ -287,7 +285,6 @@ export default function GEBC({navigation}) {
     }
   };
 
-
   const handleFocus = () => {
     setIsTextInputActive(true);
   };
@@ -316,8 +313,6 @@ export default function GEBC({navigation}) {
       })
       .catch(error => console.log(error));
   };
-
- 
 
   const handleUpdatePassword = async () => {
     // Perform the password update logic here
@@ -421,9 +416,16 @@ export default function GEBC({navigation}) {
               height: wp(10),
               borderRadius: wp(10) / 2,
             }}>
-            <Image
+            {/*  <Image
               source={appImages.profileImg}
               style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+            /> */}
+
+            <MaterialCommunityIcons
+              style={{marginTop: hp(0.5)}}
+              name={'account-circle'}
+              size={35}
+              color={'#FACA4E'}
             />
           </View>
           <Text
@@ -445,7 +447,7 @@ export default function GEBC({navigation}) {
           }}>
           <CPaperInput
             //multiline={true}
-            style={{flex:1}}
+            style={{flex: 1}}
             placeholder={'Add a comment'}
             placeholderTextColor="#B0B0B0"
             value={comment}

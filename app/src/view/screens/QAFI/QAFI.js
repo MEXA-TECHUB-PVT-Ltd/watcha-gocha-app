@@ -48,7 +48,6 @@ import IonIcons from 'react-native-vector-icons/Ionicons';
 
 import CPaperInput from '../../../assets/Custom/CPaperInput';
 import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
-
 import {SelectCountry, Dropdown} from 'react-native-element-dropdown';
 import CustomDialog from '../../../assets/Custom/CustomDialog';
 
@@ -245,7 +244,7 @@ export default function QAFI({navigation}) {
     const apiUrl = 'https://watch-gotcha-be.mtechub.com/qafi/createQafi';
 
     const requestData = {
-      description: description,
+      description: comment,
       image: data,
       disc_category: categoryId,
       user_id: userId,
@@ -359,17 +358,17 @@ export default function QAFI({navigation}) {
             setImageUri(response.assets[0].uri);
             console.log('response', response.assets[0].uri);
             setImageInfo(response.assets[0]);
-            ref_RBSendOffer.current.close();
+            ref_RBSheetCamera.current.close();
 
           } else if (response.uri) {
             // Handle the case when no assets are present (e.g., for videos)
             setImageUri(response.uri);
             console.log('response', response.uri);
-            ref_RBSendOffer.current.close();
+            ref_RBSheetCamera.current.close();
 
           }
         }
-        ref_RBSendOffer.current.close();
+        ref_RBSheetCamera.current.close();
       },
     );
   };
@@ -382,13 +381,13 @@ export default function QAFI({navigation}) {
         console.log('Response', response.assets[0]);
         setImageUri(response.assets[0].uri);
         setImageInfo(response.assets[0]);
-        ref_RBSendOffer.current.close();
+        ref_RBSheetCamera.current.close();
 
       }
 
       console.log('response', imageInfo);
 
-      ref_RBSendOffer.current.close();
+      ref_RBSheetCamera.current.close();
     });
   };
 
@@ -425,9 +424,15 @@ export default function QAFI({navigation}) {
               height: wp(10),
               borderRadius: wp(10) / 2,
             }}>
-            <Image
+            {/* <Image
               source={appImages.profileImg}
               style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+            /> */}
+            <MaterialCommunityIcons
+              style={{marginTop: hp(0.5)}}
+              name={'account-circle'}
+              size={35}
+              color={'#FACA4E'}
             />
           </View>
           <Text

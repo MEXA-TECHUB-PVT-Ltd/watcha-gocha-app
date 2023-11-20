@@ -55,7 +55,7 @@ import CPaperInput from '../../../assets/Custom/CPaperInput';
 import Headers from '../../../assets/Custom/Headers';
 import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
 
-export default function PostLetterInfo({navigation}) {
+export default function PostLetterAllUserName({navigation, route}) {
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [contact, setContact] = useState('');
@@ -89,8 +89,7 @@ export default function PostLetterInfo({navigation}) {
   const ref_RBSendOffer = useRef(null);
 
   const [postLetter, setPostLetter] = useState('');
-
-  const [letterType, setLetterTypes] = useState('Public Letter');
+  const [letterType, setLetterTypes] = useState('Public');
 
   //statrs
 
@@ -113,6 +112,22 @@ export default function PostLetterInfo({navigation}) {
   const [userId, setUserId] = useState('');
 
   const [imageUri, setImageUri] = useState(null);
+
+  const receivedDataName = route.params?.name;
+  const receivedDatAddress = route.params?.address;
+  const receivedDataContactNumber = route.params?.contactNumber;
+  const receivedDataEmail = route.params?.email;
+  const receivedDataCategoryId = route.params?.category_id;
+  const receivedDataLetterType = route.params?.letterType;
+
+  console.log('Name', receivedDataName);
+  console.log('Address', receivedDatAddress);
+  console.log('Contact', receivedDataContactNumber);
+  console.log('Email', receivedDataEmail);
+  console.log('Id', receivedDataCategoryId);
+  console.log('LetterType', receivedDataLetterType);
+  console.log('LetterTypeAppeal', receivedDataLetterType);
+
 
   useEffect(() => {
     // Make the API request and update the 'data' state
@@ -162,7 +177,7 @@ export default function PostLetterInfo({navigation}) {
 
     try {
       const response = await fetch(
-        'https://watch-gotcha-be.mtechub.com/discCategory/getAllDiscCategories?page=1&limit=5',
+        'https://watch-gotcha-be.mtechub.com/user/getAllUsers?page=1&limit=50',
         {
           method: 'GET',
           headers: {
@@ -175,8 +190,8 @@ export default function PostLetterInfo({navigation}) {
         const data = await response.json();
 
         // Use the data from the API to set the categories
-        const categories = data.AllCategories.map(category => ({
-          label: category.name, // Use the "name" property as the label
+        const categories = data.AllUser.map(category => ({
+          label: category.username, // Use the "name" property as the label
           value: category.id.toString(), // Convert "id" to a string for the value
         }));
 
@@ -255,15 +270,15 @@ export default function PostLetterInfo({navigation}) {
   ];
 
   /* const Category = [
-    {label: 'Politics', value: 'Politics'},
-    {label: 'Sports', value: 'Sports'},
-    {label: 'Business', value: 'Business'},
-    {label: 'Finance', value: 'Finance'},
-    {label: 'Tech', value: 'Tech'},
-    {label: 'Health', value: 'Health'},
-    {label: 'Culture', value: 'Culture'},
-
-  ]; */
+      {label: 'Politics', value: 'Politics'},
+      {label: 'Sports', value: 'Sports'},
+      {label: 'Business', value: 'Business'},
+      {label: 'Finance', value: 'Finance'},
+      {label: 'Tech', value: 'Tech'},
+      {label: 'Health', value: 'Health'},
+      {label: 'Culture', value: 'Culture'},
+  
+    ]; */
 
   const CategoryPublicType = [
     {label: 'general', value: 'general'},
@@ -284,15 +299,22 @@ export default function PostLetterInfo({navigation}) {
   };
 
   const uploadLetter = () => {
-    if (letterType == 'Public Letter') {
-      navigation.navigate('PostLetter', {name:name, address:address, contactNumber:contact, email:email,category_id:categoryId, letterType: categoryPublicType });
-    } else if(letterType=='Private Letter') {
-      navigation.navigate('PostLetterAllUserName', {name:name, address:address, contactNumber:contact, email:email,category_id:categoryId, letterType: categoryPublicType });
+    if (letterType == 'Public') {
+      navigation.navigate('PostLetter', {
+        name: name,
+        address: address,
+        contactNumber: contact,
+        email: email,
+        category_id: categoryId,
+        letterType: categoryPublicType,
+      });
+    } else {
+      console.log('Letter');
     }
   };
 
   const renderSearches = item => {
-    console.log('Items', item);
+    console.log('Items', item.item);
     const isSelected = selectedItemId === item.id;
 
     return (
@@ -304,19 +326,21 @@ export default function PostLetterInfo({navigation}) {
           },
         ]}
         onPress={() => {
-          setSelectedItemId(item.id);
-          console.log('Selected item:', item.title);
+          setSelectedItemId(item.item.value);
+          console.log('Selected item:', item.item.value);
         }}>
         <Text
           style={[
             styles.textSearchDetails,
             {color: isSelected ? '#FACA4E' : '#939393'},
           ]}>
-          {item.title}
+          {item.item.label}
         </Text>
       </TouchableOpacity>
     );
   };
+
+  
   return (
     <View style={styles.container}>
       <StatusBar
@@ -329,260 +353,17 @@ export default function PostLetterInfo({navigation}) {
         <Headers
           showBackIcon={true}
           showText={true}
-          text={'Post Letter'}
+          text={'Get User Name'}
           onPress={() => navigation.goBack()}
         />
       </View>
 
       <ScrollView style={{flexGrow: 1}}>
-        <View
-          style={{
-            flexDirection: 'row',
-            marginHorizontal: wp(8),
-            alignItems: 'center',
-            marginTop: hp(3),
-            height: hp(8),
-          }}>
-          <View
-            style={{
-              width: wp(12),
-              marginLeft: wp(0.5),
-              height: wp(12),
-              borderRadius: wp(12) / 2,
-            }}>
-            <Image
-              source={appImages.profileImg}
-              style={{width: '100%', height: '100%', resizeMode: 'cover'}}
-            />
-          </View>
-
-          <TouchableOpacity
-            onPress={() => ref_RBSheetCamera.current.open()}
-            style={{
-              flexDirection: 'row',
-              marginLeft: wp(5),
-              height: hp(5),
-              width: wp(33),
-              borderWidth: 0.5,
-              borderColor: '#FACA4E',
-              borderRadius: wp(5),
-              alignItems: 'center',
-              justifyContent: 'space-around',
-            }}>
-            <Text style={{color: '#FACA4E', fontFamily: 'Inter-Regular'}}>
-              {letterType}
-            </Text>
-
-            <Ionicons name="chevron-down" size={21} color="#FACA4E" />
-          </TouchableOpacity>
-        </View>
-
-        <Text
-          style={{
-            color: '#FACA4E',
-            fontFamily: 'Inter-Medium',
-            fontSize: hp(2.3),
-            marginTop: hp(3),
-            marginLeft: wp(8),
-          }}>
-          Sender's Information
-        </Text>
-
-        <TextInput
-          mode="outlined"
-          label="Name"
-          onChangeText={text => setName(text)}
-          style={[styles.ti, {marginTop: '5%'}]}
-          outlineColor="#0000001F"
-          placeholderTextColor={'#404040'}
-          activeOutlineColor="#FACA4E"
-          autoCapitalize="none"
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          /* left={
-            <TextInput.Icon
-              icon={() => (
-                <MaterialCommunityIcons
-                  name={'email-outline'}
-                  size={23}
-                  color={isTextInputActive == true ? '#FACA4E' : '#64646485'}
-                />
-              )}
-            />
-          } */
-          // left={isTextInputActive ? <Oemail /> : <Gemail />}
-        />
-
-        <TextInput
-          mode="outlined"
-          label="Address"
-          onChangeText={text => setAddress(text)}
-          style={[styles.ti, {marginTop: '5%'}]}
-          outlineColor="#0000001F"
-          placeholderTextColor={'#404040'}
-          activeOutlineColor="#FACA4E"
-          autoCapitalize="none"
-          onFocus={handleFocusAddress}
-          onBlur={handleBlurAddress}
-          /* left={
-            <TextInput.Icon
-              icon={() => (
-                <MaterialCommunityIcons
-                  name={'email-outline'}
-                  size={23}
-                  color={isTextInputActive == true ? '#FACA4E' : '#64646485'}
-                />
-              )}
-            />
-          } */
-          // left={isTextInputActive ? <Oemail /> : <Gemail />}
-        />
-
-        <TextInput
-          mode="outlined"
-          label="Contact Number"
-          onChangeText={text => setContact(text)}
-          style={[styles.ti, {marginTop: '5%'}]}
-          outlineColor="#0000001F"
-          placeholderTextColor={'#404040'}
-          activeOutlineColor="#FACA4E"
-          autoCapitalize="none"
-          onFocus={handleFocusContact}
-          onBlur={handleBlurContact}
-          /* left={
-            <TextInput.Icon
-              icon={() => (
-                <MaterialCommunityIcons
-                  name={'email-outline'}
-                  size={23}
-                  color={isTextInputActive == true ? '#FACA4E' : '#64646485'}
-                />
-              )}
-            />
-          } */
-          // left={isTextInputActive ? <Oemail /> : <Gemail />}
-        />
-
-        <TextInput
-          mode="outlined"
-          label="Email Address"
-          onChangeText={text => setEmail(text)}
-          style={[styles.ti, {marginTop: '5%'}]}
-          outlineColor="#0000001F"
-          placeholderTextColor={'#404040'}
-          activeOutlineColor="#FACA4E"
-          autoCapitalize="none"
-          onFocus={handleFocusEmail}
-          onBlur={handleBlurEmail}
-          /* left={
-            <TextInput.Icon
-              icon={() => (
-                <MaterialCommunityIcons
-                  name={'email-outline'}
-                  size={23}
-                  color={isTextInputActive == true ? '#FACA4E' : '#64646485'}
-                />
-              )}
-            />
-          } */
-          // left={isTextInputActive ? <Oemail /> : <Gemail />}
-        />
-
-        <View style={{marginLeft: wp(8), marginRight: wp(8)}}>
-          <Dropdown
-            style={styles.textInputCategoryNonSelected}
-            containerStyle={{
-              marginTop: 3,
-              alignSelf: 'center',
-              borderRadius: wp(3),
-              width: '100%',
-            }}
-            // dropdownPosition="top"
-            // mode="modal"
-            placeholderStyle={{
-              color: '#121420',
-              //   fontWeight: '400',
-              fontFamily: 'Inter',
-              fontSize: hp(1.8),
-            }}
-            iconStyle={isFocus ? styles.iconStyle : styles.iconStyleInactive}
-            itemTextStyle={{color: '#000000'}}
-            selectedTextStyle={{fontSize: 16, color: '#000000'}}
-            // inputSearchStyle={styles.inputSearchStyle}
-            // iconStyle={styles.iconStyle}
-            value={category}
-            data={categoriesSelect}
-            search={false}
-            maxHeight={200}
-            labelField="label"
-            valueField="value"
-            placeholder={'Select Category'}
-            searchPlaceholder="Search..."
-            onFocus={() => setIsFocus(true)}
-            onBlur={() => setIsFocus(false)}
-            onChange={item => {
-              //setCategory(item.label);
-              setCategoryId(item.value);
-              setIsFocus(false);
-            }}
-            renderRightIcon={() => (
-              <AntDesign
-                style={styles.icon}
-                color={isFocus ? '#000000' : '#000000'}
-                name="down"
-                size={15}
-              />
-            )}
-          />
-        </View>
-
-        <View style={{marginLeft: wp(8), marginRight: wp(8)}}>
-          <Dropdown
-            style={styles.textInputCategoryNonSelected}
-            containerStyle={{
-              marginTop: 3,
-              alignSelf: 'center',
-              borderRadius: wp(3),
-              width: '100%',
-            }}
-            // dropdownPosition="top"
-            // mode="modal"
-            placeholderStyle={{
-              color: '#121420',
-              //   fontWeight: '400',
-              fontFamily: 'Inter',
-              fontSize: hp(1.8),
-            }}
-            iconStyle={isFocus ? styles.iconStyle : styles.iconStyleInactive}
-            itemTextStyle={{color: '#000000'}}
-            selectedTextStyle={{fontSize: 16, color: '#000000'}}
-            // inputSearchStyle={styles.inputSearchStyle}
-            // iconStyle={styles.iconStyle}
-            value={categoryPublicType}
-            data={CategoryPublicType}
-            search={false}
-            maxHeight={200}
-            labelField="label"
-            valueField="value"
-            placeholder={'Select Type'}
-            searchPlaceholder="Search..."
-            onFocus={() => setIsFocusPublicType(true)}
-            onBlur={() => setIsFocusPublicType(false)}
-            onChange={item => {
-              //setCategory(item.label);
-              setCategoryPublicType(item.value);
-              setIsFocusPublicType(false);
-            }}
-            renderRightIcon={() => (
-              <AntDesign
-                style={styles.icon}
-                color={isFocus ? '#000000' : '#000000'}
-                name="down"
-                size={15}
-              />
-            )}
-          />
-        </View>
+      <FlatList
+      data={categoriesSelect}
+      renderItem={renderSearches}
+      keyExtractor={(item, index) => index.toString()}
+    />
 
         <View style={{marginTop: '30%', alignSelf: 'center'}}>
           <CustomButton
@@ -845,5 +626,20 @@ const styles = StyleSheet.create({
   },
   iconStyleInactive: {
     color: '#FACA4E',
+  },
+  searchesDetails: {
+    flexDirection: 'row',
+    marginLeft: wp(3),
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: wp(23),
+    //backgroundColor: '#F2F2F2',
+    //borderRadius: wp(5),
+    height: hp(5),
+  },
+  textSearchDetails: {
+    fontFamily: 'Inter',
+    fontWeight: '700',
+    fontSize: hp(1.8),
   },
 });

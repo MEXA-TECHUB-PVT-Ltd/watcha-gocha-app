@@ -41,6 +41,7 @@ const appImages = {
   logoWhite: require(IMAGES_DIR + 'LogoWhite.png'),
   LogoBlack: require(IMAGES_DIR + 'LogoBlack.png'),
   galleryPlaceHolder:require(IMAGES_DIR + 'galleryPlaceHolder.png'),
+  newsPlaceHolder:require(IMAGES_DIR + 'placeholderNews.jpg'),
   LogOut:require(IMAGES_DIR + 'Logout.png')
 
 

@@ -100,6 +100,7 @@ import {
 } from './app/src/assets/utilities/CommonUtils';
 import ViewAllCategoriesGEBC from './app/src/view/screens/ViewAllCategoriesGEBC';
 import ViewAllCategoriesQAFI from './app/src/view/screens/ViewAllCategoriesQAFI';
+import PostLetterAllUserName from './app/src/view/screens/PostLetter/PostLetterAllUserName';
 
 //------------------\\
 
@@ -297,6 +298,12 @@ const App = () => {
         <Stack.Screen
           name="PostLetter"
           component={PostLetter}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="PostLetterAllUserName"
+          component={PostLetterAllUserName}
           options={{headerShown: false}}
         />
 
