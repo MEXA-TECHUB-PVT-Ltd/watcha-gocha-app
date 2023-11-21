@@ -6,6 +6,7 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   StatusBar,
+  ActivityIndicator,
   ImageBackground,
   View,
   TouchableOpacity,
@@ -35,6 +36,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import PublicLetter from '../../../assets/svg/PublicLetter.svg';
 import PrivateLetter from '../../../assets/svg/PrivateLetter.svg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Share from 'react-native-share';
 
@@ -56,13 +58,20 @@ import Canvas from 'react-native-canvas';
 
 import SignatureCapture from 'react-native-signature-capture';
 
-export default function PostLetterSignature({navigation}) {
+export default function PostLetterSignature({navigation, route}) {
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [contact, setContact] = useState('');
   const [email, setEmail] = useState('');
+  const [signatureId, setSignatureId] = useState('');
 
-  
+  const [userId, setUserId] = useState('');
+
+  const [fileType, setFileType] = useState('');
+
+  const [fileName, setFileName] = useState('');
+
+  const [imageUrl, setImageUrl] = useState('');
 
   const [loading, setLoading] = useState(false);
 
@@ -70,18 +79,104 @@ export default function PostLetterSignature({navigation}) {
 
   const signatureRef = useRef(null);
 
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchVideos();
+  }, []);
+
+  const fetchVideos = async () => {
+    // Simulate loading
+    setLoading(true);
+
+    await getUserID();
+    // Fetch data one by one
+    // Once all data is fetched, set loading to false
+    setLoading(false);
+  };
+
+  const getUserID = async () => {
+    console.log("Id's");
+    try {
+      const result = await AsyncStorage.getItem('userId ');
+      if (result !== null) {
+        setUserId(result);
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+
+    try {
+      const result = await AsyncStorage.getItem('userName');
+      if (result !== null) {
+        setName(result);
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
+
+
   //-------------------\\
 
   /* const saveSign = () => {
     signatureRef.current.saveImage();
   }; */
 
+  const receivedDataName = route.params?.name;
+  const receivedDatAddress = route.params?.address;
+  const receivedDataContactNumber = route.params?.contactNumber;
+  const receivedDataEmail = route.params?.email;
+  const receivedDataCategoryId = route.params?.category_id;
+  const receivedDataLetterType = route.params?.letterType;
+  const receivedDataGreetingsTitle = route.params?.greetingsTitle;
+  const receivedDataSubjectOfLetter = route.params?.subjectOfLetter;
+  const receivedDatapostLetter = route.params?.postLetter;
+  const receivedDataintroductionOfLetter = route.params?.introductionOfLetter;
+
+
+  console.log('Name', receivedDataName);
+  console.log('Address', receivedDatAddress);
+  console.log('Contact', receivedDataContactNumber);
+  console.log('Email', receivedDataEmail);
+  console.log('Id', receivedDataCategoryId);
+  console.log('LetterType', receivedDataLetterType);
+  console.log('LetterTypeAppeal', receivedDataLetterType);
+  console.log('Greetings', receivedDataGreetingsTitle);
+  console.log('Subject Of Letter', receivedDataSubjectOfLetter);
+  console.log('Post Letter', receivedDatapostLetter);
+  console.log('Introduction Of Letter', receivedDataintroductionOfLetter);
+
+
   const saveSign = () => {
+    console.log("Before saveImage");
+
     signatureRef.current.saveImage((encodedImage) => {
+        console.log("Encoded Image")
+      //console.log(("Encoded Image of:",encodedImage.encoded))
       // Save the encoded image to state
-      setSavedSignature(encodedImage);
+     /*  setSavedSignature(true);
+
+      setEncodedImage(encodedImage.encoded) */
+
+      
+
     });
+
+    console.log("After saveImage");
+
+
+    //heyy()
   };
+
+  const heyy=()=>{
+    console.log("Heyy Ref", signatureRef)
+    console.log("Heyy Signature", encodedImage)
+
+  }
 
   const resetSign = () => {
     signatureRef.current.resetImage();
@@ -92,13 +187,170 @@ export default function PostLetterSignature({navigation}) {
   const onSaveEvent = result => {
     // result.encoded - for the base64 encoded png
     // result.pathName - for the file path name
-    console.log(result);
+
+    console.log("Encoded Image", result.encoded )
+
+    console.log("Encoded File Path", result.pathName )
+
+    //console.log(("Encoded Image of:",encodedImage.encoded))
+    // Save the encoded image to state
+     setSavedSignature(true);
+
+
+    setEncodedImage(result.encoded)
+
+    setEncodedFilePath(result.pathName)
+
+    generateRandomName()
+
+    if(fileName!==''){
+      handleUploadImage()
+    }
+
+    //extractFileInfo(result.pathName)
+
+    
+
+    /* if(fileName!=='' && fileType!== ''){
+      handleUploadImage()
+    } */
+
+
+    //handleUploadImage()
+
   };
+
+
+  const generateRandomName = () => {
+    // Generate a random string as a unique identifier
+    const randomString = Math.random().toString(36).substring(2, 10);
+  
+    // Get the current timestamp
+    const timestamp = new Date().getTime();
+  
+    // Combine the random string and timestamp to create a unique name
+    const uniqueName = `${randomString}_${timestamp}.png`;
+
+    setFileName(uniqueName)
+  
+    return uniqueName;
+  };
+  
+
+
+   const extractFileInfo = (filePath) => {
+    // Use the platform-specific path delimiter
+    const pathDelimiter = Platform.OS === 'android' ? '/' : '/';
+    
+    // Split the file path using the path delimiter
+    const pathComponents = filePath.split(pathDelimiter);
+  
+    // Get the last component, which is the file name
+    const fileName = pathComponents[pathComponents.length - 1];
+  
+    // Split the file name to get the file type
+    const fileNameComponents = fileName.split('.');
+    const fileType = fileNameComponents.length > 1 ? fileNameComponents.pop() : null;
+   
+    setFileName(fileName)
+
+    setFileType(fileType)
+
+    return { fileName, fileType };
+  };
+   
+  
+  const handleUploadImage = data => {
+    setLoading(true);
+    
+    const uri = encodedFilePath;
+    const type = 'image/png';
+    const name = fileName;
+    const sourceImage = {uri, type, name};
+    //console.log('Source Image', sourceImage);
+    console.log("Came to Upload Image", fileType)
+    const dataImage = new FormData();
+    dataImage.append('file', sourceImage);
+    dataImage.append('upload_preset', 'e6zfilan'); // Use your Cloudinary upload preset
+    dataImage.append('cloud_name', 'dxfdrtxi3'); // Use your Cloudinary cloud name
+
+    fetch('https://api.cloudinary.com/v1_1/dxfdrtxi3/image/upload', {
+      method: 'POST',
+      body: dataImage,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        setImageUrl(data.url); // Store the Cloudinary video URL in your state
+        //uploadVideo(data.url)
+        //uploadXpiVideo(data.url);
+        console.log('Image Url', data);
+        //uploadXpiVideo(data.url,data)
+       // uploadVideo(data.url);
+      })
+      .catch(err => {
+        setLoading(false);
+        console.log('Error While Uploading Video', err);
+      });
+  };
+
+  const uploadVideo = async data => {
+    console.log('Image Uri of encoded', data);
+   
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY5ODAzOTAyNywiZXhwIjoxNzAwNjMxMDI3fQ.JSki1amX9VPEP9uCsJ5vPiCl2P4EcBqW6CQyY_YdLsk';
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/signature/createSignature';
+
+    const requestData = {
+      user_id: userId,
+      image: data,
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`, // Use the provided token
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data);
+        setLoading(false);
+        //handleUpdatePassword();
+
+        // Handle the response data as needed
+      } else {
+        setLoading(false);
+
+        console.error(
+          'Failed to upload video:',
+          response.status,
+          response.statusText,
+        );
+        // Handle the error
+      }
+    } catch (error) {
+      console.error('API Request Error:', error);
+      setLoading(false);
+
+      // Handle the error
+    }
+  };
+
 
   const onDragEvent = () => {
     // This callback will be called when the user enters a signature
     console.log('dragged');
   };
+
+  
 
   //--------------------\\
 
@@ -113,7 +365,11 @@ export default function PostLetterSignature({navigation}) {
   const [isTextInputActiveContact, setIsTextInputActiveContact] =
     useState(false);
   
-  const [savedSignature, setSavedSignature] = useState(null);
+  const [savedSignature, setSavedSignature] = useState(false);
+
+  const [encodedImage, setEncodedImage] = useState(null);
+
+  const [encodedFilePath, setEncodedFilePath] = useState(null);
 
   const [isTextInputActiveEmail, setIsTextInputActiveEmail] = useState(false);
 
@@ -285,7 +541,7 @@ export default function PostLetterSignature({navigation}) {
           ref={signatureRef}
           onSaveEvent={onSaveEvent}
           onDragEvent={onDragEvent}
-          saveImageFileInExtStorage={false}
+          saveImageFileInExtStorage={true}
           showNativeButtons={false}
           showTitleLabel={false}
           //backgroundColor={'black'}
@@ -389,9 +645,8 @@ export default function PostLetterSignature({navigation}) {
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
           <Text>Saved Signature:</Text>
           <Image
-          //source={appImages.LogOut}
-            source={{ uri: `data:image/png;base64,${savedSignature}` }}
-            style={{ borderWidth:3, width: 200, height: 100 }}
+            source={{ uri: `data:image/png;base64,${encodedImage}`}}
+            style={{ borderWidth: 3, width: 200, height: 50 }}
           />
         </View>
       )}
@@ -402,11 +657,24 @@ export default function PostLetterSignature({navigation}) {
           load={loading}
           // checkdisable={inn == '' && cm == '' ? true : false}
           customClick={() => {
-            //saveSign()
-            navigation.navigate('PostLetterEditSignaturePics');
+            saveSign()
+            //navigation.navigate('PostLetterEditSignaturePics');
             //navigation.navigate('Profile_image');
           }}
         />
+      </View>
+
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {loading && <ActivityIndicator size="large" color="#FACA4E" />}
       </View>
     </View>
   );

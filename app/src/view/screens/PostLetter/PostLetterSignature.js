@@ -53,7 +53,7 @@ import {
   import Headers from '../../../assets/Custom/Headers';
   import CustomSnackbar from './../../../assets/Custom/CustomSnackBar';
 
-export default function PostLetterSignature({navigation}) {
+export default function PostLetterSignature({navigation, route}) {
 
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
@@ -85,6 +85,44 @@ export default function PostLetterSignature({navigation}) {
   const [letterType, setLetterTypes] = useState('Public');
 
   const [snackbarVisible, setsnackbarVisible] = useState(false);
+
+  const receivedDataName = route.params?.name;
+  const receivedDatAddress = route.params?.address;
+  const receivedDataContactNumber = route.params?.contactNumber;
+  const receivedDataEmail = route.params?.email;
+  const receivedDataCategoryId = route.params?.category_id;
+  const receivedDataLetterType = route.params?.letterType;
+
+  const receivedDataGreetingsTitle = route.params?.greetingsTitle;
+
+  const receivedDatasubjectOfLetter = route.params?.subjectOfLetter;
+
+  const receivedDataintroductionOfLetter = route.params?.introductionOfLetter;
+
+  const receivedDatapostLetter = route.params?.postLetter;
+
+  const receivedDataAppealOfLetter = route.params?.formOfApeal;
+
+
+
+
+  console.log ("Name", receivedDataName )
+  console.log ("Address", receivedDatAddress )
+  console.log ("Contact", receivedDataContactNumber )
+  console.log ("Email", receivedDataEmail )
+  console.log ("Id", receivedDataCategoryId )
+  console.log ("LetterType", receivedDataLetterType )
+
+  console.log ("Greetings", receivedDataGreetingsTitle )
+
+  console.log ("Subject", receivedDatasubjectOfLetter )
+
+  console.log ("Introduction", receivedDataintroductionOfLetter )
+
+  console.log ("Post Letter", receivedDatapostLetter )
+
+  console.log ("Appeal Of Letter", receivedDataAppealOfLetter )
+
 
 
   const takePhotoFromCamera = async value => {

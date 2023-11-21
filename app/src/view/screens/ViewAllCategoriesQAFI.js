@@ -29,10 +29,6 @@ export default function ViewAllCategoriesQAFI({navigation}) {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
 
-  
-
-
-
   useEffect(() => {
     // Make the API request and update the 'data' state
     fetchVideos();

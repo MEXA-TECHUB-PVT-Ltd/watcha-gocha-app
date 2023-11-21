@@ -69,7 +69,7 @@ export default function News({navigation, route}) {
   };
 
   return (
-    <ImageBackground source={appImages.videoBG} style={{flex: 1}}>
+    <ImageBackground source={appImages.newsPlaceHolder} style={{flex: 1}}>
       <StatusBar
         translucent={true}
         backgroundColor="transparent"
