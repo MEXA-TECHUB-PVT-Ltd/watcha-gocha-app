@@ -27,6 +27,9 @@ import Add from '../../../assets/svg/AddMainScreen.svg';
 
 import {appImages} from '../../../assets/utilities';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
@@ -63,19 +66,22 @@ export default function PicTours({navigation}) {
 
   const [dataMostCommentedVideos, setMostCommentedVideos] = useState([]);
 
+  const [authToken, setAuthToken] = useState('');
+
+
   const ref_RBSheetCamera = useRef(null);
 
   useEffect(() => {
     // Make the API request and update the 'data' state
     fetchVideos();
-  }, []);
+  }, [selectedItemPicsId]);
 
   const fetchVideos = async () => {
     // Simulate loading
     setLoading(true);
 
     // Fetch data one by one
-    await fetchCategory();
+    await getUserID();
     await fetchTrendingVideos();
     await fetchLatestVideos();
     await fetchMostViewedVideos();
@@ -85,11 +91,51 @@ export default function PicTours({navigation}) {
     setLoading(false);
   };
 
+  const getUserID = async () => {
+    console.log("AT User Id")
+    try {
+      const result = await AsyncStorage.getItem('authToken ');
+      if (result !== null) {
+        setAuthToken(result);
+        await fetchCategory(result);
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
+
+
+  
+
+  const fetchCategory = async (result) => {
+    const token = result;
+
+    try {
+      const response = await fetch(
+        'https://watch-gotcha-be.mtechub.com/picCategory/getAllPicCategories?page=1&limit=5',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('Search Results', result.AllCategories);
+      setSearches(result.AllCategories); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
   const fetchTrendingVideos = async () => {
 
-    console.log("selected id trending videos", selectedItemPicsId)
+    console.log("selected id trending videos", authToken)
     const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+      authToken;
 
     try {
       const response = await fetch(
@@ -111,8 +157,11 @@ export default function PicTours({navigation}) {
   };
 
   const fetchLatestVideos = async () => {
+
+    console.log("selected id latest videos", authToken)
+
     const token =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+    authToken;
 
     try {
       const response = await fetch(
@@ -134,7 +183,9 @@ export default function PicTours({navigation}) {
   };
 
   const fetchMostViewedVideos = async () => {
-    const token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+    console.log("selected id most viewed videos", authToken)
+
+    const token =authToken;
 
     try {
       const response = await fetch(
@@ -156,8 +207,10 @@ export default function PicTours({navigation}) {
   };
 
   const fetchMostCommentedVideos = async () => {
+    console.log("selected most commented videos", authToken)
+
     const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+      authToken;
 
     try {
       const response = await fetch(
@@ -173,29 +226,6 @@ export default function PicTours({navigation}) {
       const result = await response.json();
       console.log('Resultings', result.Tours);
       setMostCommentedVideos(result.Tours); // Update the state with the fetched data
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
-
-  const fetchCategory = async () => {
-    const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY5ODAzOTAyNywiZXhwIjoxNzAwNjMxMDI3fQ.JSki1amX9VPEP9uCsJ5vPiCl2P4EcBqW6CQyY_YdLsk';
-
-    try {
-      const response = await fetch(
-        'https://watch-gotcha-be.mtechub.com/picCategory/getAllPicCategories?page=1&limit=5',
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      const result = await response.json();
-      console.log('Search Results', result.AllCategories);
-      setSearches(result.AllCategories); // Update the state with the fetched data
     } catch (error) {
       console.error('Error:', error);
     }

@@ -26,6 +26,8 @@ import {appImages} from '../../../assets/utilities';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons';
 
 import RBSheet from 'react-native-raw-bottom-sheet';
@@ -36,6 +38,8 @@ export default function Video({navigation}) {
   const [loading, setLoading] = useState(false);
 
   const [searchesData, setSearches] = useState('');
+
+  const [authToken, setAuthToken] = useState('');
 
   const [imageInfo, setImageInfo] = useState(null);
 
@@ -61,8 +65,9 @@ export default function Video({navigation}) {
     setLoading(true);
 
     // Fetch data one by one
-    await fetchCategory();
-    await fetchTrendingVideos();
+    await getUserID();
+    
+   
     await fetchLatestVideos();
     await fetchMostViewedVideos();
     await fetchMostCommentedVideos();
@@ -70,11 +75,28 @@ export default function Video({navigation}) {
     // Once all data is fetched, set loading to false
     setLoading(false);
   };
-
+  
+  const getUserID = async () => {
+    console.log("AT User Id")
+    try {
+      const result = await AsyncStorage.getItem('authToken ');
+      if (result !== null) {
+        setAuthToken(result);
+        await fetchCategory(result);
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
+  
   const fetchTrendingVideos = async () => {
     console.log("Categry in id", selectedItemId)
+    console.log("Id's", authToken);
+
     const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE2OTgzMTI3NDUsImV4cCI6MTcwMDkwNDc0NX0.YsFwjW-luPHnhb4R3nAyuyHDV58PoehhrsMdMttJd08';
+      authToken;
 
     try {
       const response = await fetch(
@@ -97,7 +119,7 @@ export default function Video({navigation}) {
 
   const fetchLatestVideos = async () => {
     const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE2OTgzMTI3NDUsImV4cCI6MTcwMDkwNDc0NX0.YsFwjW-luPHnhb4R3nAyuyHDV58PoehhrsMdMttJd08';
+     authToken;
 
     try {
       const response = await fetch(
@@ -120,7 +142,7 @@ export default function Video({navigation}) {
 
   const fetchMostViewedVideos = async () => {
     const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE2OTgzMTI3NDUsImV4cCI6MTcwMDkwNDc0NX0.YsFwjW-luPHnhb4R3nAyuyHDV58PoehhrsMdMttJd08';
+      authToken;
 
     try {
       const response = await fetch(
@@ -143,7 +165,7 @@ export default function Video({navigation}) {
 
   const fetchMostCommentedVideos = async () => {
     const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+     authToken;
 
     try {
       const response = await fetch(
@@ -164,9 +186,10 @@ export default function Video({navigation}) {
     }
   };
 
-  const fetchCategory = async () => {
-    const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY5ODAzOTAyNywiZXhwIjoxNzAwNjMxMDI3fQ.JSki1amX9VPEP9uCsJ5vPiCl2P4EcBqW6CQyY_YdLsk';
+  const fetchCategory = async (result) => {
+
+    console.log("Auth Token category", result)
+    const token = result;
 
     try {
       const response = await fetch(
@@ -182,6 +205,8 @@ export default function Video({navigation}) {
       const result = await response.json();
       console.log('Search Results', result.AllCategories);
       setSearches(result.AllCategories); // Update the state with the fetched data
+
+      await fetchTrendingVideos(result);
     } catch (error) {
       console.error('Error:', error);
     }
@@ -419,13 +444,13 @@ export default function Video({navigation}) {
 
   const renderAvailableAppsVideo = item => {
     //console.log('Itemsss', item);
-    console.log('Video Link', item.video);
+    console.log('Video Link', item.thumbnail);
     return (
       <TouchableOpacity
         onPress={() => navigation.navigate('ViewVideo', {videoData: item})}
         style={{width: wp(27), margin: 5}}>
         <View>
-          {item.video !== '' || item.video !== null ? (
+          {item.thumbail === '' || item.thumbnail === null ||  item.thumbnail.startsWith('/') || item.thumbnail === undefined? (
              <Image
              style={{
                position: 'absolute',
@@ -455,7 +480,7 @@ export default function Video({navigation}) {
                 borderRadius: wp(1),
                 resizeMode: 'cover',
               }}
-              source={appImages.topSearches1}
+              source={{uri:item.thumbnail}}
             />
           )}
         </View>

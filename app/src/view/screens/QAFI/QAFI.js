@@ -145,7 +145,7 @@ export default function QAFI({navigation}) {
 
     try {
       const response = await fetch(
-        'https://watch-gotcha-be.mtechub.com/discCategory/getAllDiscCategories?page=1&limit=5',
+        'https://watch-gotcha-be.mtechub.com/discCategory/getAllDiscCategories',
         {
           method: 'GET',
           headers: {

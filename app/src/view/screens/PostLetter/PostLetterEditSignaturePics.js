@@ -318,7 +318,6 @@ import {
           </Text>
         </TouchableOpacity>
 
-
         {imageUri !== null ? (
           <View
             style={{

@@ -24,6 +24,7 @@ import Headers from '../../../assets/Custom/Headers';
 import {appImages} from '../../../assets/utilities';
 import Add from '../../../assets/svg/AddMainScreen.svg';
 import Approved from '../../../assets/svg/Approved';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Toast from 'react-native-toast-message';
 
@@ -39,6 +40,8 @@ export default function Disc({navigation, route}) {
 
   const [newsData, setNewsData] = useState([]);
 
+  const [authToken, setAuthToken] = useState('');
+
   const [opensLettersData, setOpensLettersData] = useState([]);
 
   const [qafiData, setQAFIData] = useState([]);
@@ -47,72 +50,93 @@ export default function Disc({navigation, route}) {
 
   const {NewsCategory, Type} = route?.params || {};
 
+
+  
   useEffect(() => {
-    const fetchData = async () => {
-      console.log('Received NewsCategory of:', NewsCategory);
-      console.log('Received Type of:', Type);
-    /*   Toast.show({
-        type: 'success', // 'success', 'error', 'info', 'warning'
-        position: 'bottom', // 'top', 'bottom', 'center'
-        text1: NewsCategory.toString(),
-        visibilityTime: 3000, // in milliseconds
-        autoHide: true,
-      }); */
+    
+    getUserID(); // Call the async function
+  }, [NewsCategory]); // Include 'id' in the dependency array
+
+  const getUserID = async () => {
+    
+    try {
+      const result = await AsyncStorage.getItem('authToken ');
+      if (result !== null) {
+        setAuthToken(result);
+
+        fetchData()
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
+
+
+  const fetchData = async () => {
+    console.log('Received NewsCategory of:', NewsCategory);
+    console.log('Received Type of:', Type);
+  /*   Toast.show({
+      type: 'success', // 'success', 'error', 'info', 'warning'
+      position: 'bottom', // 'top', 'bottom', 'center'
+      text1: NewsCategory.toString(),
+      visibilityTime: 3000, // in milliseconds
+      autoHide: true,
+    }); */
+    
+
+    // Check if 'id' exists before using it
+    if (NewsCategory) {
       
+     
+      console.log('Received id:', NewsCategory);
+      setCategoryIdNews(NewsCategory); // Uncomment this line if you want to use id to set selectedItemId
 
-      // Check if 'id' exists before using it
-      if (NewsCategory) {
-        
-       
-        console.log('Received id:', NewsCategory);
-        setCategoryIdNews(NewsCategory); // Uncomment this line if you want to use id to set selectedItemId
-
-        if (Type === 'NEWS') {
-          setLoading(true);
-          setSelectedItemId(1);
-          console.log('Category Id News is ', NewsCategory);
-          // Fetch data one by one
-          await fetchNews();
-
-          // Once all data is fetched, set loading to false
-          setLoading(false);
-        } else if (Type === 'QAFI') {
-          setLoading(true);
-          setSelectedItemId(3);
-          console.log('Category Id QAFI is ', NewsCategory);
-          // Fetch data one by one
-          await fetchQAFI();
-
-          // Once all data is fetched, set loading to false
-          setLoading(false);
-        } else if (Type === 'GEBC') {
-          setLoading(true);
-          setSelectedItemId(4);
-          console.log('Category Id QAFI is ', NewsCategory);
-          // Fetch data one by one
-          await fetchGEBC();
-
-          // Once all data is fetched, set loading to false
-          setLoading(false);
-        }
-      } else {
+      if (Type === 'NEWS') {
         setLoading(true);
-        //setSelectedItemId(1)
+        setSelectedItemId(1);
         console.log('Category Id News is ', NewsCategory);
         // Fetch data one by one
         await fetchNews();
 
         // Once all data is fetched, set loading to false
         setLoading(false);
+      } else if (Type === 'QAFI') {
+        setLoading(true);
+        setSelectedItemId(3);
+        console.log('Category Id QAFI is ', NewsCategory);
+        // Fetch data one by one
+        await fetchQAFI();
+
+        // Once all data is fetched, set loading to false
+        setLoading(false);
+      } else if (Type === 'GEBC') {
+        setLoading(true);
+        setSelectedItemId(4);
+        console.log('Category Id QAFI is ', NewsCategory);
+        // Fetch data one by one
+        await fetchGEBC();
+
+        // Once all data is fetched, set loading to false
+        setLoading(false);
       }
-    };
-    fetchData(); // Call the async function
-  }, [NewsCategory]); // Include 'id' in the dependency array
+    } else {
+      setLoading(true);
+      //setSelectedItemId(1)
+      console.log('Category Id News is ', NewsCategory);
+      // Fetch data one by one
+      await fetchNews();
+
+      // Once all data is fetched, set loading to false
+      setLoading(false);
+    }
+  };
 
   const fetchNews = async () => {
     console.log('Categry in id', categoryIdNews);
     const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY5ODAzOTAyNywiZXhwIjoxNzAwNjMxMDI3fQ.JSki1amX9VPEP9uCsJ5vPiCl2P4EcBqW6CQyY_YdLsk';
+      authToken;
 
     try {
       const response = await fetch(
@@ -138,7 +162,7 @@ export default function Disc({navigation, route}) {
   const fetchQAFI = async () => {
     console.log(' QAFI in id', categoryIdNews);
     const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY5ODAzOTAyNywiZXhwIjoxNzAwNjMxMDI3fQ.JSki1amX9VPEP9uCsJ5vPiCl2P4EcBqW6CQyY_YdLsk';
+      authToken;
     
     try {
       const response = await fetch(
@@ -164,7 +188,7 @@ export default function Disc({navigation, route}) {
   const fetchGEBC = async () => {
     console.log('Categry in id', categoryIdNews);
     const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+      authToken;
 
     try {
       const response = await fetch(

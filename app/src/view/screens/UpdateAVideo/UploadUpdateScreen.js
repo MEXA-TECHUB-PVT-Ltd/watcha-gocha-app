@@ -78,6 +78,9 @@ export default function UploadUpdateScreen({navigation, route}) {
 
   const [userId, setUserId] = useState('');
 
+  const [authToken, setAuthToken] = useState('');
+
+
   const [categoriesSelect, setCategorySelect] = useState([]);
 
   const [description, setDescription] = useState('');
@@ -125,7 +128,7 @@ export default function UploadUpdateScreen({navigation, route}) {
 
     await getUserID();
     // Fetch data one by one
-    await fetchCategory();
+    
 
     // Once all data is fetched, set loading to false
     setLoading(false);
@@ -138,6 +141,15 @@ export default function UploadUpdateScreen({navigation, route}) {
       if (result !== null) {
         setUserId(result);
         console.log('user id retrieved:', result);
+      } else {
+        console.log('result is null', result);
+      }
+
+      const result1 = await AsyncStorage.getItem('authToken ');
+      if (result1 !== null) {
+        setAuthToken(result1);
+        console.log('user id retrieved:', result1);
+        await fetchCategory(result1);
       } else {
         console.log('result is null', result);
       }
@@ -339,7 +351,7 @@ export default function UploadUpdateScreen({navigation, route}) {
     console.log('user id', userId);
     console.log('category id', categoryId);
 
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+    const token = authToken;
     const apiUrl = 'https://watch-gotcha-be.mtechub.com/xpi/createXpiVideo';
 
     const requestData = {
@@ -403,7 +415,7 @@ export default function UploadUpdateScreen({navigation, route}) {
           method: 'POST',
           headers: {
             Authorization:
-              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U',
+              authToken,
             'Content-Type': 'multipart/form-data',
           },
           body: formData,
@@ -603,9 +615,8 @@ export default function UploadUpdateScreen({navigation, route}) {
     setsnackbarVisible(false);
   };
 
-  const fetchCategory = async () => {
-    const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+  const fetchCategory = async (userToken) => {
+    const token = userToken;
 
     try {
       const response = await fetch(
@@ -776,7 +787,7 @@ export default function UploadUpdateScreen({navigation, route}) {
                 color: '#232323',
                 fontWeight: '700',
               }}>
-              Change Thumbnail
+              Upload Thumbnail
             </Text>
           </TouchableOpacity>
           {thumbnailImageUri == null && null}
