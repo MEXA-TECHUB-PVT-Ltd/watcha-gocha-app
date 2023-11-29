@@ -350,8 +350,6 @@ export default function PostLetterSignature({navigation, route}) {
     console.log('dragged');
   };
 
-  
-
   //--------------------\\
 
   const canvasRef = useRef(null);

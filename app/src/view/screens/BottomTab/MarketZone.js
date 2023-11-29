@@ -21,6 +21,8 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import Headers from '../../../assets/Custom/Headers';
 import {appImages} from '../../../assets/utilities';
 import Add from '../../../assets/svg/AddMainScreen.svg';
@@ -29,6 +31,8 @@ export default function MarketZone({navigation}) {
   const [selectedItemId, setSelectedItemId] = useState(null);
 
   const [data, setData] = useState(null);
+
+  const [authToken, setAuthToken] = useState('');
 
   const [dataElectronics, setDataElectronics] = useState(null);
 
@@ -51,15 +55,18 @@ export default function MarketZone({navigation}) {
     fetchVideos();
   }, [selectedItemId]);
 
+  
+
   const fetchVideos = async () => {
     // Simulate loading
     setLoading(true);
     // Fetch data one by one
+
+    await getUserID();
+
     await fetchAll();
 
     await fetchRegion();
-
-    await fetchCategory();
 
     await fetchElectronics();
 
@@ -70,10 +77,26 @@ export default function MarketZone({navigation}) {
     setLoading(false);
   };
 
+  const getUserID = async () => {
+    console.log("AT User Id")
+    try {
+      const result = await AsyncStorage.getItem('authToken ');
+      if (result !== null) {
+        setAuthToken(result);
+        await fetchCategory(result);
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
+
+
   const fetchAll = async () => {
     //console.log("Categry in id", selectedItemId)
     const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+      authToken;
 
     try {
       const response = await fetch(
@@ -97,7 +120,7 @@ export default function MarketZone({navigation}) {
   const fetchElectronics = async () => {
     console.log('Categry in id', selectedItemId);
     const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+      authToken;
 
     try {
       const response = await fetch(
@@ -121,7 +144,7 @@ export default function MarketZone({navigation}) {
   const fetchVehicles = async () => {
     //console.log("Categry in id", selectedItemId)
     const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+      authToken;
 
     try {
       const response = await fetch(
@@ -145,7 +168,7 @@ export default function MarketZone({navigation}) {
   const fetchClothing = async () => {
     //console.log("Categry in id", selectedItemId)
     const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+       authToken;
 
     try {
       const response = await fetch(
@@ -166,9 +189,10 @@ export default function MarketZone({navigation}) {
     }
   };
 
-  const fetchCategory = async () => {
-    const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY5ODAzOTAyNywiZXhwIjoxNzAwNjMxMDI3fQ.JSki1amX9VPEP9uCsJ5vPiCl2P4EcBqW6CQyY_YdLsk';
+  const fetchCategory = async (result) => {
+
+    console.log(" Categories Result", result)
+    const token = result;
 
     try {
       const response = await fetch(
@@ -210,7 +234,7 @@ export default function MarketZone({navigation}) {
   const fetchRegion = async () => {
     //console.log("Categry in id", selectedItemId)
     const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+      authToken;
 
     try {
       const response = await fetch(

@@ -372,6 +372,8 @@ const App = ({navigation}) => {
         console.log('email', firstResult.email);
         console.log('username', firstResult.username);
 
+        console.log('Auth Token', firstResult.token);
+
         AsyncStorage.setItem('email', firstResult.email.toString(), () => {
           console.log('user email saved successfully');
         });
@@ -386,6 +388,10 @@ const App = ({navigation}) => {
 
         AsyncStorage.setItem('userId ', firstResult.id.toString(), () => {
           console.log('user id saved successfully of signup');
+        });
+
+        AsyncStorage.setItem('authToken ', firstResult.token.toString(), () => {
+          console.log('authToken successfully of sign in');
         });
       } else {
         setIsLoading(false);
@@ -442,6 +448,7 @@ const App = ({navigation}) => {
         console.log('id', firstResult.id);
         console.log('email', firstResult.email);
         console.log('username', firstResult.username);
+        console.log('Auth Token', firstResult.token);
 
         AsyncStorage.setItem('email', firstResult.email.toString(), () => {
           console.log('user email saved successfully');
@@ -461,6 +468,87 @@ const App = ({navigation}) => {
 
         AsyncStorage.setItem('email ', firstResult.email.toString(), () => {
           console.log('user email saved successfully of sign in');
+        });
+
+        AsyncStorage.setItem('authToken ', firstResult.token.toString(), () => {
+          console.log('authToken successfully of sign in');
+        });
+
+        navigation.navigate('BottomTabNavigation');
+      } else {
+        setIsLoading(false);
+        handleUpdateCorrectPassword()
+        console.error('No results found.', data.response.result);
+      }
+
+      setIsLoading(false);
+
+      // Reset the input fields
+      setsignin_email('');
+      setsignin_pass('');
+
+      // navigation.navigate('SelectGender');
+    } catch (error) {
+      handleUpdateCorrectPassword()
+
+      //console.error('Error:');
+      //showAlert();
+      setIsLoading(false);
+    }
+  };
+
+
+
+  const handleSignInSkipForNow = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(signInEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: 'usama12345678@gmail.com',
+          password: 'Qwerty',
+          role: 'user',
+        }),
+      });
+
+      const data = await response.json();
+
+      console.log('error data sign in', data);
+
+      if (data.statusCode === 200) {
+        setIsLoading(false);
+        // Assuming there's at least one result
+        const firstResult = data.user;
+        console.log('id', firstResult.id);
+        console.log('email', firstResult.email);
+        console.log('username', firstResult.username);
+        console.log('Auth Token', firstResult.token);
+
+        /* AsyncStorage.setItem('email', firstResult.email.toString(), () => {
+          console.log('user email saved successfully');
+        });
+
+        AsyncStorage.setItem(
+          'userName',
+          firstResult.username.toString(),
+          () => {
+            console.log('user name saved successfully');
+          },
+        );
+
+        AsyncStorage.setItem('userId ', firstResult.id.toString(), () => {
+          console.log('user id saved successfully of sign in');
+        });
+
+        AsyncStorage.setItem('email ', firstResult.email.toString(), () => {
+          console.log('user email saved successfully of sign in');
+        });
+ */
+        AsyncStorage.setItem('authToken ', firstResult.token.toString(), () => {
+          console.log('authToken successfully of sign in');
         });
 
         navigation.navigate('BottomTabNavigation');
@@ -684,7 +772,7 @@ const App = ({navigation}) => {
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => skipforNow()}>
+            <TouchableOpacity onPress={() => handleSignInSkipForNow()}>
               <Text
                 style={{
                   color: '#FACA4E',

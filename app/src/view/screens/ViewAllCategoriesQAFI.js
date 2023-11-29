@@ -19,6 +19,7 @@ import {
 } from 'react-native-responsive-screen';
 import Fontiso from 'react-native-vector-icons/Fontisto';
 import Entypo from 'react-native-vector-icons/Entypo';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Headers from '../../assets/Custom/Headers';
 import {appImages} from '../../assets/utilities';
@@ -28,6 +29,7 @@ export default function ViewAllCategoriesQAFI({navigation}) {
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
+  const [authToken, setAuthToken] = useState('');
 
   useEffect(() => {
     // Make the API request and update the 'data' state
@@ -37,17 +39,31 @@ export default function ViewAllCategoriesQAFI({navigation}) {
   const fetchVideos = async () => {
     // Simulate loading
     setLoading(true);
-
+    
+    await getUserID()
     // Fetch data one by one
-    await fetchCategory();
-
     // Once all data is fetched, set loading to false
     setLoading(false);
   };
 
-  const fetchCategory = async () => {
+  const getUserID = async () => {
+    console.log("AT User Id")
+    try {
+      const result = await AsyncStorage.getItem('authToken ');
+      if (result !== null) {
+        setAuthToken(result);
+        await fetchCategory(result);
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
+
+  const fetchCategory = async (result) => {
     console.log('Categry in id', selectedItemId);
-    const token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY5ODAzOTAyNywiZXhwIjoxNzAwNjMxMDI3fQ.JSki1amX9VPEP9uCsJ5vPiCl2P4EcBqW6CQyY_YdLsk';
+    const token =result;
 
     try {
       const response = await fetch(

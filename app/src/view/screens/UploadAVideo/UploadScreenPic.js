@@ -63,6 +63,9 @@ export default function UploadScreenPic({navigation}) {
 
   const [loading, setLoading] = useState(false);
 
+  const [authToken, setAuthToken] = useState(false);
+
+
   const [snackbarVisible, setsnackbarVisible] = useState(false);
 
   const [isTextInputActive, setIsTextInputActive] = useState(false);
@@ -103,8 +106,6 @@ export default function UploadScreenPic({navigation}) {
 
     await getUserID();
     // Fetch data one by one
-    await fetchCategory();
-
     // Once all data is fetched, set loading to false
     setLoading(false);
   };
@@ -119,15 +120,24 @@ export default function UploadScreenPic({navigation}) {
       } else {
         console.log('result is null', result);
       }
+
+      const result1 = await AsyncStorage.getItem('authToken ');
+      if (result1 !== null) {
+        setAuthToken(result1);
+        console.log('user id retrieved:', result1);
+        await fetchCategory(result1);
+      } else {
+        console.log('result is null', result);
+      }
     } catch (error) {
       // Handle errors here
       console.error('Error retrieving user ID:', error);
     }
   };
 
-  const fetchCategory = async () => {
+  const fetchCategory = async (userToken) => {
     const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY5ODAzOTAyNywiZXhwIjoxNzAwNjMxMDI3fQ.JSki1amX9VPEP9uCsJ5vPiCl2P4EcBqW6CQyY_YdLsk';
+      userToken;
 
     try {
       const response = await fetch(
