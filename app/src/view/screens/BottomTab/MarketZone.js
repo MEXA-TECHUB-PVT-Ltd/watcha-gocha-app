@@ -48,6 +48,9 @@ export default function MarketZone({navigation}) {
 
   const [snackBarVisible, setSnackbarVisible] = useState(false);
 
+  const [dataTopVideos, setDataTopVideos] = useState([]);
+
+
   const ref_RBSheetCamera = useRef(null);
 
   useEffect(() => {
@@ -66,7 +69,7 @@ export default function MarketZone({navigation}) {
 
     await fetchAll();
 
-    await fetchRegion();
+    await fetchTopVideos()
 
     await fetchElectronics();
 
@@ -83,7 +86,7 @@ export default function MarketZone({navigation}) {
       const result = await AsyncStorage.getItem('authToken ');
       if (result !== null) {
         setAuthToken(result);
-        await fetchCategory(result);
+        await fetchRegion(result);
         console.log('user id retrieved:', result);
       }
     } catch (error) {
@@ -134,7 +137,7 @@ export default function MarketZone({navigation}) {
       );
 
       const result = await response.json();
-      console.log('AllItems', result.AllItems);
+      console.log(' s', result.AllItems);
       setDataElectronics(result.AllItems); // Update the state with the fetched data
     } catch (error) {
       console.error('Error Trending:', error);
@@ -148,7 +151,7 @@ export default function MarketZone({navigation}) {
 
     try {
       const response = await fetch(
-        `https://watch-gotcha-be.mtechub.com/item/getAllItemByCategory/5?page=1&limit=5&region=${selectedItemId}`,
+        `https://watch-gotcha-be.mtechub.com/item/getAllItemByCategory/6?page=1&limit=5&region=${selectedItemId}`,
         {
           method: 'GET',
           headers: {
@@ -165,6 +168,30 @@ export default function MarketZone({navigation}) {
     }
   };
 
+  const fetchTopVideos = async () => {
+
+    const token = authToken;
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/top/app/top_item`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('Resultings of Top Market Place', result.topitem[0]?.images[0]?.image);
+      setDataTopVideos(result.topitem[0]); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+
   const fetchClothing = async () => {
     //console.log("Categry in id", selectedItemId)
     const token =
@@ -172,7 +199,7 @@ export default function MarketZone({navigation}) {
 
     try {
       const response = await fetch(
-        `https://watch-gotcha-be.mtechub.com/item/getAllItemByCategory/5?page=1&limit=5&region=${selectedItemId}`,
+        `https://watch-gotcha-be.mtechub.com/item/getAllItemByCategory/7?page=1&limit=5&region=${selectedItemId}`,
         {
           method: 'GET',
           headers: {
@@ -189,6 +216,34 @@ export default function MarketZone({navigation}) {
     }
   };
 
+
+  const fetchRegion = async (resultId) => {
+    //console.log("Categry in id", selectedItemId)
+    const token =
+      resultId;
+
+    try {
+      const response = await fetch(
+        'https://watch-gotcha-be.mtechub.com/region/getAllRegion',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('AllItems', result.allRegion);
+      setRegions(result.allRegion); // Update the state with the fetched data
+
+      await fetchCategory(resultId);
+    } catch (error) {
+      console.error('Error Trending:', error);
+    }
+  };
+
+  
   const fetchCategory = async (result) => {
 
     console.log(" Categories Result", result)
@@ -229,31 +284,7 @@ export default function MarketZone({navigation}) {
     } catch (error) {
       console.error('Error:', error);
     }
-  };
-
-  const fetchRegion = async () => {
-    //console.log("Categry in id", selectedItemId)
-    const token =
-      authToken;
-
-    try {
-      const response = await fetch(
-        'https://watch-gotcha-be.mtechub.com/region/getAllRegion',
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      const result = await response.json();
-      console.log('AllItems', result.allRegion);
-      setRegions(result.allRegion); // Update the state with the fetched data
-    } catch (error) {
-      console.error('Error Trending:', error);
-    }
-  };
+  }; 
 
   const availableApps = [
     {
@@ -338,7 +369,7 @@ export default function MarketZone({navigation}) {
   };
 
   const renderAvailableAppsMarket = item => {
-    console.log('Items of market zone', item?.images[1]?.image);
+    console.log('Items of market zone', item?.images[0]?.image);
     return (
       <TouchableOpacity
         onPress={() =>
@@ -346,6 +377,23 @@ export default function MarketZone({navigation}) {
         }
         style={{width: wp(25.5), margin: 5}}>
         <View>
+
+        {!item.image || item.image === 'undefined'  || item.image.startsWith('/') ? (
+            <Image
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                zIndex: 1,
+                width: '100%',
+                height: hp(12),
+                borderRadius: wp(1),
+                resizeMode: 'cover',
+              }}
+              source={appImages.galleryPlaceHolder}
+            />
+        ):
+          (
           <Image
             style={{
               position: 'absolute',
@@ -359,8 +407,9 @@ export default function MarketZone({navigation}) {
               borderRadius: wp(2.5),
               resizeMode: 'cover',
             }}
-            source={{uri: item?.images[1]?.image}}
+            source={{uri: item?.images[0]?.image}}
           />
+          )}
         </View>
 
         <View
@@ -380,7 +429,7 @@ export default function MarketZone({navigation}) {
             style={{
               fontSize: hp(1.7),
               fontFamily: 'Inter',
-              color: '#FFFFFF',
+              color: 'black',
               fontWeight: '700',
             }}>
             {item?.title}
@@ -399,7 +448,22 @@ export default function MarketZone({navigation}) {
         }
         style={{width: wp(25.5), margin: 5}}>
         <View>
-          <Image
+        {!item.image || item.image === 'undefined'  || item.image.startsWith('/') ? (
+            <Image
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                zIndex: 1,
+                width: '100%',
+                height: hp(12),
+                borderRadius: wp(1),
+                resizeMode: 'cover',
+              }}
+              source={appImages.galleryPlaceHolder}
+            />
+        ):
+          (<Image
             style={{
               position: 'absolute',
               top: 0,
@@ -412,8 +476,9 @@ export default function MarketZone({navigation}) {
               borderRadius: wp(2.5),
               resizeMode: 'cover',
             }}
-            source={{uri: item?.images[1]?.image}}
-          />
+            source={{uri: item?.images[0]?.image}}
+          />)
+  }
         </View>
 
         <View
@@ -433,7 +498,7 @@ export default function MarketZone({navigation}) {
             style={{
               fontSize: hp(1.7),
               fontFamily: 'Inter',
-              color: '#FFFFFF',
+              color: 'black',
               fontWeight: '700',
             }}>
             {item?.title}
@@ -546,12 +611,12 @@ export default function MarketZone({navigation}) {
                 borderRadius: wp(3),
                 resizeMode: 'cover',
               }}
-              source={appImages.topSearches1}
+              source={appImages.galleryPlaceHolder}
             />
             <View
               style={{
                 position: 'absolute',
-                top: hp(12),
+                top: hp(10),
                 left: 7,
                 //height: hp(3),
                 //width: wp(21),
@@ -565,10 +630,10 @@ export default function MarketZone({navigation}) {
                 style={{
                   fontSize: hp(2.5),
                   fontFamily: 'Inter-Medium',
-                  color: '#FFFFFF',
+                  color: 'black',
                   fontWeight: '700',
                 }}>
-                Data
+                {dataTopVideos?.item_name}
               </Text>
             </View>
           </View>
@@ -583,9 +648,11 @@ export default function MarketZone({navigation}) {
                 color: '#000000',
                 //fontWeight: '700',
               }}>
-              Explore the intricate web of global politics in this
+             {/*  Explore the intricate web of global politics in this
               thought-provoking video as we delve into the ever-shifting
-              landscape of international diplomacy......
+              landscape of international diplomacy...... */}
+
+{dataTopVideos.length===0? "No Top Pic Shown": dataTopVideos?.description}
             </Text>
           </View>
         </View>

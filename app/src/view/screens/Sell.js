@@ -82,6 +82,8 @@ export default function Sell({navigation}) {
 
   const [categoryId, setCategoryId] = useState('');
 
+  const [authToken, setAuthToken] = useState('');
+
   const [categoriesSelect, setCategorySelect] = useState([]);
 
   const [imageUri, setImageUri] = useState(null);
@@ -139,9 +141,6 @@ export default function Sell({navigation}) {
 
     await getUserID();
     // Fetch data one by one
-    await fetchCategory();
-
-    //await requestLocationPermission();
 
     // Once all data is fetched, set loading to false
     setLoading(false);
@@ -157,15 +156,26 @@ export default function Sell({navigation}) {
       } else {
         console.log('result is null', result);
       }
+
+      const result1 = await AsyncStorage.getItem('authToken ');
+      if (result1 !== null) {
+        setAuthToken(result1);
+        console.log('user token retrieved:', result1);
+        await fetchCategory(result1);
+      } else {
+        console.log('result is null', result);
+      }
     } catch (error) {
       // Handle errors here
       console.error('Error retrieving user ID:', error);
     }
   };
 
-  const fetchCategory = async () => {
+
+  
+  const fetchCategory = async (userToken) => {
     const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY5ODAzOTAyNywiZXhwIjoxNzAwNjMxMDI3fQ.JSki1amX9VPEP9uCsJ5vPiCl2P4EcBqW6CQyY_YdLsk';
+     userToken;
 
     try {
       const response = await fetch(
@@ -505,7 +515,7 @@ export default function Sell({navigation}) {
       console.log('location ', locationName);
       console.log('region ', region);
   
-      const token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U'
+      const token = authToken
       const apiUrl = 'https://watch-gotcha-be.mtechub.com/item/sellItem';
   
       const requestData = {
