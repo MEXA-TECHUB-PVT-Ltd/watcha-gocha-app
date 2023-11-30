@@ -56,15 +56,14 @@ const Category = [
   {label: 'Item 3', value: '3'},
 ];
 
-export default function UploadScreenPic({navigation}) {
+export default function UploadScreenPic({navigation, route}) {
   const [selectedItem, setSelectedItem] = useState('');
 
   const [profileName, setProfileName] = useState('');
 
   const [loading, setLoading] = useState(false);
 
-  const [authToken, setAuthToken] = useState(false);
-
+  const [authToken, setAuthToken] = useState('');
 
   const [snackbarVisible, setsnackbarVisible] = useState(false);
 
@@ -82,6 +81,9 @@ export default function UploadScreenPic({navigation}) {
 
   const [imageUri, setImageUri] = useState(null);
 
+  const [videoUrl, setImageUrl] = useState('');
+
+
   const [imageInfo, setImageInfo] = useState(null);
 
   const [isFocus, setIsFocus] = useState(false);
@@ -89,6 +91,10 @@ export default function UploadScreenPic({navigation}) {
   const ref_RBSheetCamera = useRef(null);
 
   const ref_RBSendOffer = useRef(null);
+
+  const receivedData = route.params?.Video;
+
+  console.log("Recieved Data", receivedData)
 
   const navigateToScreen = () => {
     ref_RBSendOffer.current.close();
@@ -124,7 +130,7 @@ export default function UploadScreenPic({navigation}) {
       const result1 = await AsyncStorage.getItem('authToken ');
       if (result1 !== null) {
         setAuthToken(result1);
-        console.log('user id retrieved:', result1);
+        console.log('user token retrieved:', result1);
         await fetchCategory(result1);
       } else {
         console.log('result is null', result);
@@ -164,6 +170,9 @@ export default function UploadScreenPic({navigation}) {
         setCategorySelect(categories); // Update the state with the formatted category data
 
         console.log('Data Categories', categoriesSelect);
+
+        setImageInfo(receivedData)
+
       } else {
         console.error(
           'Failed to fetch categories:',
@@ -269,6 +278,65 @@ export default function UploadScreenPic({navigation}) {
     }, 3000);
   };
 
+  const upload = async () => {
+    if (
+      imageInfo !== null &&
+      profileName !== '' &&
+      categoryId !== '' &&
+      description !== ''
+    ) {
+      //uploadVideo()
+      //uploadVideos()
+      const uri = imageInfo.uri;
+      const type = imageInfo.type;
+      const name = imageInfo.fileName;
+      const source = {uri, type, name};
+      console.log("Video Source",source);
+      handleUploadImage(source);
+    } else {
+      setModalVisible(true);
+    }
+  };
+
+  const handleUploadImage = data => {
+    setLoading(true);
+    const uri = imageInfo.uri;
+    const type = imageInfo.type;
+    const name = imageInfo.fileName;
+    const sourceImage = {uri, type, name};
+    console.log('Source Image', sourceImage);
+    const dataImage = new FormData();
+    dataImage.append('file', sourceImage);
+    dataImage.append('upload_preset', 'e6zfilan'); // Use your Cloudinary upload preset
+    dataImage.append('cloud_name', 'dxfdrtxi3'); // Use your Cloudinary cloud name
+
+    fetch('https://api.cloudinary.com/v1_1/dxfdrtxi3/image/upload', {
+      method: 'POST',
+      body: dataImage,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        setImageUrl(data.url); // Store the Cloudinary video URL in your state
+        //uploadVideo(data.url)
+        //uploadXpiVideo(data.url);
+        console.log('Image Url', data);
+
+        createPicTour(data.url);
+        //uploadXpiVideo(data.url,data)
+       // uploadVideo(data.url);
+      })
+      .catch(err => {
+        setLoading(false);
+        console.log('Error While Uploading Video', err);
+      });
+  };
+
+
+
   const uploadVideos = async () => {
     try {
       console.log('Image Uri', imageUri);
@@ -316,18 +384,19 @@ export default function UploadScreenPic({navigation}) {
     }
   };
 
-  const createPicTour = async () => {
-    console.log('Image Uri', imageInfo.uri);
-    console.log('Image file Type', imageInfo.type);
-    console.log('Image file Type', imageInfo.fileName);
+  const createPicTour = async (value) => {
+    console.log("Image Value", value)
 
-    console.log('name', profileName);
-    console.log('description', description);
-    console.log('user_id', userId);
-    console.log('pic_category', categoryId);
+    console.log("Profile Name", profileName)
+
+    console.log("Description", description)
+
+    console.log("category id", categoryId)
+
+    console.log("user id", userId)
 
     const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+      authToken;
     const apiUrl = 'https://watch-gotcha-be.mtechub.com/picTour/createPicTour';
 
     // Construct the request data as FormData
@@ -337,15 +406,7 @@ export default function UploadScreenPic({navigation}) {
     formData.append('description', description);
     formData.append('pic_category', categoryId);
     formData.append('user_id', userId);
-    //formData.append('image', imageUri);
-
-    console.log('Form Data Entry', formData);
-
-      formData.append('image', {
-      uri: imageInfo.uri,
-      type: imageInfo.type, // Adjust the type based on the video file type
-      name: imageInfo.fileName, // Adjust the name based on the video file name
-    });
+    formData.append('image', value);
 
     try {
       const response = await fetch(apiUrl, {
@@ -407,7 +468,7 @@ export default function UploadScreenPic({navigation}) {
             borderRadius: wp(8),
             marginHorizontal: wp(23),
           }}>
-          {imageUri !== null && (
+          {imageInfo !== null && (
             <Image
               style={{
                 position: 'absolute',
@@ -420,7 +481,7 @@ export default function UploadScreenPic({navigation}) {
                 borderRadius: wp(8),
                 resizeMode: 'contain',
               }}
-              source={{uri: imageUri}}
+              source={{uri: imageInfo.uri}}
             />
           )}
           <TouchableOpacity
@@ -447,7 +508,7 @@ export default function UploadScreenPic({navigation}) {
               Change Pic
             </Text>
           </TouchableOpacity>
-          {imageUri == null && (
+          {imageInfo == null && (
             <Image
               style={{
                 flex: 1,
@@ -562,7 +623,7 @@ export default function UploadScreenPic({navigation}) {
               console.log('Upload Pics');
               if (userId !== '') {
                 //uploadVideos();
-                createPicTour();
+                upload()
               } else {
                 ref_RBSendOffer.current.open();
               }

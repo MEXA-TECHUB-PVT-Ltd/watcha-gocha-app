@@ -29,11 +29,9 @@ import {appImages} from '../../../assets/utilities';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -66,8 +64,9 @@ export default function PicTours({navigation}) {
 
   const [dataMostCommentedVideos, setMostCommentedVideos] = useState([]);
 
-  const [authToken, setAuthToken] = useState('');
+  const [dataTopVideos, setDataTopVideos] = useState([]);
 
+  const [authToken, setAuthToken] = useState('');
 
   const ref_RBSheetCamera = useRef(null);
 
@@ -83,6 +82,7 @@ export default function PicTours({navigation}) {
     // Fetch data one by one
     await getUserID();
     await fetchTrendingVideos();
+    await fetchTopVideos();
     await fetchLatestVideos();
     await fetchMostViewedVideos();
     await fetchMostCommentedVideos();
@@ -92,7 +92,7 @@ export default function PicTours({navigation}) {
   };
 
   const getUserID = async () => {
-    console.log("AT User Id")
+    console.log('AT User Id');
     try {
       const result = await AsyncStorage.getItem('authToken ');
       if (result !== null) {
@@ -106,10 +106,7 @@ export default function PicTours({navigation}) {
     }
   };
 
-
-  
-
-  const fetchCategory = async (result) => {
+  const fetchCategory = async result => {
     const token = result;
 
     try {
@@ -132,10 +129,8 @@ export default function PicTours({navigation}) {
   };
 
   const fetchTrendingVideos = async () => {
-
-    console.log("selected id trending videos", authToken)
-    const token =
-      authToken;
+    console.log('selected id trending videos', authToken);
+    const token = authToken;
 
     try {
       const response = await fetch(
@@ -157,11 +152,9 @@ export default function PicTours({navigation}) {
   };
 
   const fetchLatestVideos = async () => {
+    console.log('selected id latest videos', authToken);
 
-    console.log("selected id latest videos", authToken)
-
-    const token =
-    authToken;
+    const token = authToken;
 
     try {
       const response = await fetch(
@@ -183,9 +176,9 @@ export default function PicTours({navigation}) {
   };
 
   const fetchMostViewedVideos = async () => {
-    console.log("selected id most viewed videos", authToken)
+    console.log('selected id most viewed videos', authToken);
 
-    const token =authToken;
+    const token = authToken;
 
     try {
       const response = await fetch(
@@ -206,11 +199,35 @@ export default function PicTours({navigation}) {
     }
   };
 
-  const fetchMostCommentedVideos = async () => {
-    console.log("selected most commented videos", authToken)
+  const fetchTopVideos = async () => {
 
-    const token =
-      authToken;
+    console.log("Category Top Videos", selectedItemPicsId )
+    const token = authToken;
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/top/app/top_tour/${selectedItemPicsId}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('Resultings of Top Videossss', result.topTour[0]);
+      setDataTopVideos(result.topVideo[0]); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+
+  const fetchMostCommentedVideos = async () => {
+    console.log('selected most commented videos', authToken);
+
+    const token = authToken;
 
     try {
       const response = await fetch(
@@ -231,7 +248,6 @@ export default function PicTours({navigation}) {
     }
   };
 
-  
   //pics search
 
   const renderSearchesPic = item => {
@@ -281,24 +297,39 @@ export default function PicTours({navigation}) {
     console.log('Items of Pics', item);
     return (
       <TouchableOpacity
-        onPress={() =>  navigation.navigate('PicDetails', { picData: item })}
+        onPress={() => navigation.navigate('PicDetails', {picData: item})}
         style={{width: wp(27), margin: 5}}>
         <View>
+          {!item.image || item.image === 'undefined'  || item.image.startsWith('/') ? (
+            <Image
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                zIndex: 1,
+                width: '100%',
+                height: hp(12),
+                borderRadius: wp(1),
+                resizeMode: 'cover',
+              }}
+              source={appImages.galleryPlaceHolder}
+            />
+          ) : (
+            <Image
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                zIndex: 1,
+                width: '100%',
+                height: hp(12),
+                borderRadius: wp(1),
+                resizeMode: 'cover',
+              }}
+              source={{uri: item.image}}
+            />
+          )}
 
-        <Image
-             style={{
-               position: 'absolute',
-               top: 0,
-               left: 0,
-               zIndex: 1, // Ensure it's on top of other elements
-               //flex: 1,
-               width: '100%',
-               height: hp(12),
-               borderRadius: wp(1),
-               resizeMode: 'cover',
-             }}
-             source={appImages.galleryPlaceHolder}
-           />
           {/* <Image
             style={{
               position: 'absolute',
@@ -349,26 +380,25 @@ export default function PicTours({navigation}) {
         console.log('image here', response);
         if (!response.didCancel) {
           if (response.assets && response.assets.length > 0) {
-            setLoading(true)
+            setLoading(true);
             setImageInfo(response.assets[0]);
             ref_RBSheetCamera.current.close();
-            setLoading(false)
-    
-            navigation.navigate('UploadUpdatePic', { Video: response.assets[0] });
-    
+            setLoading(false);
+
+            navigation.navigate('UploadUpdatePic', {Video: response.assets[0]});
           } else if (response.uri) {
             console.log('response', imageInfo);
             ref_RBSheetCamera.current.close();
-            setLoading(false)
-      
-            navigation.navigate('UploadUpdatePic', { Video:response.assets[0] });
+            setLoading(false);
+
+            navigation.navigate('UploadUpdatePic', {Video: response.assets[0]});
           }
         }
         console.log('response', imageInfo);
         ref_RBSheetCamera.current.close();
-        setLoading(false)
-  
-        navigation.navigate('UploadUpdatePic', { Video:response.assets[0] });
+        setLoading(false);
+
+        navigation.navigate('UploadUpdatePic', {Video: response.assets[0]});
       },
     );
   };
@@ -378,23 +408,22 @@ export default function PicTours({navigation}) {
     launchImageLibrary({mediaType: 'Photo'}, response => {
       console.log('image here', response);
       if (!response.didCancel && response.assets.length > 0) {
-       /*  console.log('Response', response.assets[0]);
+        /*  console.log('Response', response.assets[0]);
         setImageUri(response.assets[0].uri);
         setImageInfo(response.assets[0]); */
-        setLoading(true)
+        setLoading(true);
         setImageInfo(response.assets[0]);
         ref_RBSheetCamera.current.close();
-        setLoading(false)
+        setLoading(false);
 
-        navigation.navigate('UploadUpdatePic', { Video: response.assets[0] });
-
+        navigation.navigate('UploadUpdatePic', {Video: response.assets[0]});
       }
 
       console.log('response', imageInfo);
       ref_RBSheetCamera.current.close();
-      setLoading(false)
+      setLoading(false);
 
-      navigation.navigate('UploadUpdatePic', { Video:response.assets[0] });
+      navigation.navigate('UploadUpdatePic', {Video: response.assets[0]});
     });
   };
 
@@ -537,7 +566,7 @@ export default function PicTours({navigation}) {
                 borderRadius: wp(3),
                 resizeMode: 'cover',
               }}
-              source={appImages.topSearches1}
+              source={appImages.galleryPlaceHolder}
             />
             <View
               style={{
@@ -559,7 +588,7 @@ export default function PicTours({navigation}) {
                   color: '#FFFFFF',
                   fontWeight: '700',
                 }}>
-                name
+                 {dataTopVideos?.pic_category_name}
               </Text>
             </View>
           </TouchableOpacity>
@@ -570,13 +599,13 @@ export default function PicTours({navigation}) {
                 fontSize: hp(1.6),
                 marginLeft: wp(1),
                 lineHeight: 15.5,
+                marginTop:hp(5),
                 fontFamily: 'Inter-Regular',
                 color: '#000000',
                 //fontWeight: '700',
               }}>
-              Explore the intricate web of global politics in this
-              thought-provoking video as we delve into the ever-shifting
-              landscape of
+                
+                {dataTopVideos.length===0? "No Top Pic Shown": dataTopVideos?.description} 
             </Text>
           </View>
         </View>
@@ -851,7 +880,7 @@ const styles = StyleSheet.create({
   textSearchDetails: {
     fontFamily: 'Inter',
     fontWeight: '700',
-    textAlign:'center',
+    textAlign: 'center',
     fontSize: hp(1.8),
   },
 

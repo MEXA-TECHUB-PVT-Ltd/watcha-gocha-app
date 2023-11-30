@@ -37,6 +37,10 @@ export default function Video({navigation}) {
 
   const [loading, setLoading] = useState(false);
 
+  const [topVideoImage, setTopVideoImage] = useState('');
+
+  const [topVideoText, setTopVideoText] = useState('');
+
   const [searchesData, setSearches] = useState('');
 
   const [authToken, setAuthToken] = useState('');
@@ -48,6 +52,8 @@ export default function Video({navigation}) {
   const [data, setData] = useState([]);
 
   const [dataLatestVideos, setDataLatestVideos] = useState([]);
+
+  const [dataTopVideos, setDataTopVideos] = useState([]);
 
   const [dataMostViewedVideos, setMostViewedVideos] = useState([]);
 
@@ -66,8 +72,7 @@ export default function Video({navigation}) {
 
     // Fetch data one by one
     await getUserID();
-    
-   
+    await fetchTopVideos();
     await fetchLatestVideos();
     await fetchMostViewedVideos();
     await fetchMostCommentedVideos();
@@ -75,9 +80,9 @@ export default function Video({navigation}) {
     // Once all data is fetched, set loading to false
     setLoading(false);
   };
-  
+
   const getUserID = async () => {
-    console.log("AT User Id")
+    console.log('AT User Id');
     try {
       const result = await AsyncStorage.getItem('authToken ');
       if (result !== null) {
@@ -90,13 +95,12 @@ export default function Video({navigation}) {
       console.error('Error retrieving user ID:', error);
     }
   };
-  
+
   const fetchTrendingVideos = async () => {
-    console.log("Categry in id", selectedItemId)
+    console.log('Categry in id', selectedItemId);
     console.log("Id's", authToken);
 
-    const token =
-      authToken;
+    const token = authToken;
 
     try {
       const response = await fetch(
@@ -118,8 +122,7 @@ export default function Video({navigation}) {
   };
 
   const fetchLatestVideos = async () => {
-    const token =
-     authToken;
+    const token = authToken;
 
     try {
       const response = await fetch(
@@ -140,9 +143,30 @@ export default function Video({navigation}) {
     }
   };
 
+  const fetchTopVideos = async () => {
+    const token = authToken;
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/top/app/top_video/6`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('Resultings of Top Videossss', result.topVideo[0]);
+      setDataTopVideos(result.topVideo[0]); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
   const fetchMostViewedVideos = async () => {
-    const token =
-      authToken;
+    const token = authToken;
 
     try {
       const response = await fetch(
@@ -164,8 +188,7 @@ export default function Video({navigation}) {
   };
 
   const fetchMostCommentedVideos = async () => {
-    const token =
-     authToken;
+    const token = authToken;
 
     try {
       const response = await fetch(
@@ -186,9 +209,8 @@ export default function Video({navigation}) {
     }
   };
 
-  const fetchCategory = async (result) => {
-
-    console.log("Auth Token category", result)
+  const fetchCategory = async result => {
+    console.log('Auth Token category', result);
     const token = result;
 
     try {
@@ -212,7 +234,7 @@ export default function Video({navigation}) {
     }
   };
 
- /*  const takePhotoFromCamera = value => {
+  /*  const takePhotoFromCamera = value => {
     ref_RBSheetCamera.current.close();
     setSelectedItem(value);
     navigation.navigate('UploadUpdateVideo');
@@ -223,7 +245,6 @@ export default function Video({navigation}) {
     setSelectedItem(value);
     navigation.navigate('UploadUpdateVideo');
   }; */
-
 
   const takePhotoFromCamera = async value => {
     setSelectedItem(value);
@@ -236,26 +257,29 @@ export default function Video({navigation}) {
         console.log('image here', response);
         if (!response.didCancel) {
           if (response.assets && response.assets.length > 0) {
-            setLoading(true)
+            setLoading(true);
             setImageInfo(response.assets[0]);
             ref_RBSheetCamera.current.close();
-            setLoading(false)
-    
-            navigation.navigate('UploadUpdateVideo', { Video: response.assets[0] });
-    
+            setLoading(false);
+
+            navigation.navigate('UploadUpdateVideo', {
+              Video: response.assets[0],
+            });
           } else if (response.uri) {
             console.log('response', imageInfo);
             ref_RBSheetCamera.current.close();
-            setLoading(false)
-      
-            navigation.navigate('UploadUpdateVideo', { Video:response.assets[0] });
+            setLoading(false);
+
+            navigation.navigate('UploadUpdateVideo', {
+              Video: response.assets[0],
+            });
           }
         }
         console.log('response', imageInfo);
         ref_RBSheetCamera.current.close();
-        setLoading(false)
-  
-        navigation.navigate('UploadUpdateVideo', { Video:response.assets[0] });
+        setLoading(false);
+
+        navigation.navigate('UploadUpdateVideo', {Video: response.assets[0]});
       },
     );
   };
@@ -265,23 +289,22 @@ export default function Video({navigation}) {
     launchImageLibrary({mediaType: 'video'}, response => {
       console.log('image here', response);
       if (!response.didCancel && response.assets.length > 0) {
-       /*  console.log('Response', response.assets[0]);
+        /*  console.log('Response', response.assets[0]);
         setImageUri(response.assets[0].uri);
         setImageInfo(response.assets[0]); */
-        setLoading(true)
+        setLoading(true);
         setImageInfo(response.assets[0]);
         ref_RBSheetCamera.current.close();
-        setLoading(false)
+        setLoading(false);
 
-        navigation.navigate('UploadUpdateVideo', { Video: response.assets[0] });
-
+        navigation.navigate('UploadUpdateVideo', {Video: response.assets[0]});
       }
 
       console.log('response', imageInfo);
       ref_RBSheetCamera.current.close();
-      setLoading(false)
+      setLoading(false);
 
-      navigation.navigate('UploadUpdateVideo', { Video:response.assets[0] });
+      navigation.navigate('UploadUpdateVideo', {Video: response.assets[0]});
     });
   };
 
@@ -450,22 +473,25 @@ export default function Video({navigation}) {
         onPress={() => navigation.navigate('ViewVideo', {videoData: item})}
         style={{width: wp(27), margin: 5}}>
         <View>
-          {item.thumbail === '' || item.thumbnail === null ||  item.thumbnail.startsWith('/') || item.thumbnail === undefined? (
-             <Image
-             style={{
-               position: 'absolute',
-               top: 0,
-               left: 0,
+          {item.thumbail === '' ||
+          item.thumbnail === null ||
+          item.thumbnail.startsWith('/') ||
+          item.thumbnail === undefined ? (
+            <Image
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
 
-               zIndex: 1, // Ensure it's on top of other elements
-               //flex: 1,
-               width: '100%',
-               height: hp(12),
-               borderRadius: wp(1),
-               resizeMode: 'cover',
-             }}
-             source={appImages.galleryPlaceHolder}
-           />
+                zIndex: 1, // Ensure it's on top of other elements
+                //flex: 1,
+                width: '100%',
+                height: hp(12),
+                borderRadius: wp(1),
+                resizeMode: 'cover',
+              }}
+              source={appImages.galleryPlaceHolder}
+            />
           ) : (
             <Image
               style={{
@@ -480,7 +506,7 @@ export default function Video({navigation}) {
                 borderRadius: wp(1),
                 resizeMode: 'cover',
               }}
-              source={{uri:item.thumbnail}}
+              source={{uri: item.thumbnail}}
             />
           )}
         </View>
@@ -492,8 +518,8 @@ export default function Video({navigation}) {
             marginTop: hp(12.5),
           }}>
           <Text
-           numberOfLines={1}
-           ellipsizeMode='tail'
+            numberOfLines={1}
+            ellipsizeMode="tail"
             style={{
               fontSize: hp(1.5),
               fontFamily: 'Inter-Regular',
@@ -611,7 +637,7 @@ export default function Video({navigation}) {
                 borderRadius: wp(3),
                 resizeMode: 'cover',
               }}
-              source={appImages.topSearches1}
+              source={appImages.galleryPlaceHolder}
             />
             <View
               style={{
@@ -633,7 +659,7 @@ export default function Video({navigation}) {
                   color: '#FFFFFF',
                   fontWeight: '700',
                 }}>
-                name
+                {dataTopVideos?.name}
               </Text>
             </View>
           </View>
@@ -654,9 +680,11 @@ export default function Video({navigation}) {
                 color: '#000000',
                 //fontWeight: '700',
               }}>
-              Explore the intricate web of global politics in this
+              {/* Explore the intricate web of global politics in this
               thought-provoking video as we delve into the ever-shifting
-              landscape of international diplomacy......
+              landscape of international diplomacy...... */}
+
+              {dataTopVideos?.description}
             </Text>
           </View>
         </View>

@@ -76,6 +76,9 @@ export default function ViewVideo({navigation, route}) {
 
   const ref_Comments = useRef(null);
 
+  const [authToken, setAuthToken] = useState([]);
+
+
   const refSlide = useRef();
 
   const bottomSheetRef = useRef(null);
@@ -99,7 +102,7 @@ export default function ViewVideo({navigation, route}) {
     // Fetch data one by one
 
     await getUserID();
-    await fetchComments();
+    
     //await fetchLikes()
     //await fetchCommentsCounts()
 
@@ -114,8 +117,18 @@ export default function ViewVideo({navigation, route}) {
       if (result !== null) {
         setUserId(result);
         console.log('user id retrieved:', result);
+        
       } else {
         console.log('user id null:', result);
+      }
+
+      const result1 = await AsyncStorage.getItem('authToken ');
+      if (result1 !== null) {
+        setAuthToken(result1);
+        console.log('user token retrieved:', result1);
+        await fetchComments(result1);
+      } else {
+        console.log('result is null', result);
       }
     } catch (error) {
       // Handle errors here
@@ -123,9 +136,8 @@ export default function ViewVideo({navigation, route}) {
     }
   };
 
-  const fetchComments = async () => {
-    const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+  const fetchComments = async (value) => {
+    const token = value;
 
     try {
       const response = await fetch(
@@ -142,6 +154,9 @@ export default function ViewVideo({navigation, route}) {
         const data = await response.json();
         //console.log("All Comments of usersssss", data.AllComents)
         setComments(data.AllComents);
+
+
+        await fetchLikes(value)
       } else {
         console.error(
           'Failed to fetch categories:',
@@ -154,9 +169,8 @@ export default function ViewVideo({navigation, route}) {
     }
   };
 
-  const fetchLikes = async () => {
-    const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+  const fetchLikes = async (values) => {
+    const token = values;
 
     try {
       const response = await fetch(
@@ -172,6 +186,8 @@ export default function ViewVideo({navigation, route}) {
       if (response.ok) {
         const data = await response.json();
         console.log('All Likes', data.totalLikes);
+        setLikes(data.totalLikes);
+        fetchCommentsCounts(values)
         //setLikes(data.totalLikes);
       } else {
         console.error(
@@ -185,9 +201,8 @@ export default function ViewVideo({navigation, route}) {
     }
   };
 
-  const fetchCommentsCounts = async () => {
-    const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+  const fetchCommentsCounts = async (values) => {
+    const token = values;
 
     try {
       const response = await fetch(
@@ -287,7 +302,7 @@ export default function ViewVideo({navigation, route}) {
     setLoading(true);
     console.log('Set Loading ', loading);
     const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U'; // Replace with your actual token
+       authToken; // Replace with your actual token
 
     try {
       const axiosConfig = {
@@ -331,9 +346,11 @@ export default function ViewVideo({navigation, route}) {
   };
 
   const sendLikes = async () => {
+    console.log("likes Token", authToken)
+    console.log("User Id", userId)
     setLoading(true);
     const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U'; // Replace with your actual token
+      authToken; // Replace with your actual token
 
     try {
       const axiosConfig = {
@@ -344,12 +361,12 @@ export default function ViewVideo({navigation, route}) {
       };
 
       const commentData = {
-        video_id: receivedData.video_id,
+        pic_tour_id: receivedData?.pic_tour_id,
         user_id: userId,
       };
 
       const response = await axios.post(
-        'https://watch-gotcha-be.mtechub.com/xpi/likeUnlikeVideo',
+        'https://watch-gotcha-be.mtechub.com/picTour/likeUnlikePicTour',
         commentData,
         axiosConfig,
       );
@@ -358,7 +375,7 @@ export default function ViewVideo({navigation, route}) {
 
       if (response.status === 200) {
         setLoading(false);
-        console.log('Video Liked  successfully');
+        console.log('Pic Liked  successfully');
         fetchAll();
       } else {
         setLoading(false);
@@ -658,7 +675,7 @@ export default function ViewVideo({navigation, route}) {
 
   return (
     <GestureHandlerRootView style={{flex: 1}}>
-      <ImageBackground source={{uri:'https://watch-gotcha-be.mtechub.com/'+receivedData.image}} style={{flex: 1}}>
+      <ImageBackground source={{uri:receivedData?.image}} style={{flex: 1}}>
         <StatusBar
           translucent={true}
           backgroundColor="transparent"
@@ -771,7 +788,7 @@ export default function ViewVideo({navigation, route}) {
                     fontSize: hp(1.5),
                     color: '#FFFFFF',
                   }}>
-                  {receivedData.like_count}
+                  {likes}
                 </Text>
               </View>
 
