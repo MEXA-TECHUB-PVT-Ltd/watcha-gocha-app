@@ -35,11 +35,8 @@ export const getToken= async ()=>{
 
     await AsyncStorage.setItem('UserToken', JSON.stringify(token));
 
-
-
     console.log("----------Token---------", token)
 }
-
 
 export async function requestUserPermission() {
     const authStatus = await messaging().requestPermission();

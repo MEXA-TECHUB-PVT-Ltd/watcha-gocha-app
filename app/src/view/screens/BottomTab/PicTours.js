@@ -206,7 +206,7 @@ export default function PicTours({navigation}) {
 
     try {
       const response = await fetch(
-        `https://watch-gotcha-be.mtechub.com/top/app/top_tour/${selectedItemPicsId}`,
+        `https://watch-gotcha-be.mtechub.com/top/getSpecificTopTourByCategory/${selectedItemPicsId}`,
         {
           method: 'GET',
           headers: {
