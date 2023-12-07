@@ -701,7 +701,7 @@ export default function ViewVideo({navigation, route}) {
                 marginLeft: wp(3),
                 overflow: 'hidden',
               }}>
-              <Image
+              {receivedData?.userimage===null?<Image
                 style={{
                   flex: 1,
                   width: null,
@@ -709,7 +709,15 @@ export default function ViewVideo({navigation, route}) {
                   resizeMode: 'contain',
                 }}
                 source={appImages.profileImg}
-              />
+              />:<Image
+              style={{
+                flex: 1,
+                width: null,
+                height: null,
+                resizeMode: 'contain',
+              }}
+              source={appImages.profileImg}
+            />}
             </View>
 
             <Text style={styles.textProfileName}>{receivedData.name}</Text>

@@ -261,7 +261,7 @@ export default function Video({navigation}) {
             setImageInfo(response.assets[0]);
             ref_RBSheetCamera.current.close();
             setLoading(false);
-
+              
             navigation.navigate('UploadUpdateVideo', {
               Video: response.assets[0],
             });
