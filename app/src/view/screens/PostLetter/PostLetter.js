@@ -278,7 +278,7 @@ export default function PostLetter({navigation, route}) {
               introductionOfLetter !== '' &&
               postLetter !== ''
             ) {
-              navigation.navigate('PostLetterSignature', {
+              navigation.navigate('PostLetterEditSignature', {
                 greetingsTitle: greetingsTitle,
                 subjectOfLetter: subjectOfLetter,
                 introductionOfLetter: introductionOfLetter,

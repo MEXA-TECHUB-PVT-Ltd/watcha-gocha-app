@@ -88,6 +88,8 @@ export default function PostLetterInfo({navigation}) {
 
   const ref_RBSendOffer = useRef(null);
 
+  const [authToken, setAuthToken] = useState('');
+
   const [postLetter, setPostLetter] = useState('');
 
   const [letterType, setLetterTypes] = useState('Public Letter');
@@ -125,8 +127,6 @@ export default function PostLetterInfo({navigation}) {
 
     await getUserID();
     // Fetch data one by one
-    await fetchCategory();
-
     // Once all data is fetched, set loading to false
     setLoading(false);
   };
@@ -137,6 +137,14 @@ export default function PostLetterInfo({navigation}) {
       const result = await AsyncStorage.getItem('userId ');
       if (result !== null) {
         setUserId(result);
+        console.log('user id retrieved:', result);
+      }
+
+      const result3 = await AsyncStorage.getItem('authToken ');
+      if (result3 !== null) {
+        setAuthToken(result3);
+        await fetchCategory(result3);
+
         console.log('user id retrieved:', result);
       }
     } catch (error) {
@@ -156,9 +164,8 @@ export default function PostLetterInfo({navigation}) {
     }
   };
 
-  const fetchCategory = async () => {
-    const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY5ODAzOTAyNywiZXhwIjoxNzAwNjMxMDI3fQ.JSki1amX9VPEP9uCsJ5vPiCl2P4EcBqW6CQyY_YdLsk';
+  const fetchCategory = async (id) => {
+    const token = id;
 
     try {
       const response = await fetch(
@@ -449,6 +456,8 @@ export default function PostLetterInfo({navigation}) {
           autoCapitalize="none"
           onFocus={handleFocusContact}
           onBlur={handleBlurContact}
+          keyboardType="numeric" // Set keyboardType to 'numeric'
+
           /* left={
             <TextInput.Icon
               icon={() => (

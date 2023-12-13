@@ -103,8 +103,7 @@ export default function PostLetterSignature({navigation, route}) {
 
   const receivedDataAppealOfLetter = route.params?.formOfApeal;
 
-
-
+  const receivedDataLetterImg = route.params?.letterImg;
 
   console.log ("Name", receivedDataName )
   console.log ("Address", receivedDatAddress )
@@ -123,6 +122,7 @@ export default function PostLetterSignature({navigation, route}) {
 
   console.log ("Appeal Of Letter", receivedDataAppealOfLetter )
 
+  console.log ("Letter Img", receivedDataLetterImg )
 
 
   const takePhotoFromCamera = async value => {
@@ -470,7 +470,6 @@ const styles = StyleSheet.create({
         borderRadius: wp(3),
         width: '98%',
         borderColor: '#FACA4E',
-    
         paddingHorizontal: 20,
         paddingVertical: 6.8,
         marginBottom: 20,

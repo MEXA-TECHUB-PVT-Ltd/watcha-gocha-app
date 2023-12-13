@@ -83,6 +83,9 @@ export default function ViewVideo({navigation, route}) {
 
   const [isOpen, setIsOpen] = useState(false);
 
+  const [authToken, setAuthToken] = useState('');
+
+
   const [commentsCount, setCommentsCount] = useState(null);
 
   const [showReply, setShowReply] = useState(false);
@@ -181,9 +184,9 @@ export default function ViewVideo({navigation, route}) {
     // Fetch data one by one
 
     await getUserID();
-    await fetchComments();
-    await fetchLikes();
-    await fetchCommentsCounts();
+    //await fetchComments();
+    //await fetchLikes();
+    //await fetchCommentsCounts();
 
     // Once all data is fetched, set loading to false
     setLoading(false);
@@ -199,15 +202,24 @@ export default function ViewVideo({navigation, route}) {
       } else {
         console.log('user id null:', result);
       }
+
+      const result1 = await AsyncStorage.getItem('authToken ');
+      if (result1 !== null) {
+        setAuthToken(result1);
+
+        console.log('user token retrieved:', result1);
+        await fetchComments(result1);
+      } else {
+        console.log('result is null', result);
+      }
     } catch (error) {
       // Handle errors here
       console.error('Error retrieving user ID:', error);
     }
   };
 
-  const fetchComments = async () => {
-    const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+  const fetchComments = async (result) => {
+    const token = result;
 
     try {
       const response = await fetch(
@@ -224,6 +236,7 @@ export default function ViewVideo({navigation, route}) {
         const data = await response.json();
         //console.log("All Comments of usersssss", data.AllComents)
         setComments(data.AllComents);
+        await fetchLikes(result);
       } else {
         console.error(
           'Failed to fetch categories:',
@@ -236,9 +249,8 @@ export default function ViewVideo({navigation, route}) {
     }
   };
 
-  const fetchLikes = async () => {
-    const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+  const fetchLikes = async (result) => {
+    const token = result;
 
     try {
       const response = await fetch(
@@ -255,6 +267,8 @@ export default function ViewVideo({navigation, route}) {
         const data = await response.json();
         console.log('All Likes', data.totalLikes);
         setLikes(data.totalLikes);
+        await fetchCommentsCounts(result);
+
       } else {
         console.error(
           'Failed to fetch categories:',
@@ -267,9 +281,8 @@ export default function ViewVideo({navigation, route}) {
     }
   };
 
-  const fetchCommentsCounts = async () => {
-    const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+  const fetchCommentsCounts = async (value) => {
+    const token = value;
 
     try {
       const response = await fetch(
@@ -399,8 +412,7 @@ export default function ViewVideo({navigation, route}) {
 
   const sendComment = async () => {
     setLoading(true);
-    const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U'; // Replace with your actual token
+    const token = authToken; // Replace with your actual token
 
     try {
       const axiosConfig = {
@@ -445,8 +457,7 @@ export default function ViewVideo({navigation, route}) {
 
   const sendLikes = async () => {
     setLoading(true);
-    const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U'; // Replace with your actual token
+    const token = authToken; // Replace with your actual token
 
     try {
       const axiosConfig = {

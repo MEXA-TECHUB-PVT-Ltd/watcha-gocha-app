@@ -50,15 +50,12 @@ export default function MarketZone({navigation}) {
 
   const [dataTopVideos, setDataTopVideos] = useState([]);
 
-
   const ref_RBSheetCamera = useRef(null);
 
   useEffect(() => {
     // Make the API request and update the 'data' state
     fetchVideos();
   }, [selectedItemId]);
-
-  
 
   const fetchVideos = async () => {
     // Simulate loading

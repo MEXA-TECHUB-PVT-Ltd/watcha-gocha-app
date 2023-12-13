@@ -30,7 +30,6 @@ import ViewVideoPicProfile from './app/src/view/screens/ViewVideoProfile/ViewVid
 import ViewVideoProfile from './app/src/view/screens/ViewVideoProfile/ViewVideoProfile';
 import PostLetterEditSignature from './app/src/view/screens/PostLetter/PostLetterEditSignature';
 import PostLetterEditSignaturePics from './app/src/view/screens/PostLetter/PostLetterEditSignaturePics';
-import PostLetterSignature from './app/src/view/screens/PostLetter/PostLetterEditSignature';
 import PostLetterInfo from './app/src/view/screens/PostLetter/PostLetterInfo';
 import PostLetter from './app/src/view/screens/PostLetter/PostLetter';
 import ViewProfile from './app/src/view/screens/Profile/ViewProfile';
@@ -101,6 +100,7 @@ import {
 import ViewAllCategoriesGEBC from './app/src/view/screens/ViewAllCategoriesGEBC';
 import ViewAllCategoriesQAFI from './app/src/view/screens/ViewAllCategoriesQAFI';
 import PostLetterAllUserName from './app/src/view/screens/PostLetter/PostLetterAllUserName';
+import PostLetterSignature from './app/src/view/screens/PostLetter/PostLetterSignature';
 
 //------------------\\
 

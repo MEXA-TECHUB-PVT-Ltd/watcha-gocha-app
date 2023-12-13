@@ -43,18 +43,5 @@ const appImages = {
   galleryPlaceHolder:require(IMAGES_DIR + 'galleryPlaceHolder.png'),
   newsPlaceHolder:require(IMAGES_DIR + 'placeholderNews.jpg'),
   LogOut:require(IMAGES_DIR + 'Logout.png')
-
-
-
-
-
-
-
-
-
-
-
-
-
 };
 export { appImages };

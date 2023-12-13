@@ -1,75 +1,83 @@
 import {
-    StyleSheet,
-    FlatList,
-    Text,
-    Image,
-    KeyboardAvoidingView,
-    ScrollView,
-    StatusBar,
-    ImageBackground,
-    View,
-    TouchableOpacity,
-  } from 'react-native';
-  import React, {useState, useRef} from 'react';
-  import RBSheet from 'react-native-raw-bottom-sheet';
-  import Entypo from 'react-native-vector-icons/Entypo';
-  
-  import {Button, Divider, TextInput} from 'react-native-paper';
-  import AntDesign from 'react-native-vector-icons/AntDesign';
-  import PlusPost from '../../../assets/svg/PlusPost.svg';
-  import Approved from '../../../assets/svg/Approved.svg';
-  
-  import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-  
-  import Back from '../../../assets/svg/back.svg';
-  import {appImages} from '../../../assets/utilities/index';
-  import Slider from '@react-native-community/slider';
-  import VolumeUp from '../../../assets/svg/VolumeUp.svg';
-  import Like from '../../../assets/svg/Like.svg';
-  import UnLike from '../../../assets/svg/Unlike.svg';
-  import Comment from '../../../assets/svg/Comment.svg';
-  import Send from '../../../assets/svg/Send.svg';
-  import Download from '../../../assets/svg/Download.svg';
-  import CustomButton from '../../../assets/Custom/Custom_Button';
-  import Ionicons from 'react-native-vector-icons/Ionicons';
-  import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-  import PublicLetter from '../../../assets/svg/PublicLetter.svg';
-  import PrivateLetter from '../../../assets/svg/PrivateLetter.svg';
-  
-  import Share from 'react-native-share';
-  
-  import {
-    heightPercentageToDP as hp,
-    widthPercentageToDP,
-    widthPercentageToDP as wp,
-  } from 'react-native-responsive-screen';
-  
-  import Fontiso from 'react-native-vector-icons/Fontisto';
-  
-  import IonIcons from 'react-native-vector-icons/Ionicons';
-  
-  import {SelectCountry, Dropdown} from 'react-native-element-dropdown';
-  import CPaperInput from '../../../assets/Custom/CPaperInput';
-  import Headers from '../../../assets/Custom/Headers';
-  import SignatureCapture from 'react-native-signature-capture';
-  import CustomSnackbar from './../../../assets/Custom/CustomSnackBar';
+  StyleSheet,
+  FlatList,
+  Text,
+  Image,
+  KeyboardAvoidingView,
+  ScrollView,
+  StatusBar,
+  ImageBackground,
+  View,
+  TouchableOpacity,
+} from 'react-native';
+import React, {useState, useRef, useEffect} from 'react';
+import RBSheet from 'react-native-raw-bottom-sheet';
+import Entypo from 'react-native-vector-icons/Entypo';
 
-  export default function PostLetterSignature({navigation}) {
+import {Button, Divider, TextInput} from 'react-native-paper';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import PlusPost from '../../../assets/svg/PlusPost.svg';
+import Approved from '../../../assets/svg/Approved.svg';
 
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+
+import Back from '../../../assets/svg/back.svg';
+import {appImages} from '../../../assets/utilities/index';
+import Slider from '@react-native-community/slider';
+import VolumeUp from '../../../assets/svg/VolumeUp.svg';
+import Like from '../../../assets/svg/Like.svg';
+import UnLike from '../../../assets/svg/Unlike.svg';
+import Comment from '../../../assets/svg/Comment.svg';
+import Send from '../../../assets/svg/Send.svg';
+import Download from '../../../assets/svg/Download.svg';
+import CustomButton from '../../../assets/Custom/Custom_Button';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import PublicLetter from '../../../assets/svg/PublicLetter.svg';
+import PrivateLetter from '../../../assets/svg/PrivateLetter.svg';
+import Share from 'react-native-share';
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen';
+
+import Fontiso from 'react-native-vector-icons/Fontisto';
+
+import IonIcons from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import {SelectCountry, Dropdown} from 'react-native-element-dropdown';
+import CPaperInput from '../../../assets/Custom/CPaperInput';
+import Headers from '../../../assets/Custom/Headers';
+import SignatureCapture from 'react-native-signature-capture';
+import CustomSnackbar from './../../../assets/Custom/CustomSnackBar';
+
+export default function PostLetterSignature({navigation, route}) {
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [selectedItem, setSelectedItem] = useState('');
   const [contact, setContact] = useState('');
   const [email, setEmail] = useState('');
+  const [authToken, setAuthToken] = useState('');
+  const [userId, setUserId] = useState('');
+
+  const [imageInfo, setImageInfo] = useState(null);
+
+  const [videoInfo, setVideoInfo] = useState(null);
 
   const [loading, setLoading] = useState(false);
+
+  const [videoUrl, setVideoUrl] = useState(false);
 
   const [colorSelect, setColorSelect] = useState('');
 
   const [snackbarVisible, setsnackbarVisible] = useState(false);
 
-  const ref_RBSendOffer = useRef(null);
+  const [snackbarVisibleALert, setsnackbarVisibleALert] = useState(false);
 
+
+  const ref_RBSendOffer = useRef(null);
 
   const [isTextInputActive, setIsTextInputActive] = useState(false);
   const [isTextInputActiveAddress, setIsTextInputActiveAddress] =
@@ -82,14 +90,79 @@ import {
 
   const [selectedItemId, setSelectedItemId] = useState(null);
   const ref_RBSheetCamera = useRef(null);
+  const ref_RBSheetVideo = useRef(null);
+
   const ref_RBSheetCameraCanvas = useRef(null);
 
   const [postLetter, setPostLetter] = useState('');
   const [letterType, setLetterTypes] = useState('Public');
 
   const [imageUri, setImageUri] = useState(null);
+  const [videoUri, setVideoUri] = useState(null);
 
+  const [imageUris, setImageUris] = useState([]);
 
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchVideos();
+  }, []);
+
+  const fetchVideos = async () => {
+    // Simulate loading
+    setLoading(true);
+
+    await getUserID();
+    // Fetch data one by one
+    // Once all data is fetched, set loading to false
+    setLoading(false);
+  };
+
+  const getUserID = async () => {
+    console.log("Id's");
+    try {
+      const result = await AsyncStorage.getItem('userId ');
+      if (result !== null) {
+        setUserId(result);
+        console.log('user id retrieved:', result);
+      }
+      const result3 = await AsyncStorage.getItem('authToken ');
+      if (result3 !== null) {
+        setAuthToken(result3);
+        console.log('user token retrieved:', result3);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+
+    try {
+      const result = await AsyncStorage.getItem('userName');
+      if (result !== null) {
+        setName(result);
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
+
+  const receivedDataName = route.params?.name;
+  const receivedDatAddress = route.params?.address;
+  const receivedDataContactNumber = route.params?.contactNumber;
+  const receivedDataEmail = route.params?.email;
+  const receivedDataCategoryId = route.params?.category_id;
+  const receivedDataLetterType = route.params?.letterType;
+  const receivedDataGreetingsTitle = route.params?.greetingsTitle;
+  const receivedDatasubjectOfLetter = route.params?.subjectOfLetter;
+  const receivedDataintroductionOfLetter = route.params?.introductionOfLetter;
+  const receivedDatapostLetter = route.params?.postLetter;
+  const receivedDataAppealOfLetter = route.params?.formOfApeal;
+  const receivedDataLetterImg = route.params?.letterImg;
+  const receivedDataSignatureId = route.params?.signatureId;
+  const receivedDataSignatureCreatedAt = route.params?.signatureCreatedAt;
+
+  console.log("Signature created received",receivedDataSignatureCreatedAt)
   const handleFocus = () => {
     setIsTextInputActive(true);
   };
@@ -128,7 +201,7 @@ import {
     launchCamera(
       {
         mediaType: 'photo',
-       // videoQuality: 'medium',
+        // videoQuality: 'medium',
       },
       response => {
         console.log('image here', response);
@@ -147,10 +220,21 @@ import {
   };
 
   const choosePhotoFromLibrary = value => {
-
     ref_RBSheetCameraCanvas.current.close();
 
     setSelectedItem(value);
+    launchImageLibrary({mediaType: 'photo'}, response => {
+      if (
+        !response.didCancel &&
+        response.assets &&
+        response.assets.length > 0
+      ) {
+        const newImageUri = response.assets[0];
+        updateImageUris(newImageUri);
+      }
+    });
+
+    /* setSelectedItem(value);
     launchImageLibrary({mediaType: 'photo'}, response => {
       console.log('image here', response);
       if (!response.didCancel && response.assets.length > 0) {
@@ -159,7 +243,253 @@ import {
       console.log('response', imageUri);
 
       //ref_RBSheetCamera.current.close();
+    }); */
+  };
+
+  const updateImageUris = newImageUri => {
+    if (imageUris.length < 10) {
+      setImageUris(prevImageUris => [...prevImageUris, newImageUri]);
+    } else {
+      // Handle the case when the limit exceeds (e.g., show a message)
+      console.log('Image limit exceeded');
+    }
+  };
+
+  const takeVideoFromCamera = async value => {
+    setSelectedItem(value);
+    launchCamera(
+      {
+        mediaType: 'video',
+        videoQuality: 'medium',
+      },
+      response => {
+        console.log('image here', response);
+        if (!response.didCancel) {
+          if (response.assets && response.assets.length > 0) {
+            setVideoUri(response.assets[0].uri);
+            console.log('response', response.assets[0].uri);
+            setVideoInfo(response.assets[0]);
+          } else if (response.uri) {
+            // Handle the case when no assets are present (e.g., for videos)
+            setVideoUri(response.uri);
+            console.log('response', response.uri);
+          }
+        }
+        ref_RBSheetCamera.current.close();
+      },
+    );
+  };
+
+  const chooseVideoFromLibrary = value => {
+    setSelectedItem(value);
+    launchImageLibrary({mediaType: 'video'}, response => {
+      console.log('image here', response);
+      if (!response.didCancel && response.assets.length > 0) {
+        console.log('Response', response.assets[0]);
+        setVideoUri(response.assets[0].uri);
+        setVideoInfo(response.assets[0]);
+      }
+
+      console.log('response', imageInfo);
+
+      ref_RBSheetCamera.current.close();
     });
+  };
+
+  // upload multiple images
+
+  const checkUpload=()=>{
+    if(imageUris.length===0 && videoInfo===null ){
+        handleUpdatePasswordAlert()
+    }else{
+      handleUploadImages(imageUris);
+
+    }
+  }
+
+  const handleUploadImages = async imageArray => {
+    console.log('ImageArray', imageArray);
+    setLoading(true);
+
+    const uploadPromises = imageArray.map(async imageInfo => {
+      const uri = imageInfo.uri;
+      const type = imageInfo.type;
+      const name = imageInfo.fileName;
+      const sourceImage = {uri, type, name};
+      const dataImage = new FormData();
+      dataImage.append('file', sourceImage);
+      dataImage.append('upload_preset', 'e6zfilan');
+      dataImage.append('cloud_name', 'dxfdrtxi3');
+
+      try {
+        const response = await fetch(
+          'https://api.cloudinary.com/v1_1/dxfdrtxi3/image/upload',
+          {
+            method: 'POST',
+            body: dataImage,
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'multipart/form-data',
+            },
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error('Image upload failed');
+        }
+
+        const data = await response.json();
+        console.log('Image Url', data.url);
+
+        setLoading(false);
+
+        // Assuming you have a function like uploadXpiVideo, you can call it here
+        //uploadXpiVideo(data.url, data);
+
+        return data.url;
+      } catch (error) {
+        setLoading(false);
+        console.log('Error While Uploading Image', error);
+        throw error; // Rethrow the error so that the Promise.all catches it
+      }
+    });
+
+    try {
+      const imageUrls = await Promise.all(uploadPromises);
+      console.log('All images uploaded successfully:', imageUrls);
+
+      //sellItem(imageUrls);
+
+      handleUploadVideo(imageUrls);
+
+      // Do something with the imageUrls array, e.g., store it in state or send it to the server
+    } catch (error) {
+      console.log('Error uploading images:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  //----------------------\\
+
+  const handleUploadVideo = video => {
+    setLoading(true);
+    const uri = videoInfo.uri;
+    const type = videoInfo.type;
+    const name = videoInfo.fileName;
+    const source = {uri, type, name};
+    const data = new FormData();
+    data.append('file', source);
+    data.append('upload_preset', 'e6zfilan'); // Use your Cloudinary upload preset
+    data.append('cloud_name', 'dxfdrtxi3'); // Use your Cloudinary cloud name
+
+    fetch('https://api.cloudinary.com/v1_1/dxfdrtxi3/video/upload', {
+      method: 'POST',
+      body: data,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        setVideoUrl(data.url); // Store the Cloudinary video URL in your state
+        //uploadVideo(data.url)
+
+        createLetter(data.url, video);
+        //uploadXpiVideo(data.url);
+        console.log(data);
+      })
+      .catch(err => {
+        //Alert.alert('Error While Uploading Video');
+        console.log('Error While Uploading Video', err);
+        setLoading(false);
+      });
+  };
+
+  const createLetter = async (video, image) => {
+    // console.log('Image Uri of encoded', data);
+    // console.log('image', image);
+    // console.log('video', video);
+    // console.log('user_id', userId);
+    // console.log('post_type', 'public');
+    // console.log('receiver_type', 'leader');
+    // console.log('disc_category', receivedDataName);
+    // console.log('name', receivedDataName);
+    // console.log('address', receivedDatAddress);
+    // console.log('contact_no', receivedDataContactNumber);
+    // console.log('subject_place', receivedDatasubjectOfLetter);
+    // console.log('post_date', receivedDataSignatureCreatedAt);
+    // console.log('greetings', receivedDataGreetingsTitle);
+    // console.log('introduction', receivedDataEmail);
+    // console.log('body', receivedDatapostLetter);
+    // console.log('form_of_appeal', receivedDataAppealOfLetter);
+    // console.log('signature_id', receivedDataSignatureId);
+    // console.log('paid_status', false);
+
+    const token = authToken;
+    console.log('AUTH TOKEN', token);
+
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/letter/createLetter';
+
+    const requestData = {
+      image: image, //you can send maximum 5 images
+      video: "", // you can send one video maximum
+      user_id: userId,
+      post_type: 'public',
+      receiver_type: 'leader',
+      disc_category: receivedDataCategoryId,
+      name: receivedDataName,
+      address: receivedDatAddress,
+      email: receivedDataEmail,
+      contact_no: receivedDataContactNumber,
+      subject_place: receivedDatasubjectOfLetter,
+      post_date: receivedDataSignatureCreatedAt,
+      greetings: receivedDataGreetingsTitle,
+      introduction: receivedDataintroductionOfLetter,
+      body: receivedDatapostLetter,
+      form_of_appeal: receivedDataAppealOfLetter,
+      signature_id: receivedDataSignatureId,
+      paid_status: false,
+      //   "receiver_id": 35,
+      //   "receiver_address": "receiver_address"
+    };
+
+    try {
+      console.log(requestData)
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data);
+
+        setLoading(false);
+
+        handleUpdatePassword();
+
+        // Handle the response data as needed
+      } else {
+        setLoading(false);
+
+        console.error(
+          'Failed call api:',
+           response
+        );
+        // Handle the error
+      }
+    } catch (error) {
+      console.error('API Request Error:', error);
+      setLoading(false);
+
+      // Handle the error
+    }
   };
 
   const handleUpdatePassword = async () => {
@@ -172,12 +502,29 @@ import {
     // Automatically hide the Snackbar after 3 seconds
     setTimeout(() => {
       setsnackbarVisible(false);
-      navigation.navigate("Mail")
+      navigation.navigate('Mail');
     }, 3000);
   };
 
   const dismissSnackbar = () => {
     setsnackbarVisible(false);
+  };
+
+  const handleUpdatePasswordAlert = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setsnackbarVisibleALert(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setsnackbarVisibleALert(false);
+    }, 3000);
+  };
+
+  const dismissSnackbarAlert = () => {
+    setsnackbarVisibleALert(false);
   };
 
 
@@ -194,14 +541,13 @@ import {
     ref_RBSheetCamera.current.close();
   };
 
-  const setType= ()=>{
+  const setType = () => {
     ref_RBSheetCamera.current.close();
 
     setLetterType('Private Letter');
 
     ref_RBSendOffer.current.open();
-
-  }
+  };
 
   const renderSearches = item => {
     console.log('Items', item);
@@ -229,9 +575,10 @@ import {
       </TouchableOpacity>
     );
   };
+
   return (
     <ScrollView style={styles.container}>
-    <StatusBar
+      <StatusBar
         translucent={true}
         backgroundColor="transparent"
         barStyle="dark-content" // You can set the StatusBar text color to dark or light
@@ -268,7 +615,7 @@ import {
         </View>
 
         <TouchableOpacity
-        onPress={()=>ref_RBSheetCamera.current.open()}
+          onPress={() => ref_RBSheetCamera.current.open()}
           style={{
             flexDirection: 'row',
             marginLeft: wp(5),
@@ -286,94 +633,170 @@ import {
 
           <Ionicons name="chevron-down" size={21} color="#FACA4E" />
         </TouchableOpacity>
-
-
-        
       </View>
 
       <TouchableOpacity
-        onPress={()=>ref_RBSheetCameraCanvas.current.open()}
+        onPress={() => ref_RBSheetCameraCanvas.current.open()}
+        style={{
+          borderRadius: wp(3),
+          marginTop: hp(5),
+          height: hp(25),
+          width: '70%',
+          alignSelf: 'center',
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderWidth: 1,
+          borderColor: '#E7EAF2',
+        }}>
+        <Image style={{resizeMode: 'contain'}} source={appImages.Upload} />
+
+        <Text
           style={{
-            borderRadius: wp(3),
-            marginTop: hp(5),
-            height: hp(25),
-            width:'70%',
-            alignSelf:'center',
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderWidth: 1,
-            borderColor: '#E7EAF2',
+            fontFamily: 'Inter',
+            marginTop: hp(1.8),
+            //fontWeight: 'bold',
+            fontSize: hp(1.5),
+            color: '#939393',
           }}>
-          <Image style={{resizeMode: 'contain'}} source={appImages.Upload} />
+          You can maximum 3 images or videos
+        </Text>
+      </TouchableOpacity>
 
-          <Text
-            style={{
-              fontFamily: 'Inter',
-              marginTop: hp(1.8),
-              //fontWeight: 'bold',
-              fontSize: hp(1.5),
-              color: '#939393',
-            }}>
-            You can maximum 3 images or videos
-          </Text>
-        </TouchableOpacity>
-
-        {imageUri !== null ? (
-          <View
-            style={{
-              marginTop: hp(5),
-              height: hp(35),
-              borderRadius: wp(3),
-              marginHorizontal: wp(20),
-            }}>
-            {imageUri !== null && (
-              <Image
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  zIndex: 1, // Ensure it's on top of other elements
-                  flex: 1,
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: wp(3),
-                  resizeMode: 'contain',
-                }}
-                source={{uri: imageUri}}
-              />
-            )}
-            {imageUri == null && (
-              <Image
-                style={{
-                  flex: 1,
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: wp(3),
-                  resizeMode: 'stretch',
-                  zIndex: 0, // Ensure it's below other elements when no image
-                }}
-                source={appImages.updatePics}
-              />
-            )}
-          </View>
-        ) : null}
-
-
-        <View style={{flex:1, justifyContent:'flex-end'}}>
-        <View style={{marginTop: '25%', alignSelf: 'center'}}>
-        <CustomButton
-          title="Upload"
-          load={loading}
-          // checkdisable={inn == '' && cm == '' ? true : false}
-          customClick={() => {
-             handleUpdatePassword()
-            //navigation.navigate('PostLetterEditSignature');
-            //navigation.navigate('Profile_image');
-          }}
-        />
-      </View>
+      {imageUri !== null ? (
+        <View
+          style={{
+            marginTop: hp(5),
+            height: hp(35),
+            borderRadius: wp(3),
+            marginHorizontal: wp(20),
+          }}>
+          {imageUri !== null && (
+            <Image
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                zIndex: 1, // Ensure it's on top of other elements
+                flex: 1,
+                width: '100%',
+                height: '100%',
+                borderRadius: wp(3),
+                resizeMode: 'contain',
+              }}
+              source={{uri: imageUri}}
+            />
+          )}
+          {imageUri == null && (
+            <Image
+              style={{
+                flex: 1,
+                width: '100%',
+                height: '100%',
+                borderRadius: wp(3),
+                resizeMode: 'stretch',
+                zIndex: 0, // Ensure it's below other elements when no image
+              }}
+              source={appImages.updatePics}
+            />
+          )}
         </View>
+      ) : null}
 
+      {/* //-------------------\\ */}
+      <FlatList
+        data={imageUris}
+        keyExtractor={(item, index) => index.toString()}
+        numColumns={3} // Set the number of columns to 3
+        renderItem={({item}) => (
+          <View style={styles.imageContainer}>
+            <Image source={{uri: item.uri}} style={styles.image} />
+          </View>
+        )}
+      />
+
+      <TouchableOpacity
+        onPress={() => ref_RBSheetVideo.current.open()}
+        style={{
+          borderRadius: wp(3),
+          marginTop: hp(5),
+          height: hp(25),
+          width: '70%',
+          alignSelf: 'center',
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderWidth: 1,
+          borderColor: '#E7EAF2',
+        }}>
+        <Image style={{resizeMode: 'contain'}} source={appImages.Upload} />
+
+        <Text
+          style={{
+            fontFamily: 'Inter',
+            marginTop: hp(1.8),
+            //fontWeight: 'bold',
+            fontSize: hp(1.5),
+            color: '#939393',
+          }}>
+          You can maximum upload 1 video
+        </Text>
+      </TouchableOpacity>
+
+      {imageUri !== null ? (
+        <View
+          style={{
+            marginTop: hp(5),
+            height: hp(35),
+            borderRadius: wp(3),
+            marginHorizontal: wp(20),
+          }}>
+          {imageUri !== null && (
+            <Image
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                zIndex: 1, // Ensure it's on top of other elements
+                flex: 1,
+                width: '100%',
+                height: '100%',
+                borderRadius: wp(3),
+                resizeMode: 'contain',
+              }}
+              source={{uri: imageUri}}
+            />
+          )}
+          {imageUri == null && (
+            <Image
+              style={{
+                flex: 1,
+                width: '100%',
+                height: '100%',
+                borderRadius: wp(3),
+                resizeMode: 'stretch',
+                zIndex: 0, // Ensure it's below other elements when no image
+              }}
+              source={appImages.updatePics}
+            />
+          )}
+        </View>
+      ) : null}
+
+      <View style={{flex: 1, justifyContent: 'flex-end'}}>
+        <View style={{marginTop: '25%', alignSelf: 'center'}}>
+          <CustomButton
+            title="Upload"
+            load={loading}
+            // checkdisable={inn == '' && cm == '' ? true : false}
+            customClick={() => {
+              //handleUpdatePassword();
+              checkUpload()
+              //handleUpdatePassword()
+              //navigation.navigate('PostLetterEditSignature');
+              //navigation.navigate('Profile_image');
+            }}
+          />
+        </View>
+      </View>
 
       <RBSheet
         ref={ref_RBSheetCamera}
@@ -427,50 +850,51 @@ import {
             //borderWidth: 3,
             marginTop: hp(3),
           }}>
-          <TouchableOpacity onPress={()=>setLetterType("Public Letter")} style={{flexDirection: 'row', marginHorizontal:wp(7)}}>
+          <TouchableOpacity
+            onPress={() => setLetterType('Public Letter')}
+            style={{flexDirection: 'row', marginHorizontal: wp(7)}}>
+            <PublicLetter height={23} width={23} />
 
-            <PublicLetter height={23} width={23}/>
-
-          <Text
-            style={{
-              fontFamily: 'Inter-Regular',
-              color: '#656565',
-              marginLeft:wp(3),
-              fontSize: hp(2.1),
-            }}>
-
-            Public letter
-
-          </Text>
-
+            <Text
+              style={{
+                fontFamily: 'Inter-Regular',
+                color: '#656565',
+                marginLeft: wp(3),
+                fontSize: hp(2.1),
+              }}>
+              Public letter
+            </Text>
           </TouchableOpacity>
 
-          <View style={{height:hp(0.1), marginHorizontal:wp(8), marginTop:hp(3), backgroundColor:'#00000012'}}>
-
-          </View>
-
-          <TouchableOpacity onPress={()=>setType()} style={{flexDirection: 'row', marginTop:hp(2.5), marginHorizontal:wp(7)}}>
-
-            <PrivateLetter height={23} width={23}/>
-
-          <Text
+          <View
             style={{
-              fontFamily: 'Inter-Regular',
-              color: '#656565',
-              marginLeft:wp(3),
-              fontSize: hp(2.1),
+              height: hp(0.1),
+              marginHorizontal: wp(8),
+              marginTop: hp(3),
+              backgroundColor: '#00000012',
+            }}></View>
+
+          <TouchableOpacity
+            onPress={() => setType()}
+            style={{
+              flexDirection: 'row',
+              marginTop: hp(2.5),
+              marginHorizontal: wp(7),
             }}>
+            <PrivateLetter height={23} width={23} />
 
-            Private Letter
-
-          </Text>
-
+            <Text
+              style={{
+                fontFamily: 'Inter-Regular',
+                color: '#656565',
+                marginLeft: wp(3),
+                fontSize: hp(2.1),
+              }}>
+              Private Letter
+            </Text>
           </TouchableOpacity>
-
-          
         </View>
       </RBSheet>
-
 
       <RBSheet
         ref={ref_RBSheetCameraCanvas}
@@ -523,9 +947,13 @@ import {
                 ? styles.selectedItems
                 : styles.nonselectedItems
             }>
-           <Image source={appImages.ArtBoard} style={{ resizeMode:'contain'}}/>
+            <Ionicons
+              color={selectedItem === 'camera' ? '#FACA4E' : '#888888'}
+              name="camera"
+              size={25}
+            />
 
-            <Text style={{marginTop:hp(-1.8),color: '#333333'}}>From canvas</Text>
+            <Text style={{color: '#333333'}}>From camera</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -611,24 +1039,98 @@ import {
             />
           </View>
 
+          <TouchableOpacity onPress={() => ref_RBSendOffer.current.close()}>
+            <Text
+              style={{
+                color: '#9597A6',
+                marginLeft: wp(1),
+                marginBottom: hp(3),
+                fontSize: hp(2),
+                textAlign: 'center',
+                lineHeight: hp(3),
+                //textDecorationLine:'underline',
+                fontFamily: 'Inter-Regular',
+                //fontWeight: 'bold',
+              }}>
+              Maybe later
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </RBSheet>
 
-          <TouchableOpacity onPress={()=>ref_RBSendOffer.current.close()}>
+      <RBSheet
+        ref={ref_RBSheetVideo}
+        closeOnDragDown={true}
+        closeOnPressMask={false}
+        animationType="fade"
+        minClosingHeight={0}
+        customStyles={{
+          wrapper: {
+            backgroundColor: 'rgba(52, 52, 52, 0.5)',
+          },
+          draggableIcon: {
+            backgroundColor: 'white',
+          },
+          container: {
+            borderTopLeftRadius: wp(10),
+            borderTopRightRadius: wp(10),
+            height: hp(25),
+          },
+        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginHorizontal: wp(8),
+            alignItems: 'center',
+          }}>
+          <Text style={styles.maintext}>Select an option</Text>
+          <TouchableOpacity onPress={() => ref_RBSheetVideo.current.close()}>
+            <Ionicons
+              name="close"
+              size={22}
+              color={'#303030'}
+              onPress={() => ref_RBSheetVideo.current.close()}
+            />
+          </TouchableOpacity>
+        </View>
 
-          <Text
-            style={{
-              color: '#9597A6',
-              marginLeft: wp(1),
-              marginBottom: hp(3),
-              fontSize: hp(2),
-              textAlign: 'center',
-              lineHeight: hp(3),
-              //textDecorationLine:'underline',
-              fontFamily: 'Inter-Regular',
-              //fontWeight: 'bold',
-            }}>
-            Maybe later
-          </Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-evenly',
+            alignItems: 'center',
+            marginTop: hp(3),
+          }}>
+          <TouchableOpacity
+            onPress={() => takeVideoFromCamera('camera')}
+            style={
+              selectedItem === 'camera'
+                ? styles.selectedItems
+                : styles.nonselectedItems
+            }>
+            <Ionicons
+              color={selectedItem === 'camera' ? '#FACA4E' : '#888888'}
+              name="camera"
+              size={25}
+            />
 
+            <Text style={{color: '#333333'}}>From camera</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => chooseVideoFromLibrary('gallery')}
+            style={
+              selectedItem === 'gallery'
+                ? styles.selectedItems
+                : styles.nonselectedItems
+            }>
+            <MaterialCommunityIcons
+              color={selectedItem === 'gallery' ? '#FACA4E' : '#888888'}
+              name="image"
+              size={25}
+            />
+            <Text style={{color: '#333333'}}>From gallery</Text>
           </TouchableOpacity>
         </View>
       </RBSheet>
@@ -639,106 +1141,117 @@ import {
         onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackbarVisible}
       />
-      
-      </ScrollView>
-  )
+
+      <CustomSnackbar
+        message={'Alert!'}
+        messageDescription={'Please Fill All Fields '}
+        onDismiss={dismissSnackbarAlert} // Make sure this function is defined
+        visible={snackbarVisibleALert}
+      />
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: 'white',
-      },
-      ti: {
-        marginTop: '5%',
-        width: 300,
-        backgroundColor: 'white',
-        fontSize: wp(4),
-        paddingLeft: '2%',
-        borderRadius: 10,
-      },
-      textInputSelectedCategory: {
-        borderWidth: 1,
-        borderRadius: wp(3),
-        width: '98%',
-        borderColor: '#FACA4E',
-    
-        paddingHorizontal: 20,
-        paddingVertical: 6.8,
-        marginBottom: 20,
-        marginTop: hp(3),
-      },
-      textInputCategoryNonSelected: {
-        borderWidth: 1,
-        borderRadius: wp(3),
-        width: '98%',
-        borderColor: '#E7EAF2',
-        paddingHorizontal: 20,
-        paddingVertical: 6.8,
-        marginBottom: 20,
-        marginTop: hp(3),
-      },
-      iconStyle: {
-        color: '#C4C4C4',
-        width: 20,
-        height: 20,
-      },
-      iconStyleInactive: {
-        color: '#FACA4E',
-      },
-      maintext: {
-        fontSize: hp(2.3),
-        color: '#303030',
-        fontWeight: 'bold',
-      },
-      modaltextview: {
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        width: wp(90),
-        borderRadius: 25,
-        backgroundColor: 'white',
-        paddingHorizontal: wp(15),
-      },
-      optiontext: {
-        fontSize: hp(1.7),
-        color: '#303030',
-        marginLeft: wp(4),
-      },
-      nonselectedItems: {
-        width: wp(35),
-        justifyContent: 'space-evenly',
-        alignItems: 'center',
-        height: hp(14),
-        borderRadius: wp(1.8),
-        borderWidth: 1,
-        borderColor: '#E7EAF2',
-      },
-      selectedItems: {
-        width: wp(35),
-        justifyContent: 'space-evenly',
-        alignItems: 'center',
-        height: hp(14),
-        borderRadius: wp(1.8),
-        borderWidth: 1,
-        borderColor: '#FACA4E',
-      },
-      selectCheckBox:{
-        width: 17,
-        height: 17,
-        borderRadius: wp(1),
-        borderWidth: 1,
-        alignItems:'center',
-        justifyContent:'center',
-        borderColor: '#FACA4E',
-      },
-      unSelectCheckBox:{
-        width: 17,
-        height: 17,
-        borderRadius: wp(1),
-        borderWidth: 1,
-        alignItems:'center',
-        justifyContent:'center',
-        borderColor: '#C4C4C4',
-      },
-})
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  ti: {
+    marginTop: '5%',
+    width: 300,
+    backgroundColor: 'white',
+    fontSize: wp(4),
+    paddingLeft: '2%',
+    borderRadius: 10,
+  },
+  textInputSelectedCategory: {
+    borderWidth: 1,
+    borderRadius: wp(3),
+    width: '98%',
+    borderColor: '#FACA4E',
+
+    paddingHorizontal: 20,
+    paddingVertical: 6.8,
+    marginBottom: 20,
+    marginTop: hp(3),
+  },
+  textInputCategoryNonSelected: {
+    borderWidth: 1,
+    borderRadius: wp(3),
+    width: '98%',
+    borderColor: '#E7EAF2',
+    paddingHorizontal: 20,
+    paddingVertical: 6.8,
+    marginBottom: 20,
+    marginTop: hp(3),
+  },
+  iconStyle: {
+    color: '#C4C4C4',
+    width: 20,
+    height: 20,
+  },
+  iconStyleInactive: {
+    color: '#FACA4E',
+  },
+  maintext: {
+    fontSize: hp(2.3),
+    color: '#303030',
+    fontWeight: 'bold',
+  },
+  modaltextview: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    width: wp(90),
+    borderRadius: 25,
+    backgroundColor: 'white',
+    paddingHorizontal: wp(15),
+  },
+  optiontext: {
+    fontSize: hp(1.7),
+    color: '#303030',
+    marginLeft: wp(4),
+  },
+  nonselectedItems: {
+    width: wp(35),
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    height: hp(14),
+    borderRadius: wp(1.8),
+    borderWidth: 1,
+    borderColor: '#E7EAF2',
+  },
+  selectedItems: {
+    width: wp(35),
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    height: hp(14),
+    borderRadius: wp(1.8),
+    borderWidth: 1,
+    borderColor: '#FACA4E',
+  },
+  selectCheckBox: {
+    width: 17,
+    height: 17,
+    borderRadius: wp(1),
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderColor: '#FACA4E',
+  },
+  unSelectCheckBox: {
+    width: 17,
+    height: 17,
+    borderRadius: wp(1),
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderColor: '#C4C4C4',
+  },
+  image: {
+    width: '100%',
+    height: 100,
+    aspectRatio: 1, // Maintain the aspect ratio of the image
+  },
+});
