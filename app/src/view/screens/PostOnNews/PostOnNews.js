@@ -140,8 +140,7 @@ export default function PostOnNews({navigation}) {
   };
 
   const fetchCategory = async () => {
-    const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY5ODAzOTAyNywiZXhwIjoxNzAwNjMxMDI3fQ.JSki1amX9VPEP9uCsJ5vPiCl2P4EcBqW6CQyY_YdLsk';
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjM3LCJpYXQiOjE3MDI0NTk1MTEsImV4cCI6MTcwNTA1MTUxMX0.OBTTZn0v5rT1Ps2k_OWVdpOmcHbk1x4Fbjmp2X_8Wc8'
 
     try {
       const response = await fetch(
@@ -238,8 +237,7 @@ export default function PostOnNews({navigation}) {
     console.log('Description', comment);
     console.log('user id', userId);
 
-    const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjM3LCJpYXQiOjE3MDI0NTk1MTEsImV4cCI6MTcwNTA1MTUxMX0.OBTTZn0v5rT1Ps2k_OWVdpOmcHbk1x4Fbjmp2X_8Wc8'
     const apiUrl = 'https://watch-gotcha-be.mtechub.com/news/createNews';
 
     const requestData = {

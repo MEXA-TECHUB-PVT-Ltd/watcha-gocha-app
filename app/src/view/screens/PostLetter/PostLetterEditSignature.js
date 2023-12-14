@@ -15,6 +15,8 @@ import React, {useState, useRef, useEffect} from 'react';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import Entypo from 'react-native-vector-icons/Entypo';
 
+import RNFetchBlob from 'rn-fetch-blob';
+
 import {Button, Divider, TextInput} from 'react-native-paper';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import PlusPost from '../../../assets/svg/PlusPost.svg';
@@ -58,12 +60,15 @@ import Canvas from 'react-native-canvas';
 
 import SignatureCapture from 'react-native-signature-capture';
 
-export default function PostLetterSignature({navigation, route}) {
+export default function PostLetterEditSignature({navigation, route}) {
   const [name, setName] = useState('');
+  const [authToken, setAuthToken] = useState('');
   const [address, setAddress] = useState('');
   const [contact, setContact] = useState('');
   const [email, setEmail] = useState('');
   const [signatureId, setSignatureId] = useState('');
+
+  const [imageInfo, setImageInfo] = useState(null);
 
   const [userId, setUserId] = useState('');
 
@@ -71,11 +76,17 @@ export default function PostLetterSignature({navigation, route}) {
 
   const [fileName, setFileName] = useState('');
 
+  const [imageUri, setImageUri] = useState(null);
+
+  const ref_RBSheetCameraCanvas = useRef(null);
+
   const [imageUrl, setImageUrl] = useState('');
 
   const [loading, setLoading] = useState(false);
 
   const [colorSelect, setColorSelect] = useState('#202020');
+
+  const [selectedItem, setSelectedItem] = useState('');
 
   const signatureRef = useRef(null);
 
@@ -102,6 +113,11 @@ export default function PostLetterSignature({navigation, route}) {
         setUserId(result);
         console.log('user id retrieved:', result);
       }
+      const result3 = await AsyncStorage.getItem('authToken ');
+      if (result3 !== null) {
+        setAuthToken(result3);
+        console.log('user token retrieved:', result3);
+      }
     } catch (error) {
       // Handle errors here
       console.error('Error retrieving user ID:', error);
@@ -118,7 +134,6 @@ export default function PostLetterSignature({navigation, route}) {
       console.error('Error retrieving user ID:', error);
     }
   };
-
 
   //-------------------\\
 
@@ -137,7 +152,6 @@ export default function PostLetterSignature({navigation, route}) {
   const receivedDatapostLetter = route.params?.postLetter;
   const receivedDataintroductionOfLetter = route.params?.introductionOfLetter;
 
-
   console.log('Name', receivedDataName);
   console.log('Address', receivedDatAddress);
   console.log('Contact', receivedDataContactNumber);
@@ -150,125 +164,348 @@ export default function PostLetterSignature({navigation, route}) {
   console.log('Post Letter', receivedDatapostLetter);
   console.log('Introduction Of Letter', receivedDataintroductionOfLetter);
 
-
   const saveSign = () => {
-    console.log("Before saveImage");
+    console.log('Before saveImage');
 
-    signatureRef.current.saveImage((encodedImage) => {
-        console.log("Encoded Image")
+    signatureRef.current.saveImage(encodedImage => {
+      console.log('Encoded Image');
       //console.log(("Encoded Image of:",encodedImage.encoded))
       // Save the encoded image to state
-     /*  setSavedSignature(true);
+      /*  setSavedSignature(true);
 
       setEncodedImage(encodedImage.encoded) */
-
-      
-
     });
 
-    console.log("After saveImage");
-
+    console.log('After saveImage');
 
     //heyy()
   };
 
-  const heyy=()=>{
-    console.log("Heyy Ref", signatureRef)
-    console.log("Heyy Signature", encodedImage)
-
-  }
+  const heyy = () => {
+    console.log('Heyy Ref', signatureRef);
+    console.log('Heyy Signature', encodedImage);
+  };
 
   const resetSign = () => {
     signatureRef.current.resetImage();
     setSavedSignature(null);
-
   };
 
   const onSaveEvent = result => {
     // result.encoded - for the base64 encoded png
     // result.pathName - for the file path name
 
-    console.log("Encoded Image", result.encoded )
+    console.log('Encoded Image', result.encoded);
 
-    console.log("Encoded File Path", result.pathName )
+    console.log('Encoded File Path', result.pathName);
+
+
+    if(imageInfo!==null){
+       handleUploadImages()
+    }else{
+
+      makeFile(result.encoded);
+
+    }
 
     //console.log(("Encoded Image of:",encodedImage.encoded))
     // Save the encoded image to state
-     setSavedSignature(true);
+    //setSavedSignature(true);
 
+    //setEncodedImage(result.encoded)
 
-    setEncodedImage(result.encoded)
+    //setEncodedFilePath(result.pathName)
 
-    setEncodedFilePath(result.pathName)
-
-    generateRandomName()
-
+    //generateRandomName()
+    /* 
     if(fileName!==''){
       handleUploadImage()
-    }
+    } */
 
     //extractFileInfo(result.pathName)
-
-    
 
     /* if(fileName!=='' && fileType!== ''){
       handleUploadImage()
     } */
 
-
     //handleUploadImage()
-
   };
 
+  //handleUploadImage
+
+  //upload pic 
+
+  const handleUploadImages = data => {
+    setLoading(true);
+    const uri = imageInfo.uri;
+    const type = imageInfo.type;
+    const name = imageInfo.fileName;
+    const sourceImage = {uri, type, name};
+    console.log('Source Image', sourceImage);
+    const dataImage = new FormData();
+    dataImage.append('file', sourceImage);
+    dataImage.append('upload_preset', 'e6zfilan'); // Use your Cloudinary upload preset
+    dataImage.append('cloud_name', 'dxfdrtxi3'); // Use your Cloudinary cloud name
+
+    fetch('https://api.cloudinary.com/v1_1/dxfdrtxi3/image/upload', {
+      method: 'POST',
+      body: dataImage,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        setImageUrl(data.url); // Store the Cloudinary video URL in your state
+        //uploadVideo(data.url)
+        //uploadXpiVideo(data.url);
+        console.log('Image Url', data);
+        createSignature(data.url);
+        //uploadXpiVideo(data.url,data)
+       // uploadVideo(data.url);
+      })
+      .catch(err => {
+        setLoading(false);
+        console.log('Error While Uploading Video', err);
+      });
+  };
+
+
+
+  //------------------------------------\\
+
+  const makeFile = result => {
+    console.log('Came to file', result);
+    // Decode the base64 data
+    const filePath = RNFetchBlob.fs.dirs.CacheDir + '/myImage.png';
+
+    // Write the base64 data to a file
+    RNFetchBlob.fs
+      .writeFile(filePath, result, 'base64')
+      .then(() => {
+        console.log('File saved successfully:', filePath);
+        postLetterFile(filePath);
+        // Now, you can use the filePath to display or upload the image as needed
+      })
+      .catch(error => {
+        console.error('Error saving file:', error);
+      });
+  };
+
+  const postLetterFile = async filePath => {
+    console.log('Post <> ', filePath);
+    const uploadEndpoint = 'https://watch-gotcha-be.mtechub.com/xpi/fileUpload';
+    const token = authToken;
+
+    try {
+      const response = await RNFetchBlob.fetch(
+        'POST',
+        uploadEndpoint,
+        {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+        [
+          {
+            name: 'file',
+            filename: 'myImage.png',
+            type: 'image/png',
+            data: RNFetchBlob.wrap(filePath),
+          },
+        ],
+      );
+
+      //console.log('Upload Response:', response.data);
+
+      const data = JSON.parse(response.data);
+
+      // Extract the file entity
+      const fileEntity =
+        data.file && data.file.length > 0 ? data.file[0] : null;
+
+      // Use the file entity as needed
+      console.log('File Entity Type:', typeof fileEntity);
+      console.log('File Entity:', fileEntity);
+
+      if (fileEntity !== null && fileEntity !== undefined) {
+
+        console.log('Going To Statement');
+
+        createSignature(fileEntity)
+
+        
+      } else {
+        console.log("File Entity is null or empty.");
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+    }
+  };
+
+  const createSignature = async data => {
+    console.log('Image Uri of encoded', data);
+
+    const token = authToken
+    const apiUrl =
+      'https://watch-gotcha-be.mtechub.com/signature/createSignature';
+
+    const requestData = {
+      user_id: userId,
+      image: data,
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`, // Use the provided token
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data.data?.signature_created_at);
+        
+        setLoading(false);
+        navigation.navigate('PostLetterEditSignaturePics', {
+          greetingsTitle: receivedDataGreetingsTitle,
+          subjectOfLetter: receivedDataSubjectOfLetter,
+          introductionOfLetter: receivedDataintroductionOfLetter,
+          postLetter: receivedDatapostLetter,
+          name: receivedDataName,
+          address: receivedDatAddress,
+          contactNumber: receivedDataContactNumber,
+          email: receivedDataEmail,
+          category_id: receivedDataCategoryId,
+          letterType: receivedDataLetterType,
+          formOfApeal: 'My appeal',
+          letterImg:data,
+          signatureId:data.data?.signature_id,
+          signatureCreatedAt:data.data?.signature_created_at
+        });
+        //handleUpdatePassword();
+
+        // Handle the response data as needed
+      } else {
+        setLoading(false);
+
+        console.error(
+          'Failed to upload video:',
+          response.status,
+          response.statusText,
+        );
+        // Handle the error
+      }
+    } catch (error) {
+      console.error('API Request Error:', error);
+      setLoading(false);
+      // Handle the error
+    }
+  };
+
+  //-----------Checking Image----------------\\
+
+  const takePhotoFromCamera = async value => {
+    setSelectedItem(value);
+    launchCamera(
+      {
+        mediaType: 'photo',
+        //videoQuality: 'medium',
+      },
+      response => {
+        console.log('image here', response);
+
+        if (!response.didCancel) {
+          ref_RBSheetCameraCanvas.current.close()
+          if (response.assets && response.assets.length > 0) {
+            setImageUri(response.assets[0].uri);
+            console.log('response', response.assets[0].uri);
+            setImageInfo(response.assets[0]);
+            ref_RBSheetCameraCanvas.current.close()
+
+          } else if (response.uri) {
+            // Handle the case when no assets are present (e.g., for videos)
+            setImageUri(response.uri);
+            console.log('response null', response.uri);
+            ref_RBSheetCameraCanvas.current.close()
+
+          }
+
+        }
+      },
+    );
+  };
+
+  const choosePhotoFromLibrary = value => {
+    setSelectedItem(value);
+    launchImageLibrary({mediaType: 'Photo'}, response => {
+      console.log('image here', response);
+      if (!response.didCancel && response.assets.length > 0) {
+        console.log('Response', response.assets[0]);
+        setImageUri(response.assets[0].uri);
+        setImageInfo(response.assets[0]);
+        ref_RBSheetCameraCanvas.current.close()
+      }
+      ref_RBSheetCameraCanvas.current.close()
+      
+      console.log('response', imageInfo);
+
+    });
+  };
+
+
+
+  //------------------------------------------\\
 
   const generateRandomName = () => {
     // Generate a random string as a unique identifier
     const randomString = Math.random().toString(36).substring(2, 10);
-  
+
     // Get the current timestamp
     const timestamp = new Date().getTime();
-  
+
     // Combine the random string and timestamp to create a unique name
     const uniqueName = `${randomString}_${timestamp}.png`;
 
-    setFileName(uniqueName)
-  
+    setFileName(uniqueName);
+
     return uniqueName;
   };
-  
 
-
-   const extractFileInfo = (filePath) => {
+  const extractFileInfo = filePath => {
     // Use the platform-specific path delimiter
     const pathDelimiter = Platform.OS === 'android' ? '/' : '/';
-    
+
     // Split the file path using the path delimiter
     const pathComponents = filePath.split(pathDelimiter);
-  
+
     // Get the last component, which is the file name
     const fileName = pathComponents[pathComponents.length - 1];
-  
+
     // Split the file name to get the file type
     const fileNameComponents = fileName.split('.');
-    const fileType = fileNameComponents.length > 1 ? fileNameComponents.pop() : null;
-   
-    setFileName(fileName)
+    const fileType =
+      fileNameComponents.length > 1 ? fileNameComponents.pop() : null;
 
-    setFileType(fileType)
+    setFileName(fileName);
 
-    return { fileName, fileType };
+    setFileType(fileType);
+
+    return {fileName, fileType};
   };
-   
-  
+
   const handleUploadImage = data => {
     setLoading(true);
-    
+
     const uri = encodedFilePath;
     const type = 'image/png';
     const name = fileName;
     const sourceImage = {uri, type, name};
     //console.log('Source Image', sourceImage);
-    console.log("Came to Upload Image", fileType)
+    console.log('Came to Upload Image', fileType);
     const dataImage = new FormData();
     dataImage.append('file', sourceImage);
     dataImage.append('upload_preset', 'e6zfilan'); // Use your Cloudinary upload preset
@@ -289,7 +526,7 @@ export default function PostLetterSignature({navigation, route}) {
         //uploadXpiVideo(data.url);
         console.log('Image Url', data);
         //uploadXpiVideo(data.url,data)
-       // uploadVideo(data.url);
+        // uploadVideo(data.url);
       })
       .catch(err => {
         setLoading(false);
@@ -297,52 +534,6 @@ export default function PostLetterSignature({navigation, route}) {
       });
   };
 
-  const uploadVideo = async data => {
-    console.log('Image Uri of encoded', data);
-   
-    const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY5ODAzOTAyNywiZXhwIjoxNzAwNjMxMDI3fQ.JSki1amX9VPEP9uCsJ5vPiCl2P4EcBqW6CQyY_YdLsk';
-    const apiUrl = 'https://watch-gotcha-be.mtechub.com/signature/createSignature';
-
-    const requestData = {
-      user_id: userId,
-      image: data,
-    };
-
-    try {
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`, // Use the provided token
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('API Response:', data);
-        setLoading(false);
-        //handleUpdatePassword();
-
-        // Handle the response data as needed
-      } else {
-        setLoading(false);
-
-        console.error(
-          'Failed to upload video:',
-          response.status,
-          response.statusText,
-        );
-        // Handle the error
-      }
-    } catch (error) {
-      console.error('API Request Error:', error);
-      setLoading(false);
-
-      // Handle the error
-    }
-  };
 
 
   const onDragEvent = () => {
@@ -362,7 +553,7 @@ export default function PostLetterSignature({navigation, route}) {
 
   const [isTextInputActiveContact, setIsTextInputActiveContact] =
     useState(false);
-  
+
   const [savedSignature, setSavedSignature] = useState(false);
 
   const [encodedImage, setEncodedImage] = useState(null);
@@ -505,6 +696,16 @@ export default function PostLetterSignature({navigation, route}) {
       </TouchableOpacity>
     );
   };
+  
+
+  //------------------------\\
+
+  
+
+
+
+
+  //---------------------------------\\
   return (
     <View style={styles.container}>
       <StatusBar
@@ -525,17 +726,17 @@ export default function PostLetterSignature({navigation, route}) {
       <View
         style={{
           borderRadius: wp(10),
-          marginTop:hp(10),
-          alignSelf:'center',
-          width:'80%',
-          height:hp(50),
+          marginTop: hp(10),
+          alignSelf: 'center',
+          width: '80%',
+          height: hp(50),
           //backgroundColor:'black',
           borderColor: '#E7EAF2',
           borderWidth: 1,
-          overflow:'hidden'
+          overflow: 'hidden',
         }}>
         <SignatureCapture
-          style={{width:'100%', height:'100%'}}
+          style={{width: '100%', height: '100%'}}
           ref={signatureRef}
           onSaveEvent={onSaveEvent}
           onDragEvent={onDragEvent}
@@ -583,6 +784,18 @@ export default function PostLetterSignature({navigation, route}) {
             Clear
           </Text>
         </TouchableOpacity>
+
+        <TouchableOpacity onPress={()=>ref_RBSheetCameraCanvas.current.open()} style={{justifyContent:'center', marginLeft:wp(10), alignItems:'center',alignSelf:'center', height:hp(4), width:wp(28), borderRadius:wp(5), backgroundColor:'#FACA4E'}}>
+      <Text
+        style={{
+          color: '#232323',
+          fontFamily: 'Inter-Regular',
+          fontSize: hp(1.7)
+        }}>
+        Edit Signature
+      </Text>
+      </TouchableOpacity>
+
 
         <View
           style={{
@@ -640,11 +853,11 @@ export default function PostLetterSignature({navigation, route}) {
       </View>
 
       {savedSignature && (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
           <Text>Saved Signature:</Text>
           <Image
-            source={{ uri: `data:image/png;base64,${encodedImage}`}}
-            style={{ borderWidth: 3, width: 200, height: 50 }}
+            source={{uri: `data:image/png;base64,${encodedImage}`}}
+            style={{borderWidth: 3, width: 200, height: 50}}
           />
         </View>
       )}
@@ -655,7 +868,7 @@ export default function PostLetterSignature({navigation, route}) {
           load={loading}
           // checkdisable={inn == '' && cm == '' ? true : false}
           customClick={() => {
-            saveSign()
+            saveSign();
             //navigation.navigate('PostLetterEditSignaturePics');
             //navigation.navigate('Profile_image');
           }}
@@ -674,6 +887,81 @@ export default function PostLetterSignature({navigation, route}) {
         }}>
         {loading && <ActivityIndicator size="large" color="#FACA4E" />}
       </View>
+
+      <RBSheet
+        ref={ref_RBSheetCameraCanvas}
+        closeOnDragDown={true}
+        closeOnPressMask={false}
+        animationType="fade"
+        minClosingHeight={0}
+        customStyles={{
+          wrapper: {
+            backgroundColor: 'rgba(52, 52, 52, 0.5)',
+          },
+          draggableIcon: {
+            backgroundColor: 'white',
+          },
+          container: {
+            borderTopLeftRadius: wp(10),
+            borderTopRightRadius: wp(10),
+            height: hp(25),
+          },
+        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginHorizontal: wp(8),
+            alignItems: 'center',
+          }}>
+          <Text style={styles.maintext}>Select an option</Text>
+          <TouchableOpacity onPress={() => ref_RBSheetCameraCanvas.current.close()}>
+            <Ionicons
+              name="close"
+              size={22}
+              color={'#303030'}
+              onPress={() => ref_RBSheetCameraCanvas.current.close()}
+            />
+          </TouchableOpacity>
+        </View>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-evenly',
+            alignItems: 'center',
+            marginTop: hp(3),
+          }}>
+          <TouchableOpacity
+            onPress={() => ref_RBSheetCameraCanvas.current.close()}
+            style={
+              selectedItem === 'camera'
+                ? styles.selectedItems
+                : styles.nonselectedItems
+            }>
+           <Image source={appImages.ArtBoard} style={{ resizeMode:'contain'}}/>
+
+            <Text style={{marginTop:hp(-1.8),color: '#333333'}}>From canvas</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => choosePhotoFromLibrary('gallery')}
+            style={
+              selectedItem === 'gallery'
+                ? styles.selectedItems
+                : styles.nonselectedItems
+            }>
+            <MaterialCommunityIcons
+              color={selectedItem === 'gallery' ? '#FACA4E' : '#888888'}
+              name="image"
+              size={25}
+            />
+
+            <Text style={{color: '#333333'}}>From gallery</Text>
+          </TouchableOpacity>
+        </View>
+      </RBSheet>
+
     </View>
   );
 }
@@ -693,5 +981,23 @@ const styles = StyleSheet.create({
     width: '80%',
     //borderColor: '#E7EAF2',
     borderWidth: 1,
+  },
+  nonselectedItems: {
+    width: wp(35),
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    height: hp(14),
+    borderRadius: wp(1.8),
+    borderWidth: 1,
+    borderColor: '#E7EAF2',
+  },
+  selectedItems: {
+    width: wp(35),
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    height: hp(14),
+    borderRadius: wp(1.8),
+    borderWidth: 1,
+    borderColor: '#FACA4E',
   },
 });
