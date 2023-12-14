@@ -3,6 +3,7 @@ import {
   FlatList,
   Text,
   Image,
+  ActivityIndicator,
   KeyboardAvoidingView,
   ScrollView,
   StatusBar,
@@ -76,6 +77,11 @@ export default function PostLetterSignature({navigation, route}) {
 
   const [snackbarVisibleALert, setsnackbarVisibleALert] = useState(false);
 
+  const [snackbarVisibleExceedsALert, setsnackbarVisibleExceedsALert] =
+    useState(false);
+
+    const [snackbarVisibleLimitALert, setsnackbarVisibleLimitALert] =
+    useState(false);
 
   const ref_RBSendOffer = useRef(null);
 
@@ -162,7 +168,7 @@ export default function PostLetterSignature({navigation, route}) {
   const receivedDataSignatureId = route.params?.signatureId;
   const receivedDataSignatureCreatedAt = route.params?.signatureCreatedAt;
 
-  console.log("Signature created received",receivedDataSignatureCreatedAt)
+  console.log('Signature created received', receivedDataLetterType);
   const handleFocus = () => {
     setIsTextInputActive(true);
   };
@@ -205,15 +211,13 @@ export default function PostLetterSignature({navigation, route}) {
       },
       response => {
         console.log('image here', response);
-        if (!response.didCancel) {
-          if (response.assets && response.assets.length > 0) {
-            setImageUri(response.assets[0].uri);
-            console.log('response', response.assets[0].uri);
-          } else if (response.uri) {
-            // Handle the case when no assets are present (e.g., for videos)
-            setImageUri(response.uri);
-            console.log('response', response.uri);
-          }
+        if (
+          !response.didCancel &&
+          response.assets &&
+          response.assets.length > 0
+        ) {
+          const newImageUri = response.assets[0];
+          updateImageUris(newImageUri);
         }
       },
     );
@@ -247,15 +251,17 @@ export default function PostLetterSignature({navigation, route}) {
   };
 
   const updateImageUris = newImageUri => {
-    if (imageUris.length < 10) {
+    if (imageUris.length < 3) {
       setImageUris(prevImageUris => [...prevImageUris, newImageUri]);
     } else {
       // Handle the case when the limit exceeds (e.g., show a message)
-      console.log('Image limit exceeded');
+      handleUpdatePasswordExceedsAlert();
     }
   };
 
   const takeVideoFromCamera = async value => {
+    ref_RBSheetVideo.current.close();
+
     setSelectedItem(value);
     launchCamera(
       {
@@ -269,20 +275,23 @@ export default function PostLetterSignature({navigation, route}) {
             setVideoUri(response.assets[0].uri);
             console.log('response', response.assets[0].uri);
             setVideoInfo(response.assets[0]);
+            ref_RBSheetVideo.current.close();
           } else if (response.uri) {
             // Handle the case when no assets are present (e.g., for videos)
             setVideoUri(response.uri);
             console.log('response', response.uri);
+            ref_RBSheetVideo.current.close();
           }
         }
-        ref_RBSheetCamera.current.close();
       },
     );
   };
 
   const chooseVideoFromLibrary = value => {
+    ref_RBSheetVideo.current.close();
+
     setSelectedItem(value);
-    launchImageLibrary({mediaType: 'video'}, response => {
+    launchImageLibrary({mediaType: 'Video'}, response => {
       console.log('image here', response);
       if (!response.didCancel && response.assets.length > 0) {
         console.log('Response', response.assets[0]);
@@ -292,20 +301,23 @@ export default function PostLetterSignature({navigation, route}) {
 
       console.log('response', imageInfo);
 
-      ref_RBSheetCamera.current.close();
+      ref_RBSheetVideo.current.close();
     });
   };
 
   // upload multiple images
 
-  const checkUpload=()=>{
-    if(imageUris.length===0 && videoInfo===null ){
-        handleUpdatePasswordAlert()
-    }else{
+  const checkUpload = () => {
+    if (imageUris.length === 0 && videoInfo === null) {
+      handleUpdatePasswordAlert();
+    } else if(imageUris.length!==0 && videoInfo!==null) {
+      handleUpdatePasswordLimitAlert();
+    }else if(imageUris.length>0){
       handleUploadImages(imageUris);
-
+    }else if(videoInfo!==null){
+      handleUploadVideo()
     }
-  }
+  };
 
   const handleUploadImages = async imageArray => {
     console.log('ImageArray', imageArray);
@@ -341,8 +353,6 @@ export default function PostLetterSignature({navigation, route}) {
         const data = await response.json();
         console.log('Image Url', data.url);
 
-        setLoading(false);
-
         // Assuming you have a function like uploadXpiVideo, you can call it here
         //uploadXpiVideo(data.url, data);
 
@@ -358,9 +368,11 @@ export default function PostLetterSignature({navigation, route}) {
       const imageUrls = await Promise.all(uploadPromises);
       console.log('All images uploaded successfully:', imageUrls);
 
+      createLetterImage(imageUrls)
+
       //sellItem(imageUrls);
 
-      handleUploadVideo(imageUrls);
+      //handleUploadVideo(imageUrls);
 
       // Do something with the imageUrls array, e.g., store it in state or send it to the server
     } catch (error) {
@@ -396,7 +408,7 @@ export default function PostLetterSignature({navigation, route}) {
         setVideoUrl(data.url); // Store the Cloudinary video URL in your state
         //uploadVideo(data.url)
 
-        createLetter(data.url, video);
+        createLetterVideo(data.url);
         //uploadXpiVideo(data.url);
         console.log(data);
       })
@@ -406,8 +418,8 @@ export default function PostLetterSignature({navigation, route}) {
         setLoading(false);
       });
   };
-
-  const createLetter = async (video, image) => {
+  
+  const createLetterImage = async (image) => {
     // console.log('Image Uri of encoded', data);
     // console.log('image', image);
     // console.log('video', video);
@@ -434,10 +446,10 @@ export default function PostLetterSignature({navigation, route}) {
 
     const requestData = {
       image: image, //you can send maximum 5 images
-      video: "", // you can send one video maximum
+      video: '', // you can send one video maximum
       user_id: userId,
       post_type: 'public',
-      receiver_type: 'leader',
+      receiver_type: receivedDataLetterType,
       disc_category: receivedDataCategoryId,
       name: receivedDataName,
       address: receivedDatAddress,
@@ -456,7 +468,7 @@ export default function PostLetterSignature({navigation, route}) {
     };
 
     try {
-      console.log(requestData)
+      console.log(requestData);
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -478,10 +490,89 @@ export default function PostLetterSignature({navigation, route}) {
       } else {
         setLoading(false);
 
-        console.error(
-          'Failed call api:',
-           response
-        );
+        console.error('Failed call api:', response);
+        // Handle the error
+      }
+    } catch (error) {
+      console.error('API Request Error:', error);
+      setLoading(false);
+
+      // Handle the error
+    }
+  };
+
+  const createLetterVideo = async (video) => {
+    // console.log('Image Uri of encoded', data);
+    // console.log('image', image);
+    // console.log('video', video);
+    // console.log('user_id', userId);
+    // console.log('post_type', 'public');
+    // console.log('receiver_type', 'leader');
+    // console.log('disc_category', receivedDataName);
+    // console.log('name', receivedDataName);
+    // console.log('address', receivedDatAddress);
+    // console.log('contact_no', receivedDataContactNumber);
+    // console.log('subject_place', receivedDatasubjectOfLetter);
+    // console.log('post_date', receivedDataSignatureCreatedAt);
+    // console.log('greetings', receivedDataGreetingsTitle);
+    // console.log('introduction', receivedDataEmail);
+    // console.log('body', receivedDatapostLetter);
+    // console.log('form_of_appeal', receivedDataAppealOfLetter);
+    // console.log('signature_id', receivedDataSignatureId);
+    // console.log('paid_status', false);
+
+    const token = authToken;
+    console.log('AUTH TOKEN', token);
+
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/letter/createLetter';
+
+    const requestData = {
+      image: "", //you can send maximum 5 images
+      video: video, // you can send one video maximum
+      user_id: userId,
+      post_type: 'public',
+      receiver_type: receivedDataLetterType,
+      disc_category: receivedDataCategoryId,
+      name: receivedDataName,
+      address: receivedDatAddress,
+      email: receivedDataEmail,
+      contact_no: receivedDataContactNumber,
+      subject_place: receivedDatasubjectOfLetter,
+      post_date: receivedDataSignatureCreatedAt,
+      greetings: receivedDataGreetingsTitle,
+      introduction: receivedDataintroductionOfLetter,
+      body: receivedDatapostLetter,
+      form_of_appeal: receivedDataAppealOfLetter,
+      signature_id: receivedDataSignatureId,
+      paid_status: false,
+      //   "receiver_id": 35,
+      //   "receiver_address": "receiver_address"
+    };
+
+    try {
+      console.log("Video Request data",requestData);
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data);
+
+        setLoading(false);
+
+        handleUpdatePassword();
+
+        // Handle the response data as needed
+      } else {
+        setLoading(false);
+
+        console.error('Failed call api:', response);
         // Handle the error
       }
     } catch (error) {
@@ -527,6 +618,50 @@ export default function PostLetterSignature({navigation, route}) {
     setsnackbarVisibleALert(false);
   };
 
+  const handleUpdatePasswordExceedsAlert = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setsnackbarVisibleExceedsALert(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setsnackbarVisibleExceedsALert(false);
+    }, 3000);
+  };
+
+  const dismissSnackbarExceedsAlert = () => {
+    setsnackbarVisibleExceedsALert(false);
+  };
+
+
+  const handleUpdatePasswordLimitAlert = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setsnackbarVisibleLimitALert(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setsnackbarVisibleLimitALert(false);
+      limitAlert();
+    }, 3000);
+  };
+
+  const dismissSnackbarLimitAlert = () => {
+    setsnackbarVisibleLimitALert(false);
+  };
+
+  const limitAlert=()=>{
+    setImageInfo(null);
+    setVideoUrl(false);
+    setImageUris([]);
+    setImageUri(null);
+    setVideoUri(null);
+    setVideoInfo(null);
+  }
 
   const searches = [
     {id: 1, title: 'Subject'},
@@ -703,16 +838,19 @@ export default function PostLetterSignature({navigation, route}) {
       ) : null}
 
       {/* //-------------------\\ */}
-      <FlatList
-        data={imageUris}
-        keyExtractor={(item, index) => index.toString()}
-        numColumns={3} // Set the number of columns to 3
-        renderItem={({item}) => (
-          <View style={styles.imageContainer}>
-            <Image source={{uri: item.uri}} style={styles.image} />
-          </View>
-        )}
-      />
+
+      <View style={{marginHorizontal: wp(15), marginTop: hp(3)}}>
+        <FlatList
+          data={imageUris}
+          keyExtractor={(item, index) => index.toString()}
+          numColumns={3} // Set the number of columns to 3
+          renderItem={({item}) => (
+            <View style={styles.imageContainer}>
+              <Image source={{uri: item.uri}} style={styles.image} />
+            </View>
+          )}
+        />
+      </View>
 
       <TouchableOpacity
         onPress={() => ref_RBSheetVideo.current.open()}
@@ -741,7 +879,19 @@ export default function PostLetterSignature({navigation, route}) {
         </Text>
       </TouchableOpacity>
 
-      {imageUri !== null ? (
+      {videoUri !== null && (
+        <View
+          style={{
+            height: hp(7),
+            marginTop: hp(5),
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+          <Text style={{color: '#FACA4E'}}>{videoInfo?.fileName}</Text>
+        </View>
+      )}
+
+      {/* {imageUri !== null ? (
         <View
           style={{
             marginTop: hp(5),
@@ -779,7 +929,7 @@ export default function PostLetterSignature({navigation, route}) {
             />
           )}
         </View>
-      ) : null}
+      ) : null}  */}
 
       <View style={{flex: 1, justifyContent: 'flex-end'}}>
         <View style={{marginTop: '25%', alignSelf: 'center'}}>
@@ -789,7 +939,7 @@ export default function PostLetterSignature({navigation, route}) {
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
               //handleUpdatePassword();
-              checkUpload()
+              checkUpload();
               //handleUpdatePassword()
               //navigation.navigate('PostLetterEditSignature');
               //navigation.navigate('Profile_image');
@@ -1148,6 +1298,32 @@ export default function PostLetterSignature({navigation, route}) {
         onDismiss={dismissSnackbarAlert} // Make sure this function is defined
         visible={snackbarVisibleALert}
       />
+
+      <CustomSnackbar
+        message={'Alert!'}
+        messageDescription={'Image Limit Exceeds'}
+        onDismiss={dismissSnackbarExceedsAlert} // Make sure this function is defined
+        visible={snackbarVisibleExceedsALert}
+      />
+
+      <CustomSnackbar
+        message={'Alert!'}
+        messageDescription={'You can either upload three images or one video!'}
+        onDismiss={dismissSnackbarLimitAlert} // Make sure this function is defined
+        visible={snackbarVisibleLimitALert}
+      />
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {loading && <ActivityIndicator size="large" color="#FACA4E" />}
+      </View>
     </ScrollView>
   );
 }

@@ -42,7 +42,19 @@ export default function Disc({navigation, route}) {
 
   const [authToken, setAuthToken] = useState('');
 
-  const [opensLettersData, setOpensLettersData] = useState([]);
+  const [opensLettersPublicGeneralData, setOpensLettersPublicGeneralData] =
+    useState([]);
+
+  const [opensLettersPublicCelebrityData, setOpensLettersPublicCelebrityData] =
+    useState([]);
+
+  const [opensLettersPrivateFriendsData, setOpensLettersPrivateFriendsData] =
+    useState([]);
+
+  const [
+    opensLettersPrivateCelebrityData,
+    setOpensLettersPrivateCelebrityData,
+  ] = useState([]);
 
   const [qafiData, setQAFIData] = useState([]);
 
@@ -50,21 +62,17 @@ export default function Disc({navigation, route}) {
 
   const {NewsCategory, Type} = route?.params || {};
 
-
-  
   useEffect(() => {
-    
     getUserID(); // Call the async function
   }, [NewsCategory]); // Include 'id' in the dependency array
 
   const getUserID = async () => {
-    
     try {
       const result = await AsyncStorage.getItem('authToken ');
       if (result !== null) {
         setAuthToken(result);
 
-        fetchData()
+        fetchData();
         console.log('user id retrieved:', result);
       }
     } catch (error) {
@@ -73,23 +81,19 @@ export default function Disc({navigation, route}) {
     }
   };
 
-
   const fetchData = async () => {
     console.log('Received NewsCategory of:', NewsCategory);
     console.log('Received Type of:', Type);
-  /*   Toast.show({
+    /*   Toast.show({
       type: 'success', // 'success', 'error', 'info', 'warning'
       position: 'bottom', // 'top', 'bottom', 'center'
       text1: NewsCategory.toString(),
       visibilityTime: 3000, // in milliseconds
       autoHide: true,
     }); */
-    
 
     // Check if 'id' exists before using it
     if (NewsCategory) {
-      
-     
       console.log('Received id:', NewsCategory);
       setCategoryIdNews(NewsCategory); // Uncomment this line if you want to use id to set selectedItemId
 
@@ -135,8 +139,7 @@ export default function Disc({navigation, route}) {
 
   const fetchNews = async () => {
     console.log('Categry in id', categoryIdNews);
-    const token =
-      authToken;
+    const token = authToken;
 
     try {
       const response = await fetch(
@@ -161,9 +164,8 @@ export default function Disc({navigation, route}) {
 
   const fetchQAFI = async () => {
     console.log(' QAFI in id', categoryIdNews);
-    const token =
-      authToken;
-    
+    const token = authToken;
+
     try {
       const response = await fetch(
         `https://watch-gotcha-be.mtechub.com/qafi/getAllQafisByCategory/${categoryIdNews}?page=1&limit=50`,
@@ -187,8 +189,7 @@ export default function Disc({navigation, route}) {
 
   const fetchGEBC = async () => {
     console.log('Categry in id', categoryIdNews);
-    const token =
-      authToken;
+    const token = authToken;
 
     try {
       const response = await fetch(
@@ -210,6 +211,146 @@ export default function Disc({navigation, route}) {
       console.error('Error Trending:', error);
     }
   };
+
+  const fetchLetterPublicGeneral = async () => {
+    setLoading(true);
+    console.log('Categry in id', categoryIdNews);
+    const token = authToken;
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/letter/public_general_by_category/3/?page=1&limit=100`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('Resultings of News', result.AllLetter);
+      //Alert.alert(result)
+
+      setOpensLettersPublicGeneralData(result.AllLetter); // Update the state with the fetched data
+      await fetchLetterPublicCelebrity();
+    } catch (error) {
+      setLoading(false);
+      console.error('Error Trending:', error);
+    }
+  };
+
+  const fetchLetterPublicCelebrity = async () => {
+    const token = authToken;
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/letter/public_celebrity_by_category/3/?page=1&limit=10`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('Resultings of News', result.AllLetter);
+      //Alert.alert(result)
+
+      setOpensLettersPublicCelebrityData(result.AllLetter); // Update the state with the fetched data
+      await fetchLetterPrivateFriends();
+    } catch (error) {
+      setLoading(false);
+
+      console.error('Error Trending:', error);
+    }
+  };
+
+  const fetchLetterPrivateFriends = async () => {
+    const token = authToken;
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/letter/private_friends_by_category/3/?page=1&limit=5`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('Resultings of News', result.AllLetter);
+      //Alert.alert(result)
+
+      setOpensLettersPrivateFriendsData(result.AllLetter); // Update the state with the fetched data
+      await fetchLetterPrivateCelebrity();
+    } catch (error) {
+      console.error('Error Trending:', error);
+    }
+  };
+
+  const fetchLetterPrivateCelebrity = async () => {
+    const token = authToken;
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/letter/private_celebrity_by_category/3/?page=1&limit=2`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('Resultings of News', result.AllLetter);
+      //Alert.alert(result)
+
+      setOpensLettersPrivateCelebrityData(result.AllLetter); // Update the state with the fetched data
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+
+      console.error('Error Trending:', error);
+    }
+  };
+
+  //DISC
+
+  const renderPublicGeneral = item => {
+    console.log('Item', item);
+    const imageUrl = item.images[0].startsWith('/fileUpload')
+      ? `https://watch-gotcha-be.mtechub.com${item.images[0]}`
+      : item.images[0];
+
+    return (
+      <TouchableOpacity
+        onPress={() => navigation.navigate('LetterDetails', {Letters: item})}
+        style={{width: wp(25.5), margin: 5}}>
+        <View>
+          <Image
+            style={{
+              height: hp(12),
+              width: wp(23),
+            }}
+            source={{uri: imageUrl}}
+          />
+        </View>
+      </TouchableOpacity>
+    );
+    {
+      /*  <Image
+   source={appImages.OpenLetter}
+   style={{resizeMode: 'contain', width: wp(39)}}
+ /> */
+    }
+  };
+
+  //-------------------\\
 
   const goToScreen = () => {
     if (selectedItemId === 2) {
@@ -517,6 +658,7 @@ export default function Disc({navigation, route}) {
             console.log('Log screen');
           } else if (item.id === 2) {
             setSelectedItemId(2);
+            fetchLetterPublicGeneral();
             console.log('On Letter id', item.id);
           } else if (item.id === 3) {
             navigation.navigate('ViewAllCategoriesQAFI');
@@ -1165,56 +1307,30 @@ export default function Disc({navigation, route}) {
           <Text style={{color: '#4A4A4A', fontWeight: 'bold', fontSize: hp(2)}}>
             Public (general)
           </Text>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('LetterDetails')}>
-              <Image
-                source={appImages.OpenLetter}
-                style={{resizeMode: 'contain', width: wp(39)}}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('LetterDetails')}>
-              <Image
-                source={appImages.OpenLetter}
-                style={{resizeMode: 'contain', width: wp(39)}}
-              />
-            </TouchableOpacity>
-          </View>
+          <FlatList
+            style={{flex: 1}}
+            contentContainerStyle={{alignItems: 'center'}}
+            showsHorizontalScrollIndicator={false}
+            horizontal
+            data={opensLettersPublicGeneralData}
+            keyExtractor={item => item?.post_id.toString()}
+            renderItem={({item}) => renderPublicGeneral(item)}
+          />
         </View>
 
         <View style={{marginTop: hp(5), height: hp(21)}}>
           <Text style={{color: '#4A4A4A', fontWeight: 'bold', fontSize: hp(2)}}>
             Public (to authorities, celebrities, leaders)
           </Text>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('LetterDetails')}>
-              <Image
-                source={appImages.OpenLetter}
-                style={{resizeMode: 'contain', width: wp(39)}}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('LetterDetails')}>
-              <Image
-                source={appImages.OpenLetter}
-                style={{resizeMode: 'contain', width: wp(39)}}
-              />
-            </TouchableOpacity>
-          </View>
+          <FlatList
+            style={{flex: 1}}
+            contentContainerStyle={{alignItems: 'center'}}
+            showsHorizontalScrollIndicator={false}
+            horizontal
+            data={opensLettersPublicCelebrityData}
+            keyExtractor={item => item?.post_id.toString()}
+            renderItem={({item}) => renderPublicGeneral(item)}
+          />
         </View>
 
         <View style={{marginTop: hp(5), height: hp(21)}}>
@@ -1224,53 +1340,48 @@ export default function Disc({navigation, route}) {
           <View
             style={{
               flex: 1,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
+              justifyContent: 'center',
               alignItems: 'center',
             }}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('LetterDetails')}>
-              <Image
-                source={appImages.OpenLetter}
-                style={{resizeMode: 'contain', width: wp(39)}}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('LetterDetails')}>
-              <Image
-                source={appImages.OpenLetter}
-                style={{resizeMode: 'contain', width: wp(39)}}
-              />
-            </TouchableOpacity>
+            <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+              No data available
+            </Text>
           </View>
+          {/* <FlatList
+            style={{flex: 1}}
+            contentContainerStyle={{alignItems: 'center'}}
+            showsHorizontalScrollIndicator={false}
+            horizontal
+            data={opensLettersPublicCelebrityData}
+            keyExtractor={item => item?.post_id.toString()}
+            renderItem={({item}) => renderPublicGeneral(item)}
+          /> */}
         </View>
 
         <View style={{marginTop: hp(5), height: hp(21)}}>
           <Text style={{color: '#4A4A4A', fontWeight: 'bold', fontSize: hp(2)}}>
             Private (to authorities, celebrities, leaders){' '}
           </Text>
+
           <View
             style={{
               flex: 1,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
+              justifyContent: 'center',
               alignItems: 'center',
             }}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('LetterDetails')}>
-              <Image
-                source={appImages.OpenLetter}
-                style={{resizeMode: 'contain', width: wp(39)}}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('LetterDetails')}>
-              <Image
-                source={appImages.OpenLetter}
-                style={{resizeMode: 'contain', width: wp(39)}}
-              />
-            </TouchableOpacity>
+            <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+              No data available
+            </Text>
           </View>
+          {/*  <FlatList
+            style={{flex: 1}}
+            contentContainerStyle={{alignItems: 'center'}}
+            showsHorizontalScrollIndicator={false}
+            horizontal
+            data={opensLettersPublicCelebrityData}
+            keyExtractor={item => item?.post_id.toString()}
+            renderItem={({item}) => renderPublicGeneral(item)}
+          /> */}
         </View>
       </View>
     );
@@ -1353,7 +1464,7 @@ export default function Disc({navigation, route}) {
         <Add />
       </TouchableOpacity>
 
-      <Toast ref={(ref) => Toast.setRef(ref)} />
+      <Toast ref={ref => Toast.setRef(ref)} />
     </View>
   );
 }

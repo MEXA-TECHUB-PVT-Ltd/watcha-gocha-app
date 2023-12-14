@@ -63,6 +63,9 @@ export default function PostLetter({navigation, route}) {
   const [subjectOfLetter, setSubjectOfLetter] = useState('');
   const [introductionOfLetter, setIntroductionOfLetter] = useState('');
 
+  const [greetings, setGreetings] = useState('');
+
+
   const [letterType, setLetterTypes] = useState('Public');
 
   const ref_RBSendOffer = useRef(null);
@@ -86,11 +89,37 @@ export default function PostLetter({navigation, route}) {
 
   const searches = [
     {id: 1, title: 'Subject'},
-    {id: 2, title: 'Subject'},
-    {id: 3, title: 'Greetings'},
-    {id: 4, title: 'Introduction'},
-    {id: 5, title: 'Greetings'},
+    {id: 2, title: 'Introduction'},
+    {id: 3, title: 'Body'},
+    {id: 4, title: 'Greetings'},
   ];
+  const onFocusChangeSubject = (id, title, text) => {
+    console.log("Came to here")
+    setSelectedItemId(id);
+    setGreetingsTitle(title);
+    setSubjectOfLetter(text);
+  };
+
+  const onFocusChangeIntroduction = (id, title, text) => {
+    console.log("Came to here")
+    setSelectedItemId(id);
+    setGreetingsTitle(title);
+    setIntroductionOfLetter(text);
+  };
+
+  const onFocusChangeBody = (id, title, text) => {
+    console.log("Came to here")
+    setSelectedItemId(id);
+    setGreetingsTitle(title);
+    setPostLetter(text);
+  };
+
+  const onFocusChangeGreetings = (id, title, text) => {
+    console.log("Came to here")
+    setSelectedItemId(id);
+    setGreetingsTitle(title);
+    setGreetings(text);
+  };
 
   const setLetterType = value => {
     setLetterTypes(value);
@@ -135,11 +164,11 @@ export default function PostLetter({navigation, route}) {
             // backgroundColor: isSelected ? '#FACA4E' : null,
           },
         ]}
-        onPress={() => {
+        /* onPress={() => {
           setSelectedItemId(item.id);
           setGreetingsTitle(item.title);
           console.log('Selected item:', item.title);
-        }}>
+        }} */>
         <Text
           style={[
             styles.textSearchDetails,
@@ -237,7 +266,10 @@ export default function PostLetter({navigation, route}) {
           //heading={'Title'}
           placeholderTextColor="#121420"
           value={subjectOfLetter}
-          onChangeText={text => setSubjectOfLetter(text)}
+          onChangeText={text => onFocusChangeSubject(1,'Subject',text)}
+
+          //onFocus={ console.log('CPaperInput focused')} // Log a message when CPaperInput receives focus
+
           //height={hp(55)}
         />
       </View>
@@ -249,7 +281,7 @@ export default function PostLetter({navigation, route}) {
           //heading={'Title'}
           placeholderTextColor="#121420"
           value={introductionOfLetter}
-          onChangeText={text => setIntroductionOfLetter(text)}
+          onChangeText={text => onFocusChangeIntroduction(2,'Introduction',text)}
           //height={hp(55)}
         />
       </View>
@@ -261,8 +293,20 @@ export default function PostLetter({navigation, route}) {
           //heading={'Title'}
           placeholderTextColor="#121420"
           value={postLetter}
-          onChangeText={text => setPostLetter(text)}
+          onChangeText={text => onFocusChangeBody(3,'Body', text)}
           height={hp(55)}
+        />
+      </View>
+
+      <View style={{marginLeft: wp(8), marginTop: hp(1)}}>
+        <CPaperInput
+          multiline={true}
+          placeholder={'Greetings'}
+          //heading={'Title'}
+          placeholderTextColor="#121420"
+          value={greetings}
+          onChangeText={text => onFocusChangeGreetings(4,'Greetings', text)}
+          height={hp(15)}
         />
       </View>
 
@@ -273,13 +317,13 @@ export default function PostLetter({navigation, route}) {
           // checkdisable={inn == '' && cm == '' ? true : false}
           customClick={() => {
             if (
-              greetingsTitle !== null &&
+              greetings !== '' &&
               subjectOfLetter !== '' &&
               introductionOfLetter !== '' &&
               postLetter !== ''
             ) {
               navigation.navigate('PostLetterEditSignature', {
-                greetingsTitle: greetingsTitle,
+                greetingsTitle: greetings,
                 subjectOfLetter: subjectOfLetter,
                 introductionOfLetter: introductionOfLetter,
                 postLetter: postLetter,

@@ -147,6 +147,14 @@ export default function PostLetterInfo({navigation}) {
 
         console.log('user id retrieved:', result);
       }
+
+      const  userImage = await AsyncStorage.getItem('userImage');
+      if (result3 !== null) {
+        setAuthToken(result3);
+        await fetchCategory(result3);
+
+        console.log('user id retrieved:', result);
+      }
     } catch (error) {
       // Handle errors here
       console.error('Error retrieving user ID:', error);
@@ -274,7 +282,7 @@ export default function PostLetterInfo({navigation}) {
 
   const CategoryPublicType = [
     {label: 'general', value: 'general'},
-    {label: 'Authorities', value: '(to authorities, celebrities, leaders)'},
+    {label: 'Celebrities, authorities, leaders', value: 'Celebrities, authorities, leaders'},
   ];
 
   const setLetterType = value => {
@@ -292,11 +300,22 @@ export default function PostLetterInfo({navigation}) {
 
   const uploadLetter = () => {
     if (letterType == 'Public Letter') {
-      navigation.navigate('PostLetter', {name:name, address:address, contactNumber:contact, email:email,category_id:categoryId, letterType: categoryPublicType });
+      checkOnPublicAndAuthorities();
     } else if(letterType=='Private Letter') {
       navigation.navigate('PostLetterAllUserName', {name:name, address:address, contactNumber:contact, email:email,category_id:categoryId, letterType: categoryPublicType });
     }
   };
+
+  const checkOnPublicAndAuthorities=()=>{
+    console.log("Letter Type",categoryPublicType)
+    if(categoryPublicType==="general"){
+      navigation.navigate('PostLetter', {name:name, address:address, contactNumber:contact, email:email,category_id:"3", letterType: "general" });
+
+    }else{
+      navigation.navigate('PostLetter', {name:name, address:address, contactNumber:contact, email:email,category_id:"3", letterType: "authorities" });
+
+    }
+  }
 
   const renderSearches = item => {
     console.log('Items', item);
@@ -331,6 +350,8 @@ export default function PostLetterInfo({navigation}) {
         backgroundColor="transparent"
         barStyle="dark-content" // You can set the StatusBar text color to dark or light
       />
+
+      
 
       <View style={{marginTop: hp(5), height: hp(8)}}>
         <Headers
@@ -497,7 +518,7 @@ export default function PostLetterInfo({navigation}) {
           // left={isTextInputActive ? <Oemail /> : <Gemail />}
         />
 
-        <View style={{marginLeft: wp(8), marginRight: wp(8)}}>
+        {/* <View style={{marginLeft: wp(8), marginRight: wp(8)}}>
           <Dropdown
             style={styles.textInputCategoryNonSelected}
             containerStyle={{
@@ -543,9 +564,9 @@ export default function PostLetterInfo({navigation}) {
               />
             )}
           />
-        </View>
+        </View> */}
 
-        <View style={{marginLeft: wp(8), marginRight: wp(8)}}>
+        <View style={{marginLeft: wp(8), marginTop:hp(1.8), marginRight: wp(8)}}>
           <Dropdown
             style={styles.textInputCategoryNonSelected}
             containerStyle={{
@@ -599,16 +620,21 @@ export default function PostLetterInfo({navigation}) {
             //load={loading}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
+             
+
               if (
                 name !== '' &&
                 address !== '' &&
                 contact !== '' &&
                 email !== '' &&
-                categoryId !== '' &&
                 categoryPublicType !== ''
               ) {
                 uploadLetter();
               } else {
+                console.log("Name", name)
+                console.log("Address", address)
+                console.log("Contact", contact)
+                console.log("categoryPublicType", categoryPublicType)
                 handleUpdatePassword();
               }
               //navigation.navigate('PostLetter');
