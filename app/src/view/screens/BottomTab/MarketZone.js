@@ -40,6 +40,8 @@ export default function MarketZone({navigation}) {
 
   const [dataClothing, setDataClothing] = useState(null);
 
+  //const [regions, setRegions] = useState(null);
+
   const [regions, setRegions] = useState(null);
 
   const [loading, setLoading] = useState(false);
@@ -51,6 +53,14 @@ export default function MarketZone({navigation}) {
   const [dataTopVideos, setDataTopVideos] = useState([]);
 
   const ref_RBSheetCamera = useRef(null);
+
+  const RegionArea = [
+    'Africa',
+    'Europe',
+    'Americas',
+    'Asia',
+    'Middle East',
+  ];
 
   useEffect(() => {
     // Make the API request and update the 'data' state
@@ -66,7 +76,7 @@ export default function MarketZone({navigation}) {
 
     await fetchAll();
 
-    await fetchTopVideos()
+    await fetchTopVideos();
 
     await fetchElectronics();
 
@@ -78,12 +88,13 @@ export default function MarketZone({navigation}) {
   };
 
   const getUserID = async () => {
-    console.log("AT User Id")
+    console.log('AT User Id');
     try {
       const result = await AsyncStorage.getItem('authToken ');
       if (result !== null) {
         setAuthToken(result);
-        await fetchRegion(result);
+        //await fetchRegion(result);
+        await fetchCategory(result);
         console.log('user id retrieved:', result);
       }
     } catch (error) {
@@ -92,11 +103,9 @@ export default function MarketZone({navigation}) {
     }
   };
 
-
   const fetchAll = async () => {
     //console.log("Categry in id", selectedItemId)
-    const token =
-      authToken;
+    const token = authToken;
 
     try {
       const response = await fetch(
@@ -119,8 +128,7 @@ export default function MarketZone({navigation}) {
 
   const fetchElectronics = async () => {
     console.log('Categry in id', selectedItemId);
-    const token =
-      authToken;
+    const token = authToken;
 
     try {
       const response = await fetch(
@@ -143,8 +151,7 @@ export default function MarketZone({navigation}) {
 
   const fetchVehicles = async () => {
     //console.log("Categry in id", selectedItemId)
-    const token =
-      authToken;
+    const token = authToken;
 
     try {
       const response = await fetch(
@@ -166,7 +173,6 @@ export default function MarketZone({navigation}) {
   };
 
   const fetchTopVideos = async () => {
-
     const token = authToken;
 
     try {
@@ -181,18 +187,19 @@ export default function MarketZone({navigation}) {
       );
 
       const result = await response.json();
-      console.log('Resultings of Top Market Place', result.topitem[0]?.images[0]?.image);
+      console.log(
+        'Resultings of Top Market Place',
+        result.topitem[0]?.images[0]?.image,
+      );
       setDataTopVideos(result.topitem[0]); // Update the state with the fetched data
     } catch (error) {
       console.error('Error:', error);
     }
   };
 
-
   const fetchClothing = async () => {
     //console.log("Categry in id", selectedItemId)
-    const token =
-       authToken;
+    const token = authToken;
 
     try {
       const response = await fetch(
@@ -213,11 +220,9 @@ export default function MarketZone({navigation}) {
     }
   };
 
-
-  const fetchRegion = async (resultId) => {
+  const fetchRegion = async resultId => {
     //console.log("Categry in id", selectedItemId)
-    const token =
-      resultId;
+    const token = resultId;
 
     try {
       const response = await fetch(
@@ -234,16 +239,13 @@ export default function MarketZone({navigation}) {
       console.log('AllItems', result.allRegion);
       setRegions(result.allRegion); // Update the state with the fetched data
 
-      await fetchCategory(resultId);
+      // await fetchCategory(resultId);
     } catch (error) {
       console.error('Error Trending:', error);
     }
   };
-
-  
-  const fetchCategory = async (result) => {
-
-    console.log(" Categories Result", result)
+  const fetchCategory = async result => {
+    console.log(' Categories Result', result);
     const token = result;
 
     try {
@@ -281,7 +283,7 @@ export default function MarketZone({navigation}) {
     } catch (error) {
       console.error('Error:', error);
     }
-  }; 
+  };
 
   const availableApps = [
     {
@@ -374,8 +376,9 @@ export default function MarketZone({navigation}) {
         }
         style={{width: wp(25.5), margin: 5}}>
         <View>
-
-        {!item.image || item.image === 'undefined'  || item.image.startsWith('/') ? (
+          {!item?.images[0]?.image ||
+          item?.images[0]?.image === 'undefined' ||
+          item?.images[0]?.image.startsWith('/') ? (
             <Image
               style={{
                 position: 'absolute',
@@ -389,23 +392,22 @@ export default function MarketZone({navigation}) {
               }}
               source={appImages.galleryPlaceHolder}
             />
-        ):
-          (
-          <Image
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
+          ) : (
+            <Image
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
 
-              zIndex: 1, // Ensure it's on top of other elements
-              //flex: 1,
-              width: '100%',
-              height: hp(16),
-              borderRadius: wp(2.5),
-              resizeMode: 'cover',
-            }}
-            source={{uri: item?.images[0]?.image}}
-          />
+                zIndex: 1, // Ensure it's on top of other elements
+                //flex: 1,
+                width: '100%',
+                height: hp(16),
+                borderRadius: wp(2.5),
+                resizeMode: 'cover',
+              }}
+              source={{uri: item?.images[0]?.image}}
+            />
           )}
         </View>
 
@@ -437,7 +439,7 @@ export default function MarketZone({navigation}) {
   };
 
   const renderAvailableApps = item => {
-    console.log('Items of market zone', item?.images[1]?.image);
+    console.log('Items of market zone', item?.images[0]?.image);
     return (
       <TouchableOpacity
         onPress={() =>
@@ -445,7 +447,9 @@ export default function MarketZone({navigation}) {
         }
         style={{width: wp(25.5), margin: 5}}>
         <View>
-        {!item.image || item.image === 'undefined'  || item.image.startsWith('/') ? (
+          {!item?.images[0]?.image ||
+          item?.images[0]?.image === 'undefined' ||
+          item?.images[0]?.image.startsWith('/') ? (
             <Image
               style={{
                 position: 'absolute',
@@ -459,23 +463,23 @@ export default function MarketZone({navigation}) {
               }}
               source={appImages.galleryPlaceHolder}
             />
-        ):
-          (<Image
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
+          ) : (
+            <Image
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
 
-              zIndex: 1, // Ensure it's on top of other elements
-              //flex: 1,
-              width: '100%',
-              height: hp(16),
-              borderRadius: wp(2.5),
-              resizeMode: 'cover',
-            }}
-            source={{uri: item?.images[0]?.image}}
-          />)
-  }
+                zIndex: 1, // Ensure it's on top of other elements
+                //flex: 1,
+                width: '100%',
+                height: hp(16),
+                borderRadius: wp(2.5),
+                resizeMode: 'cover',
+              }}
+              source={{uri: item?.images[0]?.image}}
+            />
+          )}
         </View>
 
         <View
@@ -587,7 +591,8 @@ export default function MarketZone({navigation}) {
             contentContainerStyle={{alignItems: 'center'}}
             showsHorizontalScrollIndicator={false}
             horizontal
-            data={regions}
+            //data={regions}
+            data={RegionArea}
             //keyExtractor={item => item.id.toString()}
             renderItem={({item}) => renderSearches(item)}
           />
@@ -600,7 +605,6 @@ export default function MarketZone({navigation}) {
                 position: 'absolute',
                 top: 0,
                 left: 0,
-
                 zIndex: 1, // Ensure it's on top of other elements
                 //flex: 1,
                 width: '100%',
@@ -613,7 +617,7 @@ export default function MarketZone({navigation}) {
             <View
               style={{
                 position: 'absolute',
-                top: hp(10),
+                top: hp(14),
                 left: 7,
                 //height: hp(3),
                 //width: wp(21),
@@ -645,11 +649,13 @@ export default function MarketZone({navigation}) {
                 color: '#000000',
                 //fontWeight: '700',
               }}>
-             {/*  Explore the intricate web of global politics in this
+              {/*  Explore the intricate web of global politics in this
               thought-provoking video as we delve into the ever-shifting
               landscape of international diplomacy...... */}
 
-{dataTopVideos.length===0? "No Top Pic Shown": dataTopVideos?.description}
+              {dataTopVideos.length === 0
+                ? 'No Top Pic Shown'
+                : dataTopVideos?.description}
             </Text>
           </View>
         </View>
@@ -682,20 +688,22 @@ export default function MarketZone({navigation}) {
               </View>
             ) : (
               <>
-                {dataElectronics?.length === 0 ? (
+                {dataClothing?.length === 0 ? (
                   <View
                     style={{
                       flex: 1,
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}>
-                    <Text style={{fontWeight:'bold', fontSize:hp(2.1)}}>No data available</Text>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
                   </View>
                 ) : (
                   <FlatList
                     style={{flex: 1}}
                     showsHorizontalScrollIndicator={false}
-                    data={dataElectronics}
+                    data={dataClothing}
                     horizontal
                     keyExtractor={item => item.id.toString()}
                     renderItem={({item}) => renderAvailableApps(item)}
@@ -719,7 +727,7 @@ export default function MarketZone({navigation}) {
           </Text>
 
           <View style={{marginTop: hp(1), height: '100%'}}>
-          {loading === true ? (
+            {loading === true ? (
               <View
                 style={{
                   position: 'absolute',
@@ -741,7 +749,9 @@ export default function MarketZone({navigation}) {
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}>
-                    <Text style={{fontWeight:'bold', fontSize:hp(2.1)}}>No data available</Text>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
                   </View>
                 ) : (
                   <FlatList
@@ -771,7 +781,7 @@ export default function MarketZone({navigation}) {
           </Text>
 
           <View style={{marginTop: hp(1), height: '100%'}}>
-          {loading === true ? (
+            {loading === true ? (
               <View
                 style={{
                   position: 'absolute',
@@ -786,20 +796,22 @@ export default function MarketZone({navigation}) {
               </View>
             ) : (
               <>
-                {dataClothing?.length === 0 ? (
+                {dataElectronics?.length === 0 ? (
                   <View
                     style={{
                       flex: 1,
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}>
-                    <Text style={{fontWeight:'bold', fontSize:hp(2.1)}}>No data available</Text>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
                   </View>
                 ) : (
                   <FlatList
                     style={{flex: 1}}
                     showsHorizontalScrollIndicator={false}
-                    data={dataClothing}
+                    data={dataElectronics}
                     horizontal
                     keyExtractor={item => item.id.toString()}
                     renderItem={({item}) => renderAvailableApps(item)}
@@ -823,7 +835,7 @@ export default function MarketZone({navigation}) {
           </Text>
 
           <View style={{marginTop: hp(1), height: '100%'}}>
-          {loading === true ? (
+            {loading === true ? (
               <View
                 style={{
                   position: 'absolute',
@@ -845,7 +857,9 @@ export default function MarketZone({navigation}) {
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}>
-                    <Text style={{fontWeight:'bold', fontSize:hp(2.1)}}>No data available</Text>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
                   </View>
                 ) : (
                   <FlatList

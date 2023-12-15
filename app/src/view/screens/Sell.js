@@ -76,6 +76,10 @@ export default function Sell({navigation}) {
 
   const [condition, setCondition] = useState('');
 
+  const [regionArea, setRegionArea] = useState('');
+  
+  const [isFocusRegion, setIsFocusRegion] = useState(false);
+
   const [loading, setLoading] = useState(false);
 
   const [category, setCategory] = useState('');
@@ -326,6 +330,15 @@ export default function Sell({navigation}) {
     {label: 'used_Good', value: 'used_Good'},
     {label: 'used_Fair', value: 'used_Fair'},
   ];
+  
+  const RegionArea = [
+    {label: 'Africa', value: 'Africa'},
+    {label: 'Europe', value: 'Europe'},
+    {label: 'Americas', value: 'Americas'},
+    {label: 'Asia', value: 'Asia'},
+    {label: 'Middle East', value: 'Middle East'},
+
+  ];
 
   const TakeImageFromCamera = () => {
     ImageCropPicker.openCamera({
@@ -433,7 +446,8 @@ export default function Sell({navigation}) {
       description !== '' &&
       price !== '' &&
       locationName !== '' &&
-      region !== ''
+      region !== ''&&
+      regionArea!==''
     ) {
       handleUploadImages(imageUris);
       //console.log('All');
@@ -528,7 +542,7 @@ export default function Sell({navigation}) {
         "condition": condition,
         "location": locationName,
         "paid_status": isChecked,
-        "region": region
+        "region": regionArea
       };
   
       try {
@@ -848,6 +862,62 @@ export default function Sell({navigation}) {
             )}
           />
         </View>
+
+        <View style={{}}>
+          <Dropdown
+            style={
+              isFocusRegion
+                ? styles.textInputSelectedCategory
+                : styles.textInputCategoryNonSelected
+            }
+            containerStyle={{
+              marginTop: 3,
+              alignSelf: 'center',
+              borderRadius: wp(3),
+              width: '100%',
+            }}
+            // dropdownPosition="top"
+            // mode="modal"
+            placeholderStyle={{
+              color: '#121420',
+              //   fontWeight: '400',
+              fontFamily: 'Inter',
+              fontSize: hp(1.8),
+            }}
+            iconStyle={
+              isFocusRegion ? styles.iconStyle : styles.iconStyleInactive
+            }
+            itemTextStyle={{color: '#000000'}}
+            selectedTextStyle={{fontSize: 16, color: '#000000'}}
+            // inputSearchStyle={styles.inputSearchStyle}
+            // iconStyle={styles.iconStyle}
+            value={regionArea}
+            data={RegionArea}
+            search={false}
+            maxHeight={200}
+            labelField="label"
+            valueField="value"
+            placeholder={'Select Region'}
+            searchPlaceholder="Search..."
+            onFocus={() => setIsFocusRegion(true)}
+            onBlur={() => setIsFocusRegion(false)}
+            onChange={item => {
+              setRegionArea(item.label);
+              //console.log("Condition", item.label)
+              setIsFocusRegion(false);
+            }}
+            renderRightIcon={() => (
+              <AntDesign
+                style={styles.icon}
+                color={isFocus ? '#FACA4E' : '#C4C4C4'}
+                name="down"
+                size={15}
+              />
+            )}
+          />
+        </View>
+
+
 
         <TextInput
           mode="outlined"

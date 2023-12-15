@@ -31,10 +31,6 @@ export default function ViewAllCategoriesGEBC({navigation}) {
   const [data, setData] = useState([]);
   const [authToken, setAuthToken] = useState('');
 
-  
-
-
-
   useEffect(() => {
     // Make the API request and update the 'data' state
     fetchVideos();
@@ -71,7 +67,7 @@ export default function ViewAllCategoriesGEBC({navigation}) {
 
     try {
       const response = await fetch(
-        'https://watch-gotcha-be.mtechub.com/discCategory/getAllDiscCategories?page=1&limit=5',
+        'https://watch-gotcha-be.mtechub.com/discCategory/getAllDiscCategories?page=1&limit=100',
         {
           method: 'GET',
           headers: {
@@ -187,7 +183,7 @@ const styles = StyleSheet.create({
   },
   textColor: {
     fontSize: hp(2.1),
-    color: '#00000017',
+    color: 'black',
     fontFamily: 'Inter-Bold',
     textAlign:'center'
 

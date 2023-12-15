@@ -254,7 +254,7 @@ export default function LetterDetails({navigation, route}) {
             marginTop: hp(12.5),
           }}>
           <Text style={{fontSize: hp(1.1), fontWeight: 'bold', width: wp(23)}}>
-            {item.title}
+            {item?.title}
           </Text>
 
           <Entypo name={'dots-three-vertical'} size={14} color={'#4A4A4A'} />
