@@ -315,6 +315,28 @@ export default function LetterDisc({navigation}) {
     );
   };
 
+  const renderPublicGeneral = item => {
+    return (
+      <View
+        style={{
+          flex: 1,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
+        <Image
+          source={appImages.OpenLetter}
+          style={{resizeMode: 'contain', width: wp(39)}}
+        />
+
+        <Image
+          source={appImages.OpenLetter}
+          style={{resizeMode: 'contain', width: wp(39)}}
+        />
+      </View>
+    );
+  };
+
   const OpenLetters = () => {
     return (
       <View style={{flex: 1}}>
@@ -334,23 +356,18 @@ export default function LetterDisc({navigation}) {
           <Text style={{color: '#4A4A4A', fontWeight: 'bold', fontSize: hp(2)}}>
             Public (general)
           </Text>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}>
-            <Image
-              source={appImages.OpenLetter}
-              style={{resizeMode: 'contain', width: wp(39)}}
-            />
 
-            <Image
-              source={appImages.OpenLetter}
-              style={{resizeMode: 'contain', width: wp(39)}}
-            />
-          </View>
+          <FlatList
+          style={{flex: 1}}
+          contentContainerStyle={{alignItems: 'center'}}
+          showsHorizontalScrollIndicator={false}
+          horizontal
+          data={searches}
+          keyExtractor={item => item.id.toString()}
+          renderItem={({item}) => renderPublicGeneral(item)}
+        />
+
+
         </View>
 
         <View style={{marginTop: hp(5), height: hp(21)}}>
@@ -482,18 +499,13 @@ export default function LetterDisc({navigation}) {
           marginTop: hp(1),
           marginHorizontal: wp(8),
         }}>
-        {
-          selectedItemId===0?(
-            <DiscScreen/>
-          ):
-          (
-            selectedItemId===2?(
-              <OpenLetters/>
-            ):(
-              <DiscScreen/>
-            )
-          )
-        }
+        {selectedItemId === 0 ? (
+          <DiscScreen />
+        ) : selectedItemId === 2 ? (
+          <OpenLetters />
+        ) : (
+          <DiscScreen />
+        )}
       </ScrollView>
 
       <TouchableOpacity

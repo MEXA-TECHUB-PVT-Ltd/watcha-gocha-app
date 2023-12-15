@@ -52,6 +52,8 @@ const App = ({navigation}) => {
    
   const [userId, setUserId] = useState('');
 
+  const [authToken, setAuthToken] = useState('');
+
   const [selectedItem, setSelectedItem] = useState('');
 
   const [imageUrl, setImageUrl] = useState(null);
@@ -91,6 +93,14 @@ const App = ({navigation}) => {
       } else {
         console.log('result is null', result);
       }
+
+      const result3 = await AsyncStorage.getItem('authToken ');
+      if (result3 !== null) {
+        setAuthToken(result3);
+
+        console.log('user id retrieved:', result);
+      }
+
     } catch (error) {
       // Handle errors here
       console.error('Error retrieving user ID:', error);
@@ -198,8 +208,7 @@ const App = ({navigation}) => {
 
     console.log('id', userId);
     
-    const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+    const token = authToken;
     const apiUrl = 'https://watch-gotcha-be.mtechub.com/user/uploadImage';
 
     // Construct the request data as FormData
@@ -239,8 +248,6 @@ const App = ({navigation}) => {
       // Handle the error
     }
   };
-
-
 
   return (
     <ScrollView style={styles.bg} contentContainerStyle={{flexGrow: 1}}>

@@ -95,6 +95,7 @@ export default function PostLetterEditSignature({navigation, route}) {
     fetchVideos();
   }, []);
 
+
   const fetchVideos = async () => {
     // Simulate loading
     setLoading(true);
@@ -194,19 +195,11 @@ export default function PostLetterEditSignature({navigation, route}) {
   const onSaveEvent = result => {
     // result.encoded - for the base64 encoded png
     // result.pathName - for the file path name
-
     console.log('Encoded Image', result.encoded);
 
     console.log('Encoded File Path', result.pathName);
 
-
-    if(imageInfo!==null){
-       handleUploadImages()
-    }else{
-
-      makeFile(result.encoded);
-
-    }
+    makeFile(result.encoded);
 
     //console.log(("Encoded Image of:",encodedImage.encoded))
     // Save the encoded image to state
@@ -233,7 +226,7 @@ export default function PostLetterEditSignature({navigation, route}) {
 
   //handleUploadImage
 
-  //upload pic 
+  //upload pic
 
   const handleUploadImages = data => {
     setLoading(true);
@@ -263,15 +256,13 @@ export default function PostLetterEditSignature({navigation, route}) {
         console.log('Image Url', data);
         createSignature(data.url);
         //uploadXpiVideo(data.url,data)
-       // uploadVideo(data.url);
+        // uploadVideo(data.url);
       })
       .catch(err => {
         setLoading(false);
         console.log('Error While Uploading Video', err);
       });
   };
-
-
 
   //------------------------------------\\
 
@@ -329,14 +320,11 @@ export default function PostLetterEditSignature({navigation, route}) {
       console.log('File Entity:', fileEntity);
 
       if (fileEntity !== null && fileEntity !== undefined) {
-
         console.log('Going To Statement');
 
-        createSignature(fileEntity)
-
-        
+        createSignature(fileEntity);
       } else {
-        console.log("File Entity is null or empty.");
+        console.log('File Entity is null or empty.');
       }
     } catch (error) {
       console.error('Error uploading file:', error);
@@ -346,7 +334,7 @@ export default function PostLetterEditSignature({navigation, route}) {
   const createSignature = async data => {
     console.log('Image Uri of encoded', data);
 
-    const token = authToken
+    const token = authToken;
     const apiUrl =
       'https://watch-gotcha-be.mtechub.com/signature/createSignature';
 
@@ -368,7 +356,7 @@ export default function PostLetterEditSignature({navigation, route}) {
       if (response.ok) {
         const data = await response.json();
         console.log('API Response:', data.data?.signature_created_at);
-        
+
         setLoading(false);
         navigation.navigate('PostLetterEditSignaturePics', {
           greetingsTitle: receivedDataGreetingsTitle,
@@ -382,9 +370,9 @@ export default function PostLetterEditSignature({navigation, route}) {
           category_id: receivedDataCategoryId,
           letterType: receivedDataLetterType,
           formOfApeal: 'My appeal',
-          letterImg:data,
-          signatureId:data.data?.signature_id,
-          signatureCreatedAt:data.data?.signature_created_at
+          letterImg: data,
+          signatureId: data.data?.signature_id,
+          signatureCreatedAt: data.data?.signature_created_at,
         });
         //handleUpdatePassword();
 
@@ -419,21 +407,18 @@ export default function PostLetterEditSignature({navigation, route}) {
         console.log('image here', response);
 
         if (!response.didCancel) {
-          ref_RBSheetCameraCanvas.current.close()
+          ref_RBSheetCameraCanvas.current.close();
           if (response.assets && response.assets.length > 0) {
             setImageUri(response.assets[0].uri);
             console.log('response', response.assets[0].uri);
             setImageInfo(response.assets[0]);
-            ref_RBSheetCameraCanvas.current.close()
-
+            ref_RBSheetCameraCanvas.current.close();
           } else if (response.uri) {
             // Handle the case when no assets are present (e.g., for videos)
             setImageUri(response.uri);
             console.log('response null', response.uri);
-            ref_RBSheetCameraCanvas.current.close()
-
+            ref_RBSheetCameraCanvas.current.close();
           }
-
         }
       },
     );
@@ -441,22 +426,21 @@ export default function PostLetterEditSignature({navigation, route}) {
 
   const choosePhotoFromLibrary = value => {
     setSelectedItem(value);
-    launchImageLibrary({mediaType: 'Photo'}, response => {
+    launchImageLibrary({mediaType: 'photo'}, response => {
       console.log('image here', response);
       if (!response.didCancel && response.assets.length > 0) {
         console.log('Response', response.assets[0]);
         setImageUri(response.assets[0].uri);
         setImageInfo(response.assets[0]);
-        ref_RBSheetCameraCanvas.current.close()
+        ref_RBSheetCameraCanvas.current.close();
+        resetSign()
       }
-      ref_RBSheetCameraCanvas.current.close()
-      
-      console.log('response', imageInfo);
+      ref_RBSheetCameraCanvas.current.close();
+      resetSign()
 
+      console.log('response', imageInfo);
     });
   };
-
-
 
   //------------------------------------------\\
 
@@ -534,11 +518,12 @@ export default function PostLetterEditSignature({navigation, route}) {
       });
   };
 
-
-
   const onDragEvent = () => {
     // This callback will be called when the user enters a signature
     console.log('dragged');
+    setImageInfo(null);
+    setImageUri(null);
+    setImageUrl('');
   };
 
   //--------------------\\
@@ -696,18 +681,12 @@ export default function PostLetterEditSignature({navigation, route}) {
       </TouchableOpacity>
     );
   };
-  
 
   //------------------------\\
 
-  
-
-
-
-
   //---------------------------------\\
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <StatusBar
         translucent={true}
         backgroundColor="transparent"
@@ -723,34 +702,33 @@ export default function PostLetterEditSignature({navigation, route}) {
         />
       </View>
 
-      <View
-        style={{
-          borderRadius: wp(10),
-          marginTop: hp(10),
-          alignSelf: 'center',
-          width: '80%',
-          height: hp(50),
-          //backgroundColor:'black',
-          borderColor: '#E7EAF2',
-          borderWidth: 1,
-          overflow: 'hidden',
-        }}>
-        <SignatureCapture
-          style={{width: '100%', height: '100%'}}
-          ref={signatureRef}
-          onSaveEvent={onSaveEvent}
-          onDragEvent={onDragEvent}
-          saveImageFileInExtStorage={true}
-          showNativeButtons={false}
-          showTitleLabel={false}
-          //backgroundColor={'black'}
-          strokeColor={colorSelect}
-          minStrokeWidth={10}
-          maxStrokeWidth={10}
-          viewMode={'portrait'}
-        />
-      </View>
-
+        <View
+          style={{
+            borderRadius: wp(10),
+            marginTop: hp(10),
+            alignSelf: 'center',
+            width: '80%',
+            height: hp(50),
+            //backgroundColor:'black',
+            borderColor: '#E7EAF2',
+            borderWidth: 1,
+            overflow: 'hidden',
+          }}>
+          <SignatureCapture
+            style={{width: '100%', height: '100%'}}
+            ref={signatureRef}
+            onSaveEvent={onSaveEvent}
+            onDragEvent={onDragEvent}
+            saveImageFileInExtStorage={true}
+            showNativeButtons={false}
+            showTitleLabel={false}
+            //backgroundColor={'black'}
+            strokeColor={colorSelect}
+            minStrokeWidth={10}
+            maxStrokeWidth={10}
+            viewMode={'portrait'}
+          />
+        </View>
       {/* <View style={{marginLeft:wp(8), marginTop:hp(5)}}>
 
       <CPaperInput
@@ -774,91 +752,107 @@ export default function PostLetterEditSignature({navigation, route}) {
           justifyContent: 'space-between',
           alignItems: 'center',
         }}>
-        <TouchableOpacity onPress={() => resetSign()}>
+          <TouchableOpacity onPress={() => resetSign()}>
+            <Text
+              style={{
+                color: '#FACA4E',
+                fontFamily: 'Inter-Regular',
+                fontSize: hp(1.7),
+              }}>
+              Clear
+            </Text>
+          </TouchableOpacity>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-evenly',
+              alignItems: 'center',
+              height: hp(5),
+              width: wp(23),
+            }}>
+            <TouchableOpacity
+              onPress={() => setColorSelect('#202020')}
+              style={{
+                width: wp(5),
+                height: wp(5),
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#202020',
+                borderRadius: wp(5) / 2,
+              }}>
+              {colorSelect === '#202020' ? (
+                <AntDesign color={'#FFFFFF'} name={'check'} size={12} />
+              ) : null}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => setColorSelect('#FFF500')}
+              style={{
+                width: wp(5),
+                height: wp(5),
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#FFF500',
+                borderRadius: wp(5) / 2,
+              }}>
+              {colorSelect === '#FFF500' ? (
+                <AntDesign color={'#FFFFFF'} name={'check'} size={12} />
+              ) : null}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => setColorSelect('#225DD9')}
+              style={{
+                width: wp(5),
+                height: wp(5),
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#225DD9',
+                borderRadius: wp(5) / 2,
+              }}>
+              {colorSelect === '#225DD9' ? (
+                <AntDesign color={'#FFFFFF'} name={'check'} size={12} />
+              ) : null}
+            </TouchableOpacity>
+          </View>
+      </View>
+
+      <View
+        style={{height: hp(8), alignItems: 'center', justifyContent: 'center'}}>
+        <TouchableOpacity
+          onPress={() => choosePhotoFromLibrary('gallery')}
+          style={{
+            justifyContent: 'center',
+            //marginLeft: wp(10),
+            alignItems: 'center',
+            alignSelf: 'center',
+            height: hp(5),
+            width: wp(28),
+            borderRadius: wp(5) /* backgroundColor:'#FACA4E' */,
+          }}>
           <Text
             style={{
               color: '#FACA4E',
+              textAlign: 'center',
               fontFamily: 'Inter-Regular',
               fontSize: hp(1.7),
             }}>
-            Clear
+            Upload From Gallery
           </Text>
         </TouchableOpacity>
-
-        <TouchableOpacity onPress={()=>ref_RBSheetCameraCanvas.current.open()} style={{justifyContent:'center', marginLeft:wp(10), alignItems:'center',alignSelf:'center', height:hp(4), width:wp(28), borderRadius:wp(5), backgroundColor:'#FACA4E'}}>
-      <Text
-        style={{
-          color: '#232323',
-          fontFamily: 'Inter-Regular',
-          fontSize: hp(1.7)
-        }}>
-        Edit Signature
-      </Text>
-      </TouchableOpacity>
-
-
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-evenly',
-            alignItems: 'center',
-            height: hp(5),
-            width: wp(23),
-          }}>
-          <TouchableOpacity
-            onPress={() => setColorSelect('#202020')}
-            style={{
-              width: wp(5),
-              height: wp(5),
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: '#202020',
-              borderRadius: wp(5) / 2,
-            }}>
-            {colorSelect === '#202020' ? (
-              <AntDesign color={'#FFFFFF'} name={'check'} size={12} />
-            ) : null}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => setColorSelect('#FFF500')}
-            style={{
-              width: wp(5),
-              height: wp(5),
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: '#FFF500',
-              borderRadius: wp(5) / 2,
-            }}>
-            {colorSelect === '#FFF500' ? (
-              <AntDesign color={'#FFFFFF'} name={'check'} size={12} />
-            ) : null}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => setColorSelect('#225DD9')}
-            style={{
-              width: wp(5),
-              height: wp(5),
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: '#225DD9',
-              borderRadius: wp(5) / 2,
-            }}>
-            {colorSelect === '#225DD9' ? (
-              <AntDesign color={'#FFFFFF'} name={'check'} size={12} />
-            ) : null}
-          </TouchableOpacity>
-        </View>
       </View>
 
-      {savedSignature && (
+      {imageInfo && (
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-          <Text>Saved Signature:</Text>
-          <Image
-            source={{uri: `data:image/png;base64,${encodedImage}`}}
-            style={{borderWidth: 3, width: 200, height: 50}}
-          />
+          <Text>Uploaded Signature:</Text>
+          <View style={{marginTop: hp(3)}}>
+            <Image
+              //source={{uri: `data:image/png;base64,${encodedImage}`}}
+              source={{uri: imageUri}}
+              style={{borderWidth: 3, width: 200, height: 100}}
+            />
+          </View>
         </View>
       )}
 
@@ -868,7 +862,12 @@ export default function PostLetterEditSignature({navigation, route}) {
           load={loading}
           // checkdisable={inn == '' && cm == '' ? true : false}
           customClick={() => {
-            saveSign();
+            if (imageInfo !== null) {
+              handleUploadImages();
+            } else {
+              saveSign();
+            }
+            //saveSign();
             //navigation.navigate('PostLetterEditSignaturePics');
             //navigation.navigate('Profile_image');
           }}
@@ -887,6 +886,18 @@ export default function PostLetterEditSignature({navigation, route}) {
         }}>
         {loading && <ActivityIndicator size="large" color="#FACA4E" />}
       </View>
+
+      {/*  <TouchableOpacity
+            onPress={() => ref_RBSheetCameraCanvas.current.close()}
+            style={
+              selectedItem === 'camera'
+                ? styles.selectedItems
+                : styles.nonselectedItems
+            }>
+           <Image source={appImages.ArtBoard} style={{ resizeMode:'contain'}}/>
+
+            <Text style={{marginTop:hp(-1.8),color: '#333333'}}>From canvas</Text>
+          </TouchableOpacity> */}
 
       <RBSheet
         ref={ref_RBSheetCameraCanvas}
@@ -915,7 +926,8 @@ export default function PostLetterEditSignature({navigation, route}) {
             alignItems: 'center',
           }}>
           <Text style={styles.maintext}>Select an option</Text>
-          <TouchableOpacity onPress={() => ref_RBSheetCameraCanvas.current.close()}>
+          <TouchableOpacity
+            onPress={() => ref_RBSheetCameraCanvas.current.close()}>
             <Ionicons
               name="close"
               size={22}
@@ -933,18 +945,6 @@ export default function PostLetterEditSignature({navigation, route}) {
             marginTop: hp(3),
           }}>
           <TouchableOpacity
-            onPress={() => ref_RBSheetCameraCanvas.current.close()}
-            style={
-              selectedItem === 'camera'
-                ? styles.selectedItems
-                : styles.nonselectedItems
-            }>
-           <Image source={appImages.ArtBoard} style={{ resizeMode:'contain'}}/>
-
-            <Text style={{marginTop:hp(-1.8),color: '#333333'}}>From canvas</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
             onPress={() => choosePhotoFromLibrary('gallery')}
             style={
               selectedItem === 'gallery'
@@ -961,8 +961,7 @@ export default function PostLetterEditSignature({navigation, route}) {
           </TouchableOpacity>
         </View>
       </RBSheet>
-
-    </View>
+    </ScrollView>
   );
 }
 
