@@ -67,7 +67,7 @@ export default function ViewAllCategoriesQAFI({navigation}) {
 
     try {
       const response = await fetch(
-        'https://watch-gotcha-be.mtechub.com/discCategory/getAllDiscCategories?page=1&limit=5',
+        'https://watch-gotcha-be.mtechub.com/discCategory/getAllDiscCategories?page=1&limit=100',
         {
           method: 'GET',
           headers: {
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
   },
   textColor: {
     fontSize: hp(2.1),
-    color: '#00000017',
+    color: 'black',
     fontFamily: 'Inter-Bold',
     textAlign:'center'
 

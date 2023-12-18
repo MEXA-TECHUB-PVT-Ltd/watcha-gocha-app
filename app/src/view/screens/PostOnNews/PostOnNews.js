@@ -81,6 +81,8 @@ export default function PostOnNews({navigation}) {
 
   const [imageInfo, setImageInfo] = useState(null);
 
+  const [authToken, setAuthToken] = useState('');
+
   const [categoryId, setCategoryId] = useState('');
 
   const [userId, setUserId] = useState('');
@@ -108,7 +110,6 @@ export default function PostOnNews({navigation}) {
 
     await getUserID();
     // Fetch data one by one
-    await fetchCategory();
 
     // Once all data is fetched, set loading to false
     setLoading(false);
@@ -137,14 +138,23 @@ export default function PostOnNews({navigation}) {
       // Handle errors here
       console.error('Error retrieving user ID:', error);
     }
+
+    const result1 = await AsyncStorage.getItem('authToken ');
+    if (result1 !== null) {
+      setAuthToken(result1);
+      console.log('user token retrieved:', result1);
+      await fetchCategory(result1);
+    } else {
+      console.log('result is null', result1);
+    }
   };
 
-  const fetchCategory = async () => {
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjM3LCJpYXQiOjE3MDI0NTk1MTEsImV4cCI6MTcwNTA1MTUxMX0.OBTTZn0v5rT1Ps2k_OWVdpOmcHbk1x4Fbjmp2X_8Wc8'
+  const fetchCategory = async (resultId) => {
+    const token = resultId
 
     try {
       const response = await fetch(
-        'https://watch-gotcha-be.mtechub.com/discCategory/getAllDiscCategories?page=1&limit=5',
+        'https://watch-gotcha-be.mtechub.com/discCategory/getAllDiscCategories?page=1&limit=100',
         {
           method: 'GET',
           headers: {
@@ -223,7 +233,7 @@ export default function PostOnNews({navigation}) {
         //uploadXpiVideo(data.url);
         console.log('Image Url', data);
         //uploadXpiVideo(data.url,data)
-       // uploadVideo(data.url);
+       uploadVideo(data.url);
       })
       .catch(err => {
         setLoading(false);
@@ -237,7 +247,7 @@ export default function PostOnNews({navigation}) {
     console.log('Description', comment);
     console.log('user id', userId);
 
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjM3LCJpYXQiOjE3MDI0NTk1MTEsImV4cCI6MTcwNTA1MTUxMX0.OBTTZn0v5rT1Ps2k_OWVdpOmcHbk1x4Fbjmp2X_8Wc8'
+    const token = authToken
     const apiUrl = 'https://watch-gotcha-be.mtechub.com/news/createNews';
 
     const requestData = {

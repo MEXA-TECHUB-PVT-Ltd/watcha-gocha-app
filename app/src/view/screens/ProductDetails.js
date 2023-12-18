@@ -60,6 +60,8 @@ export default function ProductDetails({navigation, route}) {
   const [userId, setUserId] = useState('');
   const [userToken, setUserToken] = useState(null);
 
+  const [authToken, setAuthToken] = useState('');
+
   const [priceOffer, setPriceOffer] = useState('');
 
   const [selectedValueListView, setSelectedValueListView] = useState('');
@@ -87,18 +89,53 @@ export default function ProductDetails({navigation, route}) {
     setLoading(true);
 
     // Fetch data one by one
-    await fetchAll();
-
     await getUserID();
 
     // Once all data is fetched, set loading to false
     setLoading(false);
   };
 
-  const fetchAll = async () => {
+  const getUserID = async () => {
+    console.log("Id's");
+    try {
+      const result = await AsyncStorage.getItem('userId ');
+      if (result !== null) {
+        setUserId(result);
+        console.log('user id retrieved:', result);
+      }
+
+      const result3 = await AsyncStorage.getItem('authToken ');
+      if (result3 !== null) {
+        setAuthToken(result3);
+        console.log("Token", result3);
+        
+        await fetchAll(result3);
+       
+
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+
+    try {
+      const result = await AsyncStorage.getItem('UserToken');
+      if (result !== null) {
+        setUserToken(result);
+        console.log('user token retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
+
+  //---------------fetch All-----------------\\
+
+  const fetchAll = async (result3) => {
     //console.log("Categry in id", selectedItemId)
-    const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+    const token = result3;
 
     try {
       const response = await fetch(
@@ -120,30 +157,8 @@ export default function ProductDetails({navigation, route}) {
     }
   };
 
-  const getUserID = async () => {
-    console.log("Id's");
-    try {
-      const result = await AsyncStorage.getItem('userId ');
-      if (result !== null) {
-        setUserId(result);
-        console.log('user id retrieved:', result);
-      }
-    } catch (error) {
-      // Handle errors here
-      console.error('Error retrieving user ID:', error);
-    }
 
-    try {
-      const result = await AsyncStorage.getItem('UserToken');
-      if (result !== null) {
-        setUserToken(result);
-        console.log('user token retrieved:', result);
-      }
-    } catch (error) {
-      // Handle errors here
-      console.error('Error retrieving user ID:', error);
-    }
-  };
+  //-------------------------------------------\\
 
   const ref_RBSendOffer = useRef(null);
   const ref_RBSendOffer2 = useRef(null);
@@ -259,8 +274,7 @@ export default function ProductDetails({navigation, route}) {
     console.log('Id', receivedData.id);
     console.log('userId', userId);
     console.log('price', receivedData.price);
-    const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+    const token = authToken;
     const apiUrl = 'https://watch-gotcha-be.mtechub.com/item/sendOffer';
 
     const requestData = {
@@ -351,8 +365,7 @@ export default function ProductDetails({navigation, route}) {
     console.log('Id', receivedData.id);
     console.log('userId', userId);
     console.log('price', priceOffer);
-    const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+    const token = authToken;
     const apiUrl = 'https://watch-gotcha-be.mtechub.com/item/sendOffer';
 
     const requestData = {
@@ -405,7 +418,7 @@ export default function ProductDetails({navigation, route}) {
     console.log('title', userId);
     console.log('user name', receivedData.username);
 
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTY5ODAzOTAyNywiZXhwIjoxNzAwNjMxMDI3fQ.JSki1amX9VPEP9uCsJ5vPiCl2P4EcBqW6CQyY_YdLsk';
+    const token = authToken;
     const apiUrl = 'https://watch-gotcha-be.mtechub.com/notification/createNotification';
 
     const requestData = {
@@ -455,8 +468,7 @@ export default function ProductDetails({navigation, route}) {
     console.log('Id', receivedData.id);
     console.log('userId', userId);
     console.log('price', receivedData.price);
-    const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+    const token = authToken;
     const apiUrl = 'https://watch-gotcha-be.mtechub.com/item/saveItem';
 
     const requestData = {

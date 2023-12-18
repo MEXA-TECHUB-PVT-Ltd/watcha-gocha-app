@@ -31,12 +31,17 @@ import Toast from 'react-native-toast-message';
 import NonVerified from '../../../assets/svg/NonVerified.svg';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
+import {useIsFocused} from '@react-navigation/native';
+
+
 export default function Disc({navigation, route}) {
   const [selectedItemId, setSelectedItemId] = useState(1);
 
   const [categoryIdNews, setCategoryIdNews] = useState(null);
 
   const [loading, setLoading] = useState(false);
+
+  const isFocused = useIsFocused();
 
   const [newsData, setNewsData] = useState([]);
 
@@ -63,15 +68,16 @@ export default function Disc({navigation, route}) {
   const {NewsCategory, Type} = route?.params || {};
 
   useEffect(() => {
+    if (isFocused) {
     getUserID(); // Call the async function
-  }, [NewsCategory]); // Include 'id' in the dependency array
+    }
+  }, [NewsCategory, isFocused]); // Include 'id' in the dependency array
 
   const getUserID = async () => {
     try {
       const result = await AsyncStorage.getItem('authToken ');
       if (result !== null) {
         setAuthToken(result);
-
         fetchData();
         console.log('user id retrieved:', result);
       }
@@ -126,24 +132,25 @@ export default function Disc({navigation, route}) {
         setLoading(false);
       }
     } else {
-      setLoading(true);
+     /*  setLoading(true);
       //setSelectedItemId(1)
       console.log('Category Id News is ', NewsCategory);
       // Fetch data one by one
       await fetchNews();
 
       // Once all data is fetched, set loading to false
-      setLoading(false);
+      setLoading(false); */
     }
   };
 
   const fetchNews = async () => {
     console.log('Categry in id', categoryIdNews);
+    console.log("News Called");
     const token = authToken;
 
     try {
       const response = await fetch(
-        `https://watch-gotcha-be.mtechub.com/news/getAllNewsByCategory/${categoryIdNews}?page=1&limit=50`,
+        `https://watch-gotcha-be.mtechub.com/news/getAllNewsByCategory/${categoryIdNews}?page=1&limit=100`,
         {
           method: 'GET',
           headers: {
@@ -323,31 +330,46 @@ export default function Disc({navigation, route}) {
 
   const renderPublicGeneral = item => {
     console.log('Item', item);
-    const imageUrl = item.images[0].startsWith('/fileUpload')
-      ? `https://watch-gotcha-be.mtechub.com${item.images[0]}`
-      : item.images[0];
+    const imageUrl = item.images && item.images[0]
+    ? (item.images[0].startsWith('/fileUpload')
+        ? `https://watch-gotcha-be.mtechub.com${item.images[0]}`
+        : item.images[0])
+    : null;
 
     return (
       <TouchableOpacity
         onPress={() => navigation.navigate('LetterDetails', {Letters: item})}
         style={{width: wp(25.5), margin: 5}}>
         <View>
+        {item.images && item.images[0] ? (
           <Image
             style={{
               height: hp(12),
               width: wp(23),
             }}
-            source={{uri: imageUrl}}
+            source={{ uri: imageUrl }}
           />
+        ) : (
+          // Show dummy image if item.images is null or undefined
+          <Image
+            style={{
+              height: hp(12),
+              width: wp(23),
+            }}
+            source={appImages.galleryPlaceHolder}
+          />
+        )}
+         {/* <Image
+            style={{
+              height: hp(12),
+              width: wp(23),
+            }}
+            source={{uri: imageUrl}}
+          />  */}
         </View>
       </TouchableOpacity>
     );
-    {
-      /*  <Image
-   source={appImages.OpenLetter}
-   style={{resizeMode: 'contain', width: wp(39)}}
- /> */
-    }
+    
   };
 
   //-------------------\\
@@ -767,7 +789,7 @@ export default function Disc({navigation, route}) {
 
         <View style={{marginTop: hp(2), height: hp(23)}}>
           <View style={{marginTop: hp(1), height: '100%'}}>
-            {loading === true ? (
+          {loading === true ? (
               <View
                 style={{
                   position: 'absolute',
@@ -781,6 +803,19 @@ export default function Disc({navigation, route}) {
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
             ) : (
+              <>
+                {newsData?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) : (
               <FlatList
                 style={{flex: 1}}
                 showsVerticalScrollIndicator={false}
@@ -789,7 +824,10 @@ export default function Disc({navigation, route}) {
                 //keyExtractor={item => item.id.toString()}
                 renderItem={({item}) => renderAvailableApps(item)}
               />
+              )}
+              </>
             )}
+          
           </View>
         </View>
 
