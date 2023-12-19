@@ -22,6 +22,7 @@ import Fontiso from 'react-native-vector-icons/Fontisto';
 export default function SearchProducts({navigation}) {
   const [selectedItemId, setSelectedItemId] = useState(null);
 
+  const [authToken, setAuthToken] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
   const [searches, setSearches] = useState([]);
@@ -73,10 +74,16 @@ export default function SearchProducts({navigation}) {
     setLoading(false);
   };
 
+ 
+
+  
+
+  
+
   useEffect(() => {
     const fetchData = async () => {
-      const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+      console.log("Token", authToken)
+      const token = authToken;
 
     try {
       const response = await fetch(
@@ -101,12 +108,19 @@ export default function SearchProducts({navigation}) {
   }, [selectedItemId]);
 
   const handleSearch = text => {
-    console.log("data Search", data)
-    const searchTerm = text.toLowerCase();
+    console.log("data Search", data);
 
+    if (!data) {
+      // Data is not available yet
+      return;
+    }
+  
+    const searchTerm = text.toLowerCase();
+  
     const filteredApps = data.filter(app =>
       app.title.toLowerCase().includes(searchTerm),
     );
+  
     setFilteredData(filteredApps);
   };
 
@@ -115,10 +129,30 @@ export default function SearchProducts({navigation}) {
       const savedSearches = await AsyncStorage.getItem('searchesProducts');
       if (savedSearches) {
         setSearches(JSON.parse(savedSearches));
+        getUserID();
       }
     } catch (error) {
+      getUserID();
       console.error('Error loading searches from storage:', error);
     }
+  };
+
+  const getUserID = async () => {
+    console.log("Id's");
+    try {
+
+      const result3 = await AsyncStorage.getItem('authToken ');
+      if (result3 !== null) {
+        setAuthToken(result3);
+        console.log('Token', result3);
+
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+
   };
 
 
@@ -141,8 +175,6 @@ export default function SearchProducts({navigation}) {
       console.error('Error saving search term:', error);
     }
   };
-
-
 
   const renderSearches = item => {
     const isSelected = selectedItemId === item.title;
@@ -193,7 +225,7 @@ export default function SearchProducts({navigation}) {
             borderRadius: wp(3),
             resizeMode: 'cover',
           }}
-          source={{uri:'https://watch-gotcha-be.mtechub.com/'+ item.images[0].image}}
+          source={{uri:item.images[0].image}}
         />
         <View
             style={{

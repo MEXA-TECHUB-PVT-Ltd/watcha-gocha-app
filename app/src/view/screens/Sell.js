@@ -13,6 +13,7 @@ import {
   ScrollView,
 } from 'react-native';
 import React, {useState, useEffect, useRef} from 'react';
+
 import Back from '../../assets/svg/back.svg';
 import {appImages} from '../../assets/utilities/index';
 import {
@@ -100,8 +101,9 @@ export default function Sell({navigation}) {
 
   useEffect(() => {
     // Check and request location permission
-
+   
     const requestLocationPermission = async () => {
+
       try {
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,

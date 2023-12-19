@@ -2,6 +2,7 @@ import {
   StyleSheet,
   FlatList,
   Image,
+  Modal,
   ActivityIndicator,
   StatusBar,
   TouchableOpacity,
@@ -21,6 +22,7 @@ import Headers from '../../../assets/Custom/Headers';
 import {appImages} from '../../../assets/utilities';
 import {DraxProvider, DraxView} from 'react-native-drax';
 import {BlurView} from '@react-native-community/blur';
+import Entypo from 'react-native-vector-icons/Entypo';
 
 // hover apps
 
@@ -35,6 +37,15 @@ export default function Categories({navigation}) {
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [dataApps, setData] = useState([]);
   const [isLongPress, setIsLongPress] = useState(false);
+
+  const [unUsedLocal, setUnUsedLocal] = useState([]);
+
+  const [unusedApps, setUnusedApps] = useState([]);
+
+  const [isCancelModalVisible, setIsCancelModalVisible] = useState(false);
+
+  const [isCancelRemoveModalVisible, setIsCancelRemoveModalVisible] =
+    useState(false);
 
   const [isLongPressRemove, setIsLongPressRemove] = useState(false);
 
@@ -108,7 +119,7 @@ export default function Categories({navigation}) {
         }
       };
       saveFavouriteData();
-      //AsyncStorage.removeItem('topData');
+      // AsyncStorage.removeItem('topData');
     }
   }, [favouriteData, isFocused]); // Run this effect whenever favouriteData changes
 
@@ -120,6 +131,7 @@ export default function Categories({navigation}) {
     if (isFocused) {
       // Load topData from AsyncStorage when the component mounts
       const loadTopData = async () => {
+        //await AsyncStorage.removeItem('topData');
         try {
           const storedData = await AsyncStorage.getItem('topData');
           if (storedData) {
@@ -152,8 +164,82 @@ export default function Categories({navigation}) {
 
   //---------------------------------------------\\
 
+  //------------------Use Effect Filtered Apps----------------\\
+
+  useEffect(() => {
+    const fetchUsedData = async () => {
+      const lastUsageDate = new Date().toISOString();
+
+      const installedApps = InstalledApps.getSortedApps();
+      const packageNames = installedApps.map(app => app.label);
+      const packageImages = installedApps.map(app => app.icon);
+      const packageBundle = installedApps.map(app => app.packageName);
+      const packageDataArray = packageNames.map((packageName, index) => ({
+        label: packageName,
+        bundle: packageBundle[index],
+        image: packageImages[index],
+        date: lastUsageDate,
+      }));
+      
+      setUnusedApps(packageDataArray);
+
+      await AsyncStorage.setItem(
+        'comparisonDate',
+        JSON.stringify(packageDataArray),
+      );
+      setIsLoading(false);
+    };
+
+    fetchUsedData();
+  }, []);
+
+  const filterUnusedApps = async apps => {
+    const currentDate = new Date();
+    const threeWeeksAgo = new Date(currentDate - 21 * 24 * 60 * 60 * 1000); // Three weeks ago
+
+    const unusedAppsData = [];
+
+    for (const app of apps) {
+      const storedAppInfo = await AsyncStorage.getItem(`appInfo_${app}`);
+      let appInfo;
+
+      if (storedAppInfo) {
+        appInfo = JSON.parse(storedAppInfo);
+        //console.log("APp Info", appInfo)
+      } else {
+        // Store app information for the first time
+
+        appInfo = {
+          label: app, // Assuming app is the package name if not change it to the correct property
+          bundle: app,
+          image: app.icon, // You might want to fetch and store the icon as well
+        };
+
+        await AsyncStorage.setItem(`appInfo_${app}`, JSON.stringify(appInfo));
+      }
+
+      const lastUsageDate = await AsyncStorage.getItem(`lastUsageDate_${app}`);
+
+      if (!lastUsageDate || new Date(lastUsageDate) < threeWeeksAgo) {
+        unusedAppsData.push({
+          label: appInfo.label,
+          bundle: appInfo.bundle,
+          image: appInfo.image,
+        });
+      }
+    }
+
+    //console.log("Unused Apps", unusedAppsData);
+
+    return unusedAppsData;
+  };
+
+  //------------------------------------------------------------\\
+
   const itemsPerPage = 10; // Change this to set the number of items per screen
   const screens = Math.ceil(dataApps.length / itemsPerPage);
+
+  const screenFavourite = Math.ceil(favouriteData.length / itemsPerPage);
 
   /* const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
@@ -223,7 +309,7 @@ export default function Categories({navigation}) {
     const openApp = async items => {
       try {
         // Launch the application
-        await RNLauncherKitHelper.launchApplication(item.bundle);
+        //await RNLauncherKitHelper.launchApplication(item.bundle);
 
         // Check if the app is already in the topData array
         const appIndex = topData.findIndex(app => app.bundle === item.bundle);
@@ -237,23 +323,93 @@ export default function Categories({navigation}) {
           };
 
           setTopData(updatedTopData);
+
+          //----------------------\\
+
+          const lastUsageDate = new Date().toISOString();
+
+          // Fetch existing data from AsyncStorage
+          const existingDataString = await AsyncStorage.getItem('comparisonDate');
+          const existingData = existingDataString ? JSON.parse(existingDataString) : [];
+          
+          // Find the index of the object with matching bundle
+          const indexToUpdate = existingData.findIndex(entry => entry.bundle === item.bundle);
+          
+          // Update the existing data with the new date value for the matching object
+          const updatedData = [
+            ...existingData.slice(0, indexToUpdate),  // items before the matched item
+            {
+              ...existingData[indexToUpdate],
+              date: lastUsageDate,
+            },
+            ...existingData.slice(indexToUpdate + 1),  // items after the matched item
+          ];
+          
+          // Save the updated data back in AsyncStorage
+          await AsyncStorage.setItem('comparisonDate', JSON.stringify(updatedData));
+          
+          //---------------------\\
         } else {
           // If the app is not in the array, add it with count 1
-          setTopData(prevData => [
-            ...prevData,
+          const newTopData = [
+            ...topData.slice(0, 5), // Keep the first 5 items
             {
               label: item.label,
               bundle: item.bundle,
               image: item.image,
               count: 1,
             },
-          ]);
-        }
+          ];
 
-        await RNLauncherKitHelper.launchApplication(items); // Assuming 'item.label' is the package name
+          setTopData(newTopData);
+
+          const lastUsageDate = new Date().toISOString();
+
+          // Fetch existing data from AsyncStorage
+          const existingDataString = await AsyncStorage.getItem('comparisonDate');
+          const existingData = existingDataString ? JSON.parse(existingDataString) : [];
+          
+          // Find the index of the object with matching bundle
+          const indexToUpdate = existingData.findIndex(entry => entry.bundle === item.bundle);
+          
+          // Update the existing data with the new date value for the matching object
+          const updatedData = [
+            ...existingData.slice(0, indexToUpdate),  // items before the matched item
+            {
+              ...existingData[indexToUpdate],
+              date: lastUsageDate,
+            },
+            ...existingData.slice(indexToUpdate + 1),  // items after the matched item
+          ];
+          
+          // Save the updated data back in AsyncStorage
+          await AsyncStorage.setItem('comparisonDate', JSON.stringify(updatedData));
+        }
       } catch (error) {
         console.error('Error opening the app:', error);
-        await RNLauncherKitHelper.launchApplication(items); // Assuming 'item.label' is the package name
+
+        const lastUsageDate = new Date().toISOString();
+
+        // Fetch existing data from AsyncStorage
+        const existingDataString = await AsyncStorage.getItem('comparisonDate');
+        const existingData = existingDataString ? JSON.parse(existingDataString) : [];
+        
+        // Find the index of the object with matching bundle
+        const indexToUpdate = existingData.findIndex(entry => entry.bundle === item.bundle);
+        
+        // Update the existing data with the new date value for the matching object
+        const updatedData = [
+          ...existingData.slice(0, indexToUpdate),  // items before the matched item
+          {
+            ...existingData[indexToUpdate],
+            date: lastUsageDate,
+          },
+          ...existingData.slice(indexToUpdate + 1),  // items after the matched item
+        ];
+        
+        // Save the updated data back in AsyncStorage
+        await AsyncStorage.setItem('comparisonDate', JSON.stringify(updatedData));
+        //await RNLauncherKitHelper.launchApplication(items); // Assuming 'item.label' is the package name
       }
     };
 
@@ -261,17 +417,28 @@ export default function Categories({navigation}) {
       <TouchableOpacity
         onLongPress={() => {
           setIsLongPress(true);
+          setIsCancelModalVisible(true);
           setFavouriteItem(item);
         }}
         onPress={() => openApp(item?.bundle)}
         style={styles.items}>
         <Image
-          style={{width: 30, height: 30}}
+          style={{width: 43, height: 43}}
           source={{uri: `data:image/png;base64,${item?.image}`}}
         />
-        <Text style={{color: '#000000', fontSize: hp(1.3), fontWeight: 'bold'}}>
-          {item?.label}
-        </Text>
+        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+          <Text
+            style={{
+              color: '#000000',
+              textAlign: 'center',
+              fontSize: hp(1.2),
+              fontWeight: 'bold',
+            }}
+            ellipsizeMode="tail"
+            numberOfLines={1}>
+            {item?.label}
+          </Text>
+        </View>
       </TouchableOpacity>
     );
   };
@@ -319,6 +486,7 @@ export default function Categories({navigation}) {
       <TouchableOpacity
         onLongPress={() => {
           setIsLongPressRemove(true);
+          setIsCancelRemoveModalVisible(true);
           setRemoveFavouriteItem(item);
         }}
         //onPress={() => openApp(item?.bundle)}
@@ -327,7 +495,15 @@ export default function Categories({navigation}) {
           style={{width: 30, height: 30}}
           source={{uri: `data:image/png;base64,${item?.image}`}}
         />
-        <Text style={{color: '#000000', fontSize: hp(1.3), fontWeight: 'bold'}}>
+        <Text
+          style={{
+            color: '#000000',
+            textAlign: 'center',
+            fontSize: hp(1.2),
+            fontWeight: 'bold',
+          }}
+          ellipsizeMode="tail"
+          numberOfLines={1}>
           {item?.label}
         </Text>
       </TouchableOpacity>
@@ -358,10 +534,13 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
     // Render the item only if count is equal to 2
     if (item.count >= 2) {
       return (
-        <Image
-          style={{width: 30, height: 30}}
-          source={{uri: `data:image/png;base64,${item?.image}`}}
-        />
+        <View style={{height: hp(6.5)}}>
+          <Image
+            style={{width: wp(10), height: hp(5)}}
+            resizeMode="contain"
+            source={{uri: `data:image/png;base64,${item?.image}`}}
+          />
+        </View>
       );
     } else {
       // Return null or an empty view if count is not equal to 2
@@ -418,94 +597,166 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
     );
   };
 
+  const closeRequestModal = () => {
+    setIsLongPress(false);
+    setIsCancelModalVisible(false);
+  };
+
+  const closeRequestRemoveModal = () => {
+    setIsLongPressRemove(false);
+    setIsCancelRemoveModalVisible(false);
+  };
+
   return (
     <View
       style={{
         flex: 1,
-        backgroundColor: isLongPress === true ? 'rgba(0, 0, 0, 0.5)' : 'white',
+        backgroundColor: 'white',
+        //backgroundColor: isLongPress === true ? 'rgba(0, 0, 0, 0.5)' : 'white',
       }}>
-      {isLongPress && (
-        <TouchableOpacity
-          onPress={() => {
-            // Handle your overlay button action (e.g., add to favorites)
+      <Modal
+        transparent={true}
+        animationType="fade"
+        visible={isLongPress}
+        onRequestClose={() => setIsLongPress(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity
+              onPress={() => {
+                if (favouriteItem) {
+                  const isItemInFavourites = favouriteData.some(
+                    item => item.bundle === favouriteItem.bundle,
+                  );
 
-            /*  if (favouriteItem) {
+                  if (isItemInFavourites) {
+                    console.log('Item is already in favourites');
+                  } else {
+                    setFavouriteData(prevData => [...prevData, favouriteItem]);
+                    console.log(
+                      'Add to Favorites pressed for:',
+                      favouriteItem.label,
+                    );
+                  }
+
+                  setIsLongPress(false);
+                }
+              }}
+              style={styles.overlayButton}>
+              <Text style={{color: 'white'}}>Add to Favorites</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                if (favouriteItem) {
+                  const updatedInstallData = dataApps.filter(
+                    item => item.bundle !== favouriteItem.bundle,
+                  );
+                  setData(updatedInstallData);
+                  setIsCancelModalVisible(false);
+                  setIsLongPress(false);
+                }
+              }}
+              style={styles.overlayButton}>
+              <Text style={{color: 'white'}}>
+                Remove From Watcha Gotcha App
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        {isCancelModalVisible && (
+          <TouchableOpacity
+            onPress={() => closeRequestModal()}
+            style={styles.modalContentCross}>
+            <Entypo name={'cross'} size={18} color={'black'} />
+          </TouchableOpacity>
+        )}
+      </Modal>
+
+      {/* Modal Of Cross Button */}
+      {/*  <Modal
+        transparent={true}
+        animationType="slide"
+        visible={isCancelModalVisible}
+        onRequestClose={() => closeRequestModal()}> */}
+
+      <Modal
+        transparent={true}
+        animationType="fade"
+        visible={isLongPressRemove}
+        onRequestClose={() => setIsLongPressRemove(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity
+              onPress={() => {
+                // Handle your overlay button action (e.g., add to favorites)
+
+                /*  if (favouriteItem) {
                   setFavouriteData((prevData) => [...prevData, favouriteItem]);
                   console.log('Add to Favorites pressed for:');
                   setIsLongPress(false);
                 } */
 
-            if (favouriteItem) {
-              // Check if the item already exists in favouriteData
-              const isItemInFavourites = favouriteData.some(
-                item => item.bundle === favouriteItem.bundle,
-              );
+                if (removeFavouriteItem) {
+                  // Check if the item already exists in favouriteData
+                  const isItemInFavourites = favouriteData.some(
+                    item => item.bundle === removeFavouriteItem.bundle,
+                  );
 
-              console.log('Favourite Item', isItemInFavourites);
+                  console.log('Favourite Item', isItemInFavourites);
 
-              if (isItemInFavourites) {
-                // Item already exists, display a message or handle it as needed
-                console.log('Item is already in favourites');
-              } else {
-                // Item doesn't exist, add it to favouriteData
-                setFavouriteData(prevData => [...prevData, favouriteItem]);
-                console.log('Add to Favorites pressed for:');
-              }
+                  if (isItemInFavourites) {
+                    // Item already exists, remove it from favouriteData
+                    const updatedFavouriteData = favouriteData.filter(
+                      item => item.bundle !== removeFavouriteItem.bundle,
+                    );
+                    setFavouriteData(updatedFavouriteData);
 
-              setIsLongPress(false);
-            }
-          }}
-          style={styles.overlayButton}>
-          <Text style={{color: 'white'}}>Add to Favorites</Text>
-          {/* <BlurView
-            style={styles.absolute}
-            blurType="light"
-            blurAmount={10}
-            reducedTransparencyFallbackColor="white"
-          /> */}
-        </TouchableOpacity>
-      )}
+                    console.log('Item removed from favourites');
+                  } else {
+                    // Item doesn't exist, add it to favouriteData
+                    setFavouriteData(prevData => [...prevData, favouriteItem]);
+                    console.log('Add to Favorites pressed for:');
+                  }
 
-      {isLongPressRemove && (
-        <TouchableOpacity
-          onPress={() => {
-            // Handle your overlay button action (e.g., add to favorites)
+                  setIsLongPressRemove(false);
+                }
+              }}
+              style={styles.overlayButton}>
+              <Text style={{color: 'white'}}>Remove Favorites</Text>
+            </TouchableOpacity>
 
-            /*  if (favouriteItem) {
-                  setFavouriteData((prevData) => [...prevData, favouriteItem]);
-                  console.log('Add to Favorites pressed for:');
-                  setIsLongPress(false);
-                } */
+            <TouchableOpacity
+              onPress={() => {
+                if (removeFavouriteItem) {
+                  const updatedInstallData = dataApps.filter(
+                    item => item.bundle !== removeFavouriteItem.bundle,
+                  );
+                  setData(updatedInstallData);
+                  setIsCancelModalVisible(false);
+                  setIsLongPressRemove(false);
+                } else {
+                  setIsCancelModalVisible(false);
+                  setIsLongPressRemove(false);
+                }
+              }}
+              style={styles.overlayButton}>
+              <Text style={{color: 'white'}}>
+                Remove From Watcha Gotcha App
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        {isCancelRemoveModalVisible && (
+          <TouchableOpacity
+            onPress={() => closeRequestRemoveModal()}
+            style={styles.modalContentCross}>
+            <Entypo name={'cross'} size={18} color={'black'} />
+          </TouchableOpacity>
+        )}
+      </Modal>
 
-            if (removeFavouriteItem) {
-              // Check if the item already exists in favouriteData
-              const isItemInFavourites = favouriteData.some(
-                item => item.bundle === removeFavouriteItem.bundle,
-              );
+      {/*  </Modal> */}
 
-              console.log('Favourite Item', isItemInFavourites);
-
-              if (isItemInFavourites) {
-                // Item already exists, remove it from favouriteData
-                const updatedFavouriteData = favouriteData.filter(
-                  item => item.bundle !== removeFavouriteItem.bundle,
-                );
-                setFavouriteData(updatedFavouriteData);
-
-                console.log('Item removed from favourites');
-              } else {
-                // Item doesn't exist, add it to favouriteData
-                setFavouriteData(prevData => [...prevData, favouriteItem]);
-                console.log('Add to Favorites pressed for:');
-              }
-
-              setIsLongPressRemove(false);
-            }
-          }}
-          style={styles.overlayButton}>
-          <Text style={{color: 'white'}}>Remove Favorites</Text>
-        </TouchableOpacity>
-      )}
+      {/* //------------------------\\ */}
 
       <StatusBar
         translucent={true}
@@ -538,10 +789,18 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
           />
         </View>
 
-        <View style={styles.latestSearchList}>
-          <Text style={{fontFamily: 'Inter-Medium', marginLeft: wp(-1.5)}}>
-            Top
-          </Text>
+        <Text
+          style={{
+            fontFamily: 'Inter-Medium',
+            fontWeight: 'bold',
+            fontSize: hp(2.3),
+            color: 'black',
+            marginLeft: wp(3),
+          }}>
+          Top
+        </Text>
+
+        {/*  <View style={styles.latestSearchList}>
           <FlatList
             style={{flex: 1}}
             contentContainerStyle={{alignItems: 'center'}}
@@ -551,7 +810,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
             keyExtractor={item => item.id.toString()}
             renderItem={({item}) => renderSearches(item)}
           />
-        </View>
+        </View> */}
 
         <View
           style={{
@@ -562,6 +821,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
           }}>
           <FlatList
             style={{margin: 8, flex: 1}}
+            //contentContainerStyle={{marginBottom:hp(5)}}
             showsVerticalScrollIndicator={false}
             data={topData}
             //keyExtractor={item => item.id.toString()}
@@ -570,7 +830,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
           />
         </View>
 
-        <View style={{marginTop: hp(2), height: hp(37)}}>
+        <View style={{marginTop: hp(1), height: hp(25)}}>
           <Text
             style={{
               fontSize: hp(2.3),
@@ -596,30 +856,37 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
               <ActivityIndicator size="large" color="#FACA4E" />
             </View>
           ) : (
-            <Swiper showsPagination={screens > 1}>
-              {[...Array(screens)].map((_, index) => (
-                <View
-                  key={index}
-                  style={{
-                    flex: 1,
-                    borderWidth: 1,
-                    marginHorizontal: wp(2.3),
-                    marginTop: hp(3),
-                    borderColor: '#00000017',
-                    borderRadius: wp(3),
-                  }}>
-                  <FlatList
-                    data={dataApps.slice(
-                      index * itemsPerPage,
-                      (index + 1) * itemsPerPage,
-                    )}
-                    numColumns={5}
-                    keyExtractor={(item, itemIndex) => `${index}-${itemIndex}`}
-                    renderItem={({item}) => renderApps(item)}
-                  />
-                </View>
-              ))}
-            </Swiper>
+            <View style={{flex: 1}}>
+              <FlatList
+                data={dataApps.slice(0, Math.ceil(dataApps.length / 2))}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item, itemIndex) => `${itemIndex}`}
+                renderItem={({item}) => renderApps(item)}
+                contentContainerStyle={{
+                  borderWidth: 1,
+                  marginRight: wp(2.3),
+                  marginTop: hp(3),
+                  borderColor: '#00000017',
+                  borderRadius: wp(3),
+                }}
+              />
+
+              <FlatList
+                data={dataApps.slice(Math.ceil(dataApps.length / 2))}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item, itemIndex) => `${itemIndex}`}
+                renderItem={({item}) => renderApps(item)}
+                contentContainerStyle={{
+                  borderWidth: 1,
+                  marginRight: wp(2.3),
+                  marginTop: hp(3),
+                  borderColor: '#00000017',
+                  borderRadius: wp(3),
+                }}
+              />
+            </View>
           )}
 
           {/* <View
@@ -659,7 +926,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
               //borderWidth: 1,
               marginHorizontal: wp(12),
             }}>
-            <View
+            {/* <View
               style={{
                 height: hp(5),
                 alignItems: 'center',
@@ -678,7 +945,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 }}>
                 Add To Favourites
               </Text>
-            </View>
+            </View> */}
 
             {/* <View
                 style={{
@@ -692,7 +959,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
           </View>
         </View>
 
-        <View style={{marginTop: hp(5), height: hp(37)}}>
+        {/* <View style={{marginTop: hp(5), height: hp(37)}}>
           <Text
             style={{
               fontSize: hp(2.3),
@@ -743,9 +1010,9 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
               ))}
             </Swiper>
           )}
-        </View>
+        </View> */}
 
-        <View style={{marginTop: hp(10), height: hp(20)}}>
+        <View style={{marginTop: hp(1), height: hp(20)}}>
           <Text
             style={{
               fontSize: hp(2.3),
@@ -770,34 +1037,24 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
               <ActivityIndicator size="large" color="#FACA4E" />
             </View>
           ) : (
-            <Swiper showsPagination={screens > 1}>
-              {[...Array(screens)].map((_, index) => (
-                <View
-                  key={index}
-                  style={{
-                    flex: 1,
-                    borderWidth: 1,
-                    marginHorizontal: wp(2.3),
-                    marginTop: hp(3),
-                    borderColor: '#00000017',
-                    borderRadius: wp(3),
-                  }}>
-                  <FlatList
-                    data={favouriteData.slice(
-                      index * itemsPerPage,
-                      (index + 1) * itemsPerPage,
-                    )}
-                    numColumns={5}
-                    keyExtractor={(item, itemIndex) => `${index}-${itemIndex}`}
-                    renderItem={({item}) => renderFavouritesApps(item)}
-                  />
-                </View>
-              ))}
-            </Swiper>
+            <FlatList
+              data={favouriteData}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              //keyExtractor={(item, itemIndex) => `${itemIndex}`}
+              renderItem={({item}) => renderFavouritesApps(item)}
+              contentContainerStyle={{
+                borderWidth: 1,
+                marginRight: wp(2.3),
+                marginTop: hp(3),
+                borderColor: '#00000017',
+                borderRadius: wp(3),
+              }}
+            />
           )}
         </View>
 
-        <View style={{marginTop: hp(5), height: hp(37)}}>
+        <View style={{marginTop: hp(1), marginBottom: hp(5), height: hp(25)}}>
           <Text
             style={{
               fontSize: hp(2.3),
@@ -823,31 +1080,64 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
               <ActivityIndicator size="large" color="#FACA4E" />
             </View>
           ) : (
-            <Swiper showsPagination={screens > 1}>
-              {[...Array(screens)].map((_, index) => (
-                <View
-                  key={index}
-                  style={{
-                    flex: 1,
-                    borderWidth: 1,
-                    marginHorizontal: wp(2.3),
-                    marginTop: hp(3),
-                    borderColor: '#00000017',
-                    borderRadius: wp(3),
-                  }}>
-                  <FlatList
-                    data={dataApps.slice(
-                      index * itemsPerPage,
-                      (index + 1) * itemsPerPage,
-                    )}
-                    numColumns={5}
-                    keyExtractor={(item, itemIndex) => `${index}-${itemIndex}`}
-                    renderItem={({item}) => renderApps(item)}
-                  />
-                </View>
-              ))}
-            </Swiper>
+            <View style={{flex: 1}}>
+              {/* <FlatList
+              data={unusedApps.slice(0, Math.ceil(unusedApps.length / 2))}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(item, itemIndex) => `${itemIndex}`}
+              renderItem={({item}) => renderApps(item)}
+              contentContainerStyle={{
+                borderWidth: 1,
+                marginRight: wp(2.3),
+                marginTop: hp(3),
+                borderColor: '#00000017',
+                borderRadius: wp(3),
+              }}
+            />
+        
+            <FlatList
+              data={unusedApps.slice(Math.ceil(unusedApps.length / 2))}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(item, itemIndex) => `${itemIndex}`}
+              renderItem={({item}) => renderApps(item)}
+              contentContainerStyle={{
+                borderWidth: 1,
+                marginRight: wp(2.3),
+                marginTop: hp(3),
+                borderColor: '#00000017',
+                borderRadius: wp(3),
+              }}
+            /> */}
+            </View>
           )}
+
+          {/* <View
+              style={{
+                borderWidth: 1,
+                marginHorizontal: wp(2.3),
+                marginTop: hp(3),
+                height: hp(28),
+                borderColor: '#00000017',
+                borderRadius: wp(3),
+              }}>
+              <DraxView
+                style={{flex: 1}}
+                onReceiveDragDrop={({dragged: {payload}}) => {
+                  console.log(`recieved ${payload}`);
+                }}>
+                <FlatList
+                  key={flatListKey} // Set the key prop for the FlatList
+                  style={{margin: 8, flex: 1}}
+                  showsVerticalScrollIndicator={false}
+                  data={favouriteApps}
+                  keyExtractor={item => item?.id.toString()}
+                  numColumns={5} // Set the number of columns to 3
+                  renderItem={({item}) => renderFavouriteApps(item)}
+                />
+              </DraxView>
+            </View> */}
         </View>
       </ScrollView>
     </View>
@@ -934,7 +1224,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FACA4E',
     padding: 10,
     alignItems: 'center',
-    marginHorizontal: wp(30),
+    //marginHorizontal: wp(5),
     justifyContent: 'center',
     marginTop: hp(5),
     borderRadius: 5,
@@ -950,5 +1240,37 @@ const styles = StyleSheet.create({
     left: 0,
     bottom: 0,
     right: 0,
+  },
+
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  },
+
+  modalContent: {
+    //   width: '80%',
+    //justifyContent:'center',
+    //alignItems:'center',
+    //borderWidth:3,
+    //backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'transparent',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+  },
+
+  modalContentCross: {
+    position: 'absolute',
+    backgroundColor: 'white',
+    top: 18,
+    zIndex: 999,
+    right: 16,
+    width: wp(10),
+    height: wp(10),
+    borderRadius: wp(10),
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

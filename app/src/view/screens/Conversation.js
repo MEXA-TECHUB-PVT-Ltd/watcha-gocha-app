@@ -2,6 +2,7 @@ import {
   StyleSheet,
   FlatList,
   Text,
+  ActivityIndicator,
   Image,
   ScrollView,
   Platform,
@@ -12,6 +13,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import React, {useState, useRef, useMemo, useCallback, useEffect} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Back from '../../assets/svg/back.svg';
 
@@ -27,6 +29,8 @@ import DownArrowComments from '../../assets/svg/DownArrowComments.svg';
 import UpArrowComments from '../../assets/svg/UpArrowComments.svg';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
+
+import {format} from 'date-fns';
 
 import BottomSheet, {BottomSheetFlatList} from '@gorhom/bottom-sheet';
 
@@ -50,11 +54,23 @@ import ButtonSend from '../../assets/svg/ButtonSendBlack.svg';
 
 import SmileEmoji from '../../assets/svg/SmileEmoji.svg';
 
+import firestore from '@react-native-firebase/firestore';
+
 import Entypo from 'react-native-vector-icons/Entypo';
 import CustomSnackbar from '../../assets/Custom/CustomSnackBar';
 
-export default function Conversation({navigation}) {
-  const [messages, setMessages] = useState([]);
+export default function Conversation({navigation, route}) {
+  const [messageList, setMessageList] = useState([]);
+
+  const [loading, setLoading] = useState('');
+
+  const [authToken, setAuthToken] = useState('');
+
+  const [userId, setUserId] = useState('');
+
+  const receivedData = route.params?.receivedData;
+
+  console.log('recieved Data in conversation', receivedData);
 
   const [commentText, setCommentText] = useState(null); // State variable to hold the text
 
@@ -64,7 +80,121 @@ export default function Conversation({navigation}) {
     setCommentText(null);
   };
 
+  //------------ useeffect -------------------\\
+
   useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchVideos();
+  }, []);
+
+  const fetchVideos = async () => {
+    // Simulate loading
+    setLoading(true);
+
+    // Fetch data one by one
+    await getUserID();
+
+    // Once all data is fetched, set loading to false
+    setLoading(false);
+  };
+
+  const getUserID = async () => {
+    console.log('AT User Id');
+    try {
+      const result = await AsyncStorage.getItem('authToken ');
+      if (result !== null) {
+        setAuthToken(result);
+        console.log('user token retrieved:', result);
+      }
+
+      const result3 = await AsyncStorage.getItem('userId ');
+      if (result3 !== null) {
+        setUserId(result3);
+        console.log('user id retrieved:', result3);
+        fetchData(result3)
+      } else {
+        console.log('result is null', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
+
+  //------------------------------------------\\
+
+  //-------------Fire Base Useeffect-----------\\
+   
+ /*  useEffect(() => {
+     
+  }, []); */
+  const fetchData=(userId)=>{
+
+    const subscriber= firestore().collection("chats").doc(userId + receivedData?.user_id)
+       .collection("messages")
+       .orderBy("createdAt", "desc");
+       subscriber.onSnapshot(querysnapshot=>{
+        const allMessages=  querysnapshot.docs.map(item=>{
+          const data = item.data();
+          return {...data,createdAt:data.createdAt.toDate()};
+        });
+  
+        console.log("Document", userId + receivedData?.user_id)
+  
+        console.log("Messages", allMessages)
+        setMessageList(allMessages);
+       });
+       return ()=> subscriber();
+    
+  }
+
+   // On Send Message \\
+
+   const onSend = useCallback(async (messages= []) => {
+    if (!commentText) {
+      // Don't send an empty message
+      return;
+    }
+
+    //const msg =messages[0];
+    const myMsg={
+      _id: new Date().getTime().toString(),
+      text:commentText,
+       sendBy:userId,sendTo:receivedData?.user_id,
+      createdAt: new Date(),
+      user: {
+        _id: userId,
+       // name: senderName, // Include sender's name
+       // avatar: senderImage, // Include sender's image URL
+      },
+      //createdAt:Date.parse(msg.createdAt),
+
+    }
+   
+
+    setMessageList(previousMessages=>
+      GiftedChat.append(previousMessages, [myMsg]),
+      );
+
+      firestore().collection("chats").doc(''+ userId+receivedData?.user_id)
+      .collection("messages")
+      .add(myMsg);
+
+      firestore().collection("chats").doc(''+ receivedData?.user_id+userId)
+      .collection("messages")
+      .add(myMsg);
+
+      clearTextInput();
+
+  }, [commentText, userId, receivedData.id]);
+  
+
+   //-----------------\\
+
+
+  //----------------------------------------------\\
+
+  /* useEffect(() => {
     setMessages([
       {
         _id: 1,
@@ -104,9 +234,9 @@ export default function Conversation({navigation}) {
       },
       // Add more messages here...
     ]);
-  }, []);
+  }, []); */
 
-  const renderDay = (props) => {
+  const renderDay = props => {
     return (
       <Day
         {...props}
@@ -121,6 +251,7 @@ export default function Conversation({navigation}) {
 
   // Define a function to render custom message bubbles
   const renderBubble = props => {
+    //console.log("Propsssssssssssssss", props)
     return (
       <Bubble
         {...props}
@@ -136,11 +267,11 @@ export default function Conversation({navigation}) {
     );
   };
 
-  const onSend = useCallback((messages = []) => {
+  /* const onSend = useCallback((messages = []) => {
     setMessages(previousMessages =>
       GiftedChat.append(previousMessages, messages),
     );
-  }, []);
+  }, []); */
 
   const CustomInputToolbar = () => {
     return null; // This will remove the input message box
@@ -162,7 +293,9 @@ export default function Conversation({navigation}) {
           justifyContent: 'center',
           height: hp(7),
         }}>
-        <TouchableOpacity onPress={()=>navigation.goBack()} style={styles.backArrow}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backArrow}>
           <Ionicons name="chevron-back-sharp" size={25} color="#282828" />
         </TouchableOpacity>
         <View
@@ -185,11 +318,11 @@ export default function Conversation({navigation}) {
           <Text
             style={{
               color: '#1E2022',
-              marginLeft: wp(1.5),
+              marginLeft: wp(1),
               fontFamily: 'Inter-Bold',
               fontSize: hp(2.1),
             }}>
-            Gossip Gurus
+            {receivedData?.username}
           </Text>
         </View>
       </View>
@@ -197,20 +330,18 @@ export default function Conversation({navigation}) {
       <View style={{flex: 1}}>
         <GiftedChat
           messagesContainerStyle={{paddingBottom: 30}}
-          messages={messages}
+          messages={messageList}
           //onSend={messages => onSend(messages)}
           user={{
             // _id: user_id,
-            _id: 1,
+            _id: userId,
           }}
           // renderAvatar={props => {
           //   return null;
           // }}
           renderAvatar={null}
           renderBubble={renderBubble} // Set the custom renderBubble function
-
-          renderDay={null}  
-
+          renderDay={null}
           /* renderBubble={props => {
             return <CustomBubble {...props} />;
           }} */
@@ -273,9 +404,22 @@ export default function Conversation({navigation}) {
           style={{flex: 1, marginLeft: wp(1)}}
         />
 
-        <TouchableOpacity onPress={()=> clearTextInput()}>
+        <TouchableOpacity onPress={() => onSend()}>
           <ButtonSend />
         </TouchableOpacity>
+      </View>
+
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {loading && <ActivityIndicator size="large" color="#FACA4E" />}
       </View>
     </View>
   );
