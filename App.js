@@ -101,6 +101,9 @@ import ViewAllCategoriesGEBC from './app/src/view/screens/ViewAllCategoriesGEBC'
 import ViewAllCategoriesQAFI from './app/src/view/screens/ViewAllCategoriesQAFI';
 import PostLetterAllUserName from './app/src/view/screens/PostLetter/PostLetterAllUserName';
 import PostLetterSignature from './app/src/view/screens/PostLetter/PostLetterSignature';
+import ViewAllCategoriesDashboard from './app/src/view/screens/ViewAllCategoriesDashboard';
+import ViewAllCategoriesGEBCDashboard from './app/src/view/screens/ViewAllCategoriesGEBCDashboard';
+import ViewAllCategoriesQAFIDashboard from './app/src/view/screens/ViewAllCategoriesQAFIDashboard';
 
 //------------------\\
 
@@ -556,6 +559,24 @@ const App = () => {
         <Stack.Screen
           name="Profile_image"
           component={Profile_image}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ViewAllCategoriesDashboard"
+          component={ViewAllCategoriesDashboard}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ViewAllCategoriesGEBCDashboard"
+          component={ViewAllCategoriesGEBCDashboard}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ViewAllCategoriesQAFIDashboard"
+          component={ViewAllCategoriesQAFIDashboard}
           options={{headerShown: false}}
         />
       </Stack.Navigator>
