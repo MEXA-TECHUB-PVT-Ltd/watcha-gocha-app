@@ -180,7 +180,7 @@ export default function Categories({navigation}) {
         image: packageImages[index],
         date: lastUsageDate,
       }));
-      
+
       setUnusedApps(packageDataArray);
 
       await AsyncStorage.setItem(
@@ -324,30 +324,41 @@ export default function Categories({navigation}) {
 
           setTopData(updatedTopData);
 
+          await RNLauncherKitHelper.launchApplication(item.bundle)
+
           //----------------------\\
 
-          const lastUsageDate = new Date().toISOString();
+          /* const lastUsageDate = new Date().toISOString();
 
           // Fetch existing data from AsyncStorage
-          const existingDataString = await AsyncStorage.getItem('comparisonDate');
-          const existingData = existingDataString ? JSON.parse(existingDataString) : [];
-          
+          const existingDataString = await AsyncStorage.getItem(
+            'comparisonDate',
+          );
+          const existingData = existingDataString
+            ? JSON.parse(existingDataString)
+            : [];
+
           // Find the index of the object with matching bundle
-          const indexToUpdate = existingData.findIndex(entry => entry.bundle === item.bundle);
-          
+          const indexToUpdate = existingData.findIndex(
+            entry => entry.bundle === item.bundle,
+          );
+
           // Update the existing data with the new date value for the matching object
           const updatedData = [
-            ...existingData.slice(0, indexToUpdate),  // items before the matched item
+            ...existingData.slice(0, indexToUpdate), // items before the matched item
             {
               ...existingData[indexToUpdate],
               date: lastUsageDate,
             },
-            ...existingData.slice(indexToUpdate + 1),  // items after the matched item
+            ...existingData.slice(indexToUpdate + 1), // items after the matched item
           ];
-          
+
           // Save the updated data back in AsyncStorage
-          await AsyncStorage.setItem('comparisonDate', JSON.stringify(updatedData));
-          
+          await AsyncStorage.setItem(
+            'comparisonDate',
+            JSON.stringify(updatedData),
+          );
+ */
           //---------------------\\
         } else {
           // If the app is not in the array, add it with count 1
@@ -363,52 +374,72 @@ export default function Categories({navigation}) {
 
           setTopData(newTopData);
 
-          const lastUsageDate = new Date().toISOString();
+          await RNLauncherKitHelper.launchApplication(item.bundle)
+
+          /* const lastUsageDate = new Date().toISOString();
 
           // Fetch existing data from AsyncStorage
-          const existingDataString = await AsyncStorage.getItem('comparisonDate');
-          const existingData = existingDataString ? JSON.parse(existingDataString) : [];
-          
+          const existingDataString = await AsyncStorage.getItem(
+            'comparisonDate',
+          );
+          const existingData = existingDataString
+            ? JSON.parse(existingDataString)
+            : [];
+
           // Find the index of the object with matching bundle
-          const indexToUpdate = existingData.findIndex(entry => entry.bundle === item.bundle);
-          
+          const indexToUpdate = existingData.findIndex(
+            entry => entry.bundle === item.bundle,
+          );
+
           // Update the existing data with the new date value for the matching object
           const updatedData = [
-            ...existingData.slice(0, indexToUpdate),  // items before the matched item
+            ...existingData.slice(0, indexToUpdate), // items before the matched item
             {
               ...existingData[indexToUpdate],
               date: lastUsageDate,
             },
-            ...existingData.slice(indexToUpdate + 1),  // items after the matched item
+            ...existingData.slice(indexToUpdate + 1), // items after the matched item
           ];
-          
+
           // Save the updated data back in AsyncStorage
-          await AsyncStorage.setItem('comparisonDate', JSON.stringify(updatedData));
+          await AsyncStorage.setItem(
+            'comparisonDate',
+            JSON.stringify(updatedData),
+          ); */
+          await RNLauncherKitHelper.launchApplication(item.bundle)
         }
       } catch (error) {
         console.error('Error opening the app:', error);
+        await RNLauncherKitHelper.launchApplication(item.bundle)
 
-        const lastUsageDate = new Date().toISOString();
+        /* const lastUsageDate = new Date().toISOString();
 
         // Fetch existing data from AsyncStorage
         const existingDataString = await AsyncStorage.getItem('comparisonDate');
-        const existingData = existingDataString ? JSON.parse(existingDataString) : [];
-        
+        const existingData = existingDataString
+          ? JSON.parse(existingDataString)
+          : [];
+
         // Find the index of the object with matching bundle
-        const indexToUpdate = existingData.findIndex(entry => entry.bundle === item.bundle);
-        
+        const indexToUpdate = existingData.findIndex(
+          entry => entry.bundle === item.bundle,
+        );
+
         // Update the existing data with the new date value for the matching object
         const updatedData = [
-          ...existingData.slice(0, indexToUpdate),  // items before the matched item
+          ...existingData.slice(0, indexToUpdate), // items before the matched item
           {
             ...existingData[indexToUpdate],
             date: lastUsageDate,
           },
-          ...existingData.slice(indexToUpdate + 1),  // items after the matched item
+          ...existingData.slice(indexToUpdate + 1), // items after the matched item
         ];
-        
+
         // Save the updated data back in AsyncStorage
-        await AsyncStorage.setItem('comparisonDate', JSON.stringify(updatedData));
+        await AsyncStorage.setItem(
+          'comparisonDate',
+          JSON.stringify(updatedData),
+        ); */
         //await RNLauncherKitHelper.launchApplication(items); // Assuming 'item.label' is the package name
       }
     };
@@ -1081,8 +1112,8 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
             </View>
           ) : (
             <View style={{flex: 1}}>
-              {/* <FlatList
-              data={unusedApps.slice(0, Math.ceil(unusedApps.length / 2))}
+               <FlatList
+              data={dataApps.slice(0, Math.ceil(dataApps.length / 2))}
               horizontal
               showsHorizontalScrollIndicator={false}
               keyExtractor={(item, itemIndex) => `${itemIndex}`}
@@ -1097,7 +1128,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
             />
         
             <FlatList
-              data={unusedApps.slice(Math.ceil(unusedApps.length / 2))}
+              data={dataApps.slice(Math.ceil(dataApps.length / 2))}
               horizontal
               showsHorizontalScrollIndicator={false}
               keyExtractor={(item, itemIndex) => `${itemIndex}`}
@@ -1109,7 +1140,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 borderColor: '#00000017',
                 borderRadius: wp(3),
               }}
-            /> */}
+            /> 
             </View>
           )}
 

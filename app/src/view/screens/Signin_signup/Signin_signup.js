@@ -776,7 +776,7 @@ const App = ({navigation}) => {
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => handleSignInSkipForNow()}>
+          {/*   <TouchableOpacity onPress={() => handleSignInSkipForNow()}>
               <Text
                 style={{
                   color: '#FACA4E',
@@ -789,7 +789,7 @@ const App = ({navigation}) => {
                 }}>
                 Skip For Now
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <View style={{marginTop: '25%', alignSelf: 'center'}}>
               <CustomButton
