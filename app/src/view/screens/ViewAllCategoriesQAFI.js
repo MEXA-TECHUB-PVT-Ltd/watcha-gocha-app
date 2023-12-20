@@ -186,7 +186,6 @@ const styles = StyleSheet.create({
     color: 'black',
     fontFamily: 'Inter-Bold',
     textAlign:'center'
-
   },
   textColorSelected: {
     fontSize: hp(2.1),

@@ -1,6 +1,7 @@
 import {
   StyleSheet,
   FlatList,
+  ActivityIndicator,
   Text,
   Image,
   KeyboardAvoidingView,
@@ -10,7 +11,7 @@ import {
   View,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 import {Button, Divider, TextInput} from 'react-native-paper';
@@ -41,6 +42,8 @@ import {
 
 import Fontiso from 'react-native-vector-icons/Fontisto';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import IonIcons from 'react-native-vector-icons/Ionicons';
 
 import {SelectCountry, Dropdown} from 'react-native-element-dropdown';
@@ -56,10 +59,15 @@ const Category = [
 export default function UploadUpdatePicScreen({navigation}) {
   const [selectedItem, setSelectedItem] = useState('');
 
+  const [userId, setUserId] = useState('');
+
   const [profileName, setProfileName] = useState('');
 
   const [snackBarVisible, setSnackbarVisible] = useState(false);
 
+  const [authToken, setAuthToken] = useState('');
+
+  const [loading, setLoading] = useState(false);
 
   const [isTextInputActive, setIsTextInputActive] = useState(false);
 
@@ -73,7 +81,49 @@ export default function UploadUpdatePicScreen({navigation}) {
 
   const ref_RBSheetCamera = useRef(null);
 
+  //------------------\\
 
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchVideos();
+  }, []);
+
+  const fetchVideos = async () => {
+    // Simulate loading
+    setLoading(true);
+
+    await getUserID();
+    // Fetch data one by one
+
+    // Once all data is fetched, set loading to false
+    setLoading(false);
+  };
+
+  const getUserID = async () => {
+    console.log("Id's");
+    try {
+      const result = await AsyncStorage.getItem('userId ');
+      if (result !== null) {
+        setUserId(result);
+        console.log('user id retrieved:', result);
+      } else {
+        console.log('result is null', result);
+      }
+
+      const result1 = await AsyncStorage.getItem('authToken ');
+      if (result1 !== null) {
+        setAuthToken(result1);
+        console.log('user token retrieved:', result1);
+      } else {
+        console.log('result is null', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
+
+  //-----------------\\
 
   const handleFocus = () => {
     setIsTextInputActive(true);
@@ -426,6 +476,22 @@ export default function UploadUpdatePicScreen({navigation}) {
         onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackBarVisible}
       />
+
+{loading && (
+        <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(255, 255, 255, 0.5)', // Semi-transparent white
+          }}>
+          <ActivityIndicator size="large" color="#FACA4E" />
+        </View>
+      )}
     </KeyboardAvoidingView>
   );
 }

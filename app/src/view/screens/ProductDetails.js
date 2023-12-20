@@ -33,6 +33,8 @@ import BellAlert from '../../assets/svg/BellAlert.svg';
 import BookMark from '../../assets/svg/BookMark.svg';
 import Share from '../../assets/svg/ShareGold.svg';
 
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -54,7 +56,7 @@ import CustomSnackbar from '../../assets/Custom/CustomSnackBar';
 import axios from 'axios';
 
 import Shares from 'react-native-share';
-
+ 
 export default function ProductDetails({navigation, route}) {
   const [imageUri, setImageUri] = useState(null);
   const [userId, setUserId] = useState('');
@@ -68,9 +70,13 @@ export default function ProductDetails({navigation, route}) {
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarVisibleAlert, setSnackbarVisibleAlert] = useState(false);
   const [snackbarVisibleSaved, setSnackbarVisibleSaved] = useState(false);
+  const [snackbarVisibleRemoveSave, setSnackbarRemoveSave] = useState(false);
+
   const [snackbarVisiblePrice, setSnackbarVisiblePrice] = useState(false);
 
   const [showAlert, setShowAlert] = useState(false);
+
+  const [bookMark, setBookMark] = useState(true);
 
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -107,10 +113,9 @@ export default function ProductDetails({navigation, route}) {
       const result3 = await AsyncStorage.getItem('authToken ');
       if (result3 !== null) {
         setAuthToken(result3);
-        console.log("Token", result3);
-        
+        console.log('Token', result3);
+
         await fetchAll(result3);
-       
 
         console.log('user id retrieved:', result);
       }
@@ -133,7 +138,7 @@ export default function ProductDetails({navigation, route}) {
 
   //---------------fetch All-----------------\\
 
-  const fetchAll = async (result3) => {
+  const fetchAll = async result3 => {
     //console.log("Categry in id", selectedItemId)
     const token = result3;
 
@@ -156,7 +161,6 @@ export default function ProductDetails({navigation, route}) {
       console.error('Error Trending:', error);
     }
   };
-
 
   //-------------------------------------------\\
 
@@ -269,7 +273,6 @@ export default function ProductDetails({navigation, route}) {
     }
   };
 
-  
   const sendOffer = async () => {
     console.log('Id', receivedData.id);
     console.log('userId', userId);
@@ -299,7 +302,7 @@ export default function ProductDetails({navigation, route}) {
         setLoading(false);
         //sendNotification()
 
-        createNotification()
+        createNotification();
         //handleUpdatePassword();
 
         // Handle the response data as needed
@@ -322,8 +325,9 @@ export default function ProductDetails({navigation, route}) {
   };
 
   const sendNotification = async () => {
-    console.log("User Token is-----", userToken)
-    const serverKey = 'AAAAoTTOTQU:APA91bE2b0B9Iz7SB2TWDafHN89doM8rHik0YRJ9x7QmBZhP0kJExSihD0tqPR8gTkm2Uz31e6ihPqxgLWCNz8GdlqbyLJiFwsxRk-r-Dg6ht9HqMoWbCPyFxmAAKmIO6-Gy7uDHlN6F'; // Replace with your actual server key
+    console.log('User Token is-----', userToken);
+    const serverKey =
+      'AAAAoTTOTQU:APA91bE2b0B9Iz7SB2TWDafHN89doM8rHik0YRJ9x7QmBZhP0kJExSihD0tqPR8gTkm2Uz31e6ihPqxgLWCNz8GdlqbyLJiFwsxRk-r-Dg6ht9HqMoWbCPyFxmAAKmIO6-Gy7uDHlN6F'; // Replace with your actual server key
     const token = userToken.replace(/"/g, '');
     //'f5scnV4jSJ6j2QMOLYUAYI:APA91bEQOL6umubg_n73gGvXxwM8lF9UdkiIcQC2qnHeH2Axi54RQM6Ny6wXnz8RxdvCiMOOR5KBrzGUp4d59cf9oBq3stokRw4HzMwWkQ-74ON57phpSKkrMAGASmRbvNbflqav1GSF'; // Replace with the device token
     const data = {
@@ -334,33 +338,33 @@ export default function ProductDetails({navigation, route}) {
         subtitle: 'New offer is recieved',
       },
     };
-  
+
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `key=${serverKey}`,
+      Authorization: `key=${serverKey}`,
     };
-  
+
     try {
       const response = await fetch('https://fcm.googleapis.com/fcm/send', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify(data),
       });
-  
+
       console.log('Status Code:', response.status);
-  
+
       const responseText = await response.text();
       console.log('Response Text:', responseText);
-  
+
       const result = JSON.parse(responseText);
       console.log('Parsed JSON Result:', result);
 
-      handleUpdatePassword()
+      handleUpdatePassword();
     } catch (error) {
       console.error('Error sending notification:', error);
     }
   };
-  
+
   const sendOfferPrice = async () => {
     console.log('Id', receivedData.id);
     console.log('userId', userId);
@@ -390,7 +394,7 @@ export default function ProductDetails({navigation, route}) {
         setLoading(false);
         //handleUpdatePassword();
         //sendNotification()
-        createNotification()
+        createNotification();
 
         // Handle the response data as needed
       } else {
@@ -409,7 +413,6 @@ export default function ProductDetails({navigation, route}) {
 
       // Handle the error
     }
-
   };
 
   const createNotification = async () => {
@@ -419,14 +422,15 @@ export default function ProductDetails({navigation, route}) {
     console.log('user name', receivedData.username);
 
     const token = authToken;
-    const apiUrl = 'https://watch-gotcha-be.mtechub.com/notification/createNotification';
+    const apiUrl =
+      'https://watch-gotcha-be.mtechub.com/notification/createNotification';
 
     const requestData = {
       sender_id: userId,
       receiver_id: receivedData.user_id,
-      type:7,
-      title:'Offer Received',
-      content: receivedData.username+"Give You An Offer",
+      type: 7,
+      title: 'Offer Received',
+      content: receivedData.username + 'Give You An Offer',
     };
 
     try {
@@ -443,7 +447,7 @@ export default function ProductDetails({navigation, route}) {
         const data = await response.json();
         console.log('API Response:', data);
         //handleUpdatePassword();
-        sendNotification()
+        sendNotification();
 
         // Handle the response data as needed
       } else {
@@ -490,8 +494,58 @@ export default function ProductDetails({navigation, route}) {
         const data = await response.json();
         console.log('API Response:', data);
         setLoading(false);
+
         handleUpdateSaved();
 
+        // Handle the response data as needed
+      } else {
+        setLoading(false);
+        removeBookMark();
+
+        console.error(
+          
+          'Failed to upload video:',
+          response.status,
+          response.statusText,
+          
+        );
+        // Handle the error
+      }
+    } catch (error) {
+      console.error('API Request Error:', error);
+      setLoading(false);
+
+      // Handle the error
+    }
+  };
+
+  const removeBookMark = async () => {
+    console.log('Id', receivedData.id);
+    console.log('userId', userId);
+    console.log('price', receivedData.price);
+    const token = authToken;
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/item/unSaveItem';
+
+    const requestData = {
+      item_id: receivedData.id,
+      user_id: userId,
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`, // Use the provided token
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data);
+        setLoading(false);
+         handleUpdateRemovePassword()
         // Handle the response data as needed
       } else {
         setLoading(false);
@@ -532,6 +586,30 @@ export default function ProductDetails({navigation, route}) {
     ref_RBSendOffer2.current.open();
   };
 
+  // remove item successfully
+
+  const dismissSnackbarRemove = () => {
+   setSnackbarRemoveSave(false);
+  };
+
+  const handleUpdateRemovePassword = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setSnackbarRemoveSave(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setBookMark(false);
+      setSnackbarRemoveSave(false);
+    }, 3000);
+  };
+
+
+
+  //-----------------\\
+
   const handleUpdatePassword = async () => {
     // Perform the password update logic here
     // For example, you can make an API request to update the password
@@ -568,6 +646,7 @@ export default function ProductDetails({navigation, route}) {
 
     // Automatically hide the Snackbar after 3 seconds
     setTimeout(() => {
+      setBookMark(true);
       setSnackbarVisibleSaved(false);
     }, 3000);
   };
@@ -785,7 +864,11 @@ export default function ProductDetails({navigation, route}) {
             </View>
 
             <TouchableOpacity
-              onPress={() => navigation.navigate('Conversation')}>
+              onPress={() =>
+                navigation.navigate('Conversation', {
+                  receivedData: receivedData,
+                })
+              }>
               <SendMessage width={39} height={39} />
             </TouchableOpacity>
           </View>
@@ -864,7 +947,12 @@ export default function ProductDetails({navigation, route}) {
                 justifyContent: 'space-between',
               }}>
               <TouchableOpacity onPress={() => sendBookMark()}>
-                <BookMark style={{marginTop: hp(1)}} width={21} height={21} />
+                 {bookMark ===true ? (
+                  <Icon name="bookmark" size={25} color="#FACA4E" />
+                ) : (
+                  <Icon name="bookmark-o" size={25} color="#FACA4E" />
+                )} 
+                 
               </TouchableOpacity>
 
               <Text
@@ -1339,6 +1427,13 @@ export default function ProductDetails({navigation, route}) {
         messageDescription={'Kindly Select Price First'}
         onDismiss={dismissSnackbarPrice} // Make sure this function is defined
         visible={snackbarVisiblePrice}
+      />
+
+      <CustomSnackbar
+        message={'Success'}
+        messageDescription={'Item Removed Successfully'}
+        onDismiss={dismissSnackbarRemove} // Make sure this function is defined
+        visible={snackbarVisibleRemoveSave}
       />
 
       <View

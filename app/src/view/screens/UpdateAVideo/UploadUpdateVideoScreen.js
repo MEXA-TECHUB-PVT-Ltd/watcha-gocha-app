@@ -245,7 +245,7 @@ export default function UploadUpdateVideoScreen({navigation}) {
         }); */
         // Perform the upload using the Fetch API
         const response = await fetch(
-          'http://192.168.18.172:5000/news/createNews',
+          '/news/createNews',
           {
             method: 'POST',
             headers: {
@@ -334,7 +334,7 @@ export default function UploadUpdateVideoScreen({navigation}) {
 
       // Perform the upload using Axios
       const response = await axios.post(
-        'http://192.168.18.172:5000/xpi/createXpiVideo',
+        'https://watch-gotcha-be.mtechub.com/xpi/createXpiVideo',
         formData,
         axiosConfig,
       );

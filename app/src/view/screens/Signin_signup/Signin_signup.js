@@ -424,6 +424,9 @@ const App = ({navigation}) => {
 
   const handleSignIn = async () => {
     setIsLoading(true);
+    console.log("Email", signin_email )
+    console.log("Password", signin_pass )
+
     try {
       const response = await fetch(signInEndpoint, {
         method: 'POST',
@@ -489,7 +492,8 @@ const App = ({navigation}) => {
 
       // navigation.navigate('SelectGender');
     } catch (error) {
-      handleUpdateCorrectPassword()
+      console.log("Error", error)
+      //handleUpdateCorrectPassword()
 
       //console.error('Error:');
       //showAlert();

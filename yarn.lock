@@ -1758,6 +1758,11 @@
     opencollective-postinstall "^2.0.3"
     superstruct "^0.6.2"
 
+"@react-native-firebase/firestore@^18.7.3":
+  version "18.7.3"
+  resolved "https://registry.npmjs.org/@react-native-firebase/firestore/-/firestore-18.7.3.tgz"
+  integrity sha512-ts5clqDnpXw2nnX7W9H9+AZbh0jyXNIjnhHfTnMpstpCDQ3DCld/d8Ta2n/jzLUGRhtkCd0iALXmvVQBNNOTSQ==
+
 "@react-native-firebase/messaging@^18.6.1":
   version "18.6.1"
   resolved "https://registry.npmjs.org/@react-native-firebase/messaging/-/messaging-18.6.1.tgz"
@@ -3190,6 +3195,11 @@ ctx-polyfill@^1.1.4:
   version "1.1.4"
   resolved "https://registry.npmjs.org/ctx-polyfill/-/ctx-polyfill-1.1.4.tgz"
   integrity sha512-tz65F3/zmZ2+CMtn4MhNhYi/yIN9dKnItMKzSkH2GE6dBpAIbUR0K5pSHWqUL3OuNBCA70DKlWZYUClHfydIXg==
+
+date-fns@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.npmjs.org/date-fns/-/date-fns-3.0.0.tgz"
+  integrity sha512-xjDz3rNN9jp+Lh3P/4MeY4E5HkaRnEnrJCcrdRZnKdn42gJlIe6hwrrwVXePRwVR2kh1UcMnz00erYBnHF8PFA==
 
 dayjs@^1.8.15:
   version "1.11.10"
