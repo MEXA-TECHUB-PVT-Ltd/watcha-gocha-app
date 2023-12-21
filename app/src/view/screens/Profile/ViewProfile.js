@@ -500,6 +500,12 @@ export default function ViewProfile({navigation}) {
 
   const renderAvailableAppsPic = item => {
     console.log('Items Pics', item);
+    
+    const imageUrl = item.image && item.image
+    ? (item.image.startsWith('/fileUpload')
+        ? `https://watch-gotcha-be.mtechub.com${item.image}`
+        : item.image)
+    : null;
     return (
       <TouchableOpacity
         onPress={() => navigation.navigate('ViewVideoPicProfile', {picData:item})}
@@ -518,7 +524,7 @@ export default function ViewProfile({navigation}) {
               borderRadius: wp(2.1),
               resizeMode: 'cover',
             }}
-            source={appImages.galleryPlaceHolder}
+            source={{uri:imageUrl}}
           />
         </View>
         <View

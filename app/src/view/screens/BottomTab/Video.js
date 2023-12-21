@@ -215,7 +215,7 @@ export default function Video({navigation}) {
 
     try {
       const response = await fetch(
-        'https://watch-gotcha-be.mtechub.com/videoCategory/getAllVideoCategories?page=1&limit=5',
+        'https://watch-gotcha-be.mtechub.com/videoCategory/getAllVideoCategories',
         {
           method: 'GET',
           headers: {
