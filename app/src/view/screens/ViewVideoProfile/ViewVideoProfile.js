@@ -1124,7 +1124,7 @@ export default function ViewVideo({navigation, route}) {
         <CustomSnackbar
           message={'success'}
           messageDescription={'Video deleted successfully'}
-          onDismiss={dismissSnackbar} // Make sure this function is defined
+          onDismiss={dismissDeleteSnackbar} // Make sure this function is defined
           visible={snackbarDeleteVisible}
         />
 

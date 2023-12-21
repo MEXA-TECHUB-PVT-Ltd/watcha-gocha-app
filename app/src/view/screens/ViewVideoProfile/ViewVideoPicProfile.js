@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import React, {useState, useRef, useMemo, useEffect} from 'react';
+import Entypo from 'react-native-vector-icons/Entypo';
 import {appImages} from '../../../assets/utilities/index';
 import Like from '../../../assets/svg/Like.svg';
 import UnLike from '../../../assets/svg/Unlike.svg';
@@ -21,6 +22,10 @@ import Send from '../../../assets/svg/Send.svg';
 import Download from '../../../assets/svg/Download.svg';
 import BottomSheet, {BottomSheetFlatList} from '@gorhom/bottom-sheet';
 import ButtonSend from '../../../assets/svg/ButtonSend.svg';
+
+import EditItem from '../../../assets/svg/UpdateItem.svg';
+
+import Delete from '../../../assets/svg/Delete.svg';
 
 import DownArrowComments from '../../../assets/svg/DownArrowComments.svg';
 import UpArrowComments from '../../../assets/svg/UpArrowComments.svg';
@@ -44,7 +49,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import IonIcons from 'react-native-vector-icons/Ionicons';
 
+import RBSheet from 'react-native-raw-bottom-sheet';
+
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
 
 export default function ViewVideoPicProfile({navigation, route}) {
   const [showFullContent, setShowFullContent] = useState(false);
@@ -54,6 +62,8 @@ export default function ViewVideoPicProfile({navigation, route}) {
   );
 
   const [comments, setComments] = useState([]);
+
+  const [snackbarDeleteVisible, setsnackbarDeleteVisible] = useState(false);
 
   const [likes, setLikes] = useState(null);
 
@@ -65,7 +75,7 @@ export default function ViewVideoPicProfile({navigation, route}) {
 
   const [userId, setUserId] = useState('');
 
-  const [showMenu, setShowMenu] = useState(false);
+  const [showMenu, setShowMenu] = useState(true);
 
   const [progress, setProgress] = useState(0);
 
@@ -87,6 +97,8 @@ export default function ViewVideoPicProfile({navigation, route}) {
   const [commentText, setCommentText] = useState(null); // State variable to hold the text
 
   const [showLikes, setShowLikes] = useState(false);
+
+  const ref_RBSheetCamera = useRef(null);
 
   useEffect(() => {
     // Make the API request and update the 'data' state
@@ -228,6 +240,49 @@ export default function ViewVideoPicProfile({navigation, route}) {
     }
   };
 
+  //---------------------------\\
+
+  const changeModals = () => {
+    ref_RBSheetCamera.current.close();
+    navigation.navigate('UploadUpdatePicScreen');
+  };
+
+  const changeDelete = () => {
+    ref_RBSheetCamera.current.close();
+    handleUpdateDelete();
+    //navigation.goBack()
+  };
+
+  const handleUpdateDelete = async () => {
+    const token = authToken; 
+    try {
+      const response = await fetch(`https://watch-gotcha-be.mtechub.com/picTour/deletePicTour/${receivedData?.pic_tour_id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          // Include any additional headers as needed
+        },
+        // You may include a request body if required by the server
+        // body: JSON.stringify({}),
+      });
+  
+      if (response.ok) {
+        handleUpdateDeletePassword();
+        // Optionally handle the response data here
+      } else {
+        console.error(`Error deleting video with ID ${receivedData?.video_id}:`, response.status);
+        // Optionally handle the error response here
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle other errors such as network issues
+    }
+  };
+
+
+  //----------------------------\\
+
   const dismissSnackbar = () => {
     setsnackbarVisible(false);
   };
@@ -258,6 +313,25 @@ export default function ViewVideoPicProfile({navigation, route}) {
     // Clear the text in the TextInput
     setCommentText(null);
     sendComment();
+  };
+
+  const dismissDeleteSnackbar = () => {
+    setsnackbarDeleteVisible(false);
+  };
+
+  const handleUpdateDeletePassword = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setsnackbarDeleteVisible(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setsnackbarDeleteVisible(false);
+      navigation.navigate('Dashboards');
+      //navigation.goBack();
+    }, 3000);
   };
 
   const chats = [
@@ -719,6 +793,14 @@ export default function ViewVideoPicProfile({navigation, route}) {
 
             <Text style={styles.textProfileName}>{receivedData.name}</Text>
           </View>
+
+          {showMenu && (
+            <TouchableOpacity
+              onPress={() => ref_RBSheetCamera.current.open()}
+              style={{marginLeft: wp(18), marginTop: hp(1)}}>
+              <Entypo name={'dots-three-vertical'} size={18} color={'white'} />
+            </TouchableOpacity>
+          )}
         </View>
 
         <View style={styles.bottomView}>
@@ -1055,6 +1137,117 @@ export default function ViewVideoPicProfile({navigation, route}) {
         }}>
         {loading && <ActivityIndicator size="large" color="#FACA4E" />}
       </View>
+
+      <CustomSnackbar
+          message={'success'}
+          messageDescription={'Pic deleted successfully'}
+          onDismiss={dismissDeleteSnackbar} // Make sure this function is defined
+          visible={snackbarDeleteVisible}
+        />
+
+      <RBSheet
+          ref={ref_RBSheetCamera}
+          closeOnDragDown={true}
+          closeOnPressMask={false}
+          animationType="fade"
+          minClosingHeight={0}
+          customStyles={{
+            wrapper: {
+              backgroundColor: 'rgba(52, 52, 52, 0.5)',
+            },
+            draggableIcon: {
+              backgroundColor: 'white',
+            },
+            container: {
+              borderTopLeftRadius: wp(10),
+              borderTopRightRadius: wp(10),
+              height: hp(25),
+            },
+          }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginHorizontal: wp(8),
+              alignItems: 'center',
+            }}>
+            <Text
+              style={{
+                fontFamily: 'Inter-Medium',
+                color: '#303030',
+                fontSize: hp(2.3),
+              }}>
+              Select an option
+            </Text>
+            <TouchableOpacity onPress={() => ref_RBSheetCamera.current.close()}>
+              <IonIcons
+                name="close"
+                size={22}
+                color={'#303030'}
+                onPress={() => ref_RBSheetCamera.current.close()}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View
+            style={{
+              //flexDirection: 'row',
+              justifyContent: 'space-evenly',
+              //alignItems: 'center',
+              //borderWidth: 3,
+              marginTop: hp(3),
+            }}>
+            <TouchableOpacity
+              onPress={() => changeModals()}
+              style={{flexDirection: 'row', marginHorizontal: wp(7)}}>
+              <EditItem height={23} width={23} />
+
+              <Text
+                style={{
+                  fontFamily: 'Inter-Regular',
+                  color: '#656565',
+                  marginLeft: wp(3),
+                  fontSize: hp(2.1),
+                }}>
+                Update Pic
+              </Text>
+            </TouchableOpacity>
+
+            <View
+              style={{
+                height: hp(0.1),
+                marginHorizontal: wp(8),
+                marginTop: hp(3),
+                backgroundColor: '#00000012',
+              }}></View>
+
+            <TouchableOpacity
+              onPress={() => changeDelete()}
+              style={{
+                flexDirection: 'row',
+                marginTop: hp(2.5),
+                marginHorizontal: wp(7),
+              }}>
+              <Delete height={23} width={23} />
+
+              <Text
+                style={{
+                  fontFamily: 'Inter-Regular',
+                  color: '#656565',
+                  marginLeft: wp(3),
+                  fontSize: hp(2.1),
+                }}>
+                Delete Pic
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </RBSheet>
+
+        
+
+
+
+
     </GestureHandlerRootView>
   );
 }
@@ -1082,5 +1275,34 @@ const styles = StyleSheet.create({
     marginLeft: wp(3),
     fontFamily: 'Inter',
     fontWeight: 'bold',
+  },
+
+  buttonDirections: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: hp(4.3),
+    width: '100%',
+    marginLeft: wp(5),
+    justifyContent: 'space-evenly',
+  },
+  button: {
+    borderColor: '#FACA4E',
+    borderWidth: 0.8,
+    borderRadius: wp(5),
+    width: wp(35),
+    height: hp(5.5),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  textButton: {
+    color: '#FACA4E',
+    fontWeight: 'bold',
+  },
+  txtNotification: {
+    fontWeight: '500',
+    marginTop: hp(10),
+    marginLeft: wp(5),
+    fontSize: hp(2.3),
+    color: '#0B0B0B',
   },
 });
