@@ -702,6 +702,7 @@ const App = ({navigation}) => {
               </Text>
             ) : null}
 
+
             <View>
               <TextInput
                 mode="outlined"

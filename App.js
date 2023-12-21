@@ -104,6 +104,7 @@ import PostLetterSignature from './app/src/view/screens/PostLetter/PostLetterSig
 import ViewAllCategoriesDashboard from './app/src/view/screens/ViewAllCategoriesDashboard';
 import ViewAllCategoriesGEBCDashboard from './app/src/view/screens/ViewAllCategoriesGEBCDashboard';
 import ViewAllCategoriesQAFIDashboard from './app/src/view/screens/ViewAllCategoriesQAFIDashboard';
+import UpdateVideoProfile from './app/src/view/screens/ViewVideoProfile/UpdateVideoProfile';
 
 //------------------\\
 
@@ -145,6 +146,12 @@ const App = () => {
         <Stack.Screen
           name="ResetPassword"
           component={ResetPassword}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="UpdateVideoProfile"
+          component={UpdateVideoProfile}
           options={{headerShown: false}}
         />
 

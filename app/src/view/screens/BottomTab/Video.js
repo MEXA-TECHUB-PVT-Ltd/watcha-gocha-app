@@ -41,7 +41,7 @@ export default function Video({navigation}) {
 
   const [topVideoText, setTopVideoText] = useState('');
 
-  const [searchesData, setSearches] = useState('');
+  const [searchesData, setSearches] = useState([]);
 
   const [authToken, setAuthToken] = useState('');
 
@@ -226,7 +226,7 @@ export default function Video({navigation}) {
 
       const result = await response.json();
       console.log('Search Results', result.AllCategories);
-      setSearches(result.AllCategories); // Update the state with the fetched data
+      setSearches(result.AllCategories.reverse()); // Update the state with the fetched data
 
       await fetchTrendingVideos(result);
     } catch (error) {
