@@ -3369,6 +3369,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
             height: hp(20),
             width: wp(53),
           }}>
+            
           <FlatList
             style={{margin: 8, flex: 1}}
             //contentContainerStyle={{marginBottom:hp(5)}}

@@ -59,7 +59,7 @@ const Category = [
   {label: 'Item 3', value: '3'},
 ];
 
-export default function UploadUpdateScreen({navigation, route}) {
+export default function UpdateVideoProfile({navigation, route}) {
   const [selectedItem, setSelectedItem] = useState('');
 
   const [selectedItemThumbnial, setSelectedItemThumbnial] = useState('');
@@ -69,6 +69,8 @@ export default function UploadUpdateScreen({navigation, route}) {
   const [loading, setLoading] = useState(false);
 
   const [snackbarVisible, setsnackbarVisible] = useState(false);
+
+  const [dataFetched, isDataFetched] = useState(false);
 
   const [isTextInputActive, setIsTextInputActive] = useState(false);
 
@@ -80,8 +82,9 @@ export default function UploadUpdateScreen({navigation, route}) {
 
   const [authToken, setAuthToken] = useState('');
 
-
   const [categoriesSelect, setCategorySelect] = useState([]);
+
+  const [categoryType, setCategoryType] = useState(null);
 
   const [description, setDescription] = useState('');
 
@@ -107,7 +110,7 @@ export default function UploadUpdateScreen({navigation, route}) {
 
   const receivedData = route.params?.Video;
 
-  console.log("Recieved Data", receivedData)
+  console.log('Recieved Data', receivedData);
 
   useEffect(() => {
     // Make the API request and update the 'data' state
@@ -128,7 +131,6 @@ export default function UploadUpdateScreen({navigation, route}) {
 
     await getUserID();
     // Fetch data one by one
-    
 
     // Once all data is fetched, set loading to false
     setLoading(false);
@@ -149,7 +151,7 @@ export default function UploadUpdateScreen({navigation, route}) {
       if (result1 !== null) {
         setAuthToken(result1);
         console.log('user id retrieved:', result1);
-        await fetchCategory(result1);
+        //await fetchCategory(result1);
       } else {
         console.log('result is null', result);
       }
@@ -159,7 +161,20 @@ export default function UploadUpdateScreen({navigation, route}) {
     }
   };
 
-  const upload = async () => {
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    const fetchCategory = async () => {
+      setProfileName(receivedData?.name);
+      setDescription(receivedData?.description);
+      setImageInfo({uri: receivedData?.thumbnail});
+      setThumbnailImageUri(receivedData?.thumbnail);
+      isDataFetched(true);
+    };
+
+    fetchCategory();
+  }, []);
+
+  const upload = async (category) => {
     if (
       imageInfo !== null &&
       profileName !== '' &&
@@ -172,63 +187,38 @@ export default function UploadUpdateScreen({navigation, route}) {
       const type = imageInfo.type;
       const name = imageInfo.fileName;
       const source = {uri, type, name};
-      console.log("Video Source",source);
+      console.log('Video Source', source);
+      handleUploadVideo(source,category);
 
-      convertDurationAndStoreWithVideoAndThumnailChange(source)
       //uploadVideoCloudinary(imageInfo.uri)
     } else {
       setModalVisible(true);
     }
   };
 
-  const convertDurationAndStoreWithVideoAndThumnailChange = (source) => {
-    if (imageInfo && imageInfo.duration) {
-      const durationInSeconds = imageInfo.duration;
-      const durationInMinutes = Math.ceil(durationInSeconds / 60);
-
-      let category;
-
-      if (durationInMinutes >= 0 && durationInMinutes <= 3.14) {
-        category = 16;
-      } else if (durationInMinutes > 3.14 && durationInMinutes <= 36) {
-        category = 17;
-      } else if (durationInMinutes > 36 && durationInMinutes <= 63) {
-        category = 18;
-      } else if (durationInMinutes > 63 && durationInMinutes <= 90) {
-        category = 19;
-      } else if (durationInMinutes > 90 && durationInMinutes <= 126) {
-        category = 20;
-      }
-
-      // Update the state with the calculated category
-
-      handleUploadVideo(source, category);
-    }
-  };
-
   /* const cloudinaryCore = new cloudinary.Cloudinary({ cloud_name: 'dxfdrtxi3' });
-
-  const uploadVideoCloudinary = (videoUri) => {
-    cloudinaryCore.openUploadWidget(
-      {
-        cloud_name: 'dxfdrtxi3',
-        upload_preset: 'e6zfilan',
-        sources: ['local', 'url', 'camera'],
-        resource_type: 'video',
-        files: [videoUri], // Pass the videoUri here
-      },
-      (error, result) => {
-        if (!error && result && result.event === 'success') {
-          // The URL path of the uploaded video is in result.info.secure_url
-          const videoURL = result.info.secure_url;
-          console.log('Video URL:', videoURL);
+  
+    const uploadVideoCloudinary = (videoUri) => {
+      cloudinaryCore.openUploadWidget(
+        {
+          cloud_name: 'dxfdrtxi3',
+          upload_preset: 'e6zfilan',
+          sources: ['local', 'url', 'camera'],
+          resource_type: 'video',
+          files: [videoUri], // Pass the videoUri here
+        },
+        (error, result) => {
+          if (!error && result && result.event === 'success') {
+            // The URL path of the uploaded video is in result.info.secure_url
+            const videoURL = result.info.secure_url;
+            console.log('Video URL:', videoURL);
+          }
         }
-      }
-    );
-  };
- */
+      );
+    };
+   */
 
-  const handleUploadVideo = (video, category) => {
+  const handleUploadVideo = (video,category )=> {
     setLoading(true);
     const data = new FormData();
     data.append('file', video);
@@ -245,7 +235,7 @@ export default function UploadUpdateScreen({navigation, route}) {
     })
       .then(res => res.json())
       .then(data => {
-        console.log("Video Url is" ,data)
+        console.log('Video Url is', data);
         setVideoUrl(data.url); // Store the Cloudinary video URL in your state
         //uploadVideo(data.url)
 
@@ -255,8 +245,8 @@ export default function UploadUpdateScreen({navigation, route}) {
       })
       .catch(err => {
         //Alert.alert('Error While Uploading Video');
-        console.log("Error While Uploading Video", err)
-        setLoading(false)
+        console.log('Error While Uploading Video', err);
+        setLoading(false);
       });
   };
 
@@ -266,7 +256,7 @@ export default function UploadUpdateScreen({navigation, route}) {
     const type = imageInfoThumbnail.type;
     const name = imageInfoThumbnail.fileName;
     const sourceImage = {uri, type, name};
-    console.log("Source Image",sourceImage);
+    console.log('Source Image', sourceImage);
     const dataImage = new FormData();
     dataImage.append('file', sourceImage);
     dataImage.append('upload_preset', 'e6zfilan'); // Use your Cloudinary upload preset
@@ -285,12 +275,11 @@ export default function UploadUpdateScreen({navigation, route}) {
         setImageUrl(data.url); // Store the Cloudinary video URL in your state
         //uploadVideo(data.url)
         //uploadXpiVideo(data.url);
-        console.log("Image Url",data);
-        uploadXpiVideo(data.url,data1,category)
-
+        console.log('Image Url', data);
+        uploadXpiVideo(data.url, data1, category);
       })
       .catch(err => {
-        setLoading(false)
+        setLoading(false);
         console.log('Error While Uploading Video', err);
       });
   };
@@ -334,8 +323,8 @@ export default function UploadUpdateScreen({navigation, route}) {
 
       // Append the video file to the FormData
       /* formData.append('image', {
-          uri: imageUri,
-        }); */
+            uri: imageUri,
+          }); */
       // Perform the upload using the Fetch API
       const response = await fetch(
         'http://192.168.18.172:5000/news/createNews',
@@ -367,29 +356,176 @@ export default function UploadUpdateScreen({navigation, route}) {
     }
   };
 
-  const uploadXpiVideo = async (data,data1, category) => {
+  const uploadXpiVideo = async (data, data1, category) => {
     console.log('Image Uri', data);
     console.log('Video Uri', data1);
     console.log('Profile Name', profileName);
     console.log('Description', description);
     console.log('user id', userId);
-    console.log('category id', category );
+    console.log('category id', category);
 
     const token = authToken;
-    const apiUrl = 'https://watch-gotcha-be.mtechub.com/xpi/createXpiVideo';
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/xpi/updateXpiVideo';
 
     const requestData = {
-      name: profileName,
+      id: receivedData?.video_id,
       description: description,
-      video_category: category,
+      name: profileName,
       video: data1,
       thumbnail: data,
-      user_id: userId,
+      video_category: category
     };
 
     try {
       const response = await fetch(apiUrl, {
-        method: 'POST',
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`, // Use the provided token
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response of Videos:', data);
+        setLoading(false);
+        handleUpdatePassword();
+
+        // Handle the response data as needed
+      } else {
+        setLoading(false);
+
+        console.error(
+          'Failed to upload video:',
+          response.status,
+          response.statusText,
+        );
+        // Handle the error
+      }
+    } catch (error) {
+      console.error('API Request Error:', error);
+      setLoading(false);
+
+      // Handle the error
+    }
+  };
+
+  const uploadXpiVideoWithVideoChange = async (dataVideo, category) => {
+    const token = authToken;
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/xpi/updateXpiVideo';
+
+    const requestData = {
+      id: receivedData?.video_id,
+      name: profileName,
+      description: description,
+      video_category: category,
+      video: dataVideo,
+      thumbnail: receivedData?.thumbnail,
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`, // Use the provided token
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response of Videos:', data);
+        setLoading(false);
+        handleUpdatePassword();
+
+        // Handle the response data as needed
+      } else {
+        setLoading(false);
+
+        console.error(
+          'Failed to upload video:',
+          response.status,
+          response.statusText,
+        );
+        // Handle the error
+      }
+    } catch (error) {
+      console.error('API Request Error:', error);
+      setLoading(false);
+
+      // Handle the error
+    }
+  };
+
+  const uploadXpiVideoWithThumbnailChange = async (
+    dataVideo,
+    dataThumbnail,
+  ) => {
+    const token = authToken;
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/xpi/updateXpiVideo';
+
+    const requestData = {
+      id: receivedData?.video_id,
+      name: profileName,
+      description: description,
+      video_category: receivedData?.video_category,
+      video: dataVideo,
+      thumbnail: dataThumbnail,
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`, // Use the provided token
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response of Videos:', data);
+        setLoading(false);
+        handleUpdatePassword();
+
+        // Handle the response data as needed
+      } else {
+        setLoading(false);
+
+        console.error(
+          'Failed to upload video:',
+          response.status,
+          response.statusText,
+        );
+        // Handle the error
+      }
+    } catch (error) {
+      console.error('API Request Error:', error);
+      setLoading(false);
+
+      // Handle the error
+    }
+  };
+
+  const uploadXpiVideoWithOutAnyVideoChange = async () => {
+    const token = authToken;
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/xpi/updateXpiVideo';
+
+    const requestData = {
+      id: receivedData?.video_id,
+      name: profileName,
+      description: description,
+      video_category: receivedData?.video_category,
+      video: receivedData?.video,
+      thumbnail: receivedData?.thumbnail,
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`, // Use the provided token
           'Content-Type': 'application/json',
@@ -438,8 +574,7 @@ export default function UploadUpdateScreen({navigation, route}) {
         {
           method: 'POST',
           headers: {
-            Authorization:
-              authToken,
+            Authorization: authToken,
             'Content-Type': 'multipart/form-data',
           },
           body: formData,
@@ -627,7 +762,7 @@ export default function UploadUpdateScreen({navigation, route}) {
     setTimeout(() => {
       setsnackbarVisible(false);
       //handleUpload()
-      navigation.navigate('Videos');
+      navigation.navigate('Dashboards');
     }, 3000);
   };
 
@@ -639,47 +774,170 @@ export default function UploadUpdateScreen({navigation, route}) {
     setsnackbarVisible(false);
   };
 
-  const fetchCategory = async (userToken) => {
-    const token = userToken;
+  const checkUpdate = async () => {
+    const cloudinaryUrl = 'http://res.cloudinary.com';
+    console.log('Image Info', imageInfo?.uri);
+    console.log('Data Fetched', isDataFetched);
+    if (
+      isDataFetched && // Check if data has been fetched
+      imageInfo &&
+      imageInfo.uri &&
+      imageInfo.uri.startsWith(cloudinaryUrl) &&
+      thumbnailImageUri &&
+      thumbnailImageUri.startsWith(cloudinaryUrl)
+    ) {
+      uploadXpiVideoWithOutAnyVideoChange();
+    } else if (
+      imageInfo &&
+      imageInfo.uri &&
+      imageInfo.uri.startsWith(cloudinaryUrl)
+    ) {
+      console.log('Only Image Info Is Cloudinary and thumbnail is not');
+      handleUploadImageC(receivedData?.video);
+    } else if (
+      thumbnailImageUri &&
+      thumbnailImageUri.startsWith(cloudinaryUrl)
+    ) {
+      console.log('Image Info', imageInfo);
+      console.log('Only Thumbnail Is Cloudinary and Image Info is not');
 
-    try {
-      const response = await fetch(
-        'https://watch-gotcha-be.mtechub.com/videoCategory/getAllVideoCategories?page=1&limit=5',
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-
-        console.log('Data ', data);
-
-        // Use the data from the API to set the categories
-        const categories = data.AllCategories.map(category => ({
-          label: category.name, // Use the "name" property as the label
-          value: category.id.toString(), // Convert "id" to a string for the value
-        }));
-
-        setCategorySelect(categories); // Update the state with the formatted category data
-
-        console.log('Data Categories', categoriesSelect);
-
-        setImageInfo(receivedData)
-      } else {
-        console.error(
-          'Failed to fetch categories:',
-          response.status,
-          response.statusText,
-        );
-      }
-    } catch (error) {
-      console.error('Error:', error);
+      convertDurationAndStore();
+    } else {
+      convertDurationAndStoreWithVideoAndThumnailChange();
     }
   };
+
+  // check video length
+  const convertDurationAndStore = () => {
+    if (imageInfo && imageInfo.duration) {
+      const durationInSeconds = imageInfo.duration;
+      const durationInMinutes = Math.ceil(durationInSeconds / 60);
+
+      let category;
+
+      if (durationInMinutes >= 0 && durationInMinutes <= 3.14) {
+        category = 16;
+      } else if (durationInMinutes > 3.14 && durationInMinutes <= 36) {
+        category = 17;
+      } else if (durationInMinutes > 36 && durationInMinutes <= 63) {
+        category = 18;
+      } else if (durationInMinutes > 63 && durationInMinutes <= 90) {
+        category = 19;
+      } else if (durationInMinutes > 90 && durationInMinutes <= 126) {
+        category = 20;
+      }
+
+      // Update the state with the calculated category
+      setCategoryType(category);
+
+      const uri = imageInfo.uri;
+      const type = imageInfo.type;
+      const name = imageInfo.fileName;
+      const source = {uri, type, name};
+      console.log('Video Source', source);
+
+      handleUploadVideoC(category, source);
+    }
+  };
+
+  const convertDurationAndStoreWithVideoAndThumnailChange = () => {
+    if (imageInfo && imageInfo.duration) {
+      const durationInSeconds = imageInfo.duration;
+      const durationInMinutes = Math.ceil(durationInSeconds / 60);
+
+      let category;
+
+      if (durationInMinutes >= 0 && durationInMinutes <= 3.14) {
+        category = 16;
+      } else if (durationInMinutes > 3.14 && durationInMinutes <= 36) {
+        category = 17;
+      } else if (durationInMinutes > 36 && durationInMinutes <= 63) {
+        category = 18;
+      } else if (durationInMinutes > 63 && durationInMinutes <= 90) {
+        category = 19;
+      } else if (durationInMinutes > 90 && durationInMinutes <= 126) {
+        category = 20;
+      }
+
+      // Update the state with the calculated category
+      setCategoryType(category);
+
+      upload(category);
+    }
+  };
+
+  // handle check update of video using cloudinary
+
+  const handleUploadVideoC = (category, video) => {
+    setLoading(true);
+    const data = new FormData();
+    data.append('file', video);
+    data.append('upload_preset', 'e6zfilan'); // Use your Cloudinary upload preset
+    data.append('cloud_name', 'dxfdrtxi3'); // Use your Cloudinary cloud name
+
+    fetch('https://api.cloudinary.com/v1_1/dxfdrtxi3/video/upload', {
+      method: 'POST',
+      body: data,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log('Video Url is', data);
+        setVideoUrl(data.url); // Store the Cloudinary video URL in your state
+        //uploadVideo(data.url)
+        uploadXpiVideoWithVideoChange(data.url, category);
+        //uploadXpiVideo(data.url);
+        console.log(data);
+      })
+      .catch(err => {
+        //Alert.alert('Error While Uploading Video');
+        console.log('Error While Uploading Video', err);
+        setLoading(false);
+      });
+  };
+
+  //------------------------------------------\\
+
+  // handle check update of image using cloudinary
+
+  const handleUploadImageC = data1 => {
+    setLoading(true);
+    const uri = imageInfoThumbnail.uri;
+    const type = imageInfoThumbnail.type;
+    const name = imageInfoThumbnail.fileName;
+    const sourceImage = {uri, type, name};
+    console.log('Source Image', sourceImage);
+    const dataImage = new FormData();
+    dataImage.append('file', sourceImage);
+    dataImage.append('upload_preset', 'e6zfilan'); // Use your Cloudinary upload preset
+    dataImage.append('cloud_name', 'dxfdrtxi3'); // Use your Cloudinary cloud name
+
+    fetch('https://api.cloudinary.com/v1_1/dxfdrtxi3/image/upload', {
+      method: 'POST',
+      body: dataImage,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        setImageUrl(data.url); // Store the Cloudinary video URL in your state
+        //uploadVideo(data.url)
+        //uploadXpiVideo(data.url);
+        console.log('Image Url', data);
+        uploadXpiVideoWithThumbnailChange(data1, data.url);
+      })
+      .catch(err => {
+        setLoading(false);
+        console.log('Error While Uploading Video', err);
+      });
+  };
+
+  //---------------------------------------------\\
 
   return (
     <KeyboardAvoidingView
@@ -691,139 +949,143 @@ export default function UploadUpdateScreen({navigation, route}) {
           <IonIcons name={'chevron-back'} color={'#282828'} size={25} />
         </TouchableOpacity>
 
-        <Text style={styles.headerText}>Upload Video</Text>
+        <Text style={styles.headerText}>Update Video</Text>
       </View>
 
       <ScrollView
         keyboardShouldPersistTaps="always"
         showsVerticalScrollIndicator={false}
         style={{flex: 1}}>
-
-          <View style={{height:hp(30), flexDirection:'row', alignItems:'center', justifyContent:'space-around',  marginHorizontal:wp(8)}}>
-
         <View
           style={{
-            height: hp(20),
-            width:wp(39),
-            borderRadius: wp(8),
-            marginHorizontal: wp(23),
+            height: hp(30),
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-around',
+            marginHorizontal: wp(8),
           }}>
-          {imageInfo !== null && (
-            <Image
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                zIndex: 1, // Ensure it's on top of other elements
-                flex: 1,
-                width: '100%',
-                height: '100%',
-                borderRadius: wp(8),
-                resizeMode: 'contain',
-              }}
-              source={{uri: imageInfo.uri}}
-            />
-          )}
-          <TouchableOpacity
-            onPress={() => ref_RBSheetCamera.current.open()}
+          <View
             style={{
-              position: 'absolute',
-              top: 10,
-              left: 48,
-              height: hp(3),
-              width: wp(21),
-              borderRadius: wp(3),
-              backgroundColor: '#FACA4E',
-              justifyContent: 'center',
-              alignItems: 'center',
-              zIndex: 2, // Ensure it's on top
+              height: hp(20),
+              width: wp(39),
+              borderRadius: wp(8),
+              marginHorizontal: wp(23),
             }}>
-            <Text
-              style={{
-                fontSize: hp(1.3),
-                fontFamily: 'Inter',
-                color: '#232323',
-                fontWeight: '700',
-              }}>
-              Change Video
-            </Text>
-          </TouchableOpacity>
-          {imageInfo == null && (
-            <Image
-              style={{
-                flex: 1,
-                width: '100%',
-                height: '100%',
-                borderRadius: wp(8),
-                resizeMode: 'stretch',
-                zIndex: 0, // Ensure it's below other elements when no image
-              }}
-              source={appImages.updatePics}
-            />
-          )}
-        </View>
-
-        <TouchableOpacity
-        onPress={() => ref_RBSheetThumbnail.current.open()}
-          style={{
-            height: hp(20),
-            width:wp(39),
-            borderRadius: wp(8),
-            borderStyle: 'dotted',
-            borderWidth: 3, // Use 'dotted' for dotted border
-            borderColor: '#FACA4E',
-            marginHorizontal: wp(23),
-          }}>
-          {thumbnailImageUri !== null && (
-            <Image
+            {imageInfo !== null && (
+              <Image
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  zIndex: 1, // Ensure it's on top of other elements
+                  flex: 1,
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: wp(8),
+                  resizeMode: 'contain',
+                }}
+                source={{uri: imageInfo.uri}}
+              />
+            )}
+            <TouchableOpacity
+              onPress={() => ref_RBSheetCamera.current.open()}
               style={{
                 position: 'absolute',
-                top: 0,
-                left: 0,
-                zIndex: 1, // Ensure it's on top of other elements
-                flex: 1,
-                width: '100%',
-                height: '100%',
-                borderRadius: wp(8),
-                resizeMode: 'contain',
-              }}
-              source={{uri: thumbnailImageUri}}
-            />
-          )}
+                top: 10,
+                left: 48,
+                height: hp(3),
+                width: wp(21),
+                borderRadius: wp(3),
+                backgroundColor: '#FACA4E',
+                justifyContent: 'center',
+                alignItems: 'center',
+                zIndex: 2, // Ensure it's on top
+              }}>
+              <Text
+                style={{
+                  fontSize: hp(1.3),
+                  fontFamily: 'Inter',
+                  color: '#232323',
+                  fontWeight: '700',
+                }}>
+                Change Video
+              </Text>
+            </TouchableOpacity>
+            {imageInfo == null && (
+              <Image
+                style={{
+                  flex: 1,
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: wp(8),
+                  resizeMode: 'stretch',
+                  zIndex: 0, // Ensure it's below other elements when no image
+                }}
+                source={appImages.updatePics}
+              />
+            )}
+          </View>
+
           <TouchableOpacity
             onPress={() => ref_RBSheetThumbnail.current.open()}
             style={{
-              position: 'absolute',
-              top: 10,
-              left: 39,
-              height: hp(3),
-              width: wp(25),
-              borderRadius: wp(3),
-              backgroundColor: '#FACA4E',
-              justifyContent: 'center',
-              alignItems: 'center',
-              zIndex: 2, // Ensure it's on top
+              height: hp(20),
+              width: wp(39),
+              borderRadius: wp(8),
+              borderStyle: 'dotted',
+              borderWidth: 3, // Use 'dotted' for dotted border
+              borderColor: '#FACA4E',
+              marginHorizontal: wp(23),
             }}>
-            <Text
+            {thumbnailImageUri !== null && (
+              <Image
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  zIndex: 1, // Ensure it's on top of other elements
+                  flex: 1,
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: wp(8),
+                  resizeMode: 'contain',
+                }}
+                source={{uri: thumbnailImageUri}}
+              />
+            )}
+            <TouchableOpacity
+              onPress={() => ref_RBSheetThumbnail.current.open()}
               style={{
-                fontSize: hp(1.3),
-                fontFamily: 'Inter',
-                color: '#232323',
-                fontWeight: '700',
+                position: 'absolute',
+                top: 10,
+                left: 39,
+                height: hp(3),
+                width: wp(25),
+                borderRadius: wp(3),
+                backgroundColor: '#FACA4E',
+                justifyContent: 'center',
+                alignItems: 'center',
+                zIndex: 2, // Ensure it's on top
               }}>
-              Upload Thumbnail
-            </Text>
+              <Text
+                style={{
+                  fontSize: hp(1.3),
+                  fontFamily: 'Inter',
+                  color: '#232323',
+                  fontWeight: '700',
+                }}>
+                Upload Thumbnail
+              </Text>
+            </TouchableOpacity>
+            {thumbnailImageUri == null && null}
           </TouchableOpacity>
-          {thumbnailImageUri == null && null}
-        </TouchableOpacity>
+        </View>
 
-          </View>
-
-        
         <View style={{marginRight: wp(2)}}>
           <TextInput
             mode="outlined"
             label="Video Name"
+            value={profileName}
             outlineStyle={{borderRadius: wp(3)}}
             onChangeText={text => setProfileName(text)}
             style={[styles.ti, {borderRadius: wp(10)}]}
@@ -837,57 +1099,57 @@ export default function UploadUpdateScreen({navigation, route}) {
           />
         </View>
 
-      {/*   <View style={{marginHorizontal: wp(7)}}>
-          <Dropdown
-            style={
-              isFocus
-                ? styles.textInputSelectedCategory
-                : styles.textInputCategoryNonSelected
-            }
-            containerStyle={{
-              marginTop: 3,
-              alignSelf: 'center',
-              borderRadius: wp(3),
-              width: '100%',
-            }}
-            // dropdownPosition="top"
-            // mode="modal"
-            placeholderStyle={{
-              color: '#121420',
-              //   fontWeight: '400',
-              fontFamily: 'Inter',
-              fontSize: hp(1.8),
-            }}
-            iconStyle={isFocus ? styles.iconStyle : styles.iconStyleInactive}
-            itemTextStyle={{color: '#000000'}}
-            selectedTextStyle={{fontSize: 16, color: '#000000'}}
-            // inputSearchStyle={styles.inputSearchStyle}
-            // iconStyle={styles.iconStyle}
-            value={category}
-            data={categoriesSelect}
-            search={false}
-            maxHeight={200}
-            labelField="label"
-            valueField="value"
-            placeholder={'Select Category'}
-            searchPlaceholder="Search..."
-            onFocus={() => setIsFocus(true)}
-            onBlur={() => setIsFocus(false)}
-            onChange={item => {
-              //setCategory(item.label);
-              setCategoryId(item.value);
-              setIsFocus(false);
-            }}
-            renderRightIcon={() => (
-              <AntDesign
-                style={styles.icon}
-                color={isFocus ? '#FACA4E' : '#C4C4C4'}
-                name="down"
-                size={15}
-              />
-            )}
-          />
-        </View> */}
+        {/*  <View style={{marginHorizontal: wp(7)}}>
+            <Dropdown
+              style={
+                isFocus
+                  ? styles.textInputSelectedCategory
+                  : styles.textInputCategoryNonSelected
+              }
+              containerStyle={{
+                marginTop: 3,
+                alignSelf: 'center',
+                borderRadius: wp(3),
+                width: '100%',
+              }}
+              // dropdownPosition="top"
+              // mode="modal"
+              placeholderStyle={{
+                color: '#121420',
+                //   fontWeight: '400',
+                fontFamily: 'Inter',
+                fontSize: hp(1.8),
+              }}
+              iconStyle={isFocus ? styles.iconStyle : styles.iconStyleInactive}
+              itemTextStyle={{color: '#000000'}}
+              selectedTextStyle={{fontSize: 16, color: '#000000'}}
+              // inputSearchStyle={styles.inputSearchStyle}
+              // iconStyle={styles.iconStyle}
+              value={category}
+              data={categoriesSelect}
+              search={false}
+              maxHeight={200}
+              labelField="label"
+              valueField="value"
+              placeholder={'Select Category'}
+              searchPlaceholder="Search..."
+              onFocus={() => setIsFocus(true)}
+              onBlur={() => setIsFocus(false)}
+              onChange={item => {
+                //setCategory(item.label);
+                setCategoryId(item.value);
+                setIsFocus(false);
+              }}
+              renderRightIcon={() => (
+                <AntDesign
+                  style={styles.icon}
+                  color={isFocus ? '#FACA4E' : '#C4C4C4'}
+                  name="down"
+                  size={15}
+                />
+              )}
+            />
+          </View> */}
 
         <View
           style={{
@@ -912,11 +1174,12 @@ export default function UploadUpdateScreen({navigation, route}) {
             alignItems: 'center',
           }}>
           <CustomButton
-            title={'Upload'}
+            title={'Update'}
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-              upload();
+              checkUpdate();
+              //upload();
               //handleUpdatePassword();
               //navigation.navigate('Profile_image');
             }}
@@ -1085,26 +1348,25 @@ export default function UploadUpdateScreen({navigation, route}) {
 
       <CustomSnackbar
         message={'success'}
-        messageDescription={'Upload Video successfully'}
+        messageDescription={'Update Video successfully'}
         onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackbarVisible}
       />
-{loading &&
-      <View
-        style={{
-          position: 'absolute',
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: 'rgba(255, 255, 255, 0.5)', // Semi-transparent white
-
-        }}>
-         <ActivityIndicator size="large" color="#FACA4E" />
-      </View>
-}
+      {loading && (
+        <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(255, 255, 255, 0.5)', // Semi-transparent white
+          }}>
+          <ActivityIndicator size="large" color="#FACA4E" />
+        </View>
+      )}
 
       <CustomDialog
         visible={modalVisible}

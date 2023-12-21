@@ -4,27 +4,34 @@ import {
   Text,
   Image,
   ScrollView,
+  ActivityIndicator,
   TextInput,
   StatusBar,
+  PermissionsAndroid,
   ImageBackground,
   View,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState, useRef} from 'react';
-import RBSheet from 'react-native-raw-bottom-sheet';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Back from '../../../assets/svg/back.svg';
+import React, {useState, useRef, useMemo, useEffect} from 'react';
 import {appImages} from '../../../assets/utilities/index';
-import Slider from '@react-native-community/slider';
-import VolumeUp from '../../../assets/svg/VolumeUp.svg';
 import Like from '../../../assets/svg/Like.svg';
 import UnLike from '../../../assets/svg/Unlike.svg';
 import Comment from '../../../assets/svg/Comment.svg';
 import Send from '../../../assets/svg/Send.svg';
 import Download from '../../../assets/svg/Download.svg';
-import Share from 'react-native-share';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import BottomSheet, {BottomSheetFlatList} from '@gorhom/bottom-sheet';
+import ButtonSend from '../../../assets/svg/ButtonSend.svg';
+
+import DownArrowComments from '../../../assets/svg/DownArrowComments.svg';
+import UpArrowComments from '../../../assets/svg/UpArrowComments.svg';
+
+import SmileEmoji from '../../../assets/svg/SmileEmoji.svg';
+
+import Share from 'react-native-share';
+
+import axios from 'axios';
+
+import RNFetchBlob from 'rn-fetch-blob';
 
 import {
   heightPercentageToDP as hp,
@@ -33,53 +40,232 @@ import {
 } from 'react-native-responsive-screen';
 
 import Fontiso from 'react-native-vector-icons/Fontisto';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import IonIcons from 'react-native-vector-icons/Ionicons';
 
-import Entypo from 'react-native-vector-icons/Entypo';
-import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
-import EditItem from '../../../assets/svg/UpdateItem.svg';
-
-import Delete from '../../../assets/svg/Delete.svg';
-
-import ButtonSend from '../../../assets/svg/ButtonSend.svg';
-
-import SmileEmoji from '../../../assets/svg/SmileEmoji.svg';
-
-import DownArrowComments from '../../../assets/svg/DownArrowComments.svg';
-
-import UpArrowComments from '../../../assets/svg/UpArrowComments.svg';
-
-export default function ViewVideoPicProfile({navigation}) {
+export default function ViewVideoPicProfile({navigation, route}) {
   const [showFullContent, setShowFullContent] = useState(false);
+
+  const [pastedURL, setPastedURL] = useState(
+    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+  );
+
+  const [comments, setComments] = useState([]);
+
+  const [likes, setLikes] = useState(null);
+
+  const [commentsCount, setCommentsCount] = useState(null);
+
+  const [showReply, setShowReply] = useState(false);
+
+  const [loading, setLoading] = useState(false);
+
+  const [userId, setUserId] = useState('');
+
+  const [showMenu, setShowMenu] = useState(false);
+
+  const [progress, setProgress] = useState(0);
 
   const [isBottomSheetExpanded, setIsBottomSheetExpanded] = useState(false);
 
   const ref_Comments = useRef(null);
 
-  const [showLikes, setShowLikes] = useState(false);
+  const [authToken, setAuthToken] = useState([]);
 
-  const [showMenu, setShowMenu] = useState(true);
+
+  const refSlide = useRef();
+
+  const bottomSheetRef = useRef(null);
+  // variables
+  const snapPoints = useMemo(() => ['25%', '50%'], []);
 
   const [snackbarVisible, setsnackbarVisible] = useState(false);
 
-  const [snackbarDeleteVisible, setSnackbarDeleteVisible] = useState(false);
-
-  const [showReply, setShowReply] = useState(false);
-
-  const ref_RBSheetCamera = useRef(null);
-
-  const ref_RBSheetLogout = useRef(null);
-
   const [commentText, setCommentText] = useState(null); // State variable to hold the text
+
+  const [showLikes, setShowLikes] = useState(false);
+
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchAll();
+  }, []);
+
+  const fetchAll = async () => {
+    // Simulate loading
+    setLoading(true);
+    // Fetch data one by one
+
+    await getUserID();
+    
+    //await fetchLikes()
+    //await fetchCommentsCounts()
+
+    // Once all data is fetched, set loading to false
+    setLoading(false);
+  };
+
+  const getUserID = async () => {
+    console.log("Id's");
+    try {
+      const result = await AsyncStorage.getItem('userId ');
+      if (result !== null) {
+        setUserId(result);
+        console.log('user id retrieved:', result);
+        
+      } else {
+        console.log('user id null:', result);
+      }
+
+      const result1 = await AsyncStorage.getItem('authToken ');
+      if (result1 !== null) {
+        setAuthToken(result1);
+        console.log('user token retrieved:', result1);
+        await fetchComments(result1);
+      } else {
+        console.log('result is null', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
+
+  const fetchComments = async (value) => {
+    const token = value;
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/picTour/getAllCommentsByPicTour/${receivedData.pic_tour_id}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        //console.log("All Comments of usersssss", data.AllComents)
+        setComments(data.AllComents);
+
+
+        await fetchLikes(value)
+      } else {
+        console.error(
+          'Failed to fetch categories:',
+          response.status,
+          response.statusText,
+        );
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const fetchLikes = async (values) => {
+    const token = values;
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/picTour/getAllLikesByPicTour/${receivedData.pic_tour_id}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('All Likes', data.totalLikes);
+        setLikes(data.totalLikes);
+        fetchCommentsCounts(values)
+        //setLikes(data.totalLikes);
+      } else {
+        console.error(
+          'Failed to fetch categories:',
+          response.status,
+          response.statusText,
+        );
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const fetchCommentsCounts = async (values) => {
+    const token = values;
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/xpi/getAllCommentsByVideo/${receivedData.video_id}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('All Comments', data.totalComments);
+        setCommentsCount(data.totalComments);
+      } else {
+        console.error(
+          'Failed to fetch categories:',
+          response.status,
+          response.statusText,
+        );
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const dismissSnackbar = () => {
+    setsnackbarVisible(false);
+  };
+
+  const handleUpdatePassword = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setsnackbarVisible(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setsnackbarVisible(false);
+
+      if (pastedURL !== '') {
+        requestStoragePermission();
+      } else {
+        console.log('Please Add Video Url');
+      }
+
+      //navigation.goBack();
+    }, 3000);
+  };
+
+  const clearTextInput = () => {
+    console.log('came to logssssss', commentText);
+    // Clear the text in the TextInput
+    setCommentText(null);
+    sendComment();
+  };
 
   const chats = [
     {
       id: 1,
       name: 'John Doe',
       message: 'The laughter in this video is contagious!',
-      reply: true,
+      reply: false,
     },
     {
       id: 2,
@@ -109,99 +295,110 @@ export default function ViewVideoPicProfile({navigation}) {
     },
   ];
 
-  var details =
-    'Hold onto your seats and get ready to be mesmerized by the beauty and grandeur of the Hold onto your seats';
-
-  const toggleContent = () => {
-    setShowFullContent(!showFullContent);
-  };
-
-  const toggleContentLike = () => {
-    setShowLikes(!showLikes);
-  };
-
-  const changeModals = () => {
-    ref_RBSheetCamera.current.close();
-    navigation.navigate('UploadUpdatePicScreen');
-  };
-
-  const clearTextInput = () => {
-    console.log('came to logssssss', commentText);
-    // Clear the text in the TextInput
-    setCommentText(null);
-  };
-
-  const shareViaWhatsApp = async () => {
-    const shareOptions = {
-      title: 'Share via',
-      message: 'Hey! Check out this cool app!',
-      url: 'https://play.google.com/store/apps/details?id=your.app.package',
-      //social: Share.Social,
-    };
+  const sendComment = async () => {
+    setLoading(true);
+    console.log('Set Loading ', loading);
+    const token =
+       authToken; // Replace with your actual token
 
     try {
-      await Share.open(shareOptions);
+      const axiosConfig = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      };
+
+      const commentData = {
+        pic_tours_id: receivedData.pic_tour_id,
+        user_id: userId,
+        comment: commentText,
+      };
+
+      const response = await axios.post(
+        'https://watch-gotcha-be.mtechub.com/picTour/sendComment',
+        commentData,
+        axiosConfig,
+      );
+
+      console.log('Response', response);
+
+      if (response.status === 200) {
+        setLoading(false);
+        console.log('Comment sent successfully');
+        fetchAll();
+      } else {
+        setLoading(false);
+        fetchAll();
+        console.error(
+          'Failed to send comment:',
+          response.status,
+          response.statusText,
+        );
+      }
     } catch (error) {
-      console.error('Error sharing via WhatsApp:', error.message);
+      setLoading(false);
+      console.error('Error:', error);
     }
   };
 
-  const dismissSnackbar = () => {
-    setsnackbarVisible(false);
-  };
+  const sendLikes = async () => {
+    console.log("likes Token", authToken)
+    console.log("User Id", userId)
+    setLoading(true);
+    const token =
+      authToken; // Replace with your actual token
 
-  const changeModal = () => {
-    ref_RBSheetCamera.current.close();
-    ref_RBSheetLogout.current.open();
-  };
+    try {
+      const axiosConfig = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      };
 
-  const dismissDeleteSnackbar = () => {
-    setsnackbarVisible(false);
-  };
+      const commentData = {
+        pic_tour_id: receivedData?.pic_tour_id,
+        user_id: userId,
+      };
 
-  const handleUpdatePassword = async () => {
-    // Perform the password update logic here
-    // For example, you can make an API request to update the password
+      const response = await axios.post(
+        'https://watch-gotcha-be.mtechub.com/picTour/likeUnlikePicTour',
+        commentData,
+        axiosConfig,
+      );
 
-    // Assuming the update was successful
-    setsnackbarVisible(true);
+      console.log('Response', response);
 
-    // Automatically hide the Snackbar after 3 seconds
-    setTimeout(() => {
-      setsnackbarVisible(false);
-      navigation.goBack();
-    }, 3000);
-  };
-
-  const changeDelete = () => {
-    ref_RBSheetLogout.current.close();
-    handleUpdateDelete();
-    //navigation.goBack()
-  };
-
-  const handleUpdateDelete = async () => {
-    // Perform the password update logic here
-    // For example, you can make an API request to update the password
-
-    // Assuming the update was successful
-    setSnackbarDeleteVisible(true);
-
-    // Automatically hide the Snackbar after 3 seconds
-    setTimeout(() => {
-      setSnackbarDeleteVisible(false);
-      navigation.goBack();
-    }, 3000);
+      if (response.status === 200) {
+        setLoading(false);
+        console.log('Pic Liked  successfully');
+        fetchAll();
+      } else {
+        setLoading(false);
+        fetchAll();
+        console.error(
+          'Failed to send comment:',
+          response.status,
+          response.statusText,
+        );
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error('Error:', error);
+    }
   };
 
   const renderComments = item => {
-    console.log('Items', item);
+    //console.log('Items of comments', item);
     return (
       <View>
         <View
           style={{
-            height: hp(14),
+            height: hp(10),
             //borderWidth:3,
             paddingHorizontal: wp(5),
+            alignItems: 'center',
             flexDirection: 'row',
             width: '100%',
           }}>
@@ -221,9 +418,10 @@ export default function ViewVideoPicProfile({navigation}) {
 
           <View
             style={{
-              flex: 1,
+              //flex: 1,
               marginLeft: wp(3),
-              marginTop: hp(3),
+              height: hp(5),
+              //marginTop: hp(1),
               //borderWidth:3,
               justifyContent: 'space-around',
             }}>
@@ -233,19 +431,20 @@ export default function ViewVideoPicProfile({navigation}) {
                 fontFamily: 'Inter-Medium',
                 fontSize: hp(2.1),
               }}>
-              John Doe
+              {item.username}
             </Text>
 
             <Text
               style={{
                 color: '#4C4C4C',
                 fontFamily: 'Inter-Regular',
+                marginTop: hp(2.1),
                 fontSize: hp(1.6),
               }}>
-              I wish I had a friend group like this. You all are incredible!
+              {item.comment}
             </Text>
 
-            {item.reply && (
+            {false && (
               <TouchableOpacity
                 onPress={() => setShowReply(!showReply)}
                 style={{
@@ -386,9 +585,94 @@ export default function ViewVideoPicProfile({navigation}) {
     );
   };
 
+  const requestStoragePermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        {
+          title: 'Downloader App Storage Permission',
+          message:
+            'Downloader App needs access to your storage ' +
+            'so you can download files',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        downloadFile();
+      } else {
+        console.log('storage permission denied');
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+
+  const downloadFile = () => {
+    const {config, fs} = RNFetchBlob;
+    const date = new Date();
+    const fileDir = fs.dirs.DownloadDir;
+    config({
+      // add this option that makes response data to be stored as a file,
+      // this is much more performant.
+      fileCache: true,
+      addAndroidDownloads: {
+        useDownloadManager: true,
+        notification: true,
+        path:
+          fileDir +
+          '/download_' +
+          Math.floor(date.getDate() + date.getSeconds() / 2) +
+          '.mp4',
+        description: 'file download',
+      },
+    })
+      .fetch('GET', 'https://watch-gotcha-be.mtechub.com/'+receivedData.image, {
+        //some headers ..
+      })
+      .then(res => {
+        // the temp file path
+        console.log('The file saved to ', res.path());
+        alert('file downloaded successfully ');
+      });
+  };
+
+
+  const toggleContent = () => {
+    setShowFullContent(!showFullContent);
+  };
+
+  const toggleContentLike = () => {
+    setShowLikes(!showLikes);
+    sendLikes();
+  };
+
+  const receivedData = route.params?.picData;
+
+  console.log('Data Recieved on pics', receivedData);
+
+  var details = receivedData.description;
+
+
+  const shareViaWhatsApp = async () => {
+    const shareOptions = {
+      title: 'Share via',
+      message: 'Hey! Check out this cool app!',
+      url: 'https://play.google.com/store/apps/details?id=your.app.package',
+      //social: Share.Social,
+    };
+
+    try {
+      await Share.open(shareOptions);
+    } catch (error) {
+      console.error('Error sharing via WhatsApp:', error.message);
+    }
+  };
+
   return (
     <GestureHandlerRootView style={{flex: 1}}>
-      <ImageBackground source={appImages.videoBG} style={{flex: 1}}>
+      <ImageBackground source={{uri:receivedData?.image}} style={{flex: 1}}>
         <StatusBar
           translucent={true}
           backgroundColor="transparent"
@@ -399,55 +683,53 @@ export default function ViewVideoPicProfile({navigation}) {
             <IonIcons name={'chevron-back'} color={'white'} size={25} />
           </TouchableOpacity>
 
-          <Image
-            source={appImages.logoTransparent}
-            style={{width: wp(39), marginLeft: wp(18)}}
-            resizeMode="contain"
-          />
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              height: hp(6.5),
+              marginLeft: hp(10),
+            }}>
+            <View
+              style={{
+                height: hp(10),
+                width: wp(10),
+                borderRadius: wp(8),
+                marginLeft: wp(3),
+                overflow: 'hidden',
+              }}>
+              {receivedData?.userimage===null?<Image
+                style={{
+                  flex: 1,
+                  width: null,
+                  height: null,
+                  resizeMode: 'contain',
+                }}
+                source={appImages.profileImg}
+              />:<Image
+              style={{
+                flex: 1,
+                width: null,
+                height: null,
+                resizeMode: 'contain',
+              }}
+              source={appImages.profileImg}
+            />}
+            </View>
 
-          {showMenu && (
-            <TouchableOpacity
-              onPress={() => ref_RBSheetCamera.current.open()}
-              style={{marginLeft: wp(18), marginTop: hp(1)}}>
-              <Entypo name={'dots-three-vertical'} size={18} color={'white'} />
-            </TouchableOpacity>
-          )}
+            <Text style={styles.textProfileName}>{receivedData.name}</Text>
+          </View>
         </View>
 
         <View style={styles.bottomView}>
-          <View style={{height: hp(30), marginHorizontal: wp(8)}}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                height: hp(5),
-              }}>
-              <View
-                style={{
-                  height: hp(10),
-                  width: wp(10),
-                  borderRadius: wp(8),
-                  marginLeft: wp(3),
-                  overflow: 'hidden',
-                }}>
-                <Image
-                  style={{
-                    flex: 1,
-                    width: null,
-                    height: null,
-                    resizeMode: 'contain',
-                  }}
-                  source={appImages.profileImg}
-                />
-              </View>
-
-              <Text style={styles.textProfileName}>John Doe</Text>
-            </View>
-
+          <View style={{height: hp(20)}}>
             <ScrollView
               showsVerticalScrollIndicator={false} // Hide vertical scroll indicator
-              style={{flex: 1, marginTop: hp(1)}}
-              contentContainerStyle={{verticalLine: false}}>
+              style={{flex: 1}}
+              contentContainerStyle={{
+                verticalLine: false,
+                marginHorizontal: wp(8),
+              }}>
               <Text
                 style={{
                   marginTop: hp(1),
@@ -478,54 +760,23 @@ export default function ViewVideoPicProfile({navigation}) {
                 </Text>
               </TouchableOpacity>
             </ScrollView>
-           {/*  <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                height: hp(5),
-              }}>
-              <View
-                style={{
-                  height: hp(2),
-                  width: wp(65),
-                  justifyContent: 'center',
-                }}>
-                <Slider
-                  value={95}
-                  minimumValue={0}
-                  thumbTintColor="#FACA4E"
-                  maximumValue={100}
-                  minimumTrackTintColor={'#FACA4E'}
-                  maximumTrackTintColor={'#F6F6F6'}
-                />
-              </View>
 
-              <Text
-                style={{
-                  fontFamily: 'Inter',
-                  fontSize: hp(1.5),
-                  color: '#FFFFFF',
-                }}>
-                02:14
-              </Text>
-              <VolumeUp height={14} width={14} />
-            </View>
- */}
+            <View style={{height: 1, backgroundColor: '#FFFFFF52'}}></View>
+
             <View
               style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 height: hp(8),
+                marginHorizontal: wp(8),
               }}>
               <View
                 style={{
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  width: wp(15),
-                  //borderWidth:3,
+                  width: wp(14),
                   height: hp(5),
                 }}>
                 <TouchableOpacity onPress={toggleContentLike}>
@@ -538,12 +789,11 @@ export default function ViewVideoPicProfile({navigation}) {
 
                 <Text
                   style={{
-                    fontFamily: 'Inter-Regular',
-                    fontSize: hp(1.7),
-                    marginLeft: wp(1),
+                    fontFamily: 'Inter',
+                    fontSize: hp(1.5),
                     color: '#FFFFFF',
                   }}>
-                  2.3 k
+                  {likes}
                 </Text>
               </View>
 
@@ -552,7 +802,7 @@ export default function ViewVideoPicProfile({navigation}) {
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  width: wp(15),
+                  width: wp(12),
                   height: hp(5),
                 }}>
                 <TouchableOpacity
@@ -564,11 +814,11 @@ export default function ViewVideoPicProfile({navigation}) {
 
                 <Text
                   style={{
-                    fontFamily: 'Inter-Regular',
-                    fontSize: hp(1.7),
+                    fontFamily: 'Inter',
+                    fontSize: hp(1.5),
                     color: '#FFFFFF',
                   }}>
-                  2.3 k
+                  {receivedData.comment_count}
                 </Text>
               </View>
 
@@ -577,11 +827,11 @@ export default function ViewVideoPicProfile({navigation}) {
                   flexDirection: 'row',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  width: wp(15),
+                  width: wp(10),
                   height: hp(5),
                 }}>
-                <TouchableOpacity onPress={() => shareViaWhatsApp()}>
-                  <Send height={20} width={20} />
+                <TouchableOpacity onPress={()=>shareViaWhatsApp()}>
+                  <Send height={21} width={21} />
                 </TouchableOpacity>
               </View>
 
@@ -594,301 +844,175 @@ export default function ViewVideoPicProfile({navigation}) {
                   height: hp(5),
                 }}>
                 <TouchableOpacity onPress={() => handleUpdatePassword()}>
-                  <Download height={20} width={20} />
+                  <Download height={21} width={21} />
                 </TouchableOpacity>
               </View>
             </View>
           </View>
         </View>
+      </ImageBackground>
 
-        <CustomSnackbar
-          message={'success'}
-          messageDescription={'Video downloaded successfully'}
-          onDismiss={dismissSnackbar} // Make sure this function is defined
-          visible={snackbarVisible}
-        />
-
-        <CustomSnackbar
-          message={'success'}
-          messageDescription={'Pic deleted successfully'}
-          onDismiss={dismissDeleteSnackbar} // Make sure this function is defined
-          visible={snackbarDeleteVisible}
-        />
-
-        <RBSheet
-          ref={ref_RBSheetCamera}
-          closeOnDragDown={true}
-          closeOnPressMask={false}
-          animationType="fade"
-          minClosingHeight={0}
-          customStyles={{
-            wrapper: {
-              backgroundColor: 'rgba(52, 52, 52, 0.5)',
-            },
-            draggableIcon: {
-              backgroundColor: 'white',
-            },
-            container: {
-              borderTopLeftRadius: wp(10),
-              borderTopRightRadius: wp(10),
-              height: hp(25),
-            },
+      <BottomSheet
+        ref={ref_Comments}
+        index={isBottomSheetExpanded ? 0 : -1} // Set to -1 to start with collapsed state
+        snapPoints={['65%', '90%']} // Adjust snap points as needed
+        onScroll={event => {
+          console.log('Event', event);
+          const offsetY = event.nativeEvent.contentOffset.y;
+          if (isBottomSheetExpanded && offsetY === 0) {
+            setIsBottomSheetExpanded(false);
+          } else if (!isBottomSheetExpanded && offsetY > 0) {
+            setIsBottomSheetExpanded(true);
+          }
+        }}
+        //snapPoints={snapPoints}
+        //onChange={handleSheetChange}
+        height={210}
+        openDuration={250}
+        closeOnDragDown={true}
+        draggableIcon={false}
+        closeOnPressMask={true}
+        customStyles={{
+          container: {
+            borderTopLeftRadius: 100,
+            borderTopRightRadius: 100,
+            paddingTop: 0,
+            padding: 20,
+            zIndex: 999,
+            backgroundColor: 'white',
+          },
+          draggableIcon: {
+            backgroundColor: 'white',
+          },
+        }}>
+        <View
+          style={{
+            width: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: hp(5),
           }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginHorizontal: wp(8),
-              alignItems: 'center',
-            }}>
-            <Text
-              style={{
-                fontFamily: 'Inter-Medium',
-                color: '#303030',
-                fontSize: hp(2.3),
-              }}>
-              Select an option
-            </Text>
-            <TouchableOpacity onPress={() => ref_RBSheetCamera.current.close()}>
-              <Ionicons
-                name="close"
-                size={22}
-                color={'#303030'}
-                onPress={() => ref_RBSheetCamera.current.close()}
-              />
-            </TouchableOpacity>
-          </View>
-
-          <View
-            style={{
-              //flexDirection: 'row',
-              justifyContent: 'space-evenly',
-              //alignItems: 'center',
-              //borderWidth: 3,
-              marginTop: hp(3),
-            }}>
-            <TouchableOpacity
-              onPress={() => changeModals()}
-              style={{flexDirection: 'row', marginHorizontal: wp(7)}}>
-              <EditItem height={23} width={23} />
-
-              <Text
-                style={{
-                  fontFamily: 'Inter-Regular',
-                  color: '#656565',
-                  marginLeft: wp(3),
-                  fontSize: hp(2.1),
-                }}>
-                Update Pic
-              </Text>
-            </TouchableOpacity>
-
-            <View
-              style={{
-                height: hp(0.1),
-                marginHorizontal: wp(8),
-                marginTop: hp(3),
-                backgroundColor: '#00000012',
-              }}></View>
-
-            <TouchableOpacity
-              onPress={() => changeModal()}
-              style={{
-                flexDirection: 'row',
-                marginTop: hp(2.5),
-                marginHorizontal: wp(7),
-              }}>
-              <Delete height={23} width={23} />
-
-              <Text
-                style={{
-                  fontFamily: 'Inter-Regular',
-                  color: '#656565',
-                  marginLeft: wp(3),
-                  fontSize: hp(2.1),
-                }}>
-                Delete Pic
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </RBSheet>
-
-        <RBSheet
-          ref={ref_RBSheetLogout}
-          height={330}
-          openDuration={250}
-          enableOverDrag={false}
-          enabledGestureInteraction={false}
-          closeOnDragDown={true}
-          closeOnPressMask={false}
-          customStyles={{
-            container: {
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderTopLeftRadius: 30,
-              borderTopRightRadius: 30,
-              paddingTop: 0,
-              padding: 20,
-              zIndex: 999,
-            },
-            draggableIcon: {
-              backgroundColor: 'transparent',
-            },
-          }}>
-          <Image source={appImages.alert} style={{resizeMode: 'contain'}} />
           <Text
-            style={[
-              styles.txtNotification,
-              {marginTop: 1, fontSize: hp(2.5), fontWeight: '500'},
-            ]}>
-            Confirmation
+            style={{
+              color: '#000000',
+              fontFamily: 'Inter-Bold',
+              fontSize: hp(2.3),
+            }}>
+            Comments
           </Text>
+        </View>
 
-          <Text style={{marginTop: hp(2)}}>
-            Do you really want to delete this pic?
-          </Text>
+        <View style={{marginTop: hp(1), flex: 1}}>
+          <BottomSheetFlatList
+            data={comments}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({item}) => renderComments(item)}
+            extraData={loading}
+          />
+        </View>
 
-          <View style={styles.buttonDirections}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => ref_RBSheetLogout.current.close()}>
-              <Text style={styles.textButton}>Cancel</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => changeDelete()}
-              style={[styles.button, {backgroundColor: '#FACA4E'}]}>
-              <Text style={[styles.textButton, {color: '#232323'}]}>
-                Delete
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </RBSheet>
-
-        <BottomSheet
-          ref={ref_Comments}
-          index={isBottomSheetExpanded ? 0 : -1} // Set to -1 to start with collapsed state
-          snapPoints={['65%', '90%']} // Adjust snap points as needed
-          onScroll={event => {
-            console.log('Event', event);
-            const offsetY = event.nativeEvent.contentOffset.y;
-            if (isBottomSheetExpanded && offsetY === 0) {
-              setIsBottomSheetExpanded(false);
-            } else if (!isBottomSheetExpanded && offsetY > 0) {
-              setIsBottomSheetExpanded(true);
-            }
-          }}
-          //snapPoints={snapPoints}
-          //onChange={handleSheetChange}
-          height={210}
-          openDuration={250}
-          closeOnDragDown={true}
-          draggableIcon={false}
-          closeOnPressMask={true}
-          customStyles={{
-            container: {
-              borderTopLeftRadius: 100,
-              borderTopRightRadius: 100,
-              paddingTop: 0,
-              padding: 20,
-              zIndex: 999,
-              backgroundColor: 'white',
-            },
-            draggableIcon: {
-              backgroundColor: 'white',
-            },
-          }}>
+        {showReply === false ? (
           <View
             style={{
               width: '100%',
+              flexDirection: 'row',
+              alignItems: 'center',
+              height: hp(8),
+            }}>
+            <TouchableOpacity
+              style={{
+                height: hp(8),
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: wp(14),
+              }}>
+              <SmileEmoji />
+            </TouchableOpacity>
+
+            <TextInput
+              value={commentText} // Bind the value to the state variable
+              onChangeText={text => setCommentText(text)} // Update state on text change
+              placeholderTextColor={'#848484'}
+              placeholder="Write Comment Heressssss"
+              style={{flex: 1, marginLeft: wp(1)}}
+            />
+
+            <TouchableOpacity onPress={() => clearTextInput}>
+              <ButtonSend />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View
+            style={{
+              width: '100%',
+              flexDirection: 'row',
+              alignItems: 'center',
+              height: hp(8),
+            }}>
+            <TouchableOpacity
+              style={{
+                height: hp(8),
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: wp(14),
+              }}>
+              <SmileEmoji />
+            </TouchableOpacity>
+
+            <TextInput
+              value={commentText} // Bind the value to the state variable
+              onChangeText={text => setCommentText(text)} // Update state on text change
+              placeholderTextColor={'#848484'}
+              placeholder="Add a reply"
+              style={{flex: 1, marginLeft: wp(1)}}
+            />
+
+            <TouchableOpacity onPress={() => clearTextInput()}>
+              <ButtonSend />
+            </TouchableOpacity>
+          </View>
+        )}
+      </BottomSheet>
+
+      {isBottomSheetExpanded && showReply === false ? (
+        <View
+          style={{
+            width: '100%',
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            backgroundColor: 'white',
+            flexDirection: 'row',
+            alignItems: 'center',
+            height: hp(8),
+          }}>
+          <TouchableOpacity
+            style={{
+              height: hp(8),
               justifyContent: 'center',
               alignItems: 'center',
-              height: hp(5),
+              width: wp(14),
             }}>
-            <Text
-              style={{
-                color: '#000000',
-                fontFamily: 'Inter-Bold',
-                fontSize: hp(2.3),
-              }}>
-              Comments
-            </Text>
-          </View>
+            <SmileEmoji />
+          </TouchableOpacity>
 
-          <View style={{marginTop: hp(1), flex: 1}}>
-            <BottomSheetFlatList
-              data={chats}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({item}) => renderComments(item)}
-            />
-          </View>
+          <TextInput
+            value={commentText} // Bind the value to the state variable
+            onChangeText={text => setCommentText(text)} // Update state on text change
+            placeholderTextColor={'#848484'}
+            placeholder="Write Comment Here"
+            style={{flex: 1, marginLeft: wp(1)}}
+          />
 
-          {showReply === false ? (
-            <View
-              style={{
-                width: '100%',
-                flexDirection: 'row',
-                alignItems: 'center',
-                height: hp(8),
-              }}>
-              <TouchableOpacity
-                style={{
-                  height: hp(8),
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  width: wp(14),
-                }}>
-                <SmileEmoji />
-              </TouchableOpacity>
-
-              <TextInput
-                placeholderTextColor={'#848484'}
-                placeholder="Write Comment Here"
-                style={{flex: 1, marginLeft: wp(1)}}
-              />
-
-              <TouchableOpacity>
-                <ButtonSend />
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View
-              style={{
-                width: '100%',
-                flexDirection: 'row',
-                alignItems: 'center',
-                height: hp(8),
-              }}>
-              <TouchableOpacity
-                style={{
-                  height: hp(8),
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  width: wp(14),
-                }}>
-                <SmileEmoji />
-              </TouchableOpacity>
-
-              <TextInput
-                placeholderTextColor={'#848484'}
-                placeholder="Add a reply"
-                style={{flex: 1, marginLeft: wp(1)}}
-              />
-
-              <TouchableOpacity>
-                <ButtonSend />
-              </TouchableOpacity>
-            </View>
-          )}
-        </BottomSheet>
-
-        {isBottomSheetExpanded && showReply === false ? (
+          <TouchableOpacity onPress={() => clearTextInput()}>
+            <ButtonSend />
+          </TouchableOpacity>
+        </View>
+      ) : (
+        isBottomSheetExpanded && (
           <View
             style={{
               width: '100%',
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
               backgroundColor: 'white',
               flexDirection: 'row',
               alignItems: 'center',
@@ -908,7 +1032,7 @@ export default function ViewVideoPicProfile({navigation}) {
               value={commentText} // Bind the value to the state variable
               onChangeText={text => setCommentText(text)} // Update state on text change
               placeholderTextColor={'#848484'}
-              placeholder="Write Comment Here"
+              placeholder="Add a reply"
               style={{flex: 1, marginLeft: wp(1)}}
             />
 
@@ -916,41 +1040,21 @@ export default function ViewVideoPicProfile({navigation}) {
               <ButtonSend />
             </TouchableOpacity>
           </View>
-        ) : (
-          isBottomSheetExpanded && (
-            <View
-              style={{
-                width: '100%',
-                backgroundColor: 'white',
-                flexDirection: 'row',
-                alignItems: 'center',
-                height: hp(8),
-              }}>
-              <TouchableOpacity
-                style={{
-                  height: hp(8),
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  width: wp(14),
-                }}>
-                <SmileEmoji />
-              </TouchableOpacity>
+        )
+      )}
 
-              <TextInput
-                value={commentText} // Bind the value to the state variable
-                onChangeText={text => setCommentText(text)} // Update state on text change
-                placeholderTextColor={'#848484'}
-                placeholder="Add a reply"
-                style={{flex: 1, marginLeft: wp(1)}}
-              />
-
-              <TouchableOpacity onPress={() => clearTextInput()}>
-                <ButtonSend />
-              </TouchableOpacity>
-            </View>
-          )
-        )}
-      </ImageBackground>
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {loading && <ActivityIndicator size="large" color="#FACA4E" />}
+      </View>
     </GestureHandlerRootView>
   );
 }
@@ -978,43 +1082,5 @@ const styles = StyleSheet.create({
     marginLeft: wp(3),
     fontFamily: 'Inter',
     fontWeight: 'bold',
-  },
-
-  ti: {
-    marginHorizontal: '7%',
-    marginTop: '5%',
-    width: 300,
-    backgroundColor: 'white',
-    fontSize: wp(4),
-    paddingLeft: '2%',
-    borderRadius: 10,
-  },
-  buttonDirections: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: hp(4.3),
-    width: '100%',
-    marginLeft: wp(5),
-    justifyContent: 'space-evenly',
-  },
-  button: {
-    borderColor: '#FACA4E',
-    borderWidth: 0.8,
-    borderRadius: wp(5),
-    width: wp(35),
-    height: hp(5.5),
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  textButton: {
-    color: '#FACA4E',
-    fontWeight: 'bold',
-  },
-  txtNotification: {
-    fontWeight: '500',
-    marginTop: hp(10),
-    marginLeft: wp(5),
-    fontSize: hp(2.3),
-    color: '#0B0B0B',
   },
 });
