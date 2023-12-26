@@ -45,7 +45,7 @@ import EditItem from '../../assets/svg/UpdateItem.svg';
 import Delete from '../../assets/svg/Delete.svg';
 
 
-export default function ProductDetailsProfile({navigation}) {
+export default function ProductDetailsProfile({navigation, route}) {
   const [imageUri, setImageUri] = useState(null);
   const [selectedValueListView, setSelectedValueListView] = useState('');
 
@@ -55,7 +55,9 @@ export default function ProductDetailsProfile({navigation}) {
 
   const ref_RBSheetLogout = useRef(null);
 
+  const receivedData = route.params?.ProductDetails;
 
+  console.log("Product Details", receivedData );
 
   const details = [
     {id: 1, title: 'Lense', image: appImages.lense},
@@ -66,18 +68,6 @@ export default function ProductDetailsProfile({navigation}) {
     //{id: 10, title: 'Printer', image: appImages.printer},
   ];
 
-  const availableApps = [
-    {id: 1, title: 'Lense', image: appImages.lense},
-    {id: 2, title: 'Holder', image: appImages.holder},
-    {id: 3, title: 'HeadPhone', image: appImages.headPhone},
-    {id: 4, title: 'Shoes', image: appImages.shoes},
-    {id: 5, title: 'Printer', image: appImages.printer},
-    {id: 6, title: 'Lense', image: appImages.lense},
-    {id: 7, title: 'Holder', image: appImages.holder},
-    {id: 8, title: 'HeadPhone', image: appImages.headPhone},
-    {id: 9, title: 'Shoes', image: appImages.shoes},
-    //{id: 10, title: 'Printer', image: appImages.printer},
-  ];
 
   const renderAvailableApps = item => {
     console.log('Items', item);
@@ -122,7 +112,7 @@ export default function ProductDetailsProfile({navigation}) {
 
   const goToScreen=()=>{
     ref_RBSheetCamera.current.close();
-    navigation.navigate("UpdateSellProduct")
+    navigation.navigate("UpdateSellProduct", {item:receivedData});
   }
 
   const openSheet=()=>{
@@ -145,7 +135,7 @@ export default function ProductDetailsProfile({navigation}) {
 
       <View style={{height: hp(35), marginTop: hp(5)}}>
 
-      <HeaderImageSlider data={details}  paginationStyleItemActiveStyle={{
+       <HeaderImageSlider data={receivedData?.images}  paginationStyleItemActiveStyle={{
               width: 18,
               height: 7,
               borderRadius: 7 / 2,
@@ -153,7 +143,7 @@ export default function ProductDetailsProfile({navigation}) {
             paginationStyleItemInactive={{
               backgroundColor: '#D4D4D4',
               borderWidth: 0,
-            }} />
+            }} /> 
 
         {/* <SwiperFlatList
       autoplay
@@ -195,7 +185,7 @@ export default function ProductDetailsProfile({navigation}) {
             fontWeight: '800',
             fontSize: hp(2.4),
           }}>
-          Classic Lens
+          {receivedData?.title}
         </Text>
 
         <View
@@ -212,7 +202,7 @@ export default function ProductDetailsProfile({navigation}) {
               fontWeight: '400',
               fontSize: hp(2),
             }}>
-            Item
+             {receivedData?.item_category_name}
           </Text>
 
           <Text
@@ -223,7 +213,7 @@ export default function ProductDetailsProfile({navigation}) {
               fontWeight: '400',
               fontSize: hp(2),
             }}>
-            $ 456
+             {receivedData?.price}
           </Text>
         </View>
 
@@ -243,7 +233,7 @@ export default function ProductDetailsProfile({navigation}) {
               fontWeight: '400',
               fontSize: hp(2),
             }}>
-            123 Main Street Cityville, USA
+            {receivedData?.location}
           </Text>
         </View>
 
@@ -259,12 +249,13 @@ export default function ProductDetailsProfile({navigation}) {
               //fontWeight: '400',
               fontSize: hp(1.8),
             }}>
-            Our Classic Lens offers a timeless touch to your photography.
+              {receivedData?.description}
+           {/*  Our Classic Lens offers a timeless touch to your photography.
             Crafted with precision and a nod to vintage aesthetics, this lens is
             perfect for capturing moments with a hint of nostalgia. Whether
             you're shooting portraits, landscapes, or street photography, the
             Classic Lens delivers stunning results with its soft focus and
-            beautiful bokeh.
+            beautiful bokeh. */}
           </Text>
         </ScrollView>
        </View>

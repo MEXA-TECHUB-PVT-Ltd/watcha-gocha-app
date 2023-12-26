@@ -56,16 +56,22 @@ const Category = [
   {label: 'Item 3', value: '3'},
 ];
 
-export default function UploadUpdatePicScreen({navigation}) {
+export default function UploadUpdatePicScreen({navigation, route}) {
   const [selectedItem, setSelectedItem] = useState('');
+
+  const [dataFetched, isDataFetched] = useState(false);
 
   const [userId, setUserId] = useState('');
 
   const [profileName, setProfileName] = useState('');
 
+  const [categoriesSelect, setCategorySelect] = useState([]);
+
   const [snackBarVisible, setSnackbarVisible] = useState(false);
 
   const [authToken, setAuthToken] = useState('');
+
+  const [imageInfo, setImageInfo] = useState(null);
 
   const [loading, setLoading] = useState(false);
 
@@ -77,11 +83,38 @@ export default function UploadUpdatePicScreen({navigation}) {
 
   const [imageUri, setImageUri] = useState(null);
 
+  const [imageUrl, setImageUrl] = useState(null);
+
+  const [categoryId, setCategoryId] = useState('');
+
+
   const [isFocus, setIsFocus] = useState(false);
 
   const ref_RBSheetCamera = useRef(null);
 
+  const [categoryType, setCategoryType] = useState(null);
+
+
   //------------------\\
+
+  const receivedData = route.params?.item;
+
+  console.log('Data Recieved on pics', receivedData);
+
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    const fetchCategory = async () => {
+      setProfileName(receivedData?.name);
+      setDescription(receivedData?.description);
+      setCategory(receivedData?.pic_category)
+      setImageInfo({uri: receivedData?.image});
+      isDataFetched(true);
+    };
+
+    fetchCategory();
+  }, []);
+
+ 
 
   useEffect(() => {
     // Make the API request and update the 'data' state
@@ -113,6 +146,7 @@ export default function UploadUpdatePicScreen({navigation}) {
       const result1 = await AsyncStorage.getItem('authToken ');
       if (result1 !== null) {
         setAuthToken(result1);
+        fetchCategoryPic(result1)
         console.log('user token retrieved:', result1);
       } else {
         console.log('result is null', result);
@@ -122,6 +156,52 @@ export default function UploadUpdatePicScreen({navigation}) {
       console.error('Error retrieving user ID:', error);
     }
   };
+
+  //---------------------------\\
+
+
+  const fetchCategoryPic = async (userToken) => {
+    const token = userToken;
+
+    try {
+      const response = await fetch(
+        'https://watch-gotcha-be.mtechub.com/picCategory/getAllPicCategories',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+
+        console.log('Data ', data);
+
+        // Use the data from the API to set the categories
+        const categories = data.AllCategories.map(category => ({
+          label: category.name, // Use the "name" property as the label
+          value: category.id.toString(), // Convert "id" to a string for the value
+        }));
+
+        setCategorySelect(categories); // Update the state with the formatted category data
+
+        console.log('Data Categories', categoriesSelect);
+
+      } else {
+        console.error(
+          'Failed to fetch categories:',
+          response.status,
+          response.statusText,
+        );
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  //---------------------------\\
 
   //-----------------\\
 
@@ -133,33 +213,12 @@ export default function UploadUpdatePicScreen({navigation}) {
     setIsTextInputActive(false);
   };
 
-  const TakeImageFromCamera = () => {
-    ImageCropPicker.openCamera({
-      width: 300,
-      height: 500,
-    })
-      .then(response => {
-        console.log(response);
-      })
-      .catch(error => console.log(error));
-  };
-  const TakeImageFromGallery = () => {
-    ImageCropPicker.openPicker({
-      width: 300,
-      height: 500,
-    })
-      .then(response => {
-        console.log(response);
-      })
-      .catch(error => console.log(error));
-  };
-
   const takePhotoFromCamera = async value => {
     setSelectedItem(value);
     launchCamera(
       {
         mediaType: 'photo',
-        videoQuality: 'medium',
+        photoQuality: 'medium',
       },
       response => {
         console.log('image here', response);
@@ -167,6 +226,7 @@ export default function UploadUpdatePicScreen({navigation}) {
           if (response.assets && response.assets.length > 0) {
             setImageUri(response.assets[0].uri);
             console.log('response', response.assets[0].uri);
+            setImageInfo(response.assets[0]);
           } else if (response.uri) {
             // Handle the case when no assets are present (e.g., for videos)
             setImageUri(response.uri);
@@ -183,10 +243,12 @@ export default function UploadUpdatePicScreen({navigation}) {
     launchImageLibrary({mediaType: 'photo'}, response => {
       console.log('image here', response);
       if (!response.didCancel && response.assets.length > 0) {
+        console.log('Response', response.assets[0]);
         setImageUri(response.assets[0].uri);
+        setImageInfo(response.assets[0]);
       }
 
-      console.log('response', imageUri);
+      console.log('response', imageInfo);
 
       ref_RBSheetCamera.current.close();
     });
@@ -208,6 +270,155 @@ export default function UploadUpdatePicScreen({navigation}) {
 
   const dismissSnackbar = () => {
     setSnackbarVisible(true);
+  };
+
+
+  const checkUpdate = async () => {
+    const cloudinaryUrl = 'http://res.cloudinary.com';
+    console.log('Image Info', imageInfo?.uri);
+    console.log('Data Fetched', dataFetched);
+    if (
+      dataFetched && // Check if data has been fetched
+      imageInfo &&
+      imageInfo.uri &&
+      imageInfo.uri.startsWith(cloudinaryUrl)
+    ) {
+      uploadXpiVideoWithOutAnyVideoChange();
+    } else {
+      handleUploadVideoC()
+    }
+  };
+
+  // image upload 
+  const handleUploadVideoC = data1 => {
+    setLoading(true);
+    const uri = imageInfo.uri;
+    const type = imageInfo.type;
+    const name = imageInfo.fileName;
+    const sourceImage = {uri, type, name};
+    console.log('Source Image', sourceImage);
+    const dataImage = new FormData();
+    dataImage.append('file', sourceImage);
+    dataImage.append('upload_preset', 'e6zfilan'); // Use your Cloudinary upload preset
+    dataImage.append('cloud_name', 'dxfdrtxi3'); // Use your Cloudinary cloud name
+
+    fetch('https://api.cloudinary.com/v1_1/dxfdrtxi3/image/upload', {
+      method: 'POST',
+      body: dataImage,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        setImageUrl(data.url); // Store the Cloudinary video URL in your state
+        uploadXpiVideoWithPicChange(data.url)
+        //uploadVideo(data.url)
+        //uploadXpiVideo(data.url);
+        console.log('Image Url', data);
+      })
+      .catch(err => {
+        setLoading(false);
+        console.log('Error While Uploading Video', err);
+      });
+  };
+
+
+  const uploadXpiVideoWithPicChange = async (data) => {
+    console.log("Image", data);
+    const token = authToken;
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/picTour/updatePicTour';
+
+    const requestData = {
+      id: receivedData?.pic_tour_id,
+      name: profileName,
+      image: data,
+      description: description,
+      pic_category: categoryId,
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`, // Use the provided token
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response of Videos:', data);
+        setLoading(false);
+        handleUpdatePassword();
+
+        // Handle the response data as needed
+      } else {
+        setLoading(false);
+
+        console.error(
+          'Failed to upload video:',
+          response.status,
+          response.statusText,
+        );
+        // Handle the error
+      }
+    } catch (error) {
+      console.error('API Request Error:', error);
+      setLoading(false);
+
+      // Handle the error
+    }
+  };
+
+
+  const uploadXpiVideoWithOutAnyVideoChange = async () => {
+    const token = authToken;
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/picTour/updatePicTour';
+
+    const requestData = {
+      id: receivedData?.pic_tour_id,
+      name: profileName,
+      image: receivedData?.image,
+      description: description,
+      pic_category: categoryId,
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`, // Use the provided token
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response of Videos:', data);
+        setLoading(false);
+        handleUpdatePassword();
+
+        // Handle the response data as needed
+      } else {
+        setLoading(false);
+
+        console.error(
+          'Failed to upload video:',
+          response.status,
+          response.statusText,
+        );
+        // Handle the error
+      }
+    } catch (error) {
+      console.error('API Request Error:', error);
+      setLoading(false);
+
+      // Handle the error
+    }
   };
 
   return (
@@ -236,7 +447,7 @@ export default function UploadUpdatePicScreen({navigation}) {
             borderRadius: wp(8),
             marginHorizontal: wp(23),
           }}>
-          {imageUri !== null && (
+          {imageInfo !== null && (
             <Image
               style={{
                 position: 'absolute',
@@ -249,7 +460,7 @@ export default function UploadUpdatePicScreen({navigation}) {
                 borderRadius: wp(8),
                 resizeMode: 'contain',
               }}
-              source={{uri: imageUri}}
+              source={{uri: imageInfo.uri}}
             />
           )}
           <TouchableOpacity
@@ -276,7 +487,7 @@ export default function UploadUpdatePicScreen({navigation}) {
               Change Pic
             </Text>
           </TouchableOpacity>
-          {imageUri == null && (
+          {imageInfo == null && (
             <Image
               style={{
                 flex: 1,
@@ -294,6 +505,7 @@ export default function UploadUpdatePicScreen({navigation}) {
         <TextInput
           mode="outlined"
           label="Pic Name"
+          value={profileName}
           outlineStyle={{borderRadius:wp(3)}}
           onChangeText={text => setProfileName(text)}
           style={styles.ti}
@@ -333,7 +545,7 @@ export default function UploadUpdatePicScreen({navigation}) {
             // inputSearchStyle={styles.inputSearchStyle}
             // iconStyle={styles.iconStyle}
             value={category}
-            data={Category}
+            data={categoriesSelect}
             search={false}
             maxHeight={200}
             labelField="label"
@@ -343,7 +555,7 @@ export default function UploadUpdatePicScreen({navigation}) {
             onFocus={() => setIsFocus(true)}
             onBlur={() => setIsFocus(false)}
             onChange={item => {
-              setCategory(item.value);
+              setCategoryId(item.value);
               setIsFocus(false);
             }}
             renderRightIcon={() => (
@@ -384,7 +596,8 @@ export default function UploadUpdatePicScreen({navigation}) {
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-              handleUpdatePassword()
+              checkUpdate()
+              //handleUpdatePassword()
               //ref_RBSheetCamera.current.open();
               //navigation.navigate('Profile_image');
             }}
