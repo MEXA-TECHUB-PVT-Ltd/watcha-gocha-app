@@ -682,7 +682,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
   //--------------------Video---------------------------\\
 
 
-  const [selectedItemVideoId, setSelectedItemVideoId] = useState(8);
+  const [selectedItemVideoId, setSelectedItemVideoId] = useState(null);
 
   const [loading, setLoading] = useState(false);
 
@@ -710,10 +710,17 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
 
   const ref_RBSheetCamera = useRef(null);
 
-  useEffect(() => {
-    // Make the API request and update the 'data' state
-    fetchVideos();
-  }, [selectedItemVideoId]);
+
+ useEffect(() => {
+    // Check if it's the initial load (selectedItemId is not set yet)
+    if (selectedItemVideoId === null) {
+      setSelectedItemVideoId(16);
+    } else {
+      // Fetch data based on the updated selectedItemId
+      fetchVideos();
+    }
+  }, [selectedItemVideoId, isFocused]);
+  
 
   const fetchVideos = async () => {
     // Simulate loading
@@ -797,7 +804,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
 
     try {
       const response = await fetch(
-        `https://watch-gotcha-be.mtechub.com/top/app/top_video/6`,
+        `https://watch-gotcha-be.mtechub.com/top/app/top_video/${selectedItemVideoId}`,
         {
           method: 'GET',
           headers: {
@@ -864,7 +871,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
 
     try {
       const response = await fetch(
-        'https://watch-gotcha-be.mtechub.com/videoCategory/getAllVideoCategories?page=1&limit=5',
+        'https://watch-gotcha-be.mtechub.com/videoCategory/getAllVideoCategories',
         {
           method: 'GET',
           headers: {
@@ -874,8 +881,8 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
       );
 
       const result = await response.json();
-      console.log('Search Results', result.AllCategories);
-      setSearches(result.AllCategories); // Update the state with the fetched data
+      console.log('Search Results of Dashboard', result.AllCategories);
+      setSearches(result.AllCategories.reverse()); // Update the state with the fetched data
 
       await fetchTrendingVideos(result);
     } catch (error) {
@@ -1802,61 +1809,9 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
           </View>
         </View>
 
-        <View style={{height: hp(23)}}>
-          <View style={{marginTop: hp(1), height: '100%'}}>
-            {loadingDisc === true ? (
-              <View
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <ActivityIndicator size="large" color="#FACA4E" />
-              </View>
-            ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsVerticalScrollIndicator={false}
-                data={newsData}
-                horizontal
-                //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableDiscApps(item)}
-              />
-            )}
-          </View>
-        </View>
+     
 
-        <View style={{height: hp(23)}}>
-          <View style={{marginTop: hp(1), height: '100%'}}>
-            {loadingDisc === true ? (
-              <View
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <ActivityIndicator size="large" color="#FACA4E" />
-              </View>
-            ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsVerticalScrollIndicator={false}
-                data={newsData}
-                horizontal
-                //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableDiscApps(item)}
-              />
-            )}
-          </View>
-        </View>
+      
 
         <View style={{height: hp(23)}}>
           <View style={{marginTop: hp(1), height: '100%'}}>
@@ -3754,7 +3709,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
             <View
               style={{
                 position: 'absolute',
-                top: hp(14),
+                top: hp(10),
                 left: 7,
                 //height: hp(3),
                 //width: wp(21),
@@ -3778,12 +3733,14 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
 
           <View
             style={{
-              marginTop: hp(5),
+              marginTop: hp(3),
               height: hp(12.8),
-              width: '55%',
+              width: '45%',
               marginHorizontal: wp(1.5),
             }}>
             <Text
+              numberOfLines={5}
+              ellipsizeMode="tail"
               style={{
                 fontSize: hp(1.5),
                 //marginLeft: wp(1),
@@ -3829,7 +3786,23 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 }}>
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
-            ) : (
+            ) : 
+
+            (
+              <>
+                {data?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) :
+            (
               <FlatList
                 style={{flex: 1}}
                 showsHorizontalScrollIndicator={false}
@@ -3838,6 +3811,8 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 //keyExtractor={item => item.id.toString()}
                 renderItem={({item}) => renderAvailableAppsVideo(item)}
               />
+            )}
+              </>
             )}
           </View>
         </TouchableOpacity>
@@ -3868,7 +3843,21 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 }}>
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
-            ) : (
+            ) :
+            (
+              <>
+                {dataLatestVideos?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) : (
               <FlatList
                 style={{flex: 1}}
                 showsHorizontalScrollIndicator={false}
@@ -3877,6 +3866,8 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 // keyExtractor={item => item.id.toString()}
                 renderItem={({item}) => renderAvailableAppsVideo(item)}
               />
+            )}
+            </>
             )}
           </View>
         </View>
@@ -3907,7 +3898,21 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 }}>
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
-            ) : (
+            )  :
+            (
+              <>
+                {dataMostViewedVideos?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) : (
               <FlatList
                 style={{flex: 1}}
                 showsHorizontalScrollIndicator={false}
@@ -3916,6 +3921,8 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 //keyExtractor={item => item.id.toString()}
                 renderItem={({item}) => renderAvailableAppsVideo(item)}
               />
+              )}
+              </>
             )}
           </View>
         </View>
@@ -3946,7 +3953,21 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 }}>
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
-            ) : (
+            ):
+            (
+              <>
+                {dataMostCommentedVideos?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) : (
               <FlatList
                 style={{flex: 1}}
                 showsHorizontalScrollIndicator={false}
@@ -3955,6 +3976,8 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 //keyExtractor={item => item.id.toString()}
                 renderItem={({item}) => renderAvailableAppsVideo(item)}
               />
+            )}
+            </>
             )}
           </View>
         </View>
@@ -4364,7 +4387,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
               thought-provoking video as we delve into the ever-shifting
               landscape of international diplomacy...... */}
 
-              {dataTopVideosMarket.length === 0
+              {dataTopVideosMarket.length === 0 || dataTopVideosMarket === undefined
                 ? 'No Top Pic Shown'
                 : dataTopVideosMarket?.description}
             </Text>

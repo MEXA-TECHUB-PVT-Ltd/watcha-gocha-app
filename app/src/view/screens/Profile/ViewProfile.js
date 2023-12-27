@@ -64,6 +64,9 @@ export default function ViewProfile({navigation}) {
 
   const [name, setName] = useState('');
 
+  const [image, setImage] = useState('');
+
+
   const [email, setEmail] = useState('');
 
   const [loading, setLoading] = useState(false);
@@ -162,6 +165,7 @@ export default function ViewProfile({navigation}) {
       const result = await response.json();
       //console.log('Resultings', result.user);
       setName(result.user.username);
+      setImage(result.user.image);
       setEmail(result.user.email);
       fetchMyVideos(tokens, user);
     } catch (error) {
@@ -1060,7 +1064,7 @@ export default function ViewProfile({navigation}) {
               borderRadius: wp(20) / 2,
             }}>
             <Image
-              source={appImages.profileImg}
+              source={{uri:image}}
               style={{width: '100%', height: '100%', resizeMode: 'contain'}}
             />
           </View>

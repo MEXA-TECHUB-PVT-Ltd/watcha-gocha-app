@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -21,6 +21,7 @@ import Fontiso from 'react-native-vector-icons/Fontisto';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Feater from 'react-native-vector-icons/Feather';
 import Entypo from 'react-native-vector-icons/Entypo';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const Headers = ({
@@ -52,6 +53,88 @@ const Headers = ({
   isFavorite,
   navigation,
 }) => {
+
+
+  const [image, setImage] = useState('');
+
+
+  const [userId, setUserId] = useState('');
+
+
+
+  const [authToken, setAuthToken] = useState([]);
+
+
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchVideos();
+  }, []);
+
+  const fetchVideos = async () => {
+    // Simulate loading
+
+    // Fetch data one by one
+    await getUserID();
+    //await fetchUser();
+    // Once all data is fetched, set loading to false
+  };
+
+  const getUserID = async () => {
+    console.log('AT User Id');
+
+    try {
+      const result = await AsyncStorage.getItem('authToken ');
+      if (result !== null) {
+        setAuthToken(result);
+        await fetchUserId(result);
+        console.log('user token retrieved of profile:', result);
+      }
+
+      /* console.log("User Id", userId);
+      console.log("authToken", authToken); */
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
+
+  const fetchUserId = async tokens => {
+    console.log('Token', tokens);
+    const result3 = await AsyncStorage.getItem('userId ');
+    if (result3 !== null) {
+      setUserId(result3);
+
+      console.log('user id retrieved:', result3);
+      fetchUser(tokens, result3);
+    } else {
+      console.log('result is null', result3);
+    }
+  };
+
+  const fetchUser = async (tokens, user) => {
+    console.log('Came to fetch Id');
+    const token = tokens;
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/user/getUser/${user}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      //console.log('Resultings', result.user);
+      setImage(result?.user?.image);
+    } catch (error) {
+      console.error('Error USER:', error);
+    }
+  };
+
+    
   return (
     <View style={styles.header}>
       {showBackIcon && (
@@ -86,7 +169,7 @@ const Headers = ({
         }}>
 
           <Image
-            source={appImages.profileImg}
+            source={{uri:image}}
             style={styles.profileImgs}
             resizeMode="contain"
           />
@@ -179,8 +262,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     resizeMode: 'contain',
     marginTop: hp(-1),
-    width: wp(68),
-    height: 47,
+    width: wp(100),
+    height: hp(10),
   },
   backArrow: {
     position: 'absolute',

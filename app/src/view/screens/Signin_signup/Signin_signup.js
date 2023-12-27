@@ -393,6 +393,10 @@ const App = ({navigation}) => {
         AsyncStorage.setItem('authToken ', firstResult.token.toString(), () => {
           console.log('authToken successfully of sign in');
         });
+
+        AsyncStorage.setItem('Password', signup_pass, () => {
+          console.log('user password saved successfully');
+        });
       } else {
         setIsLoading(false);
         console.error('No results found.', data.response.result);
@@ -475,6 +479,10 @@ const App = ({navigation}) => {
 
         AsyncStorage.setItem('authToken ', firstResult.token.toString(), () => {
           console.log('authToken successfully of sign in');
+
+          AsyncStorage.setItem('Password', signin_pass, () => {
+            console.log('user password saved successfully');
+          });
         });
 
         navigation.navigate('BottomTabNavigation');

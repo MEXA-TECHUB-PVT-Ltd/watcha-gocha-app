@@ -28,6 +28,8 @@ import {
 } from 'react-native-responsive-screen';
 import {appImages} from '../../../assets/utilities';
 import RBSheet from 'react-native-raw-bottom-sheet';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 
 export default function ProfileSettings({navigation}) {
@@ -38,9 +40,50 @@ export default function ProfileSettings({navigation}) {
 
 
   const goBack=()=>{
-    navigation.replace("Signin_signup");
+   
     ref_RBSheetLogout.current.close();
+
+    logOut();
   }
+
+  const logOut = async  () => {
+    ref_RBSheetLogout.current.close();
+    try {
+      // Get the 'UserToken' key
+      const userTokenKey = 'UserToken';
+      const userToken = await AsyncStorage.getItem(userTokenKey);
+  
+      // Get all keys in AsyncStorage
+      const keys = await AsyncStorage.getAllKeys();
+  
+      // Remove all items corresponding to the retrieved keys, except 'UserToken'
+      const filteredKeys = keys.filter(key => key !== userTokenKey);
+      await AsyncStorage.multiRemove(filteredKeys);
+  
+      // Check if keys are deleted
+      const remainingKeys = await AsyncStorage.getAllKeys();
+  
+      if (remainingKeys.length === 1 && remainingKeys.includes(userTokenKey)) {
+        // Optionally, you can perform additional actions after clearing AsyncStorage
+        // For example, display a success message
+        // Move to the next page (replace 'NextScreen' with your actual screen name)
+        // navigation.replace('SignIn');
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Signin_signup' }],
+        });
+      } else {
+        // Handle the case where keys are not deleted successfully
+        console.log('Failed To Delete Keys');
+      }
+    } catch (error) {
+      // Handle errors, such as AsyncStorage access issues
+      console.error('Error clearing AsyncStorage:', error);
+    }
+    navigation.navigate('Signin_signup');
+  };
+
+  
 
   const shareViaWhatsApp = async () => {
     const shareOptions = {

@@ -32,7 +32,6 @@ import Back from '../../../assets/svg/back.svg';
 
 import RBSheet from 'react-native-raw-bottom-sheet';
 
-
 import CustomButton from '../../../assets/Custom/Custom_Button';
 import {useIsFocused} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -41,18 +40,21 @@ import User from '../../../assets/svg/User.svg';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import styles from './styles';
+import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
 LogBox.ignoreAllLogs();
 
-const App = ({navigation}) => {
+const Profile_image = ({navigation}) => {
   const isFocused = useIsFocused();
 
   useEffect(() => {}, [isFocused]);
 
   const [signin_email, setsignin_email] = useState();
-   
+
   const [userId, setUserId] = useState('');
 
   const [authToken, setAuthToken] = useState('');
+
+  const [snackbarVisible, setsnackbarVisible] = useState(false);
 
   const [selectedItem, setSelectedItem] = useState('');
 
@@ -100,7 +102,6 @@ const App = ({navigation}) => {
 
         console.log('user id retrieved:', result);
       }
-
     } catch (error) {
       // Handle errors here
       console.error('Error retrieving user ID:', error);
@@ -111,8 +112,8 @@ const App = ({navigation}) => {
     setSelectedItem(value);
     launchCamera(
       {
-        mediaType: 'Photo',
-        videoQuality: 'medium',
+        mediaType: 'photo',
+        photoQuality: 'medium',
       },
       response => {
         console.log('image here', response);
@@ -134,7 +135,7 @@ const App = ({navigation}) => {
 
   const choosePhotoFromLibrary = value => {
     setSelectedItem(value);
-    launchImageLibrary({mediaType: 'Photo'}, response => {
+    launchImageLibrary({mediaType: 'photo'}, response => {
       console.log('image here', response);
       if (!response.didCancel && response.assets.length > 0) {
         console.log('Response', response.assets[0]);
@@ -148,19 +149,34 @@ const App = ({navigation}) => {
     });
   };
 
+  const dismissSnackbar = () => {
+    setsnackbarVisible(false);
+  };
 
+  const handleUpdatePassword = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setsnackbarVisible(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setsnackbarVisible(false);
+      navigation.navigate('BottomTabNavigation');
+      
+    }, 3000);
+  };
 
   const upload = async () => {
-    if (
-      imageInfo !== null
-    ) {
+    if (imageInfo !== null) {
       //uploadVideo()
       //uploadVideos()
       const uri = imageInfo.uri;
       const type = imageInfo.type;
       const name = imageInfo.fileName;
       const source = {uri, type, name};
-      console.log("Video Source",source);
+      console.log('Video Source', source);
       handleUploadImage(source);
 
       //uploadVideoCloudinary(imageInfo.uri)
@@ -169,9 +185,9 @@ const App = ({navigation}) => {
     }
   };
 
-  const handleUploadImage = (data) => {
+  const handleUploadImage = data => {
     //setIsLoading(true);
-   
+
     const dataImage = new FormData();
     dataImage.append('file', data);
     dataImage.append('upload_preset', 'e6zfilan'); // Use your Cloudinary upload preset
@@ -190,53 +206,48 @@ const App = ({navigation}) => {
         setImageUrl(data.url); // Store the Cloudinary video URL in your state
         //uploadVideo(data.url)
         //uploadXpiVideo(data.url);
-        console.log("Image Url",data);
-        uploadXpiVideo(data.url)
-
+        console.log('Image Url', data);
+        updateUserName(data.url);
       })
       .catch(err => {
-        setIsLoading(false)
+        setIsLoading(false);
         console.log('Error While Uploading Video', err);
       });
   };
 
-
-  const uploadXpiVideo = async data => {
-    console.log('Image Url', data);
-    //console.log('Image file Type', imageInfo.type);
-    //console.log('Image file Type', imageInfo.fileName);
-
-    console.log('id', userId);
-    
+  const updateUserName = async data => {
+    setIsLoading(true);
+    console.log('TOKEN', authToken);
     const token = authToken;
     const apiUrl = 'https://watch-gotcha-be.mtechub.com/user/uploadImage';
 
-    // Construct the request data as FormData
-    const formData = new FormData();
-
-    formData.append('userId', userId);
-    formData.append('image', data);
+    const requestData = {
+      userId: userId,
+      image: data,
+    };
 
     try {
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`, // Use the provided token
-          'Content-Type': 'multipart/form-data', // Set the content type to FormData
+          'Content-Type': 'application/json',
         },
-        body: formData,
+        body: JSON.stringify(requestData),
       });
 
       if (response.ok) {
-        const responseData = await response.json();
-        console.log('API Response:', responseData);
+        const data = await response.json();
+        console.log('API Response:', data);
         setIsLoading(false);
-        navigation.navigate("BottomTabNavigation")
+        handleUpdatePassword();
+
         // Handle the response data as needed
       } else {
         setIsLoading(false);
+
         console.error(
-          'Failed to upload image:',
+          'Failed to upload video:',
           response.status,
           response.statusText,
         );
@@ -305,10 +316,10 @@ const App = ({navigation}) => {
             customClick={() => {
               setIsLoading(true);
               //setTimeout(() => {
-                //navigation.navigate('BottomTabNavigation');
-                upload()
-                //setIsLoading(false);
-                // Replace 'YourTargetScreen' with the screen you want to navigate to
+              //navigation.navigate('BottomTabNavigation');
+              upload();
+              //setIsLoading(false);
+              // Replace 'YourTargetScreen' with the screen you want to navigate to
               //}, 2000);
             }}
           />
@@ -407,8 +418,15 @@ const App = ({navigation}) => {
           <ActivityIndicator size="large" color="#FACA4E" />
         </View>
       )}
+
+      <CustomSnackbar
+        message={'success'}
+        messageDescription={'Image Uploaded Successfully'}
+        onDismiss={dismissSnackbar} // Make sure this function is defined
+        visible={snackbarVisible}
+      />
     </ScrollView>
   );
 };
 
-export default App;
+export default Profile_image;

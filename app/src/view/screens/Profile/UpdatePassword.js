@@ -2,6 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
+  ActivityIndicator,
   Dimensions,
   ScrollView,
   View,
@@ -21,6 +22,8 @@ import ForgetPasswordImg from '../../../assets/images/forget.png';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons';
 
 import {appImages} from '../../../assets/utilities/index';
@@ -34,7 +37,6 @@ import Back from '../../../assets/svg/back.svg';
 
 import CustomButton from '../../../assets/Custom/Custom_Button';
 import {useIsFocused} from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import SwitchSelector from 'react-native-switch-selector';
 import User from '../../../assets/svg/User.svg';
 import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
@@ -42,9 +44,54 @@ import Headers from '../../../assets/Custom/Headers';
 LogBox.ignoreAllLogs();
 
 const UpdatePassword = ({navigation}) => {
+  const [oldPasswordAccount, setPasswordAccount] = useState('');
+  const [userId, setUserId] = useState('');
+  const [authToken, setAuthToken] = useState('');
+
   const isFocused = useIsFocused();
 
-  useEffect(() => {}, [isFocused]);
+  useEffect(() => {
+    fetchVideos();
+  }, [isFocused]);
+
+  const fetchVideos = async () => {
+    // Simulate loading
+    setIsLoading(true);
+
+    await getUserID();
+    // Fetch data one by one
+    // Once all data is fetched, set loading to false
+    setIsLoading(false);
+  };
+
+  const getUserID = async () => {
+    console.log("Id's");
+    try {
+
+      const result1 = await AsyncStorage.getItem('authToken ');
+      if (result1 !== null) {
+        setAuthToken(result1);
+        console.log('user token retrieved:', result1);
+      }
+
+      const result3 = await AsyncStorage.getItem('userId ');
+      if (result3 !== null) {
+        setUserId(result3);
+  
+        console.log('user id retrieved:', result3);
+      }
+      const passwordResult = await AsyncStorage.getItem('Password');
+      if (passwordResult !== null) {
+        setPasswordAccount(passwordResult);
+        console.log('password recieved', passwordResult);
+      } else {
+        console.log('no password recieved');
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
 
   const [newPassword, setNewPassword] = useState('');
   const [snackbarVisible, setSnackbarVisible] = useState(false);
@@ -65,7 +112,8 @@ const UpdatePassword = ({navigation}) => {
   const [confirm, setconfirm_pass] = useState();
 
   const [signin_ShowPassword, setsignin_ShowPassword] = useState(true);
-  const [signin_ConfirmShowPassword, setsignin_ConfirmShowPassword] = useState(true);
+  const [signin_ConfirmShowPassword, setsignin_ConfirmShowPassword] =
+    useState(true);
 
   const [signin_ShowPassword1, setsignin_ShowPassword1] = useState(true);
   const [signin_ShowPassword2, setsignin_ShowPassword2] = useState(true);
@@ -81,15 +129,17 @@ const UpdatePassword = ({navigation}) => {
   const [isTextInputActive4, setIsTextInputActive4] = useState(false);
   const [isTextInputActive5, setIsTextInputActive5] = useState(false);
 
-  const [isTextInputActiveConfirmPass, setIsTextInputActiveConfirmPass] = useState(false);
+  const [isTextInputActiveConfirmPass, setIsTextInputActiveConfirmPass] =
+    useState(false);
 
-  const [isTextInputActiveConfirmPassOld, setIsTextInputActiveConfirmPassOld] = useState(false);
-
+  const [isTextInputActiveConfirmPassOld, setIsTextInputActiveConfirmPassOld] =
+    useState(false);
 
   //old password
   const [OldPassword, setOldPassword] = useState();
 
-  const [oldPassword_ShowPassword, setOldPassword_ShowPassword] = useState(true);
+  const [oldPassword_ShowPassword, setOldPassword_ShowPassword] =
+    useState(true);
 
   //--------------\\
 
@@ -101,33 +151,29 @@ const UpdatePassword = ({navigation}) => {
     setIsTextInputActive(false);
   };
 
-
   const handleFocus1 = () => {
     setIsTextInputActive1(true);
   };
-
 
   const handleBlur1 = () => {
     setIsTextInputActive1(false);
   };
 
   const handleFocus2 = () => {
-    setIsTextInputActiveConfirmPass(true)
+    setIsTextInputActiveConfirmPass(true);
   };
 
   const handleBlur2 = () => {
-    setIsTextInputActiveConfirmPass(false)
-
+    setIsTextInputActiveConfirmPass(false);
   };
   // Old Pass
 
   const handleFocusOldPass = () => {
-    setIsTextInputActiveConfirmPassOld(true)
+    setIsTextInputActiveConfirmPassOld(true);
   };
 
   const handleBlurOldPass = () => {
-    setIsTextInputActiveConfirmPassOld(false)
-
+    setIsTextInputActiveConfirmPassOld(false);
   };
   const handleFocus3 = () => {
     setIsTextInputActive3(true);
@@ -175,9 +221,21 @@ const UpdatePassword = ({navigation}) => {
     setIsConfirmPasswordActive(true);
   };
 
+  const [snackbarVisibleConfirmPassword, setSnackbarVisibleConfirmPassword] =
+    useState(false);
+
+  const [
+    snackbarVisibleConfirmPasswordOld,
+    setSnackbarVisibleConfirmPasswordOld,
+  ] = useState(false);
+
+  const [
+    snackbarVisibleConfirmPasswordAlert,
+    setSnackbarVisibleConfirmPasswordAlert,
+  ] = useState(false);
 
   //--------------------------\\
-  
+
   const handleUpdatePassword = async () => {
     // Perform the password update logic here
     // For example, you can make an API request to update the password
@@ -188,13 +246,11 @@ const UpdatePassword = ({navigation}) => {
     // Automatically hide the Snackbar after 3 seconds
     setTimeout(() => {
       setSnackbarVisible(false);
-      navigation.goBack()
+      navigation.goBack();
     }, 3000);
   };
 
-  
   //----------------------------\\
-
 
   const dismissSnackbar = () => {
     setSnackbarVisible(false);
@@ -204,176 +260,348 @@ const UpdatePassword = ({navigation}) => {
     setIsConfirmPasswordActive(false);
   };
 
+  //-------------------------\\
+
+  const dismissSnackbarConfirmPassword = () => {
+    setSnackbarVisibleConfirmPassword(true);
+  };
+
+  const handleUpdateConfirmPassword = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setSnackbarVisibleConfirmPassword(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setSnackbarVisibleConfirmPassword(false);
+      //navigation.navigate('SignIn');
+    }, 3000);
+  };
+
+  const dismissSnackbarConfirmPasswordOld = () => {
+    setSnackbarVisibleConfirmPasswordOld(false);
+  };
+
+  const handleUpdateConfirmPasswordOld = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setSnackbarVisibleConfirmPasswordOld(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setSnackbarVisibleConfirmPassword(false);
+      //navigation.navigate('SignIn');
+    }, 3000);
+  };
+
+  //------------------\\
+
+  const dismissSnackbarConfirmPasswordAlert = () => {
+    setSnackbarVisibleConfirmPasswordAlert(false);
+  };
+
+  const handleUpdateConfirmPasswordAlert = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setSnackbarVisibleConfirmPasswordAlert(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setSnackbarVisibleConfirmPasswordAlert(false);
+      //navigation.navigate('SignIn');
+    }, 3000);
+  };
+
+
+
+  //--------------------------\\
+
+
+  const checkPassword = () => {
+    console.log('Came to confirm password');
+
+    if (signin_pass !== confirm) {
+      handleUpdateConfirmPassword();
+    } else if (
+      OldPassword !== '' &&
+      signin_pass !== '' &&
+      confirm !== ''
+    ) {
+
+      if (OldPassword !== oldPasswordAccount) {
+        handleUpdateConfirmPasswordOld()
+      }else{
+        resetPassword();
+      }
+    }  else {
+      handleUpdateConfirmPasswordAlert();
+    }
+  };
+
+  const resetPassword = async data => {
+
+    const token = authToken
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/user/changePassword';
+
+    const requestData = {
+      id: userId,
+      currentPassword: oldPasswordAccount,
+      newPassword: signin_pass,
+      role: "user",
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`, // Use the provided token
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data);
+        setIsLoading(false);
+        handleUpdatePassword();
+
+        // Handle the response data as needed
+      } else {
+        setIsLoading(false);
+
+        console.error(
+          'Failed to upload video:',
+          response.status,
+          response.statusText,
+        );
+        // Handle the error
+      }
+    } catch (error) {
+      console.error('API Request Error:', error);
+      setIsLoading(false);
+
+      // Handle the error
+    }
+  };
 
   return (
-    <ScrollView style={{backgroundColor:'white'}} contentContainerStyle={{flexGrow: 1}}>
+    <ScrollView
+      style={{backgroundColor: 'white'}}
+      contentContainerStyle={{flexGrow: 1}}>
       <StatusBar barStyle={'dark-content'} backgroundColor={'transparent'} />
-      
-      <View style={{marginTop:hp(5)}}>
 
-      <Headers showBackIcon={true} onPress={()=>navigation.goBack()} showText={true} text={'Update Password'}/>
+      <View style={{marginTop: hp(5)}}>
+        <Headers
+          showBackIcon={true}
+          onPress={() => navigation.goBack()}
+          showText={true}
+          text={'Update Password'}
+        />
       </View>
-      <View style={{marginTop:hp(5)}}>
-          <TextInput
-            mode="outlined"
-            label="Old Password"
-            onChangeText={text => setOldPassword(text)}
-            style={styles.ti}
-            placeholderTextColor={'#646464'}
-            outlineColor="#0000001F"
-            activeOutlineColor="#FACA4E"
-            secureTextEntry={oldPassword_ShowPassword}
-            onFocus={handleFocusConfirmPassword}
-            onBlur={handleBlurConfirmPassword}
-            left={
-              <TextInput.Icon
-                icon={() => (
-                  <MaterialCommunityIcons
-                    name={'lock-outline'}
-                    size={23}
-                    color={isConfirmActive == true ? '#FACA4E' : '#64646485'}
-                  />
-                )}
-              />
-            }
-          />
-          <TouchableOpacity
-            onPress={handleTogglePasswordVisibilityOld}
+      <View style={{marginTop: hp(5)}}>
+        <TextInput
+          mode="outlined"
+          label="Old Password"
+          value={OldPassword}
+          onChangeText={text => setOldPassword(text)}
+          style={styles.ti}
+          placeholderTextColor={'#646464'}
+          outlineColor="#0000001F"
+          activeOutlineColor="#FACA4E"
+          secureTextEntry={oldPassword_ShowPassword}
+          onFocus={handleFocusConfirmPassword}
+          onBlur={handleBlurConfirmPassword}
+          left={
+            <TextInput.Icon
+              icon={() => (
+                <MaterialCommunityIcons
+                  name={'lock-outline'}
+                  size={23}
+                  color={isConfirmActive == true ? '#FACA4E' : '#64646485'}
+                />
+              )}
+            />
+          }
+        />
+        <TouchableOpacity
+          onPress={handleTogglePasswordVisibilityOld}
+          style={[
+            styles.hs,
+            {
+              borderColor: oldPassword_ShowPassword ? '#646464' : '#FACA4E',
+              backgroundColor: oldPassword_ShowPassword
+                ? '#64646412'
+                : '#FF660012',
+            },
+          ]}>
+          <Text
             style={[
-              styles.hs,
-              {
-                borderColor: oldPassword_ShowPassword ? '#646464' : '#FACA4E',
-                backgroundColor: oldPassword_ShowPassword
-                  ? '#64646412'
-                  : '#FF660012',
-              },
+              styles.txt,
+              {color: oldPassword_ShowPassword ? '#646464' : '#FACA4E'},
             ]}>
-            <Text
-              style={[
-                styles.txt,
-                {color: oldPassword_ShowPassword ? '#646464' : '#FACA4E'},
-              ]}>
-              {oldPassword_ShowPassword ? 'Show' : 'Hide'}
-            </Text>
-          </TouchableOpacity>
-        </View>
+            {oldPassword_ShowPassword ? 'Show' : 'Hide'}
+          </Text>
+        </TouchableOpacity>
+      </View>
 
-        
-        <View>
-          <TextInput
-            mode="outlined"
-            label="New Password"
-            onChangeText={text => setsignin_pass(text)}
-            style={styles.ti}
-            placeholderTextColor={'#646464'}
-            outlineColor="#0000001F"
-            activeOutlineColor="#FACA4E"
-            secureTextEntry={signin_ShowPassword}
-            onFocus={handleFocus1}
-            onBlur={handleBlur1}
-            left={
-              <TextInput.Icon
-                icon={() => (
-                  <MaterialCommunityIcons
-                    name={'lock-outline'}
-                    size={23}
-                    color={isTextInputActive1 == true ? '#FACA4E' : '#64646485'}
-                  />
-                )}
-              />
-            }
-          />
-          <TouchableOpacity
-            onPress={handleTogglePasswordVisibility}
+      <View>
+        <TextInput
+          mode="outlined"
+          label="New Password"
+          value={signin_pass}
+          onChangeText={text => setsignin_pass(text)}
+          style={styles.ti}
+          placeholderTextColor={'#646464'}
+          outlineColor="#0000001F"
+          activeOutlineColor="#FACA4E"
+          secureTextEntry={signin_ShowPassword}
+          onFocus={handleFocus1}
+          onBlur={handleBlur1}
+          left={
+            <TextInput.Icon
+              icon={() => (
+                <MaterialCommunityIcons
+                  name={'lock-outline'}
+                  size={23}
+                  color={isTextInputActive1 == true ? '#FACA4E' : '#64646485'}
+                />
+              )}
+            />
+          }
+        />
+        <TouchableOpacity
+          onPress={handleTogglePasswordVisibility}
+          style={[
+            styles.hs,
+            {
+              borderColor: signin_ShowPassword ? '#646464' : '#FACA4E',
+              backgroundColor: signin_ShowPassword ? '#64646412' : '#FF660012',
+            },
+          ]}>
+          <Text
             style={[
-              styles.hs,
-              {
-                borderColor: signin_ShowPassword ? '#646464' : '#FACA4E',
-                backgroundColor: signin_ShowPassword
-                  ? '#64646412'
-                  : '#FF660012',
-              },
+              styles.txt,
+              {color: signin_ShowPassword ? '#646464' : '#FACA4E'},
             ]}>
-            <Text
-              style={[
-                styles.txt,
-                {color: signin_ShowPassword ? '#646464' : '#FACA4E'},
-              ]}>
-              {signin_ShowPassword ? 'Show' : 'Hide'}
-            </Text>
-          </TouchableOpacity>
-        </View>
+            {signin_ShowPassword ? 'Show' : 'Hide'}
+          </Text>
+        </TouchableOpacity>
+      </View>
 
-
-
-
-        <View>
-          <TextInput
-            mode="outlined"
-            label="Confirm Password"
-            onChangeText={text => setconfirm_pass(text)}
-            style={styles.ti}
-            placeholderTextColor={'#646464'}
-            outlineColor="#0000001F"
-            activeOutlineColor="#FACA4E"
-            secureTextEntry={signin_ConfirmShowPassword}
-            onFocus={handleFocus2}
-            onBlur={handleBlur2}
-            left={
-              <TextInput.Icon
-                icon={() => (
-                  <MaterialCommunityIcons
-                    name={'lock-outline'}
-                    size={23}
-                    color={isTextInputActiveConfirmPass == true ? '#FACA4E' : '#64646485'}
-                  />
-                )}
-              />
-            }
-          />
-          <TouchableOpacity
-            onPress={handleTogglePasswordVisibilityConfirm}
+      <View>
+        <TextInput
+          mode="outlined"
+          label="Confirm Password"
+          value={confirm}
+          onChangeText={text => setconfirm_pass(text)}
+          style={styles.ti}
+          placeholderTextColor={'#646464'}
+          outlineColor="#0000001F"
+          activeOutlineColor="#FACA4E"
+          secureTextEntry={signin_ConfirmShowPassword}
+          onFocus={handleFocus2}
+          onBlur={handleBlur2}
+          left={
+            <TextInput.Icon
+              icon={() => (
+                <MaterialCommunityIcons
+                  name={'lock-outline'}
+                  size={23}
+                  color={
+                    isTextInputActiveConfirmPass == true
+                      ? '#FACA4E'
+                      : '#64646485'
+                  }
+                />
+              )}
+            />
+          }
+        />
+        <TouchableOpacity
+          onPress={handleTogglePasswordVisibilityConfirm}
+          style={[
+            styles.hs,
+            {
+              borderColor: signin_ConfirmShowPassword ? '#646464' : '#FACA4E',
+              backgroundColor: signin_ConfirmShowPassword
+                ? '#64646412'
+                : '#FF660012',
+            },
+          ]}>
+          <Text
             style={[
-              styles.hs,
-              {
-                borderColor: signin_ConfirmShowPassword ? '#646464' : '#FACA4E',
-                backgroundColor: signin_ConfirmShowPassword
-                  ? '#64646412'
-                  : '#FF660012',
-              },
+              styles.txt,
+              {color: signin_ConfirmShowPassword ? '#646464' : '#FACA4E'},
             ]}>
-            <Text
-              style={[
-                styles.txt,
-                {color: signin_ConfirmShowPassword ? '#646464' : '#FACA4E'},
-              ]}>
-              {signin_ConfirmShowPassword ? 'Show' : 'Hide'}
-            </Text>
-          </TouchableOpacity>
-        </View>
- 
+            {signin_ConfirmShowPassword ? 'Show' : 'Hide'}
+          </Text>
+        </TouchableOpacity>
+      </View>
 
-
-
-
-
-
-
-
-        <View style={{marginTop: '90%', alignSelf: 'center'}}>
-          <CustomButton
-            title="Update"
-            load={loading}
-            // checkdisable={inn == '' && cm == '' ? true : false}
-            customClick={() => {
-              handleUpdatePassword()
-            }}
-          />
-        </View>
+      <View style={{marginTop: '90%', alignSelf: 'center'}}>
+        <CustomButton
+          title="Update"
+          load={loading}
+          // checkdisable={inn == '' && cm == '' ? true : false}
+          customClick={() => {
+           checkPassword()
+          }}
+        />
+      </View>
 
       <CustomSnackbar
         message={'success'}
         messageDescription={'Password Reset Successfully'}
+        onDismiss={dismissSnackbar} // Make sure this function is defined
+        visible={snackbarVisible}
+      />
+
+      {loading && (
+        <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ActivityIndicator size="large" color="#FACA4E" />
+        </View>
+      )}
+
+      <CustomSnackbar
+        message={'Alert!'}
+        messageDescription={'Please Match The Below Passwords'}
+        onDismiss={dismissSnackbarConfirmPassword} // Make sure this function is defined
+        visible={snackbarVisibleConfirmPassword}
+      />
+
+      <CustomSnackbar
+        message={'Alert!'}
+        messageDescription={'Kindly Fill All Fields'}
+        onDismiss={dismissSnackbarConfirmPasswordAlert} // Make sure this function is defined
+        visible={snackbarVisibleConfirmPasswordAlert}
+      />
+
+      <CustomSnackbar
+        message={'Alert!'}
+        messageDescription={'Old Password Doesnot Match'}
+        onDismiss={dismissSnackbarConfirmPasswordOld} // Make sure this function is defined
+        visible={snackbarVisibleConfirmPasswordOld}
+      />
+
+      <CustomSnackbar
+        message={'Success'}
+        messageDescription={'Password Changed Successfully'}
         onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackbarVisible}
       />
