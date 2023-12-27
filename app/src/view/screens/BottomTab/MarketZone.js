@@ -22,6 +22,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useIsFocused} from '@react-navigation/native';
 
 import Headers from '../../../assets/Custom/Headers';
 import {appImages} from '../../../assets/utilities';
@@ -35,6 +36,8 @@ export default function MarketZone({navigation}) {
   const [authToken, setAuthToken] = useState('');
 
   const [dataElectronics, setDataElectronics] = useState(null);
+
+  const isFocused = useIsFocused();
 
   const [dataVehicles, setDataVehicles] = useState(null);
 
@@ -64,8 +67,12 @@ export default function MarketZone({navigation}) {
 
   useEffect(() => {
     // Make the API request and update the 'data' state
+    if (selectedItemId === null) {
+      setSelectedItemId("Africa");
+    } else {
     fetchVideos();
-  }, [selectedItemId]);
+    }
+  }, [selectedItemId,  isFocused]);
 
   const fetchVideos = async () => {
     // Simulate loading
@@ -653,7 +660,7 @@ export default function MarketZone({navigation}) {
               thought-provoking video as we delve into the ever-shifting
               landscape of international diplomacy...... */}
 
-              {dataTopVideos.length === 0
+              {dataTopVideos=== undefined ||dataTopVideos.length === 0
                 ? 'No Top Pic Shown'
                 : dataTopVideos?.description}
             </Text>

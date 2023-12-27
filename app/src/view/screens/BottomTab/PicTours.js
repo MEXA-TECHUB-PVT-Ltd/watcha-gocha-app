@@ -32,7 +32,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-
+import {useIsFocused} from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -47,6 +47,7 @@ export default function PicTours({navigation}) {
 
   const [selectedItemMarketId, setSelectedItemMarketId] = useState(null);
 
+  const isFocused = useIsFocused();
   //pic
   const [selectedItemId, setSelectedItemId] = useState(8);
 
@@ -73,7 +74,7 @@ export default function PicTours({navigation}) {
   useEffect(() => {
     // Make the API request and update the 'data' state
     fetchVideos();
-  }, [selectedItemPicsId]);
+  }, [selectedItemPicsId, isFocused]);
 
   const fetchVideos = async () => {
     // Simulate loading
