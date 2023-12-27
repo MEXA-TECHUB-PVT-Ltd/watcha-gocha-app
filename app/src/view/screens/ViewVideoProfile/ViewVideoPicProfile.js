@@ -85,7 +85,6 @@ export default function ViewVideoPicProfile({navigation, route}) {
 
   const [authToken, setAuthToken] = useState([]);
 
-
   const refSlide = useRef();
 
   const bottomSheetRef = useRef(null);

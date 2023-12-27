@@ -850,6 +850,33 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
             height: hp(20),
             width: wp(53),
           }}>
+            {isLoading === true ? (
+              <View
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <ActivityIndicator size="large" color="#FACA4E" />
+              </View>
+            ) : (
+              <>
+                {topData?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No Top Apps
+                    </Text>
+                  </View>
+                ) : (
           <FlatList
             style={{margin: 8, flex: 1}}
             //contentContainerStyle={{marginBottom:hp(5)}}
@@ -859,6 +886,9 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
             numColumns={3} // Set the number of columns to 3
             renderItem={({item}) => renderAvailableApps(item)}
           />
+          )}
+          </>
+        )}
         </View>
 
         <View style={{marginTop: hp(1), height: hp(25)}}>
@@ -1067,7 +1097,25 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
               }}>
               <ActivityIndicator size="large" color="#FACA4E" />
             </View>
-          ) : (
+          ) :
+
+          (
+            <>
+              {favouriteData?.length === 0 ? (
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                    No Favourite Apps
+                  </Text>
+                </View>
+              ) :
+          
+          
+          (
             <FlatList
               data={favouriteData}
               horizontal
@@ -1083,6 +1131,8 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
               }}
             />
           )}
+          </>
+            )}
         </View>
 
         <View style={{marginTop: hp(1), marginBottom: hp(5), height: hp(25)}}>

@@ -1,6 +1,7 @@
 import {
   StyleSheet,
   FlatList,
+  ActivityIndicator,
   Text,
   StatusBar,
   KeyboardAvoidingView,
@@ -9,7 +10,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import Back from '../../../assets/svg/back.svg';
 import {appImages} from '../../../assets/utilities/index';
 import {
@@ -28,6 +29,7 @@ import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SelectCountry, Dropdown} from 'react-native-element-dropdown';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import CPaperInput from './../../../assets/Custom/CPaperInput';
 import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
@@ -35,13 +37,18 @@ import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
 export default function UpdateProfile({navigation}) {
   const [selectedItem, setSelectedItem] = useState('');
 
+  const [imageInfo, setImageInfo] = useState(null);
+
   const [userName, setUserName] = useState('');
 
-  const [email, setEmail] = useState('JohnDoe@gmail.com');
+  const [email, setEmail] = useState('');
 
   const [price, setPrice] = useState('');
 
   const [snackbarVisible, setsnackbarVisible] = useState(false);
+
+  const [snackbarVisibleAlert, setsnackbarVisibleAlert] = useState(false);
+
 
   const [isTextInputActive, setIsTextInputActive] = useState(false);
 
@@ -59,6 +66,117 @@ export default function UpdateProfile({navigation}) {
   const [imageUri, setImageUri] = useState(null);
 
   const [isFocus, setIsFocus] = useState(false);
+
+  //------------------------------------\\
+
+  const [showFullContent, setShowFullContent] = useState(false);
+
+  const [pastedURL, setPastedURL] = useState(
+    'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+  );
+
+  const [comments, setComments] = useState([]);
+
+  const [snackbarDeleteVisible, setsnackbarDeleteVisible] = useState(false);
+
+  const [likes, setLikes] = useState(null);
+
+  const [commentsCount, setCommentsCount] = useState(null);
+
+  const [showReply, setShowReply] = useState(false);
+
+  const [loading, setLoading] = useState(false);
+
+  const [userId, setUserId] = useState('');
+
+  const [showMenu, setShowMenu] = useState(true);
+
+  const [progress, setProgress] = useState(0);
+
+  const [isBottomSheetExpanded, setIsBottomSheetExpanded] = useState(false);
+
+  const ref_Comments = useRef(null);
+
+  const [authToken, setAuthToken] = useState([]);
+
+  //------------------------------------\\
+
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchVideos();
+  }, []);
+
+  const fetchVideos = async () => {
+    // Simulate loading
+
+    // Fetch data one by one
+    await getUserID();
+    //await fetchUser();
+    // Once all data is fetched, set loading to false
+  };
+
+  const getUserID = async () => {
+    console.log('AT User Id');
+
+    setLoading(true);
+    try {
+      const result = await AsyncStorage.getItem('authToken ');
+      if (result !== null) {
+        setAuthToken(result);
+        await fetchUserId(result);
+        console.log('user token retrieved of profile:', result);
+      }
+
+      /* console.log("User Id", userId);
+      console.log("authToken", authToken); */
+    } catch (error) {
+      // Handle errors here
+      setLoading(false);
+      console.error('Error retrieving user ID:', error);
+    }
+  };
+
+  const fetchUserId = async tokens => {
+    console.log('Token', tokens);
+    const result3 = await AsyncStorage.getItem('userId ');
+    if (result3 !== null) {
+      setUserId(result3);
+
+      console.log('user id retrieved:', result3);
+      fetchUser(tokens, result3);
+    } else {
+      setLoading(false);
+      console.log('result is null', result3);
+    }
+  };
+
+  const fetchUser = async (tokens, user) => {
+    console.log('Came to fetch Id');
+    const token = tokens;
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/user/getUser/${user}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      //console.log('Resultings', result.user);
+      setUserName(result.user.username);
+      setEmail(result.user.email);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.error('Error USER:', error);
+    }
+  };
+
+  //-------------------------------------\\
 
   const ref_RBSheetCamera = useRef(null);
 
@@ -100,25 +218,22 @@ export default function UpdateProfile({navigation}) {
     setsnackbarVisible(false);
   };
 
-  const TakeImageFromCamera = () => {
-    ImageCropPicker.openCamera({
-      width: 300,
-      height: 500,
-    })
-      .then(response => {
-        console.log(response);
-      })
-      .catch(error => console.log(error));
+  const handleUpdatePasswordAlert = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setsnackbarVisibleAlert(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setsnackbarVisibleAlert(false);
+      navigation.goBack();
+    }, 3000);
   };
-  const TakeImageFromGallery = () => {
-    ImageCropPicker.openPicker({
-      width: 300,
-      height: 500,
-    })
-      .then(response => {
-        console.log(response);
-      })
-      .catch(error => console.log(error));
+
+  const dismissSnackbarAlert = () => {
+    setsnackbarVisibleAlert(false);
   };
 
   const takePhotoFromCamera = async value => {
@@ -126,7 +241,7 @@ export default function UpdateProfile({navigation}) {
     launchCamera(
       {
         mediaType: 'photo',
-        // videoQuality: 'medium',
+        photoQuality: 'medium',
       },
       response => {
         console.log('image here', response);
@@ -134,13 +249,14 @@ export default function UpdateProfile({navigation}) {
           if (response.assets && response.assets.length > 0) {
             setImageUri(response.assets[0].uri);
             console.log('response', response.assets[0].uri);
+            setImageInfo(response.assets[0]);
+            handle(response.assets[0]);
           } else if (response.uri) {
             // Handle the case when no assets are present (e.g., for videos)
             setImageUri(response.uri);
             console.log('response', response.uri);
           }
         }
-        ref_RBSheetCamera.current.close();
       },
     );
   };
@@ -150,12 +266,162 @@ export default function UpdateProfile({navigation}) {
     launchImageLibrary({mediaType: 'photo'}, response => {
       console.log('image here', response);
       if (!response.didCancel && response.assets.length > 0) {
+        console.log('Response', response.assets[0]);
         setImageUri(response.assets[0].uri);
+        setImageInfo(response.assets[0]);
+        handle(response.assets[0]);
       }
-      console.log('response', imageUri);
-
-      ref_RBSheetCamera.current.close();
+      console.log('response', imageInfo);
     });
+  };
+
+  const handle = imageInfo => {
+    ref_RBSheetCamera.current.close();
+    console.log('Image Infosssssssssss', imageInfo);
+    handleUploadVideoC(imageInfo);
+    /*  if(imageInfo!==null){
+      console.log("Not Null");
+      handleUploadVideoC();
+    }else{
+      console.log("Null");
+    } */
+    /*  handleUploadVideoC() */
+  };
+
+  const handleUploadVideoC = data1 => {
+    ref_RBSheetCamera.current.close();
+    setLoading(true);
+    const uri = data1.uri;
+    const type = data1.type;
+    const name = data1.fileName;
+    const sourceImage = {uri, type, name};
+    console.log('Source Image', sourceImage);
+    const dataImage = new FormData();
+    dataImage.append('file', sourceImage);
+    dataImage.append('upload_preset', 'e6zfilan'); // Use your Cloudinary upload preset
+    dataImage.append('cloud_name', 'dxfdrtxi3'); // Use your Cloudinary cloud name
+
+    fetch('https://api.cloudinary.com/v1_1/dxfdrtxi3/image/upload', {
+      method: 'POST',
+      body: dataImage,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        // Update the image at the selected index in your state
+        uploadImage(data.url)
+        // Update the image of the first object
+
+        // Set the state with the updated array
+
+        setLoading(false);
+        ref_RBSheetCamera.current.close();
+      })
+      .catch(err => {
+        setLoading(false);
+        console.log('Error While Uploading Video', err);
+      });
+  };
+
+  const uploadImage = async data => {
+    const token = authToken;
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/user/uploadImage';
+
+    const requestData = {
+      userId: userId,
+      image: data,
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`, // Use the provided token
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data);
+        setLoading(false);
+        handleUpdatePassword();
+
+        // Handle the response data as needed
+      } else {
+        setLoading(false);
+
+        console.error(
+          'Failed to upload video:',
+          response.status,
+          response.statusText,
+        );
+        // Handle the error
+      }
+    } catch (error) {
+      console.error('API Request Error:', error);
+      setLoading(false);
+
+      // Handle the error
+    }
+  };
+
+  const handleUpdateUser = () => {
+    if (userName !== '') {
+      updateUserName();
+    } else {
+      handleUpdatePasswordAlert()
+    }
+  };
+
+  const updateUserName = async () => {
+    setLoading(true)
+    console.log("TOKEN", authToken)
+    const token = authToken;
+    const apiUrl =
+      'https://watch-gotcha-be.mtechub.com/user/updateUserProfile';
+
+    const requestData = {
+      id: userId,
+      username: userName,
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`, // Use the provided token
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data);
+        setLoading(false);
+        handleUpdatePassword();
+
+        // Handle the response data as needed
+      } else {
+        setLoading(false);
+
+        console.error(
+          'Failed to upload video:',
+          response.status,
+          response.statusText,
+        );
+        // Handle the error
+      }
+    } catch (error) {
+      console.error('API Request Error:', error);
+      setLoading(false);
+      // Handle the error
+    }
   };
 
   const handleUpdatePassword = async () => {
@@ -168,7 +434,7 @@ export default function UpdateProfile({navigation}) {
     // Automatically hide the Snackbar after 3 seconds
     setTimeout(() => {
       setsnackbarVisible(false);
-      navigation.goBack()
+      navigation.goBack();
     }, 3000);
   };
   return (
@@ -262,22 +528,21 @@ export default function UpdateProfile({navigation}) {
           You can't edit your email address
         </Text>
 
-        <View style={{ marginTop:hp(18)}}>
-            <CustomButton
-              title="Update"
-              customClick={() => {
-                
-                handleUpdatePassword(); // Call your password update function here
+        <View style={{marginTop: hp(18)}}>
+          <CustomButton
+            title="Update"
+            customClick={() => {
+              handleUpdateUser() // Call your password update function here
 
-                //setsnackbarVisible(true);
+              //setsnackbarVisible(true);
 
-                //navigation.goBack();
-                //ref_RBSendOffer.current.close();
-                //navigation.navigate('ResetPassword');
-              }}
-              //style={{width: wp(59)}}
-            />
-            </View>
+              //navigation.goBack();
+              //ref_RBSendOffer.current.close();
+              //navigation.navigate('ResetPassword');
+            }}
+            //style={{width: wp(59)}}
+          />
+        </View>
       </ScrollView>
 
       <RBSheet
@@ -364,6 +629,26 @@ export default function UpdateProfile({navigation}) {
         onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackbarVisible}
       />
+
+      <CustomSnackbar
+        message={'Alert!'}
+        messageDescription={'Kindly Fill Your User Name'}
+        onDismiss={dismissSnackbarAlert} // Make sure this function is defined
+        visible={snackbarVisibleAlert}
+      />
+
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {loading && <ActivityIndicator size="large" color="#FACA4E" />}
+      </View>
     </KeyboardAvoidingView>
   );
 }

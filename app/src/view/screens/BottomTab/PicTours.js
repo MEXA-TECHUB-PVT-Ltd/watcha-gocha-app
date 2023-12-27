@@ -41,7 +41,7 @@ export default function PicTours({navigation}) {
 
   const [selectedItemDiscId, setSelectedItemDiscId] = useState(null);
 
-  const [selectedItemPicsId, setSelectedItemPicsId] = useState(9);
+  const [selectedItemPicsId, setSelectedItemPicsId] = useState(null);
 
   const [imageInfo, setImageInfo] = useState(null);
 
@@ -111,7 +111,7 @@ export default function PicTours({navigation}) {
 
     try {
       const response = await fetch(
-        'https://watch-gotcha-be.mtechub.com/picCategory/getAllPicCategories?page=1&limit=5',
+        'https://watch-gotcha-be.mtechub.com/picCategory/getAllPicCategories',
         {
           method: 'GET',
           headers: {
@@ -206,7 +206,7 @@ export default function PicTours({navigation}) {
 
     try {
       const response = await fetch(
-        `https://watch-gotcha-be.mtechub.com/top/getSpecificTopTourByCategory/${selectedItemPicsId}`,
+        `https://watch-gotcha-be.mtechub.com/top/app/top_tour/${selectedItemPicsId}`,
         {
           method: 'GET',
           headers: {
@@ -217,7 +217,7 @@ export default function PicTours({navigation}) {
 
       const result = await response.json();
       console.log('Resultings of Top Videossss', result);
-      setDataTopVideos(result.topVideo[0]); // Update the state with the fetched data
+      setDataTopVideos(result.topTour[0]); // Update the state with the fetched data
     } catch (error) {
       console.error('Error:', error);
     }
@@ -251,8 +251,15 @@ export default function PicTours({navigation}) {
   //pics search
 
   const renderSearchesPic = item => {
-    console.log('Items', item);
-    const isSelected = selectedItemPicsId === item.id;
+    console.log("First Id", searchesData[0].id )
+    let isSelected;
+    if(selectedItemPicsId===null){
+       isSelected = searchesData[0].id === item.id;
+       setSelectedItemPicsId(searchesData[0].id);
+    } else {
+      console.log('Items', item);
+      isSelected = selectedItemPicsId === item.id;
+    }
 
     return (
       <TouchableOpacity
@@ -571,7 +578,7 @@ export default function PicTours({navigation}) {
             <View
               style={{
                 position: 'absolute',
-                top: hp(14),
+                top: hp(10),
                 left: 7,
                 //height: hp(3),
                 //width: wp(21),
@@ -594,7 +601,10 @@ export default function PicTours({navigation}) {
           </TouchableOpacity>
 
           <View style={{marginTop: hp(0.8), marginLeft: wp(3), width: '35%'}}>
+            
             <Text
+            ellipsizeMode='tail'
+            numberOfLines={5}
               style={{
                 fontSize: hp(1.6),
                 marginLeft: wp(1),
@@ -658,7 +668,7 @@ export default function PicTours({navigation}) {
               color: '#4A4A4A',
               fontWeight: 'bold',
             }}>
-            Latest Video
+            Latest Pic
           </Text>
 
           <View style={{marginTop: hp(1), height: '100%'}}>

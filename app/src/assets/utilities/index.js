@@ -4,7 +4,7 @@
 
 const IMAGES_DIR = '../images/';
 const appImages = {
-  logo: require(IMAGES_DIR + 'Logo1.jpg'),
+  logo: require(IMAGES_DIR + 'Logo1.png'),
   logoTransparent: require(IMAGES_DIR + 'logoTransparent.png'),
   forget: require(IMAGES_DIR + 'forget.png'),
   model_verify: require(IMAGES_DIR + 'model_verify.png'),

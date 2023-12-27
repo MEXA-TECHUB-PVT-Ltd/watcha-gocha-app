@@ -35,7 +35,7 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 import {useIsFocused} from '@react-navigation/native';
 
 export default function Video({navigation}) {
-  const [selectedItemId, setSelectedItemId] = useState(16);
+  const [selectedItemId, setSelectedItemId] = useState(null);
 
   const [loading, setLoading] = useState(false);
 
@@ -66,8 +66,11 @@ export default function Video({navigation}) {
   const ref_RBSheetCamera = useRef(null);
 
   useEffect(() => {
-    // Make the API request and update the 'data' state
-    if (isFocused) {
+    // Check if it's the initial load (selectedItemId is not set yet)
+    if (selectedItemId === null) {
+      setSelectedItemId(16);
+    } else {
+      // Fetch data based on the updated selectedItemId
       fetchVideos();
     }
   }, [selectedItemId, isFocused]);
@@ -154,7 +157,7 @@ export default function Video({navigation}) {
 
     try {
       const response = await fetch(
-        `https://watch-gotcha-be.mtechub.com/top/app/top_video/${selectedItemId}`,
+        `https://watch-gotcha-be.mtechub.com/top/app/top_tour/${selectedItemId}`,
         {
           method: 'GET',
           headers: {
@@ -725,7 +728,23 @@ export default function Video({navigation}) {
                 }}>
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
-            ) : (
+            ) : 
+
+            (
+              <>
+                {data?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) :
+            (
               <FlatList
                 style={{flex: 1}}
                 showsHorizontalScrollIndicator={false}
@@ -734,6 +753,8 @@ export default function Video({navigation}) {
                 //keyExtractor={item => item.id.toString()}
                 renderItem={({item}) => renderAvailableAppsVideo(item)}
               />
+            )}
+              </>
             )}
           </View>
         </TouchableOpacity>
@@ -764,7 +785,21 @@ export default function Video({navigation}) {
                 }}>
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
-            ) : (
+            ) :
+            (
+              <>
+                {dataLatestVideos?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) : (
               <FlatList
                 style={{flex: 1}}
                 showsHorizontalScrollIndicator={false}
@@ -773,6 +808,8 @@ export default function Video({navigation}) {
                 // keyExtractor={item => item.id.toString()}
                 renderItem={({item}) => renderAvailableAppsVideo(item)}
               />
+            )}
+            </>
             )}
           </View>
         </View>
@@ -803,7 +840,21 @@ export default function Video({navigation}) {
                 }}>
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
-            ) : (
+            )  :
+            (
+              <>
+                {dataMostViewedVideos?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) : (
               <FlatList
                 style={{flex: 1}}
                 showsHorizontalScrollIndicator={false}
@@ -812,6 +863,8 @@ export default function Video({navigation}) {
                 //keyExtractor={item => item.id.toString()}
                 renderItem={({item}) => renderAvailableAppsVideo(item)}
               />
+              )}
+              </>
             )}
           </View>
         </View>
@@ -842,7 +895,21 @@ export default function Video({navigation}) {
                 }}>
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
-            ) : (
+            ):
+            (
+              <>
+                {dataMostCommentedVideos?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) : (
               <FlatList
                 style={{flex: 1}}
                 showsHorizontalScrollIndicator={false}
@@ -851,6 +918,8 @@ export default function Video({navigation}) {
                 //keyExtractor={item => item.id.toString()}
                 renderItem={({item}) => renderAvailableAppsVideo(item)}
               />
+            )}
+            </>
             )}
           </View>
         </View>

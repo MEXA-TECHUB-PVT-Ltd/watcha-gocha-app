@@ -156,6 +156,12 @@ const App = () => {
         />
 
         <Stack.Screen
+          name="Profile_image"
+          component={Profile_image}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
           name="UpdateVideoProfile"
           component={UpdateVideoProfile}
           options={{headerShown: false}}
@@ -602,12 +608,6 @@ const App = () => {
         <Stack.Screen
           name="ForgetPassword"
           component={ForgetPassword}
-          options={{headerShown: false}}
-        />
-
-        <Stack.Screen
-          name="Profile_image"
-          component={Profile_image}
           options={{headerShown: false}}
         />
 
