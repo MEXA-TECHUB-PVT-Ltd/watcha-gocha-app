@@ -216,7 +216,7 @@ export default function PicTours({navigation}) {
       );
 
       const result = await response.json();
-      console.log('Resultings of Top Videossss', result.topTour[0]);
+      console.log('Resultings of Top Videossss', result);
       setDataTopVideos(result.topVideo[0]); // Update the state with the fetched data
     } catch (error) {
       console.error('Error:', error);
@@ -871,11 +871,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginLeft: wp(3),
     alignItems: 'center',
+    padding: wp(3.3),
     justifyContent: 'center',
-    width: wp(23),
+    //width: wp(23),
     backgroundColor: '#F2F2F2',
     borderRadius: wp(5),
-    height: hp(5),
+    //height: hp(5),
   },
   textSearchDetails: {
     fontFamily: 'Inter',

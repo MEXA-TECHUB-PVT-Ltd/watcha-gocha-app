@@ -185,7 +185,7 @@ export default function Sell({navigation}) {
 
     try {
       const response = await fetch(
-        'https://watch-gotcha-be.mtechub.com/itemCategory/getAllItemCategories?page=1&limit=5',
+        'https://watch-gotcha-be.mtechub.com/itemCategory/getAllItemCategories',
         {
           method: 'GET',
           headers: {

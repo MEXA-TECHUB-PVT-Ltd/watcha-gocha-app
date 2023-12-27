@@ -105,6 +105,12 @@ import ViewAllCategoriesDashboard from './app/src/view/screens/ViewAllCategories
 import ViewAllCategoriesGEBCDashboard from './app/src/view/screens/ViewAllCategoriesGEBCDashboard';
 import ViewAllCategoriesQAFIDashboard from './app/src/view/screens/ViewAllCategoriesQAFIDashboard';
 import UpdateVideoProfile from './app/src/view/screens/ViewVideoProfile/UpdateVideoProfile';
+import ViewUpdateNews from './app/src/view/screens/UpdateNews/ViewUpdateNews';
+import UpdatePostOnNews from './app/src/view/screens/UpdateNews/UpdatePostOnNews';
+import ViewUpdateGEBC from './app/src/view/screens/UpdateGEBC/ViewUpdateGEBC';
+import UpdateGEBC from './app/src/view/screens/UpdateGEBC/UpdateGEBC';
+import UpdateQAFI from './app/src/view/screens/UpdateQAFI/UpdateQAFI';
+import ViewUpdateQAFI from './app/src/view/screens/UpdateQAFI/ViewUpdateQAFI';
 
 //------------------\\
 
@@ -158,6 +164,42 @@ const App = () => {
         <Stack.Screen
           name="ViewAllCategoriesGEBC"
           component={ViewAllCategoriesGEBC}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ViewUpdateNews"
+          component={ViewUpdateNews}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="UpdatePostOnNews"
+          component={UpdatePostOnNews}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ViewUpdateGEBC"
+          component={ViewUpdateGEBC}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="UpdateGEBC"
+          component={UpdateGEBC}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ViewUpdateQAFI"
+          component={ViewUpdateQAFI}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="UpdateQAFI"
+          component={UpdateQAFI}
           options={{headerShown: false}}
         />
 

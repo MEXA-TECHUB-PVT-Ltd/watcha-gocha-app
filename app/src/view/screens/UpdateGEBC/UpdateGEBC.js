@@ -12,29 +12,17 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import React, {useState, useEffect, useRef} from 'react';
-import RBSheet from 'react-native-raw-bottom-sheet';
-
-import {Button, Divider, TextInput} from 'react-native-paper';
+import RBSheet from 'react-native-raw-bottom-sheet';;
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import PlusPost from '../../../assets/svg/PlusPost.svg';
 
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 
-import Back from '../../../assets/svg/back.svg';
 import {appImages} from '../../../assets/utilities/index';
-
-import Slider from '@react-native-community/slider';
-import VolumeUp from '../../../assets/svg/VolumeUp.svg';
-import Like from '../../../assets/svg/Like.svg';
-import UnLike from '../../../assets/svg/Unlike.svg';
-import Comment from '../../../assets/svg/Comment.svg';
-import Send from '../../../assets/svg/Send.svg';
-import Download from '../../../assets/svg/Download.svg';
 import CustomButton from '../../../assets/Custom/Custom_Button';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import Share from 'react-native-share';
 
 import {
   heightPercentageToDP as hp,
@@ -59,7 +47,7 @@ const Category = [
   {label: 'Item 3', value: '3'},
 ];
 
-export default function GEBC({navigation}) {
+export default function UpdateGEBC({navigation, route}) {
   const [selectedItem, setSelectedItem] = useState('');
 
   const [snackbarVisible, setsnackbarVisible] = useState(false);
@@ -82,11 +70,13 @@ export default function GEBC({navigation}) {
 
   const [imageInfo, setImageInfo] = useState(null);
 
+  const [authToken, setAuthToken] = useState('');
+
   const [categoryId, setCategoryId] = useState('');
 
   const [userId, setUserId] = useState('');
 
-  const [authToken, setAuthToken] = useState('');
+  const [dataFetched, isDataFetched] = useState(false);
 
   const [userName, setName] = useState('');
 
@@ -99,6 +89,22 @@ export default function GEBC({navigation}) {
   const ref_RBSheetCamera = useRef(null);
 
   const ref_RBSendOffer = useRef(null);
+
+  const receivedData = route.params?.item;
+
+  console.log('ReceivedData', receivedData);
+
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    const fetchCategory = async () => {
+      setComment(receivedData?.description);
+      setCategoryId(receivedData?.disc_category);
+      setImageUrl(receivedData?.image);
+      isDataFetched(true);
+    };
+
+    fetchCategory();
+  }, []);
 
   useEffect(() => {
     // Make the API request and update the 'data' state
@@ -124,15 +130,6 @@ export default function GEBC({navigation}) {
         setUserId(result);
         console.log('user id retrieved:', result);
       }
-
-      const result1 = await AsyncStorage.getItem('authToken ');
-      if (result1 !== null) {
-        setAuthToken(result1);
-        fetchCategory(result1);
-        console.log('user token retrieved:', result1);
-      } else {
-        console.log('result is null', result);
-      }
     } catch (error) {
       // Handle errors here
       console.error('Error retrieving user ID:', error);
@@ -148,10 +145,19 @@ export default function GEBC({navigation}) {
       // Handle errors here
       console.error('Error retrieving user ID:', error);
     }
+
+    const result1 = await AsyncStorage.getItem('authToken ');
+    if (result1 !== null) {
+      setAuthToken(result1);
+      console.log('user token retrieved:', result1);
+      await fetchCategory(result1);
+    } else {
+      console.log('result is null', result1);
+    }
   };
 
-  const fetchCategory = async (result) => {
-    const token = result;
+  const fetchCategory = async (resultId) => {
+    const token = resultId
 
     try {
       const response = await fetch(
@@ -195,7 +201,7 @@ export default function GEBC({navigation}) {
       handleUploadImage();
       //uploadVideo();
     } else {
-      setModalVisible(true);
+      uploadVideo();
     }
   };
 
@@ -234,7 +240,7 @@ export default function GEBC({navigation}) {
         //uploadXpiVideo(data.url);
         console.log('Image Url', data);
         //uploadXpiVideo(data.url,data)
-        uploadVideo(data.url);
+       uploadVideo();
       })
       .catch(err => {
         setLoading(false);
@@ -242,25 +248,27 @@ export default function GEBC({navigation}) {
       });
   };
 
-  const uploadVideo = async data => {
-    console.log('Image Uri', data);
+  const uploadVideo = async () => {
+    console.log('Image Uri', imageUrl);
     console.log('disc category Id', categoryId);
-    console.log('Description', description);
+    console.log('Description', comment);
     console.log('user id', userId);
 
-    const token = authToken;
-    const apiUrl = 'https://watch-gotcha-be.mtechub.com/gebc/createGEBC';
+    const token = authToken
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/gebc/updateGEBC';
 
     const requestData = {
-      description: description,
-      image: data,
+      description: comment,
+      image: imageUrl,
       disc_category: categoryId,
-      user_id: userId,
+      id: receivedData?.gebc_id,
     };
+
+    console.log("Request Data", requestData)
 
     try {
       const response = await fetch(apiUrl, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`, // Use the provided token
           'Content-Type': 'application/json',
@@ -301,6 +309,26 @@ export default function GEBC({navigation}) {
     setIsTextInputActive(false);
   };
 
+  const TakeImageFromCamera = () => {
+    ImageCropPicker.openCamera({
+      width: 300,
+      height: 500,
+    })
+      .then(response => {
+        console.log(response);
+      })
+      .catch(error => console.log(error));
+  };
+  const TakeImageFromGallery = () => {
+    ImageCropPicker.openPicker({
+      width: 300,
+      height: 500,
+    })
+      .then(response => {
+        console.log(response);
+      })
+      .catch(error => console.log(error));
+  };
 
   const handleUpdatePassword = async () => {
     // Perform the password update logic here
@@ -339,18 +367,24 @@ export default function GEBC({navigation}) {
       },
       response => {
         console.log('image here', response);
+
         if (!response.didCancel) {
+          ref_RBSheetCamera.current.close()
           if (response.assets && response.assets.length > 0) {
             setImageUri(response.assets[0].uri);
             console.log('response', response.assets[0].uri);
             setImageInfo(response.assets[0]);
+            ref_RBSheetCamera.current.close()
+
           } else if (response.uri) {
             // Handle the case when no assets are present (e.g., for videos)
             setImageUri(response.uri);
-            console.log('response', response.uri);
+            console.log('response null', response.uri);
+            ref_RBSheetCamera.current.close()
+
           }
+
         }
-        ref_RBSheetCamera.current.close();
       },
     );
   };
@@ -363,11 +397,15 @@ export default function GEBC({navigation}) {
         console.log('Response', response.assets[0]);
         setImageUri(response.assets[0].uri);
         setImageInfo(response.assets[0]);
+        ref_RBSheetCamera.current.close()
+
+       
+
       }
+      ref_RBSheetCamera.current.close()
 
       console.log('response', imageInfo);
 
-      ref_RBSheetCamera.current.close();
     });
   };
 
@@ -381,7 +419,7 @@ export default function GEBC({navigation}) {
           <IonIcons name={'chevron-back'} color={'#282828'} size={25} />
         </TouchableOpacity>
 
-        <Text style={styles.headerText}>GEBC</Text>
+        <Text style={styles.headerText}>Update GEBC</Text>
       </View>
 
       <ScrollView
@@ -434,8 +472,7 @@ export default function GEBC({navigation}) {
             marginTop: hp(-1),
           }}>
           <CPaperInput
-            //multiline={true}
-            style={{flex: 1}}
+            multiline={true}
             placeholder={'Add a comment'}
             placeholderTextColor="#B0B0B0"
             value={comment}
@@ -566,7 +603,7 @@ export default function GEBC({navigation}) {
           alignSelf: 'center',
         }}>
         <CustomButton
-          title="Post"
+          title="Update"
           load={false}
           // checkdisable={inn == '' && cm == '' ? true : false}
           customClick={() => {
@@ -679,7 +716,7 @@ export default function GEBC({navigation}) {
 
       <CustomSnackbar
         message={'Success'}
-        messageDescription={'GEBC Posted Successfully'}
+        messageDescription={'News Posted Successfully'}
         onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackbarVisible}
       />
@@ -821,7 +858,7 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: hp(2.5),
     alignSelf: 'center',
-    marginLeft: wp(32),
+    marginLeft: wp(23),
     color: '#333333',
     fontFamily: 'Inter',
     fontWeight: 'bold',

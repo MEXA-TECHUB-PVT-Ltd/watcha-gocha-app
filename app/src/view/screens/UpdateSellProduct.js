@@ -3,13 +3,14 @@ import {
   FlatList,
   Text,
   StatusBar,
+  ActivityIndicator,
   KeyboardAvoidingView,
   Image,
   View,
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import Back from '../../assets/svg/back.svg';
 import {appImages} from '../../assets/utilities/index';
 import {
@@ -32,12 +33,12 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 import CPaperInput from '../../assets/Custom/CPaperInput';
 import CustomSnackbar from '../../assets/Custom/CustomSnackBar';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function UpdateSellProduct({navigation}) {
+export default function UpdateSellProduct({navigation, route}) {
   const [selectedItem, setSelectedItem] = useState('');
 
   const [snackbarVisible, setsnackbarVisible] = useState(false);
-
 
   const [title, setTitle] = useState('');
 
@@ -51,6 +52,8 @@ export default function UpdateSellProduct({navigation}) {
     useState(false);
 
   const [isChecked, setIsChecked] = useState(false);
+
+  const [selectedImageIndex, setSelectedImageIndex] = useState(null);
 
   const [category, setCategory] = useState('');
 
@@ -68,7 +71,135 @@ export default function UpdateSellProduct({navigation}) {
 
   const [isFocusCondition, setIsFocusCondition] = useState(false);
 
+  //------------------------------\\
+
+  const [dataFetched, isDataFetched] = useState(false);
+
+  const [userId, setUserId] = useState('');
+
+  const [categoriesSelect, setCategorySelect] = useState([]);
+
+  const [snackBarVisible, setSnackbarVisible] = useState(false);
+
+  const [authToken, setAuthToken] = useState('');
+
+  const [imageInfo, setImageInfo] = useState(null);
+
+  const [loading, setLoading] = useState(false);
+
+  const [imageUrl, setImageUrl] = useState(null);
+
+  const [categoryId, setCategoryId] = useState('');
+
+  const [categoryType, setCategoryType] = useState(null);
+
+  const [recievedImages, setReceivedImages] = useState([]);
+
+  //--------------------------------\\
+
   const ref_RBSheetCamera = useRef(null);
+
+  const receivedData = route.params?.item;
+
+  console.log('ReceivedData', receivedData);
+
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    const fetchCategory = async () => {
+      setTitle(receivedData?.title);
+      setDescription(receivedData?.description);
+      setReceivedImages(receivedData?.images);
+      setCategory(receivedData?.item_category);
+      setPrice(receivedData?.price);
+      setIsChecked(receivedData?.top_post);
+      isDataFetched(true);
+    };
+
+    fetchCategory();
+  }, []);
+
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchVideos();
+  }, []);
+
+  const fetchVideos = async () => {
+    // Simulate loading
+    setLoading(true);
+
+    await getUserID();
+    // Fetch data one by one
+
+    // Once all data is fetched, set loading to false
+    setLoading(false);
+  };
+
+  const getUserID = async () => {
+    console.log("Id's");
+    try {
+      const result = await AsyncStorage.getItem('userId ');
+      if (result !== null) {
+        setUserId(result);
+        console.log('user id retrieved:', result);
+      } else {
+        console.log('result is null', result);
+      }
+
+      const result1 = await AsyncStorage.getItem('authToken ');
+      if (result1 !== null) {
+        setAuthToken(result1);
+        fetchCategoryPic(result1);
+        console.log('user token retrieved:', result1);
+      } else {
+        console.log('result is null', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
+
+  //---------------------------\\
+
+  const fetchCategoryPic = async userToken => {
+    const token = userToken;
+
+    try {
+      const response = await fetch(
+        'https://watch-gotcha-be.mtechub.com/itemCategory/getAllItemCategories',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+
+        console.log('Data ', data);
+
+        // Use the data from the API to set the categories
+        const categories = data.AllCategories.map(category => ({
+          label: category.name, // Use the "name" property as the label
+          value: category.id.toString(), // Convert "id" to a string for the value
+        }));
+
+        setCategorySelect(categories); // Update the state with the formatted category data
+
+        console.log('Data Categories', categoriesSelect);
+      } else {
+        console.error(
+          'Failed to fetch categories:',
+          response.status,
+          response.statusText,
+        );
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
 
   const handleFocus = () => {
     setIsTextInputActive(true);
@@ -118,33 +249,12 @@ export default function UpdateSellProduct({navigation}) {
     {label: 'Item 3', value: '3'},
   ];
 
-  const TakeImageFromCamera = () => {
-    ImageCropPicker.openCamera({
-      width: 300,
-      height: 500,
-    })
-      .then(response => {
-        console.log(response);
-      })
-      .catch(error => console.log(error));
-  };
-  const TakeImageFromGallery = () => {
-    ImageCropPicker.openPicker({
-      width: 300,
-      height: 500,
-    })
-      .then(response => {
-        console.log(response);
-      })
-      .catch(error => console.log(error));
-  };
-
   const takePhotoFromCamera = async value => {
     setSelectedItem(value);
     launchCamera(
       {
         mediaType: 'photo',
-        // videoQuality: 'medium',
+        photoQuality: 'medium',
       },
       response => {
         console.log('image here', response);
@@ -152,13 +262,15 @@ export default function UpdateSellProduct({navigation}) {
           if (response.assets && response.assets.length > 0) {
             setImageUri(response.assets[0].uri);
             console.log('response', response.assets[0].uri);
+            setImageInfo(response.assets[0]);
+            handle(response.assets[0]);
           } else if (response.uri) {
             // Handle the case when no assets are present (e.g., for videos)
             setImageUri(response.uri);
             console.log('response', response.uri);
           }
         }
-        ref_RBSheetCamera.current.close();
+       
       },
     );
   };
@@ -168,12 +280,72 @@ export default function UpdateSellProduct({navigation}) {
     launchImageLibrary({mediaType: 'photo'}, response => {
       console.log('image here', response);
       if (!response.didCancel && response.assets.length > 0) {
+        console.log('Response', response.assets[0]);
         setImageUri(response.assets[0].uri);
+        setImageInfo(response.assets[0]);
+        handle(response.assets[0]);
       }
-      console.log('response', imageUri);
+      console.log('response', imageInfo);
 
-      ref_RBSheetCamera.current.close();
     });
+  };
+
+  const handle=(imageInfo)=>{
+    ref_RBSheetCamera.current.close();
+    console.log("Image Infosssssssssss", imageInfo)
+    handleUploadVideoC(imageInfo)
+   /*  if(imageInfo!==null){
+      console.log("Not Null");
+      handleUploadVideoC();
+    }else{
+      console.log("Null");
+    } */
+   /*  handleUploadVideoC() */
+  }
+
+  const handleUploadVideoC = data1 => {
+    ref_RBSheetCamera.current.close();
+    console.log("Indexxxxxxxxxxxxxxxxxx", selectedImageIndex)
+    setLoading(true);
+    const uri = data1.uri;
+    const type = data1.type;
+    const name = data1.fileName;
+    const sourceImage = {uri, type, name};
+    console.log('Source Image', sourceImage);
+    const dataImage = new FormData();
+    dataImage.append('file', sourceImage);
+    dataImage.append('upload_preset', 'e6zfilan'); // Use your Cloudinary upload preset
+    dataImage.append('cloud_name', 'dxfdrtxi3'); // Use your Cloudinary cloud name
+
+    fetch('https://api.cloudinary.com/v1_1/dxfdrtxi3/image/upload', {
+      method: 'POST',
+      body: dataImage,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        // Update the image at the selected index in your state
+          console.log("Images", data.url)
+          console.log("Images of array", recievedImages)
+
+          const updatedImages = [...recievedImages];
+
+          // Update the image of the first object
+          updatedImages[selectedImageIndex].image = data.url;
+        
+          // Set the state with the updated array
+          setReceivedImages(updatedImages);
+
+        setLoading(false);
+        ref_RBSheetCamera.current.close();
+      })
+      .catch(err => {
+        setLoading(false);
+        console.log('Error While Uploading Video', err);
+      });
   };
 
   const availableApps = [
@@ -185,8 +357,8 @@ export default function UpdateSellProduct({navigation}) {
     //{id: 10, title: 'Printer', image: appImages.printer},
   ];
 
-  const renderAvailableApps = item => {
-    console.log('Items', item);
+  const renderAvailableApps = (item, index) => {
+    console.log('Items', item, index);
     return (
       <View
         style={{
@@ -209,7 +381,7 @@ export default function UpdateSellProduct({navigation}) {
             borderRadius: wp(3),
             resizeMode: 'cover',
           }}
-          source={item.image}
+          source={{uri: item.image}}
         />
         <TouchableOpacity
           style={{
@@ -223,15 +395,75 @@ export default function UpdateSellProduct({navigation}) {
             justifyContent: 'center',
             alignItems: 'center',
             zIndex: 2, // Ensure it's on top
-          }}>
+          }}
+          onPress={() => indexSelected(index)}>
           <UpdateItems width={30} height={30} />
         </TouchableOpacity>
       </View>
     );
   };
 
+  const indexSelected = index => {
+    setSelectedImageIndex(index);
+    ref_RBSheetCamera.current.open();
+  };
+
   const dismissSnackbar = () => {
     setsnackbarVisible(false);
+  };
+
+  const uploadItem = async () => {
+
+    const token = authToken
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/item/updateItem';
+
+    const requestData = {
+      images: recievedImages,
+      item_id: receivedData?.id,
+      item_category: category,
+      title: receivedData?.title,
+      description:receivedData?.description,
+      price: receivedData?.price,
+      condition: receivedData?.condition,
+      location: receivedData?.location,
+      region: receivedData?.region,
+      paid_status: isChecked
+
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`, // Use the provided token
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data);
+        setLoading(false);
+        handleUpdatePassword();
+
+        // Handle the response data as needed
+      } else {
+        setLoading(false);
+
+        console.error(
+          'Failed to upload video:',
+          response.status,
+          response.statusText,
+        );
+        // Handle the error
+      }
+    } catch (error) {
+      console.error('API Request Error:', error);
+      setLoading(false);
+
+      // Handle the error
+    }
   };
   return (
     <KeyboardAvoidingView
@@ -244,7 +476,12 @@ export default function UpdateSellProduct({navigation}) {
         barStyle="dark-content" // You can set the StatusBar text color to dark or light
       />
       <View style={{marginTop: hp(5)}}>
-        <Headers onPress={()=>navigation.goBack()} showBackIcon={true} text={'Update Item'} showText={true} />
+        <Headers
+          onPress={() => navigation.goBack()}
+          showBackIcon={true}
+          text={'Update Item'}
+          showText={true}
+        />
       </View>
       <ScrollView
         keyboardShouldPersistTaps="always"
@@ -255,10 +492,10 @@ export default function UpdateSellProduct({navigation}) {
             style={{marginTop: hp(3)}}
             contentContainerStyle={{marginLeft: wp(5)}}
             showsVerticalScrollIndicator={false}
-            data={availableApps}
-            keyExtractor={item => item.id.toString()}
+            data={recievedImages}
+            //keyExtractor={item => item.id.toString()}
             numColumns={3} // Set the number of columns to 3
-            renderItem={({item}) => renderAvailableApps(item)}
+            renderItem={({item, index}) => renderAvailableApps(item, index)}
           />
         </View>
 
@@ -266,11 +503,10 @@ export default function UpdateSellProduct({navigation}) {
           style={{
             justifyContent: 'center',
             height: hp(15),
-            marginHorizontal:wp(8),
+            marginHorizontal: wp(8),
             //alignItems: 'center',
             marginTop: hp(2),
           }}>
-
           <CPaperInput
             //multiline={true}
             //placeholder={'Description'}
@@ -282,16 +518,13 @@ export default function UpdateSellProduct({navigation}) {
           />
         </View>
 
-
         <View
           style={{
             justifyContent: 'center',
             //height: hp(15),
-            marginHorizontal:wp(8),
+            marginHorizontal: wp(8),
             //alignItems: 'center',
           }}>
-
-         
           <CPaperInput
             //multiline={true}
             //placeholder={'Description'}
@@ -304,12 +537,10 @@ export default function UpdateSellProduct({navigation}) {
           />
         </View>
 
-        <View style={{marginTop:hp(3),marginHorizontal:wp(7)}}>
-
-        <Text
-            style={isFocus?styles.headingFocused:styles.heading}>
+        <View style={{marginTop: hp(3), marginHorizontal: wp(7)}}>
+          <Text style={isFocus ? styles.headingFocused : styles.heading}>
             Select Category
-          </Text> 
+          </Text>
           <Dropdown
             style={
               isFocus
@@ -336,7 +567,7 @@ export default function UpdateSellProduct({navigation}) {
             // inputSearchStyle={styles.inputSearchStyle}
             // iconStyle={styles.iconStyle}
             value={category}
-            data={Category}
+            data={categoriesSelect}
             search={false}
             maxHeight={200}
             labelField="label"
@@ -360,10 +591,7 @@ export default function UpdateSellProduct({navigation}) {
           />
         </View>
 
-
-
-
-        <View style={{marginTop:hp(3),marginHorizontal:wp(7)}}>
+        {/*  <View style={{marginTop:hp(3),marginHorizontal:wp(7)}}>
 
         <Text
             style={isFocusSubCategory?styles.headingFocused:styles.heading}>
@@ -417,11 +645,9 @@ export default function UpdateSellProduct({navigation}) {
               />
             )}
           />
-        </View>
+        </View> */}
 
-
-
-        <View style={{marginTop:hp(3),marginHorizontal:wp(7)}}>
+        {/*  <View style={{marginTop:hp(3),marginHorizontal:wp(7)}}>
 
         <Text
             style={isFocusCondition?styles.headingFocused:styles.heading}>
@@ -475,16 +701,15 @@ export default function UpdateSellProduct({navigation}) {
               />
             )}
           />
-        </View>
+        </View> */}
 
         <View
           style={{
             justifyContent: 'center',
             //height: hp(15),
-            marginHorizontal:wp(8),
+            marginHorizontal: wp(8),
             //alignItems: 'center',
           }}>
-         
           <CPaperInput
             multiline={true}
             //placeholder={'Description'}
@@ -499,7 +724,12 @@ export default function UpdateSellProduct({navigation}) {
 
         <TouchableOpacity
           onPress={() => handleCheckboxChange()}
-          style={{flexDirection: 'row', marginTop:hp(3), marginHorizontal:wp(8), width: '100%'}}>
+          style={{
+            flexDirection: 'row',
+            marginTop: hp(3),
+            marginHorizontal: wp(8),
+            width: '100%',
+          }}>
           <TouchableOpacity
             style={isChecked ? styles.selectCheckBox : styles.unSelectCheckBox}
             onPress={
@@ -527,18 +757,96 @@ export default function UpdateSellProduct({navigation}) {
             Add to top post
           </Text>
         </TouchableOpacity>
-        <View style={{marginTop:hp(5),marginHorizontal:wp(8)}}>
-        <CustomButton
+        <View style={{marginTop: hp(5), marginHorizontal: wp(8)}}>
+          <CustomButton
             title={'Update'}
             load={false}
             // checkdisable={inn == '' && cm == '' ? true : false}
             customClick={() => {
-              handleUpdatePassword()
+              uploadItem();
               //navigation.navigate('Profile_image');
             }}
           />
-          </View>
+        </View>
       </ScrollView>
+
+      <RBSheet
+        ref={ref_RBSheetCamera}
+        closeOnDragDown={true}
+        closeOnPressMask={false}
+        animationType="fade"
+        minClosingHeight={0}
+        customStyles={{
+          wrapper: {
+            backgroundColor: 'rgba(52, 52, 52, 0.5)',
+          },
+          draggableIcon: {
+            backgroundColor: 'white',
+          },
+          container: {
+            borderTopLeftRadius: wp(10),
+            borderTopRightRadius: wp(10),
+            height: hp(25),
+          },
+        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginHorizontal: wp(8),
+            alignItems: 'center',
+          }}>
+          <Text style={styles.maintext}>Select an option</Text>
+          <TouchableOpacity onPress={() => ref_RBSheetCamera.current.close()}>
+            <Ionicons
+              name="close"
+              size={22}
+              color={'#303030'}
+              onPress={() => ref_RBSheetCamera.current.close()}
+            />
+          </TouchableOpacity>
+        </View>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-evenly',
+            alignItems: 'center',
+            marginTop: hp(3),
+          }}>
+          <TouchableOpacity
+            onPress={() => takePhotoFromCamera('camera')}
+            style={
+              selectedItem === 'camera'
+                ? styles.selectedItems
+                : styles.nonselectedItems
+            }>
+            <Ionicons
+              color={selectedItem === 'camera' ? '#FACA4E' : '#888888'}
+              name="camera"
+              size={25}
+            />
+
+            <Text style={{color: '#333333'}}>From camera</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => choosePhotoFromLibrary('gallery')}
+            style={
+              selectedItem === 'gallery'
+                ? styles.selectedItems
+                : styles.nonselectedItems
+            }>
+            <MaterialCommunityIcons
+              color={selectedItem === 'gallery' ? '#FACA4E' : '#888888'}
+              name="image"
+              size={25}
+            />
+
+            <Text style={{color: '#333333'}}>From gallery</Text>
+          </TouchableOpacity>
+        </View>
+      </RBSheet>
 
       <CustomSnackbar
         message={'Success'}
@@ -546,6 +854,22 @@ export default function UpdateSellProduct({navigation}) {
         onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackbarVisible}
       />
+
+      {loading && (
+        <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(255, 255, 255, 0.5)', // Semi-transparent white
+          }}>
+          <ActivityIndicator size="large" color="#FACA4E" />
+        </View>
+      )}
     </KeyboardAvoidingView>
   );
 }
@@ -650,17 +974,17 @@ const styles = StyleSheet.create({
   },
   heading: {
     color: '#0B0B0B',
-    fontWeight:'bold',
+    fontWeight: 'bold',
     //marginBottom:hp(2.3),
     fontSize: hp(2.1),
     fontFamily: 'Inter',
   },
-  headingFocused:{
+  headingFocused: {
     //marginBottom:hp(1.5),
     fontSize: hp(2.3),
-    fontWeight:'bold',
+    fontWeight: 'bold',
     color: '#FACA4E',
     //fontSize: 13,
     fontFamily: 'Inter',
-  }
+  },
 });

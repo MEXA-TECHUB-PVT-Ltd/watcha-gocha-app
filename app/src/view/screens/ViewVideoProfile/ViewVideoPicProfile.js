@@ -150,7 +150,7 @@ export default function ViewVideoPicProfile({navigation, route}) {
 
     try {
       const response = await fetch(
-        `https://watch-gotcha-be.mtechub.com/picTour/getAllCommentsByPicTour/${receivedData.pic_tour_id}`,
+        `https://watch-gotcha-be.mtechub.com/picTour/getAllCommentsByPicTour/${receivedData?.pic_tour_id}`,
         {
           method: 'GET',
           headers: {
@@ -244,7 +244,7 @@ export default function ViewVideoPicProfile({navigation, route}) {
 
   const changeModals = () => {
     ref_RBSheetCamera.current.close();
-    navigation.navigate('UploadUpdatePicScreen');
+    navigation.navigate('UploadUpdatePicScreen', { item:receivedData});
   };
 
   const changeDelete = () => {

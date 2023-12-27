@@ -32,8 +32,10 @@ import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons';
 
 import RBSheet from 'react-native-raw-bottom-sheet';
 
+import {useIsFocused} from '@react-navigation/native';
+
 export default function Video({navigation}) {
-  const [selectedItemId, setSelectedItemId] = useState(8);
+  const [selectedItemId, setSelectedItemId] = useState(16);
 
   const [loading, setLoading] = useState(false);
 
@@ -46,6 +48,8 @@ export default function Video({navigation}) {
   const [authToken, setAuthToken] = useState('');
 
   const [imageInfo, setImageInfo] = useState(null);
+
+  const isFocused = useIsFocused();
 
   const [selectedItem, setSelectedItem] = useState('');
 
@@ -63,8 +67,10 @@ export default function Video({navigation}) {
 
   useEffect(() => {
     // Make the API request and update the 'data' state
-    fetchVideos();
-  }, [selectedItemId]);
+    if (isFocused) {
+      fetchVideos();
+    }
+  }, [selectedItemId, isFocused]);
 
   const fetchVideos = async () => {
     // Simulate loading
@@ -148,7 +154,7 @@ export default function Video({navigation}) {
 
     try {
       const response = await fetch(
-        `https://watch-gotcha-be.mtechub.com/top/app/top_video/6`,
+        `https://watch-gotcha-be.mtechub.com/top/app/top_video/${selectedItemId}`,
         {
           method: 'GET',
           headers: {
@@ -261,7 +267,7 @@ export default function Video({navigation}) {
             setImageInfo(response.assets[0]);
             ref_RBSheetCamera.current.close();
             setLoading(false);
-              
+
             navigation.navigate('UploadUpdateVideo', {
               Video: response.assets[0],
             });
@@ -642,7 +648,7 @@ export default function Video({navigation}) {
             <View
               style={{
                 position: 'absolute',
-                top: hp(14),
+                top: hp(10),
                 left: 7,
                 //height: hp(3),
                 //width: wp(21),
@@ -666,12 +672,14 @@ export default function Video({navigation}) {
 
           <View
             style={{
-              marginTop: hp(5),
+              marginTop: hp(3),
               height: hp(12.8),
-              width: '55%',
+              width: '45%',
               marginHorizontal: wp(1.5),
             }}>
             <Text
+              numberOfLines={5}
+              ellipsizeMode="tail"
               style={{
                 fontSize: hp(1.5),
                 //marginLeft: wp(1),

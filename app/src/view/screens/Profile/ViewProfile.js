@@ -433,7 +433,7 @@ export default function ViewProfile({navigation}) {
     console.log(imageUri);
     return (
       <TouchableOpacity
-        //onPress={() => navigation.navigate('ProductDetailsProfile')}
+        onPress={() => navigation.navigate('ProductDetailsProfile', {ProductDetails:item})}
         style={{width: wp(35), margin: 5}}>
         <View>
           {imageUri === null ? (
@@ -802,7 +802,8 @@ export default function ViewProfile({navigation}) {
     console.log(imageUri);
     return (
       <TouchableOpacity
-        //onPress={() => navigation.navigate('ProductDetailsProfile')}
+      onPress={() => navigation.navigate('ViewUpdateGEBC',{details:item})}
+
         style={{width: wp(35), marginLeft:wp(3)}}>
         <View>
           {imageUri === null ? (
@@ -879,7 +880,7 @@ export default function ViewProfile({navigation}) {
     console.log(imageUri);
     return (
       <TouchableOpacity
-        //onPress={() => navigation.navigate('ProductDetailsProfile')}
+      onPress={() => navigation.navigate('ViewUpdateQAFI',{details:item})}
         style={{width: wp(35), marginLeft:wp(3)}}>
         <View>
           {imageUri === null ? (
@@ -956,7 +957,7 @@ export default function ViewProfile({navigation}) {
     console.log(imageUri);
     return (
       <TouchableOpacity
-        //onPress={() => navigation.navigate('ProductDetailsProfile')}
+        onPress={() => navigation.navigate('ViewUpdateNews',{details:item})}
         style={{width: wp(35), marginLeft:wp(3)}}>
         <View>
           {imageUri === null ? (
