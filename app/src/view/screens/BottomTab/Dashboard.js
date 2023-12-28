@@ -714,7 +714,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
  useEffect(() => {
     // Check if it's the initial load (selectedItemId is not set yet)
     if (selectedItemVideoId === null) {
-      setSelectedItemVideoId(16);
+      setSelectedItemVideoId(17);
     } else {
       // Fetch data based on the updated selectedItemId
       fetchVideos();
@@ -4387,7 +4387,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
               thought-provoking video as we delve into the ever-shifting
               landscape of international diplomacy...... */}
 
-              {dataTopVideosMarket.length === 0 || dataTopVideosMarket === undefined
+              { dataTopVideosMarket === undefined || dataTopVideosMarket.length === 0 
                 ? 'No Top Pic Shown'
                 : dataTopVideosMarket?.description}
             </Text>
