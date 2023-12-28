@@ -68,7 +68,7 @@ export default function Video({navigation}) {
   useEffect(() => {
     // Check if it's the initial load (selectedItemId is not set yet)
     if (selectedItemId === null) {
-      setSelectedItemId(16);
+      setSelectedItemId(17);
     } else {
       // Fetch data based on the updated selectedItemId
       fetchVideos();

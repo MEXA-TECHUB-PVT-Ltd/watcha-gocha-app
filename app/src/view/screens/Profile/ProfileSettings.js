@@ -10,7 +10,7 @@ import {
   View,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import Shares from 'react-native-share';
 import PenSettings from '../../../assets/svg/PenSettings.svg';
 import LockSettings from '../../../assets/svg/LockSettings.svg';
@@ -38,6 +38,45 @@ export default function ProfileSettings({navigation}) {
 
   const ref_RBSheetDelete = useRef(null);
 
+  const [userId, setUserId] = useState('');
+
+  const [authToken, setAuthToken] = useState('');
+
+  useEffect(() => {
+    fetchVideos();
+  }, []);
+
+  const fetchVideos = async () => {
+    // Simulate loading
+    setIsLoading(true);
+
+    await getUserID();
+    // Fetch data one by one
+    // Once all data is fetched, set loading to false
+    setIsLoading(false);
+  };
+
+  const getUserID = async () => {
+    console.log("Id's");
+    try {
+
+      const result1 = await AsyncStorage.getItem('authToken ');
+      if (result1 !== null) {
+        setAuthToken(result1);
+        console.log('user token retrieved:', result1);
+      }
+
+      const result3 = await AsyncStorage.getItem('userId ');
+      if (result3 !== null) {
+        setUserId(result3);
+  
+        console.log('user id retrieved:', result3);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
 
   const goBack=()=>{
    
@@ -82,6 +121,37 @@ export default function ProfileSettings({navigation}) {
     }
     navigation.navigate('Signin_signup');
   };
+
+  const deleteAccount=()=>{
+    ref_RBSheetDelete.current.close()
+    deleteUser()
+  }
+
+  const deleteUser=async ()=>{
+    const token = authToken; 
+    try {
+      const response = await fetch(`https://watch-gotcha-be.mtechub.com/user/deleteUser/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          // Include any additional headers as needed
+        },
+        // You may include a request body if required by the server
+        // body: JSON.stringify({}),
+      });
+  
+      if (response.ok) {
+        handleUpdateDeletePassword();
+        // Optionally handle the response data here
+      } else {
+        // Optionally handle the error response here
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle other errors such as network issues
+    }
+  }
 
   
 
@@ -410,7 +480,7 @@ export default function ProfileSettings({navigation}) {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={()=>ref_RBSheetDelete.current.close()}
+            onPress={()=>deleteAccount()}
             style={[styles.button, {backgroundColor: '#FACA4E'}]}>
             <Text style={[styles.textButton, {color: '#232323'}]}>Delete</Text>
           </TouchableOpacity>
