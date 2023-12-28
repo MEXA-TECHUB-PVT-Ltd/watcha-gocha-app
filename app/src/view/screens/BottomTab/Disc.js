@@ -604,12 +604,12 @@ export default function Disc({navigation, route}) {
 
               zIndex: 1, // Ensure it's on top of other elements
               //flex: 1,
-              width: '100%',
-              height: hp(12),
+              width: '39%',
+              height: hp(5),
               borderRadius: wp(1),
-              resizeMode: 'cover',
+              resizeMode: 'stretch',
             }}
-            source={appImages.galleryPlaceHolder}
+            source={{uri:item?.image}}
           />
         </View>
 
@@ -617,7 +617,7 @@ export default function Disc({navigation, route}) {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            marginTop: hp(12),
+            marginTop: hp(5),
             height: hp(7),
             width: wp(25),
           }}>

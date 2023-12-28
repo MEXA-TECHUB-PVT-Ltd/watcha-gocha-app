@@ -191,15 +191,15 @@ export default function UploadUpdateScreen({navigation, route}) {
       let category;
 
       if (durationInMinutes >= 0 && durationInMinutes <= 3.14) {
-        category = 16;
-      } else if (durationInMinutes > 3.14 && durationInMinutes <= 36) {
         category = 17;
-      } else if (durationInMinutes > 36 && durationInMinutes <= 63) {
+      } else if (durationInMinutes > 3.14 && durationInMinutes <= 36) {
         category = 18;
-      } else if (durationInMinutes > 63 && durationInMinutes <= 90) {
+      } else if (durationInMinutes > 36 && durationInMinutes <= 63) {
         category = 19;
-      } else if (durationInMinutes > 90 && durationInMinutes <= 126) {
+      } else if (durationInMinutes > 63 && durationInMinutes <= 90) {
         category = 20;
+      } else if (durationInMinutes > 90 && durationInMinutes <= 126) {
+        category = 21;
       }
 
       // Update the state with the calculated category
@@ -376,6 +376,7 @@ export default function UploadUpdateScreen({navigation, route}) {
     console.log('Description', description);
     console.log('user id', userId);
     console.log('category id', category );
+    console.log('authToken', authToken );
 
     const token = authToken;
     const apiUrl = 'https://watch-gotcha-be.mtechub.com/xpi/createXpiVideo';

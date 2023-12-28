@@ -69,7 +69,7 @@ export default function News({navigation, route}) {
   };
 
   return (
-    <ImageBackground source={appImages.newsPlaceHolder} style={{flex: 1}}>
+    <View style={{flex: 1, backgroundColor:'#4A4A4A'}}>
       <StatusBar
         translucent={true}
         backgroundColor="transparent"
@@ -102,13 +102,20 @@ export default function News({navigation, route}) {
                 height: null,
                 resizeMode: 'contain',
               }}
-              source={appImages.profileImg}
+              source={{uri:receivedData?.userimage}}
             />
           </View>
 
           <Text style={styles.textProfileName}>{receivedData.username}</Text>
         </View>
       </View>
+
+      <View style={styles.centeredView}>
+        {/* Centered Image */}
+        <Image
+          style={styles.centeredImage}
+          source={{ uri: receivedData?.image }}
+        />
 
       <View style={styles.bottomView}>
         <View style={{height: hp(20)}}>
@@ -151,7 +158,8 @@ export default function News({navigation, route}) {
           </ScrollView>
         </View>
       </View>
-    </ImageBackground>
+    </View>
+    </View>
   );
 }
 
@@ -168,7 +176,7 @@ const styles = StyleSheet.create({
     marginHorizontal: wp(8),
   },
   bottomView: {
-    flex: 1,
+    //flex: 1,
     justifyContent: 'flex-end',
     // You can add padding or content to this view as needed.
   },
@@ -178,5 +186,16 @@ const styles = StyleSheet.create({
     marginLeft: wp(3),
     fontFamily: 'Inter',
     fontWeight: 'bold',
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  centeredImage: {
+    width: '39%',
+    height: hp(18), // Adjust the height as needed
+    resizeMode: 'stretch',
+    borderRadius: wp(2),
   },
 });

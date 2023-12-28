@@ -382,13 +382,13 @@ export default function Sell({navigation}) {
 
   const choosePhotoFromLibrary = value => {
     setSelectedItem(value);
-    launchImageLibrary({mediaType: 'photo'}, response => {
+    launchImageLibrary({mediaType: 'photo', selectionLimit:10}, response => {
       if (
         !response.didCancel &&
         response.assets &&
         response.assets.length > 0
       ) {
-        const newImageUri = response.assets[0];
+        const newImageUri = response.assets;
         updateImageUris(newImageUri);
       }
       ref_RBSheetCamera.current.close();
@@ -396,8 +396,11 @@ export default function Sell({navigation}) {
   };
 
   const updateImageUris = newImageUri => {
+    console.log("RESPONSE", imageUris.length )
+
     if (imageUris.length < 10) {
-      setImageUris(prevImageUris => [...prevImageUris, newImageUri]);
+      setImageUris(prevImageUris => [...prevImageUris, ...newImageUri]);
+
     } else {
       // Handle the case when the limit exceeds (e.g., show a message)
       console.log('Image limit exceeded');
@@ -439,6 +442,15 @@ export default function Sell({navigation}) {
   };
 
   const upload = async () => {
+    console.log("Image URIS",imageUris.length );
+    console.log("title",title );
+    console.log("categoryId",categoryId );
+    console.log("condition",condition );
+    console.log("description",description );
+    console.log("price",price );
+    console.log("locationName",locationName);
+    console.log("region",region);
+    console.log("regionArea",regionArea);
 
     if (
       imageUris.length !== 0 &&
