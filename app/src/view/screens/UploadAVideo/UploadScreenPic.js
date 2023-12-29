@@ -577,7 +577,7 @@ export default function UploadScreenPic({navigation, route}) {
             onFocus={() => setIsFocus(true)}
             onBlur={() => setIsFocus(false)}
             onChange={item => {
-              setCategory(item.label);
+              //setCategory(item.label);
               setCategoryId(item.value);
               setIsFocus(false);
             }}

@@ -180,7 +180,7 @@ export default function PostLetter({navigation, route}) {
     );
   };
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar
         translucent={true}
         backgroundColor="transparent"
@@ -238,6 +238,7 @@ export default function PostLetter({navigation, route}) {
         </TouchableOpacity>
       </View>
 
+     
       <View
         style={{
           height: hp(8),
@@ -258,6 +259,8 @@ export default function PostLetter({navigation, route}) {
           renderItem={({item}) => renderSearches(item)}
         />
       </View>
+
+      <ScrollView style={{flex:1}}>
 
       <View style={{marginLeft: wp(8), marginTop: hp(3)}}>
         <CPaperInput
@@ -342,6 +345,8 @@ export default function PostLetter({navigation, route}) {
           }}
         />
       </View>
+
+      </ScrollView>
 
       <RBSheet
         ref={ref_RBSheetCamera}
@@ -530,7 +535,7 @@ export default function PostLetter({navigation, route}) {
           </TouchableOpacity>
         </View>
       </RBSheet>
-    </ScrollView>
+    </View>
   );
 }
 

@@ -57,22 +57,16 @@ export default function MarketZone({navigation}) {
 
   const ref_RBSheetCamera = useRef(null);
 
-  const RegionArea = [
-    'Africa',
-    'Europe',
-    'Americas',
-    'Asia',
-    'Middle East',
-  ];
+  const RegionArea = ['Africa', 'Europe', 'Americas', 'Asia', 'Middle East'];
 
   useEffect(() => {
     // Make the API request and update the 'data' state
     if (selectedItemId === null) {
-      setSelectedItemId("Africa");
+      setSelectedItemId('Africa');
     } else {
-    fetchVideos();
+      fetchVideos();
     }
-  }, [selectedItemId,  isFocused]);
+  }, [selectedItemId, isFocused]);
 
   const fetchVideos = async () => {
     // Simulate loading
@@ -210,7 +204,7 @@ export default function MarketZone({navigation}) {
 
     try {
       const response = await fetch(
-        `https://watch-gotcha-be.mtechub.com/item/getAllItemByCategory/7?page=1&limit=5&region=${selectedItemId}`,
+        `https://watch-gotcha-be.mtechub.com/item/getAllItemByCategory/12?page=1&limit=5&region=${selectedItemId}`,
         {
           method: 'GET',
           headers: {
@@ -660,7 +654,7 @@ export default function MarketZone({navigation}) {
               thought-provoking video as we delve into the ever-shifting
               landscape of international diplomacy...... */}
 
-              {dataTopVideos=== undefined ||dataTopVideos.length === 0
+              {dataTopVideos === undefined || dataTopVideos.length === 0
                 ? 'No Top Pic Shown'
                 : dataTopVideos?.description}
             </Text>
@@ -885,7 +879,7 @@ export default function MarketZone({navigation}) {
       </ScrollView>
 
       <TouchableOpacity
-        onPress={() =>     navigation.navigate('Sell')      }
+        onPress={() => navigation.navigate('Sell')}
         style={{position: 'absolute', bottom: 1, right: 25}}>
         <Add />
       </TouchableOpacity>

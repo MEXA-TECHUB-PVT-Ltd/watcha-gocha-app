@@ -111,6 +111,9 @@ import ViewUpdateGEBC from './app/src/view/screens/UpdateGEBC/ViewUpdateGEBC';
 import UpdateGEBC from './app/src/view/screens/UpdateGEBC/UpdateGEBC';
 import UpdateQAFI from './app/src/view/screens/UpdateQAFI/UpdateQAFI';
 import ViewUpdateQAFI from './app/src/view/screens/UpdateQAFI/ViewUpdateQAFI';
+import ViewGEBC from './app/src/view/screens/GEBC/ViewGEBC';
+import ViewNews from './app/src/view/screens/ViewNews/ViewNews';
+import ViewQAFI from './app/src/view/screens/QAFI/ViewQAFI';
 
 //------------------\\
 
@@ -170,6 +173,24 @@ const App = () => {
         <Stack.Screen
           name="ViewAllCategoriesGEBC"
           component={ViewAllCategoriesGEBC}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ViewGEBC"
+          component={ViewGEBC}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ViewQAFI"
+          component={ViewQAFI}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ViewNews"
+          component={ViewNews}
           options={{headerShown: false}}
         />
 

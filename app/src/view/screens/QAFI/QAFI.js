@@ -62,10 +62,14 @@ export default function QAFI({navigation}) {
 
   const [snackbarVisible, setsnackbarVisible] = useState(false);
 
+  const [snackbarVisibleAlert, setsnackbarVisibleAlert] = useState(false);
+
   const [profileName, setProfileName] = useState('');
 
-  const [imageUrl, setImageUrl] = useState('');
+  const [userImage, setUserImage] = useState('');
 
+
+  const [imageUrl, setImageUrl] = useState('');
 
   const [loading, setLoading] = useState(false);
 
@@ -80,6 +84,8 @@ export default function QAFI({navigation}) {
   const [comment, setComment] = useState('');
 
   const [imageInfo, setImageInfo] = useState(null);
+
+  const [authToken, setAuthToken] = useState('');
 
   const [categoryId, setCategoryId] = useState('');
 
@@ -102,13 +108,16 @@ export default function QAFI({navigation}) {
     fetchVideos();
   }, []);
 
+  useEffect(() => {
+    authTokenAndId();
+  }, [userId, authToken]);
+
   const fetchVideos = async () => {
     // Simulate loading
     setLoading(true);
 
     await getUserID();
     // Fetch data one by one
-    await fetchCategory();
 
     // Once all data is fetched, set loading to false
     setLoading(false);
@@ -120,6 +129,7 @@ export default function QAFI({navigation}) {
       const result = await AsyncStorage.getItem('userId ');
       if (result !== null) {
         setUserId(result);
+
         console.log('user id retrieved:', result);
       }
     } catch (error) {
@@ -137,11 +147,70 @@ export default function QAFI({navigation}) {
       // Handle errors here
       console.error('Error retrieving user ID:', error);
     }
+
+    const result1 = await AsyncStorage.getItem('authToken ');
+    if (result1 !== null) {
+      setAuthToken(result1);
+      console.log('user token retrieved:', result1);
+      //await fetchUser(result1);
+      //await fetchCategory(result1);
+    } else {
+      console.log('result is null', result1);
+    }
+
+    await authTokenAndId();
   };
 
-  const fetchCategory = async () => {
-    const token =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjM3LCJpYXQiOjE3MDI0NTk1MTEsImV4cCI6MTcwNTA1MTUxMX0.OBTTZn0v5rT1Ps2k_OWVdpOmcHbk1x4Fbjmp2X_8Wc8'
+  const authTokenAndId = async () => {
+    if (userId !== '' && authToken !== '') {
+      console.log('USER ID', userId);
+      console.log('AUTH TOKEN ', authToken);
+      fetchUser(userId, authToken);
+    }
+  };
+
+  const fetchUser = async (id, tokens) => {
+    console.log('USER', id);
+    console.log('TOKEN', tokens);
+    const token = tokens;
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/user/getUser/${id}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('IMAGE', data);
+
+        // Use the data from the API to set the categories
+        setUserImage(data.user.image);
+        await fetchCategory(id, tokens);
+      } else {
+        console.error(
+          'Failed to fetch user:',
+          response.status,
+          response.statusText,
+          await fetchCategory(id, tokens),
+        );
+      }
+    } catch (error) {
+      await fetchCategory(id, tokens);
+      console.error('Errors:', error);
+    }
+  };
+
+
+
+
+  const fetchCategory = async (id, tokens) => {
+    const token = tokens
 
     try {
       const response = await fetch(
@@ -182,10 +251,10 @@ export default function QAFI({navigation}) {
 
   const upload = async () => {
     if (imageUri !== null && comment !== '' && categoryId !== '') {
-         handleUploadImage()
+      handleUploadImage();
       //uploadVideo();
     } else {
-      setModalVisible(true);
+      handleUpdatePasswordAlert();
     }
   };
 
@@ -197,13 +266,13 @@ export default function QAFI({navigation}) {
     setModalVisible(false);
   };
 
-  const handleUploadImage = (data) => {
+  const handleUploadImage = data => {
     setLoading(true);
     const uri = imageInfo.uri;
     const type = imageInfo.type;
     const name = imageInfo.fileName;
     const sourceImage = {uri, type, name};
-    console.log("Source Image",sourceImage);
+    console.log('Source Image', sourceImage);
     const dataImage = new FormData();
     dataImage.append('file', sourceImage);
     dataImage.append('upload_preset', 'e6zfilan'); // Use your Cloudinary upload preset
@@ -222,25 +291,23 @@ export default function QAFI({navigation}) {
         setImageUrl(data.url); // Store the Cloudinary video URL in your state
         //uploadVideo(data.url)
         //uploadXpiVideo(data.url);
-        console.log("Image Url",data);
+        console.log('Image Url', data);
         //uploadXpiVideo(data.url,data)
-        uploadVideo(data.url)
-        
-
+        uploadVideo(data.url);
       })
       .catch(err => {
-        setLoading(false)
+        setLoading(false);
         console.log('Error While Uploading Video', err);
       });
   };
 
-  const uploadVideo = async (data) => {
+  const uploadVideo = async data => {
     console.log('Image Uri', data);
     console.log('disc category Id', categoryId);
     console.log('Description', description);
     console.log('user id', userId);
 
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjM3LCJpYXQiOjE3MDI0NTk1MTEsImV4cCI6MTcwNTA1MTUxMX0.OBTTZn0v5rT1Ps2k_OWVdpOmcHbk1x4Fbjmp2X_8Wc8';
+    const token = authToken
     const apiUrl = 'https://watch-gotcha-be.mtechub.com/qafi/createQafi';
 
     const requestData = {
@@ -248,7 +315,6 @@ export default function QAFI({navigation}) {
       image: data,
       disc_category: categoryId,
       user_id: userId,
-      
     };
 
     try {
@@ -284,7 +350,6 @@ export default function QAFI({navigation}) {
     }
   };
 
-
   const handleFocus = () => {
     setIsTextInputActive(true);
   };
@@ -314,8 +379,6 @@ export default function QAFI({navigation}) {
       .catch(error => console.log(error));
   };
 
- 
-
   const handleUpdatePassword = async () => {
     // Perform the password update logic here
     // For example, you can make an API request to update the password
@@ -333,6 +396,27 @@ export default function QAFI({navigation}) {
   const dismissSnackbar = () => {
     setsnackbarVisible(false);
   };
+
+  //---------------------\\
+
+  const handleUpdatePasswordAlert = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setsnackbarVisibleAlert(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setsnackbarVisibleAlert(false);
+    }, 3000);
+  };
+
+  const dismissSnackbarAlert = () => {
+    setsnackbarVisibleAlert(false);
+  };
+
+  //-----------------------\\
 
   const Category = [
     {label: 'Politics', value: 'Politics'},
@@ -359,13 +443,11 @@ export default function QAFI({navigation}) {
             console.log('response', response.assets[0].uri);
             setImageInfo(response.assets[0]);
             ref_RBSheetCamera.current.close();
-
           } else if (response.uri) {
             // Handle the case when no assets are present (e.g., for videos)
             setImageUri(response.uri);
             console.log('response', response.uri);
             ref_RBSheetCamera.current.close();
-
           }
         }
         ref_RBSheetCamera.current.close();
@@ -375,14 +457,13 @@ export default function QAFI({navigation}) {
 
   const choosePhotoFromLibrary = value => {
     setSelectedItem(value);
-    launchImageLibrary({mediaType: 'Photo'}, response => {
+    launchImageLibrary({mediaType: 'photo'}, response => {
       console.log('image here', response);
       if (!response.didCancel && response.assets.length > 0) {
         console.log('Response', response.assets[0]);
         setImageUri(response.assets[0].uri);
         setImageInfo(response.assets[0]);
         ref_RBSheetCamera.current.close();
-
       }
 
       console.log('response', imageInfo);
@@ -428,17 +509,46 @@ export default function QAFI({navigation}) {
               source={appImages.profileImg}
               style={{width: '100%', height: '100%', resizeMode: 'cover'}}
             /> */}
-            <MaterialCommunityIcons
-              style={{marginTop: hp(0.5)}}
-              name={'account-circle'}
-              size={35}
-              color={'#FACA4E'}
-            />
+           {userImage ? (
+            <View
+              style={{
+                width: wp(10),
+                marginLeft: wp(3),
+                height: wp(10),
+                overflow: 'hidden',
+                borderRadius: wp(10) / 2,
+              }}>
+              {/*  <Image
+              source={appImages.profileImg}
+              style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+            /> */}
+              <Image
+                source={{uri: userImage}}
+                style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+              />
+            </View>
+          ) : (
+            <View
+              style={{
+                width: wp(10),
+                marginLeft: wp(3),
+                height: wp(10),
+                overflow: 'hidden',
+                borderRadius: wp(10) / 2,
+              }}>
+              <MaterialCommunityIcons
+                style={{marginTop: hp(0.5)}}
+                name={'account-circle'}
+                size={35}
+                color={'#FACA4E'}
+              />
+            </View>
+          )}
           </View>
           <Text
             style={{
               color: '#333333',
-              marginLeft: wp(3),
+              marginLeft: wp(5),
               fontFamily: 'Inter',
               fontWeight: 'bold',
             }}>
@@ -450,7 +560,7 @@ export default function QAFI({navigation}) {
           style={{
             justifyContent: 'center',
             alignItems: 'center',
-            flex:1,
+            flex: 1,
             marginTop: hp(-1),
           }}>
           <CPaperInput
@@ -698,9 +808,16 @@ export default function QAFI({navigation}) {
 
       <CustomSnackbar
         message={'Success'}
-        messageDescription={'News Posted Successfully'}
+        messageDescription={'QAFI Posted Successfully'}
         onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackbarVisible}
+      />
+
+      <CustomSnackbar
+        message={'Alert!'}
+        messageDescription={'Kindly Fill All Fields'}
+        onDismiss={dismissSnackbarAlert} // Make sure this function is defined
+        visible={snackbarVisibleAlert}
       />
 
       <RBSheet

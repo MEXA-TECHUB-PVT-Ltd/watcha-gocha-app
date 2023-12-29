@@ -54,6 +54,9 @@ export default function Sell({navigation}) {
 
   const [snackbarVisible, setsnackbarVisible] = useState(false);
 
+  const [snackbarVisibleExceeded, setsnackbarVisibleExceeded] = useState(false);
+
+
   const [snackbarVisibleAlert, setsnackbarVisibleAlert] = useState(false);
 
   const [price, setPrice] = useState('');
@@ -78,7 +81,7 @@ export default function Sell({navigation}) {
   const [condition, setCondition] = useState('');
 
   const [regionArea, setRegionArea] = useState('');
-  
+
   const [isFocusRegion, setIsFocusRegion] = useState(false);
 
   const [loading, setLoading] = useState(false);
@@ -101,9 +104,8 @@ export default function Sell({navigation}) {
 
   useEffect(() => {
     // Check and request location permission
-   
-    const requestLocationPermission = async () => {
 
+    const requestLocationPermission = async () => {
       try {
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
@@ -177,11 +179,8 @@ export default function Sell({navigation}) {
     }
   };
 
-
-  
-  const fetchCategory = async (userToken) => {
-    const token =
-     userToken;
+  const fetchCategory = async userToken => {
+    const token = userToken;
 
     try {
       const response = await fetch(
@@ -332,14 +331,13 @@ export default function Sell({navigation}) {
     {label: 'used_Good', value: 'used_Good'},
     {label: 'used_Fair', value: 'used_Fair'},
   ];
-  
+
   const RegionArea = [
     {label: 'Africa', value: 'Africa'},
     {label: 'Europe', value: 'Europe'},
     {label: 'Americas', value: 'Americas'},
     {label: 'Asia', value: 'Asia'},
     {label: 'Middle East', value: 'Middle East'},
-
   ];
 
   const TakeImageFromCamera = () => {
@@ -382,7 +380,7 @@ export default function Sell({navigation}) {
 
   const choosePhotoFromLibrary = value => {
     setSelectedItem(value);
-    launchImageLibrary({mediaType: 'photo', selectionLimit:10}, response => {
+    launchImageLibrary({mediaType: 'photo', selectionLimit: 10}, response => {
       if (
         !response.didCancel &&
         response.assets &&
@@ -396,14 +394,14 @@ export default function Sell({navigation}) {
   };
 
   const updateImageUris = newImageUri => {
-    console.log("RESPONSE", imageUris.length )
+    console.log('RESPONSE', imageUris.length);
 
     if (imageUris.length < 10) {
       setImageUris(prevImageUris => [...prevImageUris, ...newImageUri]);
-
     } else {
       // Handle the case when the limit exceeds (e.g., show a message)
-      console.log('Image limit exceeded');
+      //console.log('Image limit exceeded');
+      handleUpdatePasswordExceeded();
     }
   };
 
@@ -442,26 +440,26 @@ export default function Sell({navigation}) {
   };
 
   const upload = async () => {
-    console.log("Image URIS",imageUris.length );
-    console.log("title",title );
-    console.log("categoryId",categoryId );
-    console.log("condition",condition );
-    console.log("description",description );
-    console.log("price",price );
-    console.log("locationName",locationName);
-    console.log("region",region);
-    console.log("regionArea",regionArea);
+    console.log('Image URIS', imageUris.length);
+    console.log('title', title);
+    console.log('categoryId', categoryId);
+    console.log('condition', condition);
+    console.log('description', description);
+    console.log('price', price);
+    console.log('locationName', locationName);
+    console.log('region', region);
+    console.log('regionArea', regionArea);
 
     if (
       imageUris.length !== 0 &&
       title !== '' &&
       categoryId !== '' &&
-      condition!=='' &&
+      condition !== '' &&
       description !== '' &&
       price !== '' &&
       locationName !== '' &&
-      region !== ''&&
-      regionArea!==''
+      region !== '' &&
+      regionArea !== ''
     ) {
       handleUploadImages(imageUris);
       //console.log('All');
@@ -529,71 +527,68 @@ export default function Sell({navigation}) {
     }
   };
 
- 
+  const sellItem = async data => {
+    console.log('user Id', userId);
+    console.log('condition', condition);
+    console.log('imageUri', data);
+    console.log('title', title);
+    console.log('categoryId ', categoryId);
+    console.log('description ', description);
+    console.log('price ', price);
+    console.log('paid Status ', isChecked);
+    console.log('location ', locationName);
+    console.log('region ', region);
 
-    const sellItem = async (data) => {
-      console.log('user Id', userId );
-      console.log('condition', condition );
-      console.log('imageUri', data);
-      console.log('title', title);
-      console.log('categoryId ', categoryId);
-      console.log('description ', description);
-      console.log('price ', price);
-      console.log('paid Status ', isChecked);
-      console.log('location ', locationName);
-      console.log('region ', region);
-  
-      const token = authToken
-      const apiUrl = 'https://watch-gotcha-be.mtechub.com/item/sellItem';
-  
-      const requestData = {
-        "user_id": userId,
-        "item_category": categoryId,
-        "images":data,
-        "title": title,
-        "description": description,
-        "price": price,
-        "condition": condition,
-        "location": locationName,
-        "paid_status": isChecked,
-        "region": regionArea
-      };
-  
-      try {
-        const response = await fetch(apiUrl, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`, // Use the provided token
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestData),
-        });
-  
-        if (response.ok) {
-          const data = await response.json();
-          console.log('API Response:', data);
-          setLoading(false);
-          handleUpdatePassword();
-  
-          // Handle the response data as needed
-        } else {
-          setLoading(false);
-  
-          console.error(
-            'Failed to upload pic',
-            response.status,
-            response.statusText,
-          );
-          // Handle the error
-        }
-      } catch (error) {
-        console.error('API Request Error:', error);
+    const token = authToken;
+    const apiUrl = 'https://watch-gotcha-be.mtechub.com/item/sellItem';
+
+    const requestData = {
+      user_id: userId,
+      item_category: categoryId,
+      images: data,
+      title: title,
+      description: description,
+      price: price,
+      condition: condition,
+      location: locationName,
+      paid_status: isChecked,
+      region: regionArea,
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`, // Use the provided token
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data);
         setLoading(false);
-  
+        handleUpdatePassword();
+
+        // Handle the response data as needed
+      } else {
+        setLoading(false);
+
+        console.error(
+          'Failed to upload pic',
+          response.status,
+          response.statusText,
+        );
         // Handle the error
       }
-    };
-  
+    } catch (error) {
+      console.error('API Request Error:', error);
+      setLoading(false);
+
+      // Handle the error
+    }
+  };
 
   // Call the function wherever you need to trigger the API request
 
@@ -637,6 +632,28 @@ export default function Sell({navigation}) {
       //navigation.goBack();
     }, 3000);
   };
+
+  //---------------------\\
+
+  const dismissSnackbarAlertExceeded = () => {
+    setsnackbarVisibleExceeded(false);
+  };
+
+  const handleUpdatePasswordExceeded = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setsnackbarVisibleExceeded(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setsnackbarVisibleExceeded(false);
+    }, 3000);
+  };
+
+
+  //------------------------\\
 
   return (
     <KeyboardAvoidingView
@@ -931,15 +948,13 @@ export default function Sell({navigation}) {
           />
         </View>
 
-
-
         <TextInput
           mode="outlined"
           label="Description"
           onChangeText={text => setDescription(text)}
           multiline={true} // Enable multiline input
           numberOfLines={3} // Set the initial number of lines
-          style={{height: hp(25), ...styles.ti, width:wp(82)}} // Adjust the height as needed
+          style={{height: hp(25), ...styles.ti, width: wp(82)}} // Adjust the height as needed
           outlineColor="#0000001F"
           placeholderTextColor="#646464"
           activeOutlineColor="#FACA4E"
@@ -1090,6 +1105,13 @@ export default function Sell({navigation}) {
         messageDescription={'Kindly Fill All Fields'}
         onDismiss={dismissSnackbarAlert} // Make sure this function is defined
         visible={snackbarVisibleAlert}
+      />
+
+      <CustomSnackbar
+        message={'Alert'}
+        messageDescription={'Image Limit Exceeded!'}
+        onDismiss={dismissSnackbarAlertExceeded} // Make sure this function is defined
+        visible={snackbarVisibleExceeded}
       />
       <RBSheet
         ref={ref_RBSendOffer}
