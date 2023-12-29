@@ -71,7 +71,7 @@ export default function UploadUpdatePic({navigation, route}) {
             }}
           />
 
-          <Text
+         {/*  <Text
             style={{
               fontFamily: 'Inter',
               fontWeight:'bold',
@@ -79,7 +79,7 @@ export default function UploadUpdatePic({navigation, route}) {
               color: '#FFFFFF',
             }}>
             Change Pic
-          </Text>
+          </Text> */}
         </View>
       </View>
     </ImageBackground>
