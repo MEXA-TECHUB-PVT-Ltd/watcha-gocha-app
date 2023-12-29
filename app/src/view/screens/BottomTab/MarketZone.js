@@ -885,7 +885,7 @@ export default function MarketZone({navigation}) {
       </ScrollView>
 
       <TouchableOpacity
-        onPress={() => ref_RBSheetCamera.current.open()}
+        onPress={() =>     navigation.navigate('Sell')      }
         style={{position: 'absolute', bottom: 1, right: 25}}>
         <Add />
       </TouchableOpacity>

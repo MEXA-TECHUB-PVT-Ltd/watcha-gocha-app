@@ -46,7 +46,7 @@ import Fontiso from 'react-native-vector-icons/Fontisto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import IonIcons from 'react-native-vector-icons/Ionicons';
-
+import EmojiSelector from 'react-native-emoji-selector';
 import CPaperInput from '../../../assets/Custom/CPaperInput';
 import CustomSnackbar from '../../../assets/Custom/CustomSnackBar';
 
@@ -64,9 +64,17 @@ export default function GEBC({navigation}) {
 
   const [snackbarVisible, setsnackbarVisible] = useState(false);
 
+  const [snackbarVisibleAlert, setsnackbarVisibleAlert] = useState(false);
+
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
   const [profileName, setProfileName] = useState('');
 
   const [imageUrl, setImageUrl] = useState('');
+
+  const [emojiUrl, setEmojiUrl] = useState(
+    'https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/1f604.png',
+  );
 
   const [loading, setLoading] = useState(false);
 
@@ -150,7 +158,19 @@ export default function GEBC({navigation}) {
     }
   };
 
-  const fetchCategory = async (result) => {
+  //--------------------\\
+
+  const emojiToImage = emoji => {
+    const emojiCodePoint = emoji.codePointAt(0).toString(16); // Get Unicode code point
+    const imageUrl = `https://twemoji.maxcdn.com/v/latest/72x72/${emojiCodePoint}.png`; // Example UR
+    console.log('EMOJI', imageUrl);
+    setEmojiUrl(imageUrl);
+    setShowEmojiPicker(false);
+  };
+
+  //--------------------\\
+
+  const fetchCategory = async result => {
     const token = result;
 
     try {
@@ -191,11 +211,13 @@ export default function GEBC({navigation}) {
   };
 
   const upload = async () => {
-    if (imageUri !== null && comment !== '' && categoryId !== '') {
-      handleUploadImage();
+    if (emojiUrl !== '' && comment !== '' && categoryId !== '') {
+        uploadVideo();
+      //handleUploadImage();
       //uploadVideo();
     } else {
-      setModalVisible(true);
+      handleUpdatePasswordAlert();
+      //setModalVisible(true);
     }
   };
 
@@ -243,7 +265,7 @@ export default function GEBC({navigation}) {
   };
 
   const uploadVideo = async data => {
-    console.log('Image Uri', data);
+    console.log('Image Uri', emojiUrl);
     console.log('disc category Id', categoryId);
     console.log('Description', description);
     console.log('user id', userId);
@@ -253,7 +275,7 @@ export default function GEBC({navigation}) {
 
     const requestData = {
       description: description,
-      image: data,
+      image: emojiUrl,
       disc_category: categoryId,
       user_id: userId,
     };
@@ -301,7 +323,6 @@ export default function GEBC({navigation}) {
     setIsTextInputActive(false);
   };
 
-
   const handleUpdatePassword = async () => {
     // Perform the password update logic here
     // For example, you can make an API request to update the password
@@ -318,6 +339,23 @@ export default function GEBC({navigation}) {
 
   const dismissSnackbar = () => {
     setsnackbarVisible(false);
+  };
+
+  const handleUpdatePasswordAlert = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setsnackbarVisibleAlert(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setsnackbarVisibleAlert(false);
+    }, 3000);
+  };
+
+  const dismissSnackbarAlert = () => {
+    setsnackbarVisibleAlert(false);
   };
 
   const Category = [
@@ -385,7 +423,7 @@ export default function GEBC({navigation}) {
       </View>
 
       <ScrollView
-        keyboardShouldPersistTaps="always"
+        //keyboardShouldPersistTaps="always"
         showsVerticalScrollIndicator={false}
         style={{flex: 1}}>
         <View
@@ -434,17 +472,17 @@ export default function GEBC({navigation}) {
             marginTop: hp(-1),
           }}>
           <CPaperInput
-            //multiline={true}
+            multiline={true}
             style={{flex: 1}}
             placeholder={'Add a comment'}
             placeholderTextColor="#B0B0B0"
             value={comment}
             onChangeText={text => setComment(text)}
-            //height={hp(5)}
+            height={hp(14)}
           />
         </View>
 
-        <TouchableOpacity
+        {/*   <TouchableOpacity
           onPress={() => ref_RBSheetCamera.current.open()}
           style={{
             flexDirection: 'row',
@@ -467,7 +505,7 @@ export default function GEBC({navigation}) {
             }}>
             Add Image
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {imageUri !== null ? (
           <View
@@ -556,6 +594,40 @@ export default function GEBC({navigation}) {
             )}
           />
         </View>
+
+        <View
+          style={{
+            marginHorizontal: wp(30),
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: hp(10),
+            //borderWidth: 3,
+          }}>
+          <TouchableOpacity onPress={()=>setShowEmojiPicker(true)}>
+            <Image
+              style={{
+                width: 50,
+                height: 50,
+                resizeMode: 'contain',
+              }}
+              source={{uri: emojiUrl}}
+            />
+          </TouchableOpacity>
+        </View>
+
+        {showEmojiPicker &&<View style={{marginHorizontal: wp(10), marginTop: hp(10)}}>
+          <EmojiSelector
+            placeholder={'Search Emoji...'}
+            onEmojiSelected={emoji => emojiToImage(emoji)}
+            showTabs={false}
+          />
+        </View>}
+
+        {/*  <EmojiSelector
+          placeholder={'Search Emoji...'}
+          onEmojiSelected={emoji => emojiToImage(emoji)}
+          showTabs={false}
+        /> */}
       </ScrollView>
 
       <View
@@ -682,6 +754,13 @@ export default function GEBC({navigation}) {
         messageDescription={'GEBC Posted Successfully'}
         onDismiss={dismissSnackbar} // Make sure this function is defined
         visible={snackbarVisible}
+      />
+
+      <CustomSnackbar
+        message={'Alert!'}
+        messageDescription={'Kindly Fill All Fields'}
+        onDismiss={dismissSnackbarAlert} // Make sure this function is defined
+        visible={snackbarVisibleAlert}
       />
 
       <RBSheet
@@ -900,5 +979,9 @@ const styles = StyleSheet.create({
     borderRadius: wp(1.8),
     borderWidth: 1,
     borderColor: '#FACA4E',
+  },
+  emojiSelectorContainer: {
+    width: 300, // Set your desired width
+    height: 300, // Set your desired height
   },
 });
