@@ -33,7 +33,6 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 import {useIsFocused} from '@react-navigation/native';
 
-
 export default function Disc({navigation, route}) {
   const [selectedItemId, setSelectedItemId] = useState(1);
 
@@ -69,7 +68,7 @@ export default function Disc({navigation, route}) {
 
   useEffect(() => {
     if (isFocused) {
-    getUserID(); // Call the async function
+      getUserID(); // Call the async function
     }
   }, [NewsCategory, isFocused]); // Include 'id' in the dependency array
 
@@ -132,7 +131,7 @@ export default function Disc({navigation, route}) {
         setLoading(false);
       }
     } else {
-     /*  setLoading(true);
+      /*  setLoading(true);
       //setSelectedItemId(1)
       console.log('Category Id News is ', NewsCategory);
       // Fetch data one by one
@@ -145,7 +144,7 @@ export default function Disc({navigation, route}) {
 
   const fetchNews = async () => {
     console.log('Categry in id', categoryIdNews);
-    console.log("News Called");
+    console.log('News Called');
     const token = authToken;
 
     try {
@@ -330,36 +329,37 @@ export default function Disc({navigation, route}) {
 
   const renderPublicGeneral = item => {
     console.log('Item', item);
-    const imageUrl = item.images && item.images[0]
-    ? (item.images[0].startsWith('/fileUpload')
-        ? `https://watch-gotcha-be.mtechub.com${item.images[0]}`
-        : item.images[0])
-    : null;
+    const imageUrl =
+      item.images && item.images[0]
+        ? item.images[0].startsWith('/fileUpload')
+          ? `https://watch-gotcha-be.mtechub.com${item.images[0]}`
+          : item.images[0]
+        : null;
 
     return (
       <TouchableOpacity
         onPress={() => navigation.navigate('LetterDetails', {Letters: item})}
         style={{width: wp(25.5), margin: 5}}>
         <View>
-        {item.images && item.images[0] ? (
-          <Image
-            style={{
-              height: hp(12),
-              width: wp(23),
-            }}
-            source={{ uri: imageUrl }}
-          />
-        ) : (
-          // Show dummy image if item.images is null or undefined
-          <Image
-            style={{
-              height: hp(12),
-              width: wp(23),
-            }}
-            source={appImages.galleryPlaceHolder}
-          />
-        )}
-         {/* <Image
+          {item.images && item.images[0] ? (
+            <Image
+              style={{
+                height: hp(12),
+                width: wp(23),
+              }}
+              source={{uri: imageUrl}}
+            />
+          ) : (
+            // Show dummy image if item.images is null or undefined
+            <Image
+              style={{
+                height: hp(12),
+                width: wp(23),
+              }}
+              source={appImages.galleryPlaceHolder}
+            />
+          )}
+          {/* <Image
             style={{
               height: hp(12),
               width: wp(23),
@@ -369,7 +369,6 @@ export default function Disc({navigation, route}) {
         </View>
       </TouchableOpacity>
     );
-    
   };
 
   //-------------------\\
@@ -452,7 +451,7 @@ export default function Disc({navigation, route}) {
     console.log('Items of News', item);
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate('News', {News: item})}
+        onPress={() => navigation.navigate('ViewNews', {picData: item})}
         style={{width: wp(25.5), margin: 5}}>
         <View>
           <Image
@@ -468,7 +467,7 @@ export default function Disc({navigation, route}) {
               borderRadius: wp(1),
               resizeMode: 'cover',
             }}
-            source={appImages.galleryPlaceHolder}
+            source={{uri: item.image}}
           />
         </View>
 
@@ -480,24 +479,40 @@ export default function Disc({navigation, route}) {
             height: hp(7),
             width: wp(25),
           }}>
-          <View
-            style={{
-              width: wp(7),
-              marginLeft: wp(0.5),
-              height: wp(7),
-              borderRadius: wp(7) / 2,
-            }}>
-            <MaterialCommunityIcons
-              style={{marginTop: hp(0.5)}}
-              name={'account-circle'}
-              size={30}
-              color={'#FACA4E'}
-            />
-            {/*  <Image
-              source={appImages.profileImg}
-              style={{width: '100%', height: '100%', resizeMode: 'cover'}}
-            /> */}
-          </View>
+          {item?.userimage ? (
+            <View
+              style={{
+                width: wp(7),
+                marginLeft: wp(0.5),
+                height: wp(7),
+                overflow: 'hidden',
+                borderRadius: wp(7) / 2,
+              }}>
+              <Image
+                source={{uri: item?.userimage}}
+                style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+              />
+            </View>
+          ) : (
+            <View
+              style={{
+                width: wp(7),
+                marginLeft: wp(0.5),
+                height: wp(7),
+                borderRadius: wp(7) / 2,
+              }}>
+              <MaterialCommunityIcons
+                style={{marginTop: hp(0.5)}}
+                name={'account-circle'}
+                size={30}
+                color={'#FACA4E'}
+              />
+              {/*  <Image
+            source={appImages.profileImg}
+            style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+          /> */}
+            </View>
+          )}
 
           <Text
             style={{
@@ -522,7 +537,7 @@ export default function Disc({navigation, route}) {
     console.log('Items of QAFI', item);
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate('News', {News: item})}
+        onPress={() => navigation.navigate('ViewQAFI', {picData: item})}
         style={{width: wp(25.5), margin: 5}}>
         <View>
           <Image
@@ -538,7 +553,7 @@ export default function Disc({navigation, route}) {
               borderRadius: wp(1),
               resizeMode: 'cover',
             }}
-            source={appImages.galleryPlaceHolder}
+            source={{uri: item.image}}
           />
         </View>
 
@@ -550,25 +565,40 @@ export default function Disc({navigation, route}) {
             height: hp(7),
             width: wp(25),
           }}>
-          <View
-            style={{
-              width: wp(7),
-              marginLeft: wp(0.5),
-              height: wp(7),
-              borderRadius: wp(7) / 2,
-            }}>
-            {/* <Image
-              source={appImages.profileImg}
-              style={{width: '100%', height: '100%', resizeMode: 'cover'}}
-            /> */}
-
-            <MaterialCommunityIcons
-              //style={{marginTop: hp(0.5)}}
-              name={'account-circle'}
-              size={25}
-              color={'#FACA4E'}
-            />
-          </View>
+          {item?.userimage ? (
+            <View
+              style={{
+                width: wp(7),
+                marginLeft: wp(0.5),
+                height: wp(7),
+                overflow: 'hidden',
+                borderRadius: wp(7) / 2,
+              }}>
+              <Image
+                source={{uri: item?.userimage}}
+                style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+              />
+            </View>
+          ) : (
+            <View
+              style={{
+                width: wp(7),
+                marginLeft: wp(0.5),
+                height: wp(7),
+                borderRadius: wp(7) / 2,
+              }}>
+              <MaterialCommunityIcons
+                style={{marginTop: hp(0.5)}}
+                name={'account-circle'}
+                size={30}
+                color={'#FACA4E'}
+              />
+              {/*  <Image
+            source={appImages.profileImg}
+            style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+          /> */}
+            </View>
+          )}
 
           <Text
             style={{
@@ -590,56 +620,69 @@ export default function Disc({navigation, route}) {
   };
 
   const renderAvailableAppsGEBC = item => {
-    console.log('Items of News', item);
+    console.log('Items of GEBC', item);
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate('News', {News: item})}
+        onPress={() => navigation.navigate('ViewGEBC', {picData: item})}
         style={{width: wp(25.5), margin: 5}}>
-        <View>
-          <Image
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-
-              zIndex: 1, // Ensure it's on top of other elements
-              //flex: 1,
-              width: '39%',
-              height: hp(5),
-              borderRadius: wp(1),
-              resizeMode: 'stretch',
-            }}
-            source={{uri:item?.image}}
-          />
-        </View>
+        <View
+          style={{
+            width: '100%',
+            justifyContent:'center',
+            alignItems:'center',
+            height: hp(10),
+            borderRadius: wp(1),
+            resizeMode: 'stretch',
+            borderWidth: 1, // Border width
+            borderColor: 'grey', // Border color
+          }}>
+            <Text style={{fontSize:hp(5)}}>
+              {item.image}
+            </Text>
+          </View>
 
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            marginTop: hp(5),
+            marginTop: hp(1),
             height: hp(7),
             width: wp(25),
           }}>
-          <View
-            style={{
-              width: wp(7),
-              marginLeft: wp(0.5),
-              height: wp(7),
-              borderRadius: wp(7) / 2,
-            }}>
-            {/* <Image
-              source={appImages.profileImg}
-              style={{width: '100%', height: '100%', resizeMode: 'cover'}}
-            /> */}
-
-            <MaterialCommunityIcons
-              //style={{marginTop: hp(0.5)}}
-              name={'account-circle'}
-              size={25}
-              color={'#FACA4E'}
-            />
-          </View>
+          {item?.userimage ? (
+            <View
+              style={{
+                width: wp(7),
+                marginLeft: wp(0.5),
+                height: wp(7),
+                overflow: 'hidden',
+                borderRadius: wp(7) / 2,
+              }}>
+              <Image
+                source={{uri: item?.userimage}}
+                style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+              />
+            </View>
+          ) : (
+            <View
+              style={{
+                width: wp(7),
+                marginLeft: wp(0.5),
+                height: wp(7),
+                borderRadius: wp(7) / 2,
+              }}>
+              <MaterialCommunityIcons
+                style={{marginTop: hp(0.5)}}
+                name={'account-circle'}
+                size={30}
+                color={'#FACA4E'}
+              />
+              {/*  <Image
+            source={appImages.profileImg}
+            style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+          /> */}
+            </View>
+          )}
 
           <Text
             style={{
@@ -789,7 +832,7 @@ export default function Disc({navigation, route}) {
 
         <View style={{marginTop: hp(2), height: hp(23)}}>
           <View style={{marginTop: hp(1), height: '100%'}}>
-          {loading === true ? (
+            {loading === true ? (
               <View
                 style={{
                   position: 'absolute',
@@ -816,18 +859,17 @@ export default function Disc({navigation, route}) {
                     </Text>
                   </View>
                 ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsVerticalScrollIndicator={false}
-                data={newsData}
-                horizontal
-                //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableApps(item)}
-              />
-              )}
+                  <FlatList
+                    style={{flex: 1}}
+                    showsVerticalScrollIndicator={false}
+                    data={newsData}
+                    horizontal
+                    //keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableApps(item)}
+                  />
+                )}
               </>
             )}
-          
           </View>
         </View>
 
@@ -1023,14 +1065,29 @@ export default function Disc({navigation, route}) {
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
             ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsVerticalScrollIndicator={false}
-                data={qafiData}
-                horizontal
-                //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableAppsQAFI(item)}
-              />
+              <>
+                {qafiData?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsVerticalScrollIndicator={false}
+                    data={qafiData}
+                    horizontal
+                    //keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableAppsQAFI(item)}
+                  />
+                )}
+              </>
             )}
           </View>
         </View>
@@ -1051,14 +1108,29 @@ export default function Disc({navigation, route}) {
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
             ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsVerticalScrollIndicator={false}
-                data={qafiData}
-                horizontal
-                //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableAppsQAFI(item)}
-              />
+              <>
+                {qafiData?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsVerticalScrollIndicator={false}
+                    data={qafiData}
+                    horizontal
+                    //keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableAppsQAFI(item)}
+                  />
+                )}
+              </>
             )}
           </View>
         </View>
@@ -1079,14 +1151,29 @@ export default function Disc({navigation, route}) {
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
             ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsVerticalScrollIndicator={false}
-                data={qafiData}
-                horizontal
-                //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableAppsQAFI(item)}
-              />
+              <>
+                {qafiData?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsVerticalScrollIndicator={false}
+                    data={qafiData}
+                    horizontal
+                    //keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableAppsQAFI(item)}
+                  />
+                )}
+              </>
             )}
           </View>
         </View>
@@ -1107,14 +1194,29 @@ export default function Disc({navigation, route}) {
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
             ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsVerticalScrollIndicator={false}
-                data={qafiData}
-                horizontal
-                //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableAppsQAFI(item)}
-              />
+              <>
+                {qafiData?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsVerticalScrollIndicator={false}
+                    data={qafiData}
+                    horizontal
+                    //keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableAppsQAFI(item)}
+                  />
+                )}
+              </>
             )}
           </View>
         </View>
@@ -1227,14 +1329,29 @@ export default function Disc({navigation, route}) {
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
             ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsVerticalScrollIndicator={false}
-                data={gebcData}
-                horizontal
-                //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableAppsGEBC(item)}
-              />
+              <>
+                {gebcData?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsVerticalScrollIndicator={false}
+                    data={gebcData}
+                    horizontal
+                    //keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableAppsGEBC(item)}
+                  />
+                )}
+              </>
             )}
           </View>
         </View>
@@ -1255,14 +1372,29 @@ export default function Disc({navigation, route}) {
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
             ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsVerticalScrollIndicator={false}
-                data={gebcData}
-                horizontal
-                //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableAppsGEBC(item)}
-              />
+              <>
+                {gebcData?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsVerticalScrollIndicator={false}
+                    data={gebcData}
+                    horizontal
+                    //keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableAppsGEBC(item)}
+                  />
+                )}
+              </>
             )}
           </View>
         </View>
@@ -1283,14 +1415,29 @@ export default function Disc({navigation, route}) {
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
             ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsVerticalScrollIndicator={false}
-                data={gebcData}
-                horizontal
-                //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableAppsGEBC(item)}
-              />
+              <>
+                {gebcData?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsVerticalScrollIndicator={false}
+                    data={gebcData}
+                    horizontal
+                    //keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableAppsGEBC(item)}
+                  />
+                )}
+              </>
             )}
           </View>
         </View>
@@ -1311,14 +1458,29 @@ export default function Disc({navigation, route}) {
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
             ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsVerticalScrollIndicator={false}
-                data={gebcData}
-                horizontal
-                //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableAppsGEBC(item)}
-              />
+              <>
+                {gebcData?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsVerticalScrollIndicator={false}
+                    data={gebcData}
+                    horizontal
+                    //keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableAppsGEBC(item)}
+                  />
+                )}
+              </>
             )}
           </View>
         </View>

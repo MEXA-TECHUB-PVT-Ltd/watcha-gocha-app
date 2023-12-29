@@ -72,9 +72,7 @@ export default function GEBC({navigation}) {
 
   const [imageUrl, setImageUrl] = useState('');
 
-  const [emojiUrl, setEmojiUrl] = useState(
-    'https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/1f604.png',
-  );
+  const [emojiUrl, setEmojiUrl] = useState('😀');
 
   const [loading, setLoading] = useState(false);
 
@@ -98,6 +96,9 @@ export default function GEBC({navigation}) {
 
   const [userName, setName] = useState('');
 
+  const [userImage, setUserImage] = useState('');
+
+
   const [categoriesSelect, setCategorySelect] = useState([]);
 
   const [imageUri, setImageUri] = useState(null);
@@ -108,10 +109,15 @@ export default function GEBC({navigation}) {
 
   const ref_RBSendOffer = useRef(null);
 
+  
   useEffect(() => {
     // Make the API request and update the 'data' state
     fetchVideos();
   }, []);
+
+  useEffect(() => {
+    authTokenAndId();
+  }, [userId, authToken]);
 
   const fetchVideos = async () => {
     // Simulate loading
@@ -130,16 +136,8 @@ export default function GEBC({navigation}) {
       const result = await AsyncStorage.getItem('userId ');
       if (result !== null) {
         setUserId(result);
-        console.log('user id retrieved:', result);
-      }
 
-      const result1 = await AsyncStorage.getItem('authToken ');
-      if (result1 !== null) {
-        setAuthToken(result1);
-        fetchCategory(result1);
-        console.log('user token retrieved:', result1);
-      } else {
-        console.log('result is null', result);
+        console.log('user id retrieved:', result);
       }
     } catch (error) {
       // Handle errors here
@@ -156,15 +154,73 @@ export default function GEBC({navigation}) {
       // Handle errors here
       console.error('Error retrieving user ID:', error);
     }
+
+    const result1 = await AsyncStorage.getItem('authToken ');
+    if (result1 !== null) {
+      setAuthToken(result1);
+      console.log('user token retrieved:', result1);
+      //await fetchUser(result1);
+      //await fetchCategory(result1);
+    } else {
+      console.log('result is null', result1);
+    }
+
+    await authTokenAndId();
+  };
+
+  const authTokenAndId = async () => {
+    if (userId !== '' && authToken !== '') {
+      console.log('USER ID', userId);
+      console.log('AUTH TOKEN ', authToken);
+      fetchUser(userId, authToken);
+    }
+  };
+
+  const fetchUser = async (id, tokens) => {
+    console.log('USER', id);
+    console.log('TOKEN', tokens);
+    const token = tokens;
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/user/getUser/${id}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('IMAGE', data);
+
+        // Use the data from the API to set the categories
+        setUserImage(data.user.image);
+        await fetchCategory(id, tokens);
+      } else {
+        console.error(
+          'Failed to fetch user:',
+          response.status,
+          response.statusText,
+          await fetchCategory(id, tokens),
+        );
+      }
+    } catch (error) {
+      await fetchCategory(id, tokens);
+      console.error('Errors:', error);
+    }
   };
 
   //--------------------\\
 
   const emojiToImage = emoji => {
-    const emojiCodePoint = emoji.codePointAt(0).toString(16); // Get Unicode code point
-    const imageUrl = `https://twemoji.maxcdn.com/v/latest/72x72/${emojiCodePoint}.png`; // Example UR
-    console.log('EMOJI', imageUrl);
-    setEmojiUrl(imageUrl);
+    //const emojiCodePoint = emoji.codePointAt(0).toString(16); // Get Unicode code point
+   // const imageUrl = `https://twemoji.maxcdn.com/v/latest/72x72/${emojiCodePoint}.png`; // Example UR
+    //console.log('EMOJI', imageUrl);
+    console.log(emoji)
+    setEmojiUrl(emoji);
     setShowEmojiPicker(false);
   };
 
@@ -267,14 +323,14 @@ export default function GEBC({navigation}) {
   const uploadVideo = async data => {
     console.log('Image Uri', emojiUrl);
     console.log('disc category Id', categoryId);
-    console.log('Description', description);
+    console.log('Description', comment);
     console.log('user id', userId);
 
     const token = authToken;
     const apiUrl = 'https://watch-gotcha-be.mtechub.com/gebc/createGEBC';
 
     const requestData = {
-      description: description,
+      description: comment,
       image: emojiUrl,
       disc_category: categoryId,
       user_id: userId,
@@ -446,18 +502,47 @@ export default function GEBC({navigation}) {
               source={appImages.profileImg}
               style={{width: '100%', height: '100%', resizeMode: 'cover'}}
             /> */}
-
-            <MaterialCommunityIcons
-              style={{marginTop: hp(0.5)}}
-              name={'account-circle'}
-              size={35}
-              color={'#FACA4E'}
-            />
+             {userImage ? (
+            <View
+              style={{
+                width: wp(10),
+                marginLeft: wp(3),
+                height: wp(10),
+                overflow: 'hidden',
+                borderRadius: wp(10) / 2,
+              }}>
+              {/*  <Image
+              source={appImages.profileImg}
+              style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+            /> */}
+              <Image
+                source={{uri: userImage}}
+                style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+              />
+            </View>
+          ) : (
+            <View
+              style={{
+                width: wp(10),
+                marginLeft: wp(3),
+                height: wp(10),
+                overflow: 'hidden',
+                borderRadius: wp(10) / 2,
+              }}>
+              <MaterialCommunityIcons
+                style={{marginTop: hp(0.5)}}
+                name={'account-circle'}
+                size={35}
+                color={'#FACA4E'}
+              />
+            </View>
+          )}
+           
           </View>
           <Text
             style={{
               color: '#333333',
-              marginLeft: wp(3),
+              marginLeft: wp(5),
               fontFamily: 'Inter',
               fontWeight: 'bold',
             }}>
@@ -600,18 +685,17 @@ export default function GEBC({navigation}) {
             marginHorizontal: wp(30),
             justifyContent: 'center',
             alignItems: 'center',
-            height: hp(10),
+            height: hp(21),
             //borderWidth: 3,
           }}>
-          <TouchableOpacity onPress={()=>setShowEmojiPicker(true)}>
-            <Image
-              style={{
-                width: 50,
-                height: 50,
-                resizeMode: 'contain',
-              }}
-              source={{uri: emojiUrl}}
-            />
+
+            <Text style={{color:'#FACA4E', fontWeight:'bold'}}>
+              Click on this emoji to select your emoji's
+            </Text>
+          <TouchableOpacity style={{marginTop:hp(3)}} onPress={()=>setShowEmojiPicker(true)}>
+          <Text style={{fontSize:hp(10)}}>
+              {emojiUrl}
+            </Text>
           </TouchableOpacity>
         </View>
 

@@ -381,7 +381,7 @@ export default function PicTours({navigation}) {
     setSelectedItem(value);
     launchCamera(
       {
-        mediaType: 'Photo',
+        mediaType: 'photo',
         //videoQuality: 'medium',
       },
       response => {
@@ -402,18 +402,18 @@ export default function PicTours({navigation}) {
             navigation.navigate('UploadUpdatePic', {Video: response.assets[0]});
           }
         }
-        console.log('response', imageInfo);
+        //console.log('response', imageInfo);
         ref_RBSheetCamera.current.close();
         setLoading(false);
 
-        navigation.navigate('UploadUpdatePic', {Video: response.assets[0]});
+       // navigation.navigate('UploadUpdatePic', {Video: response.assets[0]});
       },
     );
   };
 
   const choosePhotoFromLibrary = value => {
     setSelectedItem(value);
-    launchImageLibrary({mediaType: 'Photo'}, response => {
+    launchImageLibrary({mediaType: 'photo'}, response => {
       console.log('image here', response);
       if (!response.didCancel && response.assets.length > 0) {
         /*  console.log('Response', response.assets[0]);
@@ -427,11 +427,11 @@ export default function PicTours({navigation}) {
         navigation.navigate('UploadUpdatePic', {Video: response.assets[0]});
       }
 
-      console.log('response', imageInfo);
+      //console.log('response', imageInfo);
       ref_RBSheetCamera.current.close();
       setLoading(false);
 
-      navigation.navigate('UploadUpdatePic', {Video: response.assets[0]});
+      //navigation.navigate('UploadUpdatePic', {Video: response.assets[0]});
     });
   };
 
