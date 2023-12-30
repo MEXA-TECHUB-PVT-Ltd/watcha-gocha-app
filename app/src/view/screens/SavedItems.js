@@ -81,8 +81,13 @@ export default function SavedItems({navigation}) {
   const [loading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    // Make the API request and update the 'data' state
     fetchVideos();
   }, []);
+
+  useEffect(() => {
+    authTokenAndId();
+  }, [userId, authToken]);
 
   const fetchVideos = async () => {
     // Simulate loading
@@ -90,6 +95,7 @@ export default function SavedItems({navigation}) {
 
     await getUserID();
     // Fetch data one by one
+
     // Once all data is fetched, set loading to false
     setIsLoading(false);
   };
@@ -97,33 +103,58 @@ export default function SavedItems({navigation}) {
   const getUserID = async () => {
     console.log("Id's");
     try {
-      const result1 = await AsyncStorage.getItem('authToken ');
-      if (result1 !== null) {
-        setAuthToken(result1);
-        console.log('user token retrieved:', result1);
-      }
+      const result = await AsyncStorage.getItem('userId ');
+      if (result !== null) {
+        setUserId(result);
 
-      const result3 = await AsyncStorage.getItem('userId ');
-      if (result3 !== null) {
-        setUserId(result3);
-        //fetchSavedItems(result3);
-
-        console.log('user id retrieved:', result3);
+        console.log('user id retrieved:', result);
       }
     } catch (error) {
       // Handle errors here
       console.error('Error retrieving user ID:', error);
     }
+
+    try {
+      const result = await AsyncStorage.getItem('userName');
+      if (result !== null) {
+        setName(result);
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+
+    const result1 = await AsyncStorage.getItem('authToken ');
+    if (result1 !== null) {
+      setAuthToken(result1);
+      console.log('user token retrieved:', result1);
+      //await fetchUser(result1);
+      //await fetchCategory(result1);
+    } else {
+      console.log('result is null', result1);
+    }
+
+    await authTokenAndId();
   };
 
-  const fetchSavedItems = async result => {
-    console.log('selected most commented videos', authToken);
+  const authTokenAndId = async () => {
+    if (userId !== '' && authToken !== '') {
+      console.log('USER ID', userId);
+      console.log('AUTH TOKEN ', authToken);
+      fetchSavedItems(userId, authToken);
+    }
+  };
 
-    const token = authToken;
+  
+  const fetchSavedItems = async (ids, tokens) => {
+    console.log('selected most commented videosssssssssssss', tokens);
+
+    const token = tokens;
 
     try {
       const response = await fetch(
-        `https://watch-gotcha-be.mtechub.com/item/getAllSavedItemsByUser${result}`,
+        `https://watch-gotcha-be.mtechub.com/item/getAllSavedItemsByUser/${ids}`,
         {
           method: 'GET',
           headers: {
@@ -141,7 +172,7 @@ export default function SavedItems({navigation}) {
   };
 
   const renderAvailableApps = item => {
-    console.log('Items', item);
+    console.log('Items', item.images[0].image);
     return (
       <View
         style={{
@@ -160,9 +191,9 @@ export default function SavedItems({navigation}) {
             width: '100%',
             height: '100%',
             borderRadius: wp(3),
-            resizeMode: 'contain',
+            resizeMode: 'stretch',
           }}
-          source={item.image}
+          source={{uri:item.images[0].image}}
         />
         <View
           style={{
@@ -199,7 +230,7 @@ export default function SavedItems({navigation}) {
       <FlatList
         style={{marginTop: hp(3), marginHorizontal: wp(5), flex: 1}}
         showsVerticalScrollIndicator={false}
-        data={availableApps}
+        data={savedItems}
         keyExtractor={item => item.id.toString()}
         numColumns={3} // Set the number of columns to 3
         renderItem={({item}) => renderAvailableApps(item)}

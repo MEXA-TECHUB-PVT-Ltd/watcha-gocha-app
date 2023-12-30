@@ -63,7 +63,7 @@ export default function UploadVideo() {
             }}
           />
 
-          <Text
+        {/*   <Text
             style={{
               fontFamily: 'Inter',
               fontWeight:'bold',
@@ -71,7 +71,7 @@ export default function UploadVideo() {
               color: '#FFFFFF',
             }}>
             Change Pic
-          </Text>
+          </Text> */}
         </View>
       </View>
     </ImageBackground>

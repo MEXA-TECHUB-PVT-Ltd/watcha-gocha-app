@@ -198,17 +198,17 @@ export default function GEBC({navigation}) {
 
         // Use the data from the API to set the categories
         setUserImage(data.user.image);
-        await fetchCategory(id, tokens);
+        await fetchCategory( tokens);
       } else {
         console.error(
           'Failed to fetch user:',
           response.status,
           response.statusText,
-          await fetchCategory(id, tokens),
+          await fetchCategory( tokens),
         );
       }
     } catch (error) {
-      await fetchCategory(id, tokens);
+      await fetchCategory( tokens);
       console.error('Errors:', error);
     }
   };
@@ -227,6 +227,7 @@ export default function GEBC({navigation}) {
   //--------------------\\
 
   const fetchCategory = async result => {
+    console.log("TOKEN", result)
     const token = result;
 
     try {

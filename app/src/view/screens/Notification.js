@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import React, {useState, useEffect, useRef} from 'react';
 import RBSheet from 'react-native-raw-bottom-sheet';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {Button, Divider, TextInput} from 'react-native-paper';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -70,102 +71,124 @@ const availableApps = [
 ];
 
 export default function Notification({navigation}) {
-    const [selectedRide, setSelectedRide] = useState(null);
+  const [selectedRide, setSelectedRide] = useState(null);
 
-    const [imageUri, setImageUri] = useState(null);
-    const [userId, setUserId] = useState('');
-    const [userToken, setUserToken] = useState(null);
-  
-    const [priceOffer, setPriceOffer] = useState('');
-  
-    const [selectedValueListView, setSelectedValueListView] = useState('');
-    const [snackbarVisible, setSnackbarVisible] = useState(false);
-    const [snackbarVisibleAlert, setSnackbarVisibleAlert] = useState(false);
-    const [snackbarVisibleSaved, setSnackbarVisibleSaved] = useState(false);
-    const [snackbarVisiblePrice, setSnackbarVisiblePrice] = useState(false);
-  
-    const [showAlert, setShowAlert] = useState(false);
-  
-    const [userData, setUserData] = useState(null);
-    const [loading, setLoading] = useState(false);
-    
-    useEffect(() => {
-      // Make the API request and update the 'data' state
-      fetchVideos();
-    }, []);
-  
-    const fetchVideos = async () => {
-      // Simulate loading
-      setLoading(true);
+  const [imageUri, setImageUri] = useState(null);
+  const [userId, setUserId] = useState('');
+  const [userToken, setUserToken] = useState(null);
+  const [authToken, setAuthToken] = useState('');
 
-      await getUserID();
-  
-      // Fetch data one by one
-      await fetchAll();
-  
-     
-  
-      // Once all data is fetched, set loading to false
-      setLoading(false);
-    };
-  
-    const fetchAll = async () => {
-      //console.log("Categry in id", selectedItemId)
-      const token =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
-  
-      try {
-        const response = await fetch(
-          `https://watch-gotcha-be.mtechub.com/notification/getAllNotificationsByUser/${userId}?page=1&limit=2`,
-  
-          {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+  const [priceOffer, setPriceOffer] = useState('');
+
+  const [selectedValueListView, setSelectedValueListView] = useState('');
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [snackbarVisibleAlert, setSnackbarVisibleAlert] = useState(false);
+  const [snackbarVisibleSaved, setSnackbarVisibleSaved] = useState(false);
+  const [snackbarVisiblePrice, setSnackbarVisiblePrice] = useState(false);
+
+  const [showAlert, setShowAlert] = useState(false);
+
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchVideos();
+  }, []);
+
+  useEffect(() => {
+    authTokenAndId();
+  }, [userId, authToken]);
+
+  const fetchVideos = async () => {
+    // Simulate loading
+    setLoading(true);
+
+    await getUserID();
+    // Fetch data one by one
+
+    // Once all data is fetched, set loading to false
+    setLoading(false);
+  };
+
+  const getUserID = async () => {
+    console.log("Id's");
+    try {
+      const result = await AsyncStorage.getItem('userId ');
+      if (result !== null) {
+        setUserId(result);
+
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+
+    try {
+      const result = await AsyncStorage.getItem('userName');
+      if (result !== null) {
+        setName(result);
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+
+    const result1 = await AsyncStorage.getItem('authToken ');
+    if (result1 !== null) {
+      setAuthToken(result1);
+      console.log('user token retrieved:', result1);
+      //await fetchUser(result1);
+      //await fetchCategory(result1);
+    } else {
+      console.log('result is null', result1);
+    }
+
+    await authTokenAndId();
+  };
+
+  const authTokenAndId = async () => {
+    if (userId !== '' && authToken !== '') {
+      console.log('USER ID', userId);
+      console.log('AUTH TOKEN ', authToken);
+      fetchAll(userId, authToken);
+    }
+  };
+
+  const fetchAll = async (id, tokens) => {
+    console.log('Categry in id', id);
+    console.log('USER ID', tokens);
+    const token = tokens;
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/notification/getAllNotificationsByUser/${userId}`,
+
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-        );
-  
-        const result = await response.json();
-        console.log('AllItems of user', result.user);
-        setUserData(result.user); // Update the state with the fetched data
-      } catch (error) {
-        console.error('Error Trending:', error);
-      }
-    };
-  
-    const getUserID = async () => {
-      console.log("Id's");
-      try {
-        const result = await AsyncStorage.getItem('userId ');
-        if (result !== null) {
-          setUserId(result);
-          console.log('user id retrieved:', result);
-        }
-      } catch (error) {
-        // Handle errors here
-        console.error('Error retrieving user ID:', error);
-      }
-  
-      try {
-        const result = await AsyncStorage.getItem('UserToken');
-        if (result !== null) {
-          setUserToken(result);
-          console.log('user token retrieved:', result);
-        }
-      } catch (error) {
-        // Handle errors here
-        console.error('Error retrieving user ID:', error);
-      }
-    };
-  
-    const handleSelected = (item) => {
-      if (selectedRide === item) {
-        setSelectedRide(null); // Deselect the item if it's already selected
-      } else {
-        setSelectedRide(item); // Select the item if it's not selected
-      }
-    };
+        },
+      );
+
+      const result = await response.json();
+      console.log('AllItems of user', result.AllNotifications);
+      setUserData(result.AllNotifications); // Update the state with the fetched data
+    } catch (error) {
+      console.error('Error Trending:', error);
+    }
+  };
+
+  const handleSelected = item => {
+    if (selectedRide === item) {
+      setSelectedRide(null); // Deselect the item if it's already selected
+    } else {
+      setSelectedRide(item); // Select the item if it's not selected
+    }
+  };
 
   const availableApps = [
     {
@@ -175,48 +198,50 @@ export default function Notification({navigation}) {
       image: appImages.logoWhite,
     },
     {
-        id: 2,
-        title: 'NewRider',
-        desc: 'our journey is almost ready to be shared with the community. To complete the ride publishing process, please review the details......',
-        image: appImages.logoWhite,
-      },
-      {
-        id: 3,
-        title: 'NewRider',
-        desc: 'our journey is almost ready to be shared with the community. To complete the ride publishing process, please review the details......',
-        image: appImages.logoWhite,
-      },
-      {
-        id: 4,
-        title: 'NewRider',
-        desc: 'our journey is almost ready to be shared with the community. To complete the ride publishing process, please review the details......',
-        image: appImages.logoWhite,
-      },
-      {
-        id: 5,
-        title: 'NewRider',
-        desc: 'our journey is almost ready to be shared with the community. To complete the ride publishing process, please review the details......',
-        image: appImages.logoWhite,
-      },
-    
+      id: 2,
+      title: 'NewRider',
+      desc: 'our journey is almost ready to be shared with the community. To complete the ride publishing process, please review the details......',
+      image: appImages.logoWhite,
+    },
+    {
+      id: 3,
+      title: 'NewRider',
+      desc: 'our journey is almost ready to be shared with the community. To complete the ride publishing process, please review the details......',
+      image: appImages.logoWhite,
+    },
+    {
+      id: 4,
+      title: 'NewRider',
+      desc: 'our journey is almost ready to be shared with the community. To complete the ride publishing process, please review the details......',
+      image: appImages.logoWhite,
+    },
+    {
+      id: 5,
+      title: 'NewRider',
+      desc: 'our journey is almost ready to be shared with the community. To complete the ride publishing process, please review the details......',
+      image: appImages.logoWhite,
+    },
+
     //{id: 10, title: 'Printer', image: appImages.printer},
   ];
 
-  const renderItems = ({ item }) => {
+  const renderItems = ({item}) => {
+    console.log("ITEMS OF NOTIFICATIONS", item)
     return (
       <TouchableOpacity
         onPress={() => handleSelected(item.id)}
-        style={
-          selectedRide === item.id ? styles.selected : styles.nonSelected
-        }>
+        style={selectedRide === item.id ? styles.selected : styles.nonSelected}>
+        <View
+          style={{flexDirection: 'row', alignItems: 'center', height: hp(8)}}>
+          <Image
+            style={{width: 100, height: 50, resizeMode: 'contain'}}
+            source={appImages.logo}
+          />
 
-            <View style={{flexDirection:'row', alignItems:'center', height:hp(8)}}>
-                <Image style={{width:100, height:50, resizeMode:'contain'}} source={item.image}/>
-
-            <Text style={{color:'#000000', fontSize:hp(3), fontWeight:'700'}}>
-              Watcha Gotcha
-            </Text>
-            </View>
+          <Text style={{color: '#000000', fontSize: hp(3), fontWeight: '700'}}>
+            Watcha Gotcha
+          </Text>
+        </View>
 
         <Text
           style={
@@ -245,10 +270,10 @@ export default function Notification({navigation}) {
       <FlatList
         data={availableApps}
         renderItem={renderItems}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={item => item.id.toString()}
       />
 
-<View
+      <View
         style={{
           position: 'absolute',
           top: 0,
@@ -271,37 +296,32 @@ const styles = StyleSheet.create({
   },
   selected: {
     height: hp(15),
-    marginTop:hp(1),
+    marginTop: hp(1),
     borderRadius: wp(4),
     marginHorizontal: wp(8),
     borderWidth: 1,
-    justifyContent:'center'
+    justifyContent: 'center',
   },
   nonSelected: {
     height: hp(15),
     borderRadius: wp(4),
-    marginTop:hp(1),
+    marginTop: hp(1),
 
-    backgroundColor:'#F4F4F4',
+    backgroundColor: '#F4F4F4',
     marginHorizontal: wp(8),
     //borderWidth: 1,
-    justifyContent:'center'
+    justifyContent: 'center',
   },
-  textSelected:{
-
-    color:'#000000',
-    fontSize:hp(1.3),
-    marginLeft:wp(3),
-    fontFamily:'Inter-Bold',
-
-
-  },nonTextSelected:{
-
-    color:'#606060',
-    fontSize:hp(1.3),
-    marginLeft:wp(3),
-    fontFamily:'Inter-Regular',
-
-
-  }
+  textSelected: {
+    color: '#000000',
+    fontSize: hp(1.3),
+    marginLeft: wp(3),
+    fontFamily: 'Inter-Bold',
+  },
+  nonTextSelected: {
+    color: '#606060',
+    fontSize: hp(1.3),
+    marginLeft: wp(3),
+    fontFamily: 'Inter-Regular',
+  },
 });

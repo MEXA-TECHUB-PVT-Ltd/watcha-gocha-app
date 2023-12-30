@@ -288,7 +288,7 @@ export default function Video({navigation}) {
         ref_RBSheetCamera.current.close();
         setLoading(false);
 
-        navigation.navigate('UploadUpdateVideo', {Video: response.assets[0]});
+        //navigation.navigate('UploadUpdateVideo', {Video: response.assets[0]});
       },
     );
   };
@@ -313,7 +313,7 @@ export default function Video({navigation}) {
       ref_RBSheetCamera.current.close();
       setLoading(false);
 
-      navigation.navigate('UploadUpdateVideo', {Video: response.assets[0]});
+      //navigation.navigate('UploadUpdateVideo', {Video: response.assets[0]});
     });
   };
 
