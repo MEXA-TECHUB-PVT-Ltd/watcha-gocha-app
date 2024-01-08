@@ -39,7 +39,25 @@ const STYLES = StyleSheet.create({
      
         fontSize:wp(3.6),
         fontFamily: 'Inter-Medium'
-    }
+    },
+    selectCheckBox: {
+        width: 17,
+        height: 17,
+        borderRadius: wp(1),
+        borderWidth: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderColor: '#FACA4E',
+      },
+      unSelectCheckBox: {
+        width: 17,
+        height: 17,
+        borderRadius: wp(1),
+        borderWidth: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderColor: '#C4C4C4',
+      },
 })
 
 export default STYLES; 

@@ -112,6 +112,8 @@ export default function PostLetterInfo({navigation}) {
 
   const [imageInfo, setImageInfo] = useState(null);
 
+  const [userImage, setUserImage] = useState();
+
   const [userId, setUserId] = useState('');
 
   const [imageUri, setImageUri] = useState(null);
@@ -170,7 +172,63 @@ export default function PostLetterInfo({navigation}) {
       // Handle errors here
       console.error('Error retrieving user ID:', error);
     }
+
+    await authTokenAndId()
   };
+
+  //--------------------------------\\
+
+  const authTokenAndId = async () => {
+    if (userId !== '' && authToken !== '') {
+      console.log('USER ID', userId);
+      console.log('AUTH TOKEN ', authToken);
+      fetchUser(userId, authToken);
+    }else{
+      console.log("AUTH JJBJBJBSV");
+
+    }
+  };
+
+  const fetchUser = async (id, tokens) => {
+    console.log('USER', id);
+    console.log('TOKEN', tokens);
+    const token = tokens;
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/user/getUser/${id}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('IMAGE', data.user.image);
+
+        // Use the data from the API to set the categories
+        setUserImage(data.user.image);
+        //await fetchCategory(id, tokens);
+      } else {
+        console.error(
+          'Failed to fetch user:',
+          response.status,
+          response.statusText,
+          await fetchCategory(id, tokens),
+        );
+      }
+    } catch (error) {
+      //await fetchCategory(id, tokens);
+      console.error('Errors:', error);
+    }
+  };
+
+
+
+  //----------------------------------\\
 
   const fetchCategory = async (id) => {
     const token = id;
@@ -379,7 +437,7 @@ export default function PostLetterInfo({navigation}) {
               borderRadius: wp(12) / 2,
             }}>
             <Image
-              source={appImages.profileImg}
+              source={{uri:userImage}}
               style={{width: '100%', height: '100%', resizeMode: 'cover'}}
             />
           </View>

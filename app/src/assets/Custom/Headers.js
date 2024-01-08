@@ -145,7 +145,7 @@ const Headers = ({
 
       {showListings && (
         <TouchableOpacity style={styles.backArrow} onPress={onPressListings}>
-          <Ionicons name="menu" size={25} color="#282828" />
+          <Ionicons name="menu" size={32} color="#282828" />
         </TouchableOpacity>
       )}
 
@@ -261,16 +261,22 @@ const styles = StyleSheet.create({
   logoImage: {
     alignSelf: 'center',
     resizeMode: 'contain',
-    marginTop: hp(-1),
-    width: wp(100),
-    height: hp(10),
+    marginTop: hp(-2.4),
+    width: wp(80),
+    height: hp(8),
   },
   backArrow: {
     position: 'absolute',
     left: 20,
     justifyContent: 'center', // Vertically align the arrow within the touchable area
-    paddingVertical: 10, // Add padding to increase the touchable area
+    paddingVertical: 15, // Add padding to increase the touchable area
     paddingRight: 10, // Add some space on the right side if needed
+  },
+  listingsMenu:{
+    position: 'absolute',
+    left: 20,
+    justifyContent: 'center',
+    padding: 10, // Padding to increase the touchable area
   },
   heartIcon: {
     position: 'absolute',

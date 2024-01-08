@@ -21,7 +21,6 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import ForgetPasswordImg from '../../../assets/images/forget.png';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
 import {appImages} from '../../../assets/utilities/index';
 import {Button, Divider, TextInput} from 'react-native-paper';
 import {
@@ -36,6 +35,7 @@ import {useIsFocused} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SwitchSelector from 'react-native-switch-selector';
 import User from '../../../assets/svg/User.svg';
+import CustomSnackbar from './../../../assets/Custom/CustomSnackBar';
 LogBox.ignoreAllLogs();
 
 const ForgetPassword = ({navigation}) => {
@@ -54,6 +54,9 @@ const ForgetPassword = ({navigation}) => {
   const [emailSignInError, setEmailSignInError] = useState(false);
   const ref_RBSheet = useRef(null);
   const ref_RBSheetCamera = useRef(null);
+
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+
 
   const handleFocus = () => {
     setIsTextInputActive(true);
@@ -102,7 +105,7 @@ const ForgetPassword = ({navigation}) => {
 
       const data = await response.json();
 
-      console.log('error data sign in', data);
+      //console.log('error data sign in', data);
 
       if (data.statusCode === 200) {
         setIsLoading(false);
@@ -113,6 +116,8 @@ const ForgetPassword = ({navigation}) => {
         });
       } else {
         setIsLoading(false);
+        handleUpdatePasswordAlert();
+        console.log("ERROR", data )
         console.error('No results found.', data.response.result);
       }
 
@@ -124,6 +129,26 @@ const ForgetPassword = ({navigation}) => {
       //showAlert();
       setIsLoading(false);
     }
+  };
+
+  const dismissSnackbar = () => {
+    setSnackbarVisible(false);
+  };
+
+  const handleUpdatePasswordAlert = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setSnackbarVisible(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setSnackbarVisible(false);
+
+      navigation.navigate('VerifyAccount');
+      //navigation.goBack();
+    }, 3000);
   };
 
   return (
@@ -215,6 +240,14 @@ const ForgetPassword = ({navigation}) => {
         }}>
         {loading && <ActivityIndicator size="large" color="#FACA4E" />}
       </View>
+
+      <CustomSnackbar
+        message={'Alert'}
+        messageDescription={'Invalid Or Wrong Email'}
+        onDismiss={dismissSnackbar} // Make sure this function is defined
+        visible={snackbarVisible}
+      />
+
     </ScrollView>
   );
 };

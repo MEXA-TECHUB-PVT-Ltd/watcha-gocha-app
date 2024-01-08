@@ -173,6 +173,7 @@ export default function ViewVideo({navigation, route}) {
     }
   };
 
+
   useEffect(() => {
     // Make the API request and update the 'data' state
     fetchAll();
@@ -299,6 +300,8 @@ export default function ViewVideo({navigation, route}) {
         const data = await response.json();
         //console.log("All Comments", data.totalComments);
         setCommentsCount(data.totalComments);
+
+         await fetchSpecificVideo(value)
       } else {
         console.error(
           'Failed to fetch categories:',
@@ -310,6 +313,43 @@ export default function ViewVideo({navigation, route}) {
       console.error('Error:', error);
     }
   };
+
+  //----------------------------------\\
+
+  
+  const fetchSpecificVideo = async (result) => {
+    console.log("GET SPECIFIC VIDEO CALLED", result)
+    const token = result;
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/xpi/getSpecificVideo/${receivedData?.video_id}?user_id=${userId}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        //console.log("All Comments of usersssss", data.AllComents)
+        console.log("video Is liked or not>>>>>>>>", data.Video)
+       // setShowLikes(data?.Video?.is_liked)
+      } else {
+        console.error(
+          'Failed to fetch categories:',
+          response.status,
+          response.statusText,
+        );
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  //------------------------------------\\
 
   const dismissSnackbar = () => {
     setsnackbarVisible(false);
@@ -739,7 +779,7 @@ export default function ViewVideo({navigation, route}) {
   }
 
   const openComments = () => {
-    setPaused(!paused);
+   // setPaused(!paused);
 
     setIsBottomSheetExpanded(!isBottomSheetExpanded);
   };
@@ -783,7 +823,7 @@ export default function ViewVideo({navigation, route}) {
         {/* Add the play button View */}
         {paused === true ? (
           <View
-            style={{position: 'absolute', top: '50%', left: '48%', zIndex: 2}}>
+            style={{position: 'absolute', top: '50%', left: '48%', zIndex:1}}>
             {/* Adjust the marginLeft and marginTop based on the size of your play button image */}
             <AntDesign name={'pause'} size={35} color={'#FACA4E'} />
           </View>

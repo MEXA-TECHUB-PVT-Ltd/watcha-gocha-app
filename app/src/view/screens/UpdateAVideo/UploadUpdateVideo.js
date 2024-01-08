@@ -87,7 +87,7 @@ export default function UploadUpdateVideo({navigation, route}) {
             }}
           />
           
-          <TouchableOpacity onPress={()=>navigation.replace('UploadUpdateScreen',{ Video:receivedData })}>
+         {/*  <TouchableOpacity onPress={()=>navigation.replace('UploadUpdateScreen',{ Video:receivedData })}>
 
           <Text
             style={{
@@ -98,7 +98,7 @@ export default function UploadUpdateVideo({navigation, route}) {
             }}>
             Change Video
           </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
     </View>

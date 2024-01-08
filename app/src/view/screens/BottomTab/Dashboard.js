@@ -1430,7 +1430,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
     console.log('Items of News', item);
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate('News', {News: item})}
+        onPress={() => navigation.navigate('ViewNews', {picData: item})}
         style={{width: wp(25.5), margin: 5}}>
         <View>
           <Image
@@ -1446,7 +1446,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
               borderRadius: wp(1),
               resizeMode: 'cover',
             }}
-            source={appImages.galleryPlaceHolder}
+            source={{uri: item.image}}
           />
         </View>
 
@@ -1458,24 +1458,40 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
             height: hp(7),
             width: wp(25),
           }}>
-          <View
-            style={{
-              width: wp(7),
-              marginLeft: wp(0.5),
-              height: wp(7),
-              borderRadius: wp(7) / 2,
-            }}>
-            <MaterialCommunityIcons
-              style={{marginTop: hp(0.5)}}
-              name={'account-circle'}
-              size={30}
-              color={'#FACA4E'}
-            />
-            {/*  <Image
-              source={appImages.profileImg}
-              style={{width: '100%', height: '100%', resizeMode: 'cover'}}
-            /> */}
-          </View>
+          {item?.userimage ? (
+            <View
+              style={{
+                width: wp(7),
+                marginLeft: wp(0.5),
+                height: wp(7),
+                overflow: 'hidden',
+                borderRadius: wp(7) / 2,
+              }}>
+              <Image
+                source={{uri: item?.userimage}}
+                style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+              />
+            </View>
+          ) : (
+            <View
+              style={{
+                width: wp(7),
+                marginLeft: wp(0.5),
+                height: wp(7),
+                borderRadius: wp(7) / 2,
+              }}>
+              <MaterialCommunityIcons
+                style={{marginTop: hp(0.5)}}
+                name={'account-circle'}
+                size={30}
+                color={'#FACA4E'}
+              />
+              {/*  <Image
+            source={appImages.profileImg}
+            style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+          /> */}
+            </View>
+          )}
 
           <Text
             style={{
@@ -1496,11 +1512,11 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
     );
   };
 
-  const renderAvailableAppsDiscQAFI = item => {
+  const renderAvailableAppsQAFI = item => {
     console.log('Items of QAFI', item);
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate('News', {News: item})}
+        onPress={() => navigation.navigate('ViewQAFI', {picData: item})}
         style={{width: wp(25.5), margin: 5}}>
         <View>
           <Image
@@ -1516,7 +1532,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
               borderRadius: wp(1),
               resizeMode: 'cover',
             }}
-            source={appImages.galleryPlaceHolder}
+            source={{uri: item.image}}
           />
         </View>
 
@@ -1528,25 +1544,40 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
             height: hp(7),
             width: wp(25),
           }}>
-          <View
-            style={{
-              width: wp(7),
-              marginLeft: wp(0.5),
-              height: wp(7),
-              borderRadius: wp(7) / 2,
-            }}>
-            {/* <Image
-              source={appImages.profileImg}
-              style={{width: '100%', height: '100%', resizeMode: 'cover'}}
-            /> */}
-
-            <MaterialCommunityIcons
-              //style={{marginTop: hp(0.5)}}
-              name={'account-circle'}
-              size={25}
-              color={'#FACA4E'}
-            />
-          </View>
+          {item?.userimage ? (
+            <View
+              style={{
+                width: wp(7),
+                marginLeft: wp(0.5),
+                height: wp(7),
+                overflow: 'hidden',
+                borderRadius: wp(7) / 2,
+              }}>
+              <Image
+                source={{uri: item?.userimage}}
+                style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+              />
+            </View>
+          ) : (
+            <View
+              style={{
+                width: wp(7),
+                marginLeft: wp(0.5),
+                height: wp(7),
+                borderRadius: wp(7) / 2,
+              }}>
+              <MaterialCommunityIcons
+                style={{marginTop: hp(0.5)}}
+                name={'account-circle'}
+                size={30}
+                color={'#FACA4E'}
+              />
+              {/*  <Image
+            source={appImages.profileImg}
+            style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+          /> */}
+            </View>
+          )}
 
           <Text
             style={{
@@ -1568,56 +1599,69 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
   };
 
   const renderAvailableAppsDiscGEBC = item => {
-    console.log('Items of News', item);
+    console.log('Items of GEBC', item);
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate('News', {News: item})}
+        onPress={() => navigation.navigate('ViewGEBC', {picData: item})}
         style={{width: wp(25.5), margin: 5}}>
-        <View>
-          <Image
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-
-              zIndex: 1, // Ensure it's on top of other elements
-              //flex: 1,
-              width: '100%',
-              height: hp(12),
-              borderRadius: wp(1),
-              resizeMode: 'cover',
-            }}
-            source={appImages.galleryPlaceHolder}
-          />
-        </View>
+        <View
+          style={{
+            width: '100%',
+            justifyContent:'center',
+            alignItems:'center',
+            height: hp(10),
+            borderRadius: wp(1),
+            resizeMode: 'stretch',
+            borderWidth: 1, // Border width
+            borderColor: 'grey', // Border color
+          }}>
+            <Text style={{fontSize:hp(5)}}>
+              {item.image}
+            </Text>
+          </View>
 
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            marginTop: hp(12),
+            marginTop: hp(1),
             height: hp(7),
             width: wp(25),
           }}>
-          <View
-            style={{
-              width: wp(7),
-              marginLeft: wp(0.5),
-              height: wp(7),
-              borderRadius: wp(7) / 2,
-            }}>
-            {/* <Image
-              source={appImages.profileImg}
-              style={{width: '100%', height: '100%', resizeMode: 'cover'}}
-            /> */}
-
-            <MaterialCommunityIcons
-              //style={{marginTop: hp(0.5)}}
-              name={'account-circle'}
-              size={25}
-              color={'#FACA4E'}
-            />
-          </View>
+          {item?.userimage ? (
+            <View
+              style={{
+                width: wp(7),
+                marginLeft: wp(0.5),
+                height: wp(7),
+                overflow: 'hidden',
+                borderRadius: wp(7) / 2,
+              }}>
+              <Image
+                source={{uri: item?.userimage}}
+                style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+              />
+            </View>
+          ) : (
+            <View
+              style={{
+                width: wp(7),
+                marginLeft: wp(0.5),
+                height: wp(7),
+                borderRadius: wp(7) / 2,
+              }}>
+              <MaterialCommunityIcons
+                style={{marginTop: hp(0.5)}}
+                name={'account-circle'}
+                size={30}
+                color={'#FACA4E'}
+              />
+              {/*  <Image
+            source={appImages.profileImg}
+            style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+          /> */}
+            </View>
+          )}
 
           <Text
             style={{
@@ -1767,7 +1811,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
 
         <View style={{marginTop: hp(2), height: hp(23)}}>
           <View style={{marginTop: hp(1), height: '100%'}}>
-          {loadingDisc === true ? (
+            {loading === true ? (
               <View
                 style={{
                   position: 'absolute',
@@ -1794,24 +1838,19 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                     </Text>
                   </View>
                 ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsVerticalScrollIndicator={false}
-                data={newsData}
-                horizontal
-                //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableDiscApps(item)}
-              />
-              )}
+                  <FlatList
+                    style={{flex: 1}}
+                    showsVerticalScrollIndicator={false}
+                    data={newsData}
+                    horizontal
+                    //keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableDiscApps(item)}
+                  />
+                )}
               </>
             )}
-          
           </View>
         </View>
-
-     
-
-      
 
         <View style={{height: hp(23)}}>
           <View style={{marginTop: hp(1), height: '100%'}}>
@@ -1835,14 +1874,70 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 data={newsData}
                 horizontal
                 //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableDiscApps(item)}
+                renderItem={({item}) => renderAvailableApps(item)}
+              />
+            )}
+          </View>
+        </View>
+
+        <View style={{height: hp(23)}}>
+          <View style={{marginTop: hp(1), height: '100%'}}>
+            {loading === true ? (
+              <View
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <ActivityIndicator size="large" color="#FACA4E" />
+              </View>
+            ) : (
+              <FlatList
+                style={{flex: 1}}
+                showsVerticalScrollIndicator={false}
+                data={newsData}
+                horizontal
+                //keyExtractor={item => item.id.toString()}
+                renderItem={({item}) => renderAvailableApps(item)}
+              />
+            )}
+          </View>
+        </View>
+
+        <View style={{height: hp(23)}}>
+          <View style={{marginTop: hp(1), height: '100%'}}>
+            {loading === true ? (
+              <View
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <ActivityIndicator size="large" color="#FACA4E" />
+              </View>
+            ) : (
+              <FlatList
+                style={{flex: 1}}
+                showsVerticalScrollIndicator={false}
+                data={newsData}
+                horizontal
+                //keyExtractor={item => item.id.toString()}
+                renderItem={({item}) => renderAvailableApps(item)}
               />
             )}
           </View>
         </View>
       </View>
     );
-  };
+  }
 
   const QAFI = () => {
     console.log('Came to QAFI');
@@ -1949,14 +2044,29 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
             ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsVerticalScrollIndicator={false}
-                data={qafiData}
-                horizontal
-                //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableAppsDiscQAFI(item)}
-              />
+              <>
+                {qafiData?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsVerticalScrollIndicator={false}
+                    data={qafiData}
+                    horizontal
+                    //keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableAppsQAFI(item)}
+                  />
+                )}
+              </>
             )}
           </View>
         </View>
@@ -1977,14 +2087,29 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
             ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsVerticalScrollIndicator={false}
-                data={qafiData}
-                horizontal
-                //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableAppsDiscQAFI(item)}
-              />
+              <>
+                {qafiData?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsVerticalScrollIndicator={false}
+                    data={qafiData}
+                    horizontal
+                    //keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableAppsQAFI(item)}
+                  />
+                )}
+              </>
             )}
           </View>
         </View>
@@ -2005,14 +2130,29 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
             ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsVerticalScrollIndicator={false}
-                data={qafiData}
-                horizontal
-                //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableAppsDiscQAFI(item)}
-              />
+              <>
+                {qafiData?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsVerticalScrollIndicator={false}
+                    data={qafiData}
+                    horizontal
+                    //keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableAppsQAFI(item)}
+                  />
+                )}
+              </>
             )}
           </View>
         </View>
@@ -2033,14 +2173,29 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
             ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsVerticalScrollIndicator={false}
-                data={qafiData}
-                horizontal
-                //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableAppsDiscQAFI(item)}
-              />
+              <>
+                {qafiData?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsVerticalScrollIndicator={false}
+                    data={qafiData}
+                    horizontal
+                    //keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableAppsQAFI(item)}
+                  />
+                )}
+              </>
             )}
           </View>
         </View>
@@ -2153,14 +2308,29 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
             ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsVerticalScrollIndicator={false}
-                data={gebcData}
-                horizontal
-                //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableAppsDiscGEBC(item)}
-              />
+              <>
+                {gebcData?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsVerticalScrollIndicator={false}
+                    data={gebcData}
+                    horizontal
+                    //keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableAppsDiscGEBC(item)}
+                  />
+                )}
+              </>
             )}
           </View>
         </View>
@@ -2181,21 +2351,36 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
             ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsVerticalScrollIndicator={false}
-                data={gebcData}
-                horizontal
-                //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableAppsDiscGEBC(item)}
-              />
+              <>
+                {gebcData?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsVerticalScrollIndicator={false}
+                    data={gebcData}
+                    horizontal
+                    //keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableAppsDiscGEBC(item)}
+                  />
+                )}
+              </>
             )}
           </View>
         </View>
 
         <View style={{height: hp(23)}}>
           <View style={{marginTop: hp(1), height: '100%'}}>
-            {loadingDisc === true ? (
+            {loading === true ? (
               <View
                 style={{
                   position: 'absolute',
@@ -2209,21 +2394,36 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
             ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsVerticalScrollIndicator={false}
-                data={gebcData}
-                horizontal
-                //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableAppsDiscGEBC(item)}
-              />
+              <>
+                {gebcData?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsVerticalScrollIndicator={false}
+                    data={gebcData}
+                    horizontal
+                    //keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableAppsDiscGEBC(item)}
+                  />
+                )}
+              </>
             )}
           </View>
         </View>
 
         <View style={{height: hp(23)}}>
           <View style={{marginTop: hp(1), height: '100%'}}>
-            {loadingDisc === true ? (
+            {loading === true ? (
               <View
                 style={{
                   position: 'absolute',
@@ -2237,14 +2437,29 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
             ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsVerticalScrollIndicator={false}
-                data={gebcData}
-                horizontal
-                //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableAppsDiscGEBC(item)}
-              />
+              <>
+                {gebcData?.length === 0 ? (
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                      No data available
+                    </Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsVerticalScrollIndicator={false}
+                    data={gebcData}
+                    horizontal
+                    //keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableAppsDiscGEBC(item)}
+                  />
+                )}
+              </>
             )}
           </View>
         </View>
@@ -3099,7 +3314,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
         barStyle="dark-content" // You can set the StatusBar text color to dark or light
       />
 
-      <View style={{marginTop: hp(5)}}>
+      <View style={{marginTop: hp(5), width:'100%'}}>
         <Headers
           showListings={true}
           showLogo={true}
@@ -3112,8 +3327,9 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={{flex: 1, marginHorizontal: wp(5)}}>
-        <View style={styles.searchBar}>
-          {/* Home */}
+            
+           {/*  <View style={styles.searchBar}>
+      
           <Fontiso
             name={'search'}
             size={18}
@@ -3124,8 +3340,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
             style={{flex: 1, marginLeft: wp(3)}}
             placeholder="Search here"
           />
-        </View>     
-
+        </View> */}
       
        {/* //-------------- Category ---------------------\\ */}
     
@@ -4750,10 +4965,9 @@ const styles = StyleSheet.create({
     marginLeft: wp(3),
     alignItems: 'center',
     justifyContent: 'center',
-    width: wp(23),
+    padding:10,
     backgroundColor: '#F2F2F2',
     borderRadius: wp(5),
-    height: hp(5),
   },
   textSearchDetails: {
     fontFamily: 'Inter',

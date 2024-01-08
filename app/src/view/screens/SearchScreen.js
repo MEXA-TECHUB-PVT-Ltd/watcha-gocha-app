@@ -1,15 +1,14 @@
 import {
   StyleSheet,
   FlatList,
-  ActivityIndicator,
   Text,
+  StatusBar,
   Image,
   TextInput,
   View,
   TouchableOpacity,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Back from '../../assets/svg/back.svg';
 import {appImages} from '../../assets/utilities/index';
 import {
@@ -17,21 +16,49 @@ import {
   widthPercentageToDP,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
-
-import axios from 'axios';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Fontiso from 'react-native-vector-icons/Fontisto';
 
 export default function SearchScreen({navigation}) {
   const [selectedItemId, setSelectedItemId] = useState(null);
 
+  const [authToken, setAuthToken] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+
   const [searches, setSearches] = useState([]);
 
   const [data, setData] = useState([]);
 
+  const [filteredData, setFilteredData] = useState([]);
+
   const [loading, setLoading] = useState(false);
 
+  const searchess = [
+    {id: 1, title: 'Lense'},
+    {id: 2, title: 'Shoes'},
+    {id: 3, title: 'HeadPhones'},
+    {id: 4, title: 'Lense'},
+    {id: 5, title: 'Shoes'},
+    {id: 6, title: 'HeadPhones'},
+    {id: 7, title: 'Lense'},
+    {id: 8, title: 'Shoes'},
+    {id: 9, title: 'HeadPhones'},
+    {id: 10, title: 'Lense'},
+  ];
+
+  const availableApps = [
+    {id: 1, title: 'Lense', image: appImages.lense},
+    {id: 2, title: 'Holder', image: appImages.holder},
+    {id: 3, title: 'HeadPhone', image: appImages.headPhone},
+    {id: 4, title: 'Shoes', image: appImages.shoes},
+    {id: 5, title: 'Printer', image: appImages.printer},
+    {id: 6, title: 'Lense', image: appImages.lense},
+    {id: 7, title: 'Holder', image: appImages.holder},
+    {id: 8, title: 'HeadPhone', image: appImages.headPhone},
+    {id: 9, title: 'Shoes', image: appImages.shoes},
+    //{id: 10, title: 'Printer', image: appImages.printer},
+    
+  ];
   useEffect(() => {
     // Make the API request and update the 'data' state
     fetchAll();
@@ -41,21 +68,26 @@ export default function SearchScreen({navigation}) {
     // Simulate loading
     setLoading(true);
     // Fetch data one by one
-    await fetchTrendingVideos();
-
     await loadSearchesFromStorage();
 
     // Once all data is fetched, set loading to false
     setLoading(false);
   };
 
-  const fetchTrendingVideos = async () => {
-    const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY5ODEyMzUxNSwiZXhwIjoxNzAwNzE1NTE1fQ.0JrofPFHubokiOAwlQWsL1rSuKdnadl9ERLrUnLkd_U';
+ 
+
+  
+
+  
+
+  useEffect(() => {
+    const fetchData = async () => {
+      console.log("Token", authToken)
+      const token = authToken;
 
     try {
       const response = await fetch(
-        `https://watch-gotcha-be.mtechub.com/xpi/getTrendingVideosByCategory/6?page=1&limit=5`,
+        `https://watch-gotcha-be.mtechub.com/xpi/searchVideo?name=${selectedItemId}`,
         {
           method: 'GET',
           headers: {
@@ -65,103 +97,86 @@ export default function SearchScreen({navigation}) {
       );
 
       const result = await response.json();
-      console.log('Resultings', result.Videos);
+      console.log('AllItems', result.Videos);
       setData(result.Videos); // Update the state with the fetched data
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error Trending:', error);
     }
+    };
+
+    fetchData();
+  }, [selectedItemId]);
+
+  const handleSearch = text => {
+    console.log("data Search", data);
+
+    if (!data) {
+      // Data is not available yet
+      return;
+    }
+  
+    const searchTerm = text.toLowerCase();
+  
+    const filteredApps = data.filter(app =>
+      app.title.toLowerCase().includes(searchTerm),
+    );
+  
+    setFilteredData(filteredApps);
   };
 
   const loadSearchesFromStorage = async () => {
     try {
-      const savedSearches = await AsyncStorage.getItem('searches');
+      const savedSearches = await AsyncStorage.getItem('searchVideo');
       if (savedSearches) {
         setSearches(JSON.parse(savedSearches));
+        getUserID();
       }
     } catch (error) {
+      getUserID();
       console.error('Error loading searches from storage:', error);
     }
   };
 
-  const search = [
-    {id: 1, title: 'John Doe'},
-    {id: 2, title: 'Olivia'},
-    {id: 3, title: 'Wiliam'},
-    {id: 4, title: 'Mia Pat'},
-    {id: 5, title: 'John Doe'},
-    {id: 6, title: 'Olivia'},
-    {id: 7, title: 'Wiliam'},
-    {id: 8, title: 'Mia Pat'},
-    {id: 9, title: 'Wiliam'},
-    {id: 10, title: 'Mia Pat'},
-  ];
+  const getUserID = async () => {
+    console.log("Id's");
+    try {
 
-  const availableApps = [
-    {
-      id: 1,
-      title:
-        'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......',
-      image: appImages.topSearches1,
-    },
-    {
-      id: 2,
-      title:
-        'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......',
-      image: appImages.topSearches2,
-    },
-    {
-      id: 3,
-      title:
-        'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......',
-      image: appImages.topSearches3,
-    },
-    {
-      id: 4,
-      title:
-        'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......',
-      image: appImages.topSearches4,
-    },
-    {
-      id: 5,
-      title:
-        'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......',
-      image: appImages.topSearches1,
-    },
-    {
-      id: 6,
-      title:
-        'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......',
-      image: appImages.topSearches2,
-    },
-    {
-      id: 7,
-      title:
-        'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......',
-      image: appImages.topSearches3,
-    },
-    {
-      id: 8,
-      title:
-        'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......',
-      image: appImages.topSearches4,
-    },
-    {
-      id: 9,
-      title:
-        'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......',
-      image: appImages.topSearches1,
-    },
-    {
-      id: 10,
-      title:
-        'Explore the intricate web of global politics in this ever-shifting landscape of international diplomacy......',
-      image: appImages.topSearches2,
-    },
-  ];
+      const result3 = await AsyncStorage.getItem('authToken ');
+      if (result3 !== null) {
+        setAuthToken(result3);
+        console.log('Token', result3);
+
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+
+  };
+
+
+  const saveSearchTerm = async () => {
+
+    console.log("Search Term", searchTerm)
+    if (searchTerm.trim() === '') {
+      return;
+    }
+
+    try {
+      const newSearchTerm = {id: searches.length + 1, title: searchTerm};
+      const updatedSearches = [...searches, newSearchTerm];
+
+      await AsyncStorage.setItem('searchVideo', JSON.stringify(updatedSearches));
+      setSearches(updatedSearches);
+      setSearchTerm(''); // Clear the input field
+      fetchAll();
+    } catch (error) {
+      console.error('Error saving search term:', error);
+    }
+  };
 
   const renderSearches = item => {
-    console.log('Items', item);
-    const isSelected = selectedItemId === item.id;
+    const isSelected = selectedItemId === item.title;
 
     return (
       <TouchableOpacity
@@ -172,7 +187,7 @@ export default function SearchScreen({navigation}) {
           },
         ]}
         onPress={() => {
-          setSelectedItemId(item.id);
+          setSelectedItemId(item.title);
           console.log('Selected item:', item.title);
         }}>
         <Text
@@ -187,77 +202,66 @@ export default function SearchScreen({navigation}) {
   };
 
   const renderAvailableApps = item => {
-    console.log('Items', item);
+    console.log('Items images', item);
+
     return (
       <View
         style={{
-          height: hp(14),
-          //marginTop:hp(1),
-          marginBottom: hp(1.5),
-          flexDirection: 'row',
-          //alignItems: 'center',
-          marginHorizontal: wp(7),
+          height: hp(18),
+          flex: 1,
           borderRadius: wp(3),
+          margin: 5,
         }}>
-        <View
+        <Image
           style={{
-            height: hp(12),
-            width: wp(25),
-            borderRadius: wp(5),
-            //borderWidth: 3,
-            marginLeft: wp(3),
-            overflow: 'hidden',
-          }}>
-          <Image
-            style={{
-              flex: 1,
-              width: null,
-              height: null,
-              resizeMode: 'contain',
-            }}
-            source={item.userimage}
-          />
-        </View>
-
-        <Text
-          style={{
-            marginLeft: wp(3),
-            fontSize: hp(1.6),
-            lineHeight: 18,
-            marginTop: hp(1.5),
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            zIndex: 1, // Ensure it's on top of other elements
             flex: 1,
-            color: '#000000',
-            fontFamily: 'Inter-Medium',
-          }}>
-          {item.description}
-        </Text>
+            width: '100%',
+            height: '100%',
+            borderRadius: wp(3),
+            resizeMode: 'cover',
+          }}
+          source={{uri:item?.thumbnail}}
+        />
+        <View
+            style={{
+              position: 'absolute',
+              top: hp(14.5),
+              left: 7,
+              //height: hp(3),
+              //width: wp(21),
+              //borderRadius: wp(3),
+              //backgroundColor: '#FACA4E',
+              justifyContent: 'center',
+              alignItems: 'center',
+              zIndex: 2, // Ensure it's on top
+            }}>
+            <Text
+              style={{
+                fontSize: hp(1.9),
+                fontFamily: 'Inter-Medium',
+                color: '#FFFFFF',
+              }}>
+              {item?.description}
+            </Text>
+          </View>
       </View>
     );
   };
 
-  const saveSearchTerm = async () => {
-    if (searchTerm.trim() === '') {
-      return;
-    }
-
-    try {
-      const newSearchTerm = {id: searches.length + 1, title: searchTerm};
-      const updatedSearches = [...searches, newSearchTerm];
-
-      await AsyncStorage.setItem('searches', JSON.stringify(updatedSearches));
-      setSearches(updatedSearches);
-      setSearchTerm(''); // Clear the input field
-      fetchAll()
-    } catch (error) {
-      console.error('Error saving search term:', error);
-    }
-  };
-
   return (
     <View style={styles.container}>
+      <StatusBar
+        translucent={true}
+        backgroundColor="transparent"
+        barStyle="dark-content" // You can set the StatusBar text color to dark or light
+      />
       <View style={styles.searchHeader}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Back width={20} height={20} style={{marginLeft: '1%'}} />
+        <TouchableOpacity onPress={()=>navigation.goBack()}>
+        <Back width={20} height={20} style={{marginLeft: '1%'}} />
         </TouchableOpacity>
 
         <View style={styles.searchBar}>
@@ -271,60 +275,44 @@ export default function SearchScreen({navigation}) {
             style={{flex: 1, marginLeft: wp(3)}}
             placeholder="Search here"
             value={searchTerm}
-            onChangeText={(text) => setSearchTerm(text)}
+            onChangeText={text => {
+              setSearchTerm(text);
+              //setSelectedItemId(text)
+              handleSearch(text);
+            }}
             onSubmitEditing={() => {
-              saveSearchTerm()
+              saveSearchTerm();
               // This code will execute when the "Okay" button is pressed
               //console.log("Good", searchTerm);
-
             }}
           />
         </View>
       </View>
 
-      <Text style={styles.latestSearch}>Latest Searches</Text>
+      <Text style={styles.latestSearch}>Latest Search</Text>
 
       <View style={styles.latestSearchList}>
-        {searches.length > 0 ? (
-          <FlatList
-            style={{flex: 1}}
-            contentContainerStyle={{alignItems: 'center'}}
-            showsHorizontalScrollIndicator={false}
-            horizontal
-            data={searches}
-            keyExtractor={item => item.id.toString()}
-            renderItem={({item}) => renderSearches(item)}
-          />
-        ) : (
-          <Text
-            style={{color: '#939393', fontSize: hp(1.8), alignSelf: 'center'}}>
-            No recent searches found.
-          </Text>
-        )}
+        <FlatList
+          style={{flex: 1}}
+          contentContainerStyle={{alignItems: 'center'}}
+          showsHorizontalScrollIndicator={false}
+          horizontal
+          data={searches}
+          keyExtractor={item => item.id.toString()}
+          renderItem={({item}) => renderSearches(item)}
+        />
       </View>
 
       <Text style={styles.latestSearch}>Top Searches</Text>
 
       <FlatList
-        style={{marginTop: hp(3), flex: 1}}
+        style={{marginTop: hp(3), marginHorizontal:wp(5), flex: 1}}
         showsVerticalScrollIndicator={false}
         data={data}
-        keyExtractor={(item, index) => index.toString()}
+        //keyExtractor={item => item.id.toString()}
+        numColumns={3} // Set the number of columns to 3
         renderItem={({item}) => renderAvailableApps(item)}
       />
-
-      <View
-        style={{
-          position: 'absolute',
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        {loading && <ActivityIndicator size="large" color="#FACA4E" />}
-      </View>
     </View>
   );
 }
@@ -338,7 +326,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-evenly',
-    marginTop: hp(5),
+    marginTop: hp(8),
     marginHorizontal: wp(8),
     height: hp(8),
     //borderWidth: 3,

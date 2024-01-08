@@ -19,6 +19,7 @@ import {
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Entypo from 'react-native-vector-icons/Entypo';
 
 import {appImages} from '../../../assets/utilities/index';
 import {Button, Divider, TextInput} from 'react-native-paper';
@@ -73,6 +74,8 @@ const App = ({navigation}) => {
   const [isTextInputActive4, setIsTextInputActive4] = useState(false);
   const [isTextInputActive5, setIsTextInputActive5] = useState(false);
 
+  const [isChecked, setIsChecked] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
 
   const [emailSignInError, setEmailSignInError] = useState(false);
@@ -96,13 +99,16 @@ const App = ({navigation}) => {
 
   const [snackbarCorrectVisible, setSnackbarCorrectVisible] = useState(false);
 
-
   const dismissSnackbar = () => {
     setSnackbarVisible(false);
   };
 
   const dismissCorrectSnackbar = () => {
     setSnackbarCorrectVisible(false);
+  };
+
+  const handleCheckboxChange = () => {
+    setIsChecked(!isChecked);
   };
 
   const handleUpdatePassword = async () => {
@@ -428,8 +434,8 @@ const App = ({navigation}) => {
 
   const handleSignIn = async () => {
     setIsLoading(true);
-    console.log("Email", signin_email )
-    console.log("Password", signin_pass )
+    console.log('Email', signin_email);
+    console.log('Password', signin_pass);
 
     try {
       const response = await fetch(signInEndpoint, {
@@ -488,7 +494,7 @@ const App = ({navigation}) => {
         navigation.navigate('BottomTabNavigation');
       } else {
         setIsLoading(false);
-        handleUpdateCorrectPassword()
+        handleUpdateCorrectPassword();
         console.error('No results found.', data.response.result);
       }
 
@@ -500,7 +506,7 @@ const App = ({navigation}) => {
 
       // navigation.navigate('SelectGender');
     } catch (error) {
-      console.log("Error", error)
+      console.log('Error', error);
       //handleUpdateCorrectPassword()
 
       //console.error('Error:');
@@ -508,8 +514,6 @@ const App = ({navigation}) => {
       setIsLoading(false);
     }
   };
-
-
 
   const handleSignInSkipForNow = async () => {
     setIsLoading(true);
@@ -566,7 +570,7 @@ const App = ({navigation}) => {
         navigation.navigate('BottomTabNavigation');
       } else {
         setIsLoading(false);
-        handleUpdateCorrectPassword()
+        handleUpdateCorrectPassword();
         console.error('No results found.', data.response.result);
       }
 
@@ -578,7 +582,7 @@ const App = ({navigation}) => {
 
       // navigation.navigate('SelectGender');
     } catch (error) {
-      handleUpdateCorrectPassword()
+      handleUpdateCorrectPassword();
 
       //console.error('Error:');
       //showAlert();
@@ -784,7 +788,7 @@ const App = ({navigation}) => {
               </Text>
             </TouchableOpacity>
 
-          {/*   <TouchableOpacity onPress={() => handleSignInSkipForNow()}>
+            {/*   <TouchableOpacity onPress={() => handleSignInSkipForNow()}>
               <Text
                 style={{
                   color: '#FACA4E',
@@ -1022,6 +1026,38 @@ const App = ({navigation}) => {
                 </Text>
               ) : null}
             </View>
+
+            <TouchableOpacity
+              onPress={() => handleCheckboxChange()}
+              style={{
+                flexDirection: 'row',
+                marginLeft: widthPercentageToDP(7),
+                marginTop: heightPercentageToDP(3),
+                width: '100%',
+              }}>
+              <TouchableOpacity
+                style={
+                  isChecked ? styles.selectCheckBox : styles.unSelectCheckBox
+                }
+                onPress={
+                  () => handleCheckboxChange()
+                  // setChecked(!checked);
+                }>
+                {isChecked && (
+                  <Entypo name={'check'} size={15} color={'#FACA4E'} />
+                )}
+
+                {/* {checked ? ( */}
+                {/* <Icon
+                  name="checkmark"
+                  size={28}
+                  color={AppColors.buttonColor}
+                /> */}
+                {/* ) : ( */}
+
+                {/* )} */}
+              </TouchableOpacity>
+            </TouchableOpacity>
 
             <View style={{marginTop: '25%', alignSelf: 'center'}}>
               <CustomButton

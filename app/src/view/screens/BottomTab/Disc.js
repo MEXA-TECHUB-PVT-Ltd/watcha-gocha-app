@@ -44,6 +44,8 @@ export default function Disc({navigation, route}) {
 
   const [newsData, setNewsData] = useState([]);
 
+  const [topNewsData, setTopNewsData] = useState([]);
+
   const [authToken, setAuthToken] = useState('');
 
   const [opensLettersPublicGeneralData, setOpensLettersPublicGeneralData] =
@@ -163,6 +165,34 @@ export default function Disc({navigation, route}) {
       //Alert.alert(result)
 
       setNewsData(result.AllQAFIs); // Update the state with the fetched data
+
+      fetchTopNews();
+    } catch (error) {
+      console.error('Error Trending:', error);
+    }
+  };
+
+  const fetchTopNews = async () => {
+    console.log('Categry in id', categoryIdNews);
+    console.log('News Called');
+    const token = authToken;
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/top/getSpecificTopNEWSByCategory/${categoryIdNews}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('Resultings of QAFI', result);
+      //Alert.alert(result)
+
+      setTopNewsData(result.topNEWS[0]); // Update the state with the fetched data
     } catch (error) {
       console.error('Error Trending:', error);
     }
@@ -328,7 +358,7 @@ export default function Disc({navigation, route}) {
   //DISC
 
   const renderPublicGeneral = item => {
-    console.log('Item', item);
+    console.log('Item of general public', item);
     const imageUrl =
       item.images && item.images[0]
         ? item.images[0].startsWith('/fileUpload')
@@ -356,7 +386,7 @@ export default function Disc({navigation, route}) {
                 height: hp(12),
                 width: wp(23),
               }}
-              source={appImages.galleryPlaceHolder}
+              source={appImages?.videoPlaceHolder}
             />
           )}
           {/* <Image
@@ -504,7 +534,7 @@ export default function Disc({navigation, route}) {
               <MaterialCommunityIcons
                 style={{marginTop: hp(0.5)}}
                 name={'account-circle'}
-                size={30}
+                size={23}
                 color={'#FACA4E'}
               />
               {/*  <Image
@@ -628,18 +658,16 @@ export default function Disc({navigation, route}) {
         <View
           style={{
             width: '100%',
-            justifyContent:'center',
-            alignItems:'center',
+            justifyContent: 'center',
+            alignItems: 'center',
             height: hp(10),
             borderRadius: wp(1),
             resizeMode: 'stretch',
             borderWidth: 1, // Border width
             borderColor: 'grey', // Border color
           }}>
-            <Text style={{fontSize:hp(5)}}>
-              {item.image}
-            </Text>
-          </View>
+          <Text style={{fontSize: hp(5)}}>{item.image}</Text>
+        </View>
 
         <View
           style={{
@@ -747,28 +775,49 @@ export default function Disc({navigation, route}) {
       <View style={{flex: 1}}>
         <View
           style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(18)}}>
-          <View
-            onPress={() => navigation.navigate('News')}
-            style={{width: wp(35), height: '100%', borderRadius: wp(5)}}>
-            <Image
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-
-                zIndex: 1, // Ensure it's on top of other elements
-                //flex: 1,
-                width: '100%',
-                height: '100%',
-                borderRadius: wp(3),
-                resizeMode: 'cover',
-              }}
-              source={appImages.galleryPlaceHolder}
-            />
-          </View>
-
-          <View style={{justifyContent: 'flex-end', flex: 1}}>
+          {topNewsData === undefined || topNewsData.length === 0 ? (
             <View
+              //onPress={() => navigation.navigate('News')}
+              style={{width: wp(35), height: '100%', borderRadius: wp(5)}}>
+              <Image
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  zIndex: 1, // Ensure it's on top of other elements
+                  //flex: 1,
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: wp(3),
+                  resizeMode: 'cover',
+                }}
+                source={appImages.galleryPlaceHolder}
+              />
+            </View>
+          ) : (
+            <View
+              //onPress={() => navigation.navigate('News')}
+              style={{width: wp(35), height: '100%', borderRadius: wp(5)}}>
+              <Image
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+
+                  zIndex: 1, // Ensure it's on top of other elements
+                  //flex: 1,
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: wp(3),
+                  resizeMode: 'cover',
+                }}
+                source={appImages.galleryPlaceHolder}
+              />
+            </View>
+          )}
+
+          <View style={{justifyContent: 'center', flex: 1}}>
+            {/*   <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
@@ -788,10 +837,6 @@ export default function Disc({navigation, route}) {
                   size={30}
                   color={'#FACA4E'}
                 />
-                {/* <Image
-                  source={appImages.profileImg}
-                  style={{width: '100%', height: '100%', resizeMode: 'cover'}}
-                /> */}
               </View>
 
               <Text
@@ -808,7 +853,7 @@ export default function Disc({navigation, route}) {
               <View style={{marginLeft: wp(1)}}>
                 <Approved />
               </View>
-            </View>
+            </View> */}
 
             <View
               style={{
@@ -824,7 +869,9 @@ export default function Disc({navigation, route}) {
                   fontFamily: 'Inter-Regular',
                   color: '#000000',
                 }}>
-                Explore the intricate web of global politics in this thought-
+                {topNewsData === undefined || topNewsData.length === 0
+                  ? 'Does not contain any top news'
+                  : topNewsData?.description}
               </Text>
             </View>
           </View>

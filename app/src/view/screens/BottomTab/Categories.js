@@ -688,7 +688,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
               }}
               style={styles.overlayButton}>
               <Text style={{color: 'white'}}>
-                Remove From Watcha Gotcha App
+                Remove From Wotcha Gotcha App
               </Text>
             </TouchableOpacity>
           </View>
@@ -749,6 +749,8 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                   }
 
                   setIsLongPressRemove(false);
+                }else{
+                  console.log('NO APPS FOUND')
                 }
               }}
               style={styles.overlayButton}>
@@ -765,13 +767,14 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                   setIsCancelModalVisible(false);
                   setIsLongPressRemove(false);
                 } else {
+                  console.log('CANCEL');
                   setIsCancelModalVisible(false);
                   setIsLongPressRemove(false);
                 }
               }}
               style={styles.overlayButton}>
               <Text style={{color: 'white'}}>
-                Remove From Watcha Gotcha App
+                Remove From Wotcha Gotcha App
               </Text>
             </TouchableOpacity>
           </View>
