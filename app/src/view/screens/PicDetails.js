@@ -24,6 +24,7 @@ import Send from '../../assets/svg/Send.svg';
 import Download from '../../assets/svg/Download.svg';
 import BottomSheet, {BottomSheetFlatList} from '@gorhom/bottom-sheet';
 import ButtonSend from '../../assets/svg/ButtonSend.svg';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import DownArrowComments from '../../assets/svg/DownArrowComments.svg';
 import UpArrowComments from '../../assets/svg/UpArrowComments.svg';
@@ -701,22 +702,23 @@ export default function ViewVideo({navigation, route}) {
                 marginLeft: wp(3),
                 overflow: 'hidden',
               }}>
-              {receivedData?.userimage===null?<Image
-                style={{
-                  flex: 1,
-                  width: null,
-                  height: null,
-                  resizeMode: 'contain',
-                }}
-                source={appImages.profileImg}
-              />:<Image
+              {receivedData?.userimage===null?
+              
+              <MaterialCommunityIcons
+              style={{marginTop: hp(2.3)}}
+              name={'account-circle'}
+              size={35}
+              color={'#FACA4E'}
+            />
+              
+              :<Image
               style={{
                 flex: 1,
                 width: null,
                 height: null,
                 resizeMode: 'contain',
               }}
-              source={appImages.profileImg}
+              source={{uri:receivedData?.userimage}}
             />}
             </View>
 

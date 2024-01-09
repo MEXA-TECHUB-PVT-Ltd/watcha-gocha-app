@@ -85,7 +85,6 @@ export default function ViewVideo({navigation, route}) {
 
   const [authToken, setAuthToken] = useState('');
 
-
   const [commentsCount, setCommentsCount] = useState(null);
 
   const [showReply, setShowReply] = useState(false);
@@ -173,7 +172,6 @@ export default function ViewVideo({navigation, route}) {
     }
   };
 
-
   useEffect(() => {
     // Make the API request and update the 'data' state
     fetchAll();
@@ -219,7 +217,7 @@ export default function ViewVideo({navigation, route}) {
     }
   };
 
-  const fetchComments = async (result) => {
+  const fetchComments = async result => {
     const token = result;
 
     try {
@@ -250,7 +248,7 @@ export default function ViewVideo({navigation, route}) {
     }
   };
 
-  const fetchLikes = async (result) => {
+  const fetchLikes = async result => {
     const token = result;
 
     try {
@@ -269,7 +267,6 @@ export default function ViewVideo({navigation, route}) {
         console.log('All Likes', data.totalLikes);
         setLikes(data.totalLikes);
         await fetchCommentsCounts(result);
-
       } else {
         console.error(
           'Failed to fetch categories:',
@@ -282,7 +279,7 @@ export default function ViewVideo({navigation, route}) {
     }
   };
 
-  const fetchCommentsCounts = async (value) => {
+  const fetchCommentsCounts = async value => {
     const token = value;
 
     try {
@@ -301,7 +298,7 @@ export default function ViewVideo({navigation, route}) {
         //console.log("All Comments", data.totalComments);
         setCommentsCount(data.totalComments);
 
-         await fetchSpecificVideo(value)
+        await fetchSpecificVideo(value);
       } else {
         console.error(
           'Failed to fetch categories:',
@@ -316,9 +313,8 @@ export default function ViewVideo({navigation, route}) {
 
   //----------------------------------\\
 
-  
-  const fetchSpecificVideo = async (result) => {
-    console.log("GET SPECIFIC VIDEO CALLED", result)
+  const fetchSpecificVideo = async result => {
+    console.log('GET SPECIFIC VIDEO CALLED', result);
     const token = result;
 
     try {
@@ -335,8 +331,8 @@ export default function ViewVideo({navigation, route}) {
       if (response.ok) {
         const data = await response.json();
         //console.log("All Comments of usersssss", data.AllComents)
-        console.log("video Is liked or not>>>>>>>>", data.Video)
-       // setShowLikes(data?.Video?.is_liked)
+        console.log('video Is liked or not>>>>>>>>', data.Video);
+        // setShowLikes(data?.Video?.is_liked)
       } else {
         console.error(
           'Failed to fetch categories:',
@@ -779,7 +775,7 @@ export default function ViewVideo({navigation, route}) {
   }
 
   const openComments = () => {
-   // setPaused(!paused);
+    setPaused(true);
 
     setIsBottomSheetExpanded(!isBottomSheetExpanded);
   };
@@ -821,13 +817,17 @@ export default function ViewVideo({navigation, route}) {
         {/* Existing components go here */}
 
         {/* Add the play button View */}
-        {paused === true ? (
+        {!isBottomSheetExpanded && paused === true && (
           <View
-            style={{position: 'absolute', top: '50%', left: '48%', zIndex:1}}>
-            {/* Adjust the marginLeft and marginTop based on the size of your play button image */}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '48%',
+              zIndex: 1,
+            }}>
             <AntDesign name={'pause'} size={35} color={'#FACA4E'} />
           </View>
-        ) : null}
+        )}
 
         <TouchableOpacity
           onPress={() => togglePaused()}
@@ -1400,7 +1400,7 @@ const styles = StyleSheet.create({
     height: hp(6.2),
     marginTop: hp(8),
     alignItems: 'center',
-    marginHorizontal: wp(8),
+    marginHorizontal: wp(8)
   },
   bottomView: {
     flex: 1,

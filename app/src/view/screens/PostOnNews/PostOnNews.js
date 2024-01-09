@@ -547,7 +547,7 @@ export default function PostOnNews({navigation}) {
             marginTop: hp(-1),
           }}>
           <CPaperInput
-            placeholder={'Add a comment'}
+            placeholder={'Add a news'}
             placeholderTextColor="#B0B0B0"
             value={comment}
             onChangeText={text => setComment(text)}

@@ -228,7 +228,7 @@ export default function UpdateProfile({navigation}) {
     // Automatically hide the Snackbar after 3 seconds
     setTimeout(() => {
       setsnackbarVisibleAlert(false);
-      navigation.goBack();
+      navigation.navigate("ViewProfile");
     }, 3000);
   };
 
@@ -434,7 +434,8 @@ export default function UpdateProfile({navigation}) {
     // Automatically hide the Snackbar after 3 seconds
     setTimeout(() => {
       setsnackbarVisible(false);
-      navigation.goBack();
+      navigation.navigate("ViewProfile");
+
     }, 3000);
   };
   return (
