@@ -76,10 +76,24 @@ export default function Categories({navigation}) {
 
       setData(packageDataArray);
       setIsLoading(false);
+
+     
     };
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const copyTopData=()=>{
+      const topSixItems = dataApps.slice(0, 6);
+      console.log("APPS CALLED")
+      setTopData(topSixItems);
+    }
+
+    copyTopData()
+  }, [dataApps]);
+
+ 
 
   //-------------- Use Effect-------------------\\
 
@@ -324,7 +338,7 @@ export default function Categories({navigation}) {
 
           setTopData(updatedTopData);
 
-          await RNLauncherKitHelper.launchApplication(item.bundle)
+          await RNLauncherKitHelper.launchApplication(item.bundle);
 
           //----------------------\\
 
@@ -374,7 +388,7 @@ export default function Categories({navigation}) {
 
           setTopData(newTopData);
 
-          await RNLauncherKitHelper.launchApplication(item.bundle)
+          await RNLauncherKitHelper.launchApplication(item.bundle);
 
           /* const lastUsageDate = new Date().toISOString();
 
@@ -406,11 +420,11 @@ export default function Categories({navigation}) {
             'comparisonDate',
             JSON.stringify(updatedData),
           ); */
-          await RNLauncherKitHelper.launchApplication(item.bundle)
+          await RNLauncherKitHelper.launchApplication(item.bundle);
         }
       } catch (error) {
         console.error('Error opening the app:', error);
-        await RNLauncherKitHelper.launchApplication(item.bundle)
+        await RNLauncherKitHelper.launchApplication(item.bundle);
 
         /* const lastUsageDate = new Date().toISOString();
 
@@ -523,7 +537,7 @@ export default function Categories({navigation}) {
         //onPress={() => openApp(item?.bundle)}
         style={styles.items}>
         <Image
-          style={{width: 30, height: 30}}
+          style={{width: 43, height: 43}}
           source={{uri: `data:image/png;base64,${item?.image}`}}
         />
         <Text
@@ -749,8 +763,8 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                   }
 
                   setIsLongPressRemove(false);
-                }else{
-                  console.log('NO APPS FOUND')
+                } else {
+                  console.log('NO APPS FOUND');
                 }
               }}
               style={styles.overlayButton}>
@@ -853,45 +867,45 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
             height: hp(20),
             width: wp(53),
           }}>
-            {isLoading === true ? (
-              <View
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <ActivityIndicator size="large" color="#FACA4E" />
-              </View>
-            ) : (
-              <>
-                {topData?.length === 0 ? (
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}>
-                    <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
-                      No Top Apps
-                    </Text>
-                  </View>
-                ) : (
-          <FlatList
-            style={{margin: 8, flex: 1}}
-            //contentContainerStyle={{marginBottom:hp(5)}}
-            showsVerticalScrollIndicator={false}
-            data={topData}
-            //keyExtractor={item => item.id.toString()}
-            numColumns={3} // Set the number of columns to 3
-            renderItem={({item}) => renderAvailableApps(item)}
-          />
+          {isLoading === true ? (
+            <View
+              style={{
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <ActivityIndicator size="large" color="#FACA4E" />
+            </View>
+          ) : (
+            <>
+              {topData?.length === 0 ? (
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                    No Top Apps
+                  </Text>
+                </View>
+              ) : (
+                <FlatList
+                  style={{margin: 8, flex: 1}}
+                  //contentContainerStyle={{marginBottom:hp(5)}}
+                  showsVerticalScrollIndicator={false}
+                  data={topData}
+                  //keyExtractor={item => item.id.toString()}
+                  numColumns={3} // Set the number of columns to 3
+                  renderItem={({item}) => renderAvailableApps(item)}
+                />
+              )}
+            </>
           )}
-          </>
-        )}
         </View>
 
         <View style={{marginTop: hp(1), height: hp(25)}}>
@@ -1076,7 +1090,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
           )}
         </View> */}
 
-        <View style={{marginTop: hp(1), height: hp(20)}}>
+        <View style={{marginTop: hp(1), height: hp(28)}}>
           <Text
             style={{
               fontSize: hp(2.3),
@@ -1100,9 +1114,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
               }}>
               <ActivityIndicator size="large" color="#FACA4E" />
             </View>
-          ) :
-
-          (
+          ) : (
             <>
               {favouriteData?.length === 0 ? (
                 <View
@@ -1115,27 +1127,41 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                     No Favourite Apps
                   </Text>
                 </View>
-              ) :
-          
-          
-          (
-            <FlatList
-              data={favouriteData}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              //keyExtractor={(item, itemIndex) => `${itemIndex}`}
-              renderItem={({item}) => renderFavouritesApps(item)}
-              contentContainerStyle={{
-                borderWidth: 1,
-                marginRight: wp(2.3),
-                marginTop: hp(3),
-                borderColor: '#00000017',
-                borderRadius: wp(3),
-              }}
-            />
+              ) : (
+                <FlatList
+                  data={favouriteData.slice(
+                    0,
+                    Math.ceil(favouriteData.length / 2),
+                  )}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  keyExtractor={(item, itemIndex) => `${itemIndex}`}
+                  renderItem={({item}) => renderFavouritesApps(item)}
+                  contentContainerStyle={{
+                    borderWidth: 1,
+                    marginRight: wp(2.3),
+                    marginTop: hp(3),
+                    borderColor: '#00000017',
+                    borderRadius: wp(3),
+                  }}
+                />
+              )}
+              <FlatList
+                data={favouriteData.slice(Math.ceil(favouriteData.length / 2))}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item, itemIndex) => `${itemIndex}`}
+                renderItem={({item}) => renderFavouritesApps(item)}
+                contentContainerStyle={{
+                  borderWidth: 1,
+                  marginRight: wp(2.3),
+                  marginTop: hp(3),
+                  borderColor: '#00000017',
+                  borderRadius: wp(3),
+                }}
+              />
+            </>
           )}
-          </>
-            )}
         </View>
 
         <View style={{marginTop: hp(1), marginBottom: hp(5), height: hp(25)}}>
@@ -1165,35 +1191,35 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
             </View>
           ) : (
             <View style={{flex: 1}}>
-               <FlatList
-              data={dataApps.slice(0, Math.ceil(dataApps.length / 2))}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={(item, itemIndex) => `${itemIndex}`}
-              renderItem={({item}) => renderApps(item)}
-              contentContainerStyle={{
-                borderWidth: 1,
-                marginRight: wp(2.3),
-                marginTop: hp(3),
-                borderColor: '#00000017',
-                borderRadius: wp(3),
-              }}
-            />
-        
-            <FlatList
-              data={dataApps.slice(Math.ceil(dataApps.length / 2))}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={(item, itemIndex) => `${itemIndex}`}
-              renderItem={({item}) => renderApps(item)}
-              contentContainerStyle={{
-                borderWidth: 1,
-                marginRight: wp(2.3),
-                marginTop: hp(3),
-                borderColor: '#00000017',
-                borderRadius: wp(3),
-              }}
-            /> 
+              <FlatList
+                data={dataApps.slice(0, Math.ceil(dataApps.length / 2))}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item, itemIndex) => `${itemIndex}`}
+                renderItem={({item}) => renderApps(item)}
+                contentContainerStyle={{
+                  borderWidth: 1,
+                  marginRight: wp(2.3),
+                  marginTop: hp(3),
+                  borderColor: '#00000017',
+                  borderRadius: wp(3),
+                }}
+              />
+
+              <FlatList
+                data={dataApps.slice(Math.ceil(dataApps.length / 2))}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item, itemIndex) => `${itemIndex}`}
+                renderItem={({item}) => renderApps(item)}
+                contentContainerStyle={{
+                  borderWidth: 1,
+                  marginRight: wp(2.3),
+                  marginTop: hp(3),
+                  borderColor: '#00000017',
+                  borderRadius: wp(3),
+                }}
+              />
             </View>
           )}
 

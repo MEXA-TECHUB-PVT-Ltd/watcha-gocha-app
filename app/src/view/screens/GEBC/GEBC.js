@@ -560,7 +560,7 @@ export default function GEBC({navigation}) {
           <CPaperInput
             multiline={true}
             style={{flex: 1}}
-            placeholder={'Add a comment'}
+            placeholder={'Add GEBC'}
             placeholderTextColor="#B0B0B0"
             value={comment}
             onChangeText={text => setComment(text)}

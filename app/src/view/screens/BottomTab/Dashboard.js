@@ -48,30 +48,23 @@ import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons';
 
 import RBSheet from 'react-native-raw-bottom-sheet';
 
-
-
-
 //----------------------------------------------------\\
 
 //------------------IMPORT OF DISC --------------------\\
-
-
 
 import Toast from 'react-native-toast-message';
 
 import NonVerified from '../../../assets/svg/NonVerified.svg';
 
-
 //-----------------------------------------------------\\
 
 //-----------------IMPORTS OF PIC TOUR------------------\\
 
-  //NOTHING NEW
+//NOTHING NEW
 
 //--------------------------------------------------------\\
 
 export default function Dashboard({navigation, route}) {
-
   //----------------- CATEGORY ----------------------\\
 
   const [selectedItemId, setSelectedItemId] = useState(null);
@@ -562,7 +555,7 @@ export default function Dashboard({navigation, route}) {
         //onPress={() => openApp(item?.bundle)}
         style={styles.items}>
         <Image
-          style={{width: 30, height: 30}}
+          style={{width: 43, height: 43}}
           source={{uri: `data:image/png;base64,${item?.image}`}}
         />
         <Text
@@ -676,11 +669,10 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
     setIsLongPressRemove(false);
     setIsCancelRemoveModalVisible(false);
   };
- 
+
   //---------------------------------------------------\\
 
   //--------------------Video---------------------------\\
-
 
   const [selectedItemVideoId, setSelectedItemVideoId] = useState(null);
 
@@ -710,8 +702,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
 
   const ref_RBSheetCamera = useRef(null);
 
-
- useEffect(() => {
+  useEffect(() => {
     // Check if it's the initial load (selectedItemId is not set yet)
     if (selectedItemVideoId === null) {
       setSelectedItemVideoId(17);
@@ -720,7 +711,6 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
       fetchVideos();
     }
   }, [selectedItemVideoId, isFocused]);
-  
 
   const fetchVideos = async () => {
     // Simulate loading
@@ -917,7 +907,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
             setImageInfo(response.assets[0]);
             ref_RBSheetCamera.current.close();
             setLoading(false);
-              
+
             navigation.navigate('UploadUpdateVideo', {
               Video: response.assets[0],
             });
@@ -963,7 +953,6 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
       navigation.navigate('UploadUpdateVideo', {Video: response.assets[0]});
     });
   };
-
 
   const renderAvailableAppsVideo = item => {
     //console.log('Itemsss', item);
@@ -1068,6 +1057,8 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
 
   const [selectedItemDiscId, setSelectedItemDiscId] = useState(1);
 
+  const [topNewsData, setTopNewsData] = useState([]);
+
   const [categoryIdNews, setCategoryIdNews] = useState(null);
 
   const [loadingDisc, setLoadingDisc] = useState(false);
@@ -1100,7 +1091,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
 
   useEffect(() => {
     if (isFocusedDisc) {
-    getUserDiscID(); // Call the async function
+      getUserDiscID(); // Call the async function
     }
   }, [NewsCategory, isFocusedDisc]); // Include 'id' in the dependency array
 
@@ -1163,7 +1154,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
         setLoadingDisc(false);
       }
     } else {
-     /*  setLoading(true);
+      /*  setLoading(true);
       //setSelectedItemId(1)
       console.log('Category Id News is ', NewsCategory);
       // Fetch data one by one
@@ -1176,7 +1167,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
 
   const fetchNews = async () => {
     console.log('Categry in id', categoryIdNews);
-    console.log("News Called");
+    console.log('News Called');
     const token = authToken;
 
     try {
@@ -1195,6 +1186,34 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
       //Alert.alert(result)
 
       setNewsData(result.AllQAFIs); // Update the state with the fetched data
+
+      fetchTopNews();
+    } catch (error) {
+      console.error('Error Trending:', error);
+    }
+  };
+
+  const fetchTopNews = async () => {
+    console.log('Categry in id', categoryIdNews);
+    console.log('News Called');
+    const token = authToken;
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/top/getAllTopQAFIByCategory/${categoryIdNews}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('Resultings of QAFI', result);
+      //Alert.alert(result)
+
+      setTopNewsData(result.AllQAFI[0]); // Update the state with the fetched data
     } catch (error) {
       console.error('Error Trending:', error);
     }
@@ -1245,6 +1264,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
       //Alert.alert(result)
 
       setGEBCData(result.GEBCs); // Update the state with the fetched data
+      fetchTopNews();
     } catch (error) {
       console.error('Error Trending:', error);
     }
@@ -1349,6 +1369,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
       //Alert.alert(result)
 
       setOpensLettersPrivateCelebrityData(result.AllLetter); // Update the state with the fetched data
+      fetchTopNews();
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -1361,36 +1382,37 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
 
   const renderPublicGeneral = item => {
     console.log('Item', item);
-    const imageUrl = item.images && item.images[0]
-    ? (item.images[0].startsWith('/fileUpload')
-        ? `https://watch-gotcha-be.mtechub.com${item.images[0]}`
-        : item.images[0])
-    : null;
+    const imageUrl =
+      item.images && item.images[0]
+        ? item.images[0].startsWith('/fileUpload')
+          ? `https://watch-gotcha-be.mtechub.com${item.images[0]}`
+          : item.images[0]
+        : null;
 
     return (
       <TouchableOpacity
         onPress={() => navigation.navigate('LetterDetails', {Letters: item})}
         style={{width: wp(25.5), margin: 5}}>
         <View>
-        {item.images && item.images[0] ? (
-          <Image
-            style={{
-              height: hp(12),
-              width: wp(23),
-            }}
-            source={{ uri: imageUrl }}
-          />
-        ) : (
-          // Show dummy image if item.images is null or undefined
-          <Image
-            style={{
-              height: hp(12),
-              width: wp(23),
-            }}
-            source={appImages.galleryPlaceHolder}
-          />
-        )}
-         {/* <Image
+          {item.images && item.images[0] ? (
+            <Image
+              style={{
+                height: hp(12),
+                width: wp(23),
+              }}
+              source={{uri: imageUrl}}
+            />
+          ) : (
+            // Show dummy image if item.images is null or undefined
+            <Image
+              style={{
+                height: hp(12),
+                width: wp(23),
+              }}
+              source={appImages.galleryPlaceHolder}
+            />
+          )}
+          {/* <Image
             style={{
               height: hp(12),
               width: wp(23),
@@ -1400,7 +1422,6 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
         </View>
       </TouchableOpacity>
     );
-    
   };
 
   //-------------------\\
@@ -1607,18 +1628,16 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
         <View
           style={{
             width: '100%',
-            justifyContent:'center',
-            alignItems:'center',
+            justifyContent: 'center',
+            alignItems: 'center',
             height: hp(10),
             borderRadius: wp(1),
             resizeMode: 'stretch',
             borderWidth: 1, // Border width
             borderColor: 'grey', // Border color
           }}>
-            <Text style={{fontSize:hp(5)}}>
-              {item.image}
-            </Text>
-          </View>
+          <Text style={{fontSize: hp(5)}}>{item.image}</Text>
+        </View>
 
         <View
           style={{
@@ -1727,27 +1746,50 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
         <View
           style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(18)}}>
           <View
-            onPress={() => navigation.navigate('News')}
-            style={{width: wp(35), height: '100%', borderRadius: wp(5)}}>
-            <Image
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
+            style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(18)}}>
+            {topNewsData === undefined || topNewsData.length === 0 ? (
+              <View
+                //onPress={() => navigation.navigate('News')}
+                style={{width: wp(35), height: '100%', borderRadius: wp(5)}}>
+                <Image
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    zIndex: 1, // Ensure it's on top of other elements
+                    //flex: 1,
+                    width: '100%',
+                    height: '100%',
+                    borderRadius: wp(3),
+                    resizeMode: 'cover',
+                  }}
+                  source={appImages.galleryPlaceHolder}
+                />
+              </View>
+            ) : (
+              <View
+                //onPress={() => navigation.navigate('News')}
+                style={{width: wp(35), height: '100%', borderRadius: wp(5)}}>
+                <Image
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
 
-                zIndex: 1, // Ensure it's on top of other elements
-                //flex: 1,
-                width: '100%',
-                height: '100%',
-                borderRadius: wp(3),
-                resizeMode: 'cover',
-              }}
-              source={appImages.galleryPlaceHolder}
-            />
-          </View>
+                    zIndex: 1, // Ensure it's on top of other elements
+                    //flex: 1,
+                    width: '100%',
+                    height: '100%',
+                    borderRadius: wp(3),
+                    resizeMode: 'cover',
+                  }}
+                  source={appImages.galleryPlaceHolder}
+                />
+              </View>
+            )}
 
-          <View style={{justifyContent: 'flex-end', flex: 1}}>
-            <View
+            <View style={{justifyContent: 'center', flex: 1}}>
+              {/*   <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
@@ -1767,10 +1809,6 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                   size={30}
                   color={'#FACA4E'}
                 />
-                {/* <Image
-                  source={appImages.profileImg}
-                  style={{width: '100%', height: '100%', resizeMode: 'cover'}}
-                /> */}
               </View>
 
               <Text
@@ -1787,24 +1825,27 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
               <View style={{marginLeft: wp(1)}}>
                 <Approved />
               </View>
-            </View>
+            </View> */}
 
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                height: hp(7),
-                width: wp(35),
-              }}>
-              <Text
+              <View
                 style={{
-                  fontSize: hp(1.5),
-                  marginLeft: wp(2.5),
-                  fontFamily: 'Inter-Regular',
-                  color: '#000000',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  height: hp(7),
+                  width: wp(35),
                 }}>
-                Explore the intricate web of global politics in this thought-
-              </Text>
+                <Text
+                  style={{
+                    fontSize: hp(1.5),
+                    marginLeft: wp(2.5),
+                    fontFamily: 'Inter-Regular',
+                    color: '#000000',
+                  }}>
+                  {topNewsData === undefined || topNewsData.length === 0
+                    ? 'Does not contain any top news'
+                    : topNewsData?.description}
+                </Text>
+              </View>
             </View>
           </View>
         </View>
@@ -1937,7 +1978,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
         </View>
       </View>
     );
-  }
+  };
 
   const QAFI = () => {
     console.log('Came to QAFI');
@@ -1945,28 +1986,49 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
       <View style={{flex: 1}}>
         <View
           style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(18)}}>
-          <View
-            onPress={() => navigation.navigate('News')}
-            style={{width: wp(35), height: '100%', borderRadius: wp(5)}}>
-            <Image
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-
-                zIndex: 1, // Ensure it's on top of other elements
-                //flex: 1,
-                width: '100%',
-                height: '100%',
-                borderRadius: wp(3),
-                resizeMode: 'cover',
-              }}
-              source={appImages.galleryPlaceHolder}
-            />
-          </View>
-
-          <View style={{justifyContent: 'flex-end', flex: 1}}>
+          {topNewsData === undefined || topNewsData.length === 0 ? (
             <View
+              //onPress={() => navigation.navigate('News')}
+              style={{width: wp(35), height: '100%', borderRadius: wp(5)}}>
+              <Image
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  zIndex: 1, // Ensure it's on top of other elements
+                  //flex: 1,
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: wp(3),
+                  resizeMode: 'cover',
+                }}
+                source={appImages.galleryPlaceHolder}
+              />
+            </View>
+          ) : (
+            <View
+              //onPress={() => navigation.navigate('News')}
+              style={{width: wp(35), height: '100%', borderRadius: wp(5)}}>
+              <Image
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+
+                  zIndex: 1, // Ensure it's on top of other elements
+                  //flex: 1,
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: wp(3),
+                  resizeMode: 'cover',
+                }}
+                source={appImages.galleryPlaceHolder}
+              />
+            </View>
+          )}
+
+          <View style={{justifyContent: 'center', flex: 1}}>
+            {/*   <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
@@ -1986,10 +2048,6 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                   size={30}
                   color={'#FACA4E'}
                 />
-                {/*  <Image
-                  source={appImages.profileImg}
-                  style={{width: '100%', height: '100%', resizeMode: 'cover'}}
-                /> */}
               </View>
 
               <Text
@@ -2006,7 +2064,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
               <View style={{marginLeft: wp(1)}}>
                 <Approved />
               </View>
-            </View>
+            </View> */}
 
             <View
               style={{
@@ -2022,7 +2080,9 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                   fontFamily: 'Inter-Regular',
                   color: '#000000',
                 }}>
-                Explore the intricate web of global politics in this thought-
+                {topNewsData === undefined || topNewsData.length === 0
+                  ? 'Does not contain any top news'
+                  : topNewsData?.description}
               </Text>
             </View>
           </View>
@@ -2209,27 +2269,50 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
         <View
           style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(18)}}>
           <View
-            onPress={() => navigation.navigate('News')}
-            style={{width: wp(35), height: '100%', borderRadius: wp(5)}}>
-            <Image
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
+            style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(18)}}>
+            {topNewsData === undefined || topNewsData.length === 0 ? (
+              <View
+                //onPress={() => navigation.navigate('News')}
+                style={{width: wp(35), height: '100%', borderRadius: wp(5)}}>
+                <Image
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    zIndex: 1, // Ensure it's on top of other elements
+                    //flex: 1,
+                    width: '100%',
+                    height: '100%',
+                    borderRadius: wp(3),
+                    resizeMode: 'cover',
+                  }}
+                  source={appImages.galleryPlaceHolder}
+                />
+              </View>
+            ) : (
+              <View
+                //onPress={() => navigation.navigate('News')}
+                style={{width: wp(35), height: '100%', borderRadius: wp(5)}}>
+                <Image
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
 
-                zIndex: 1, // Ensure it's on top of other elements
-                //flex: 1,
-                width: '100%',
-                height: '100%',
-                borderRadius: wp(3),
-                resizeMode: 'cover',
-              }}
-              source={appImages.galleryPlaceHolder}
-            />
-          </View>
+                    zIndex: 1, // Ensure it's on top of other elements
+                    //flex: 1,
+                    width: '100%',
+                    height: '100%',
+                    borderRadius: wp(3),
+                    resizeMode: 'cover',
+                  }}
+                  source={appImages.galleryPlaceHolder}
+                />
+              </View>
+            )}
 
-          <View style={{justifyContent: 'flex-end', flex: 1}}>
-            <View
+            <View style={{justifyContent: 'center', flex: 1}}>
+              {/*   <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
@@ -2243,15 +2326,10 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                   height: wp(10),
                   borderRadius: wp(10) / 2,
                 }}>
-                {/* <Image
-                  source={appImages.galleryPlaceHolder}
-                  style={{width: '100%', height: '100%', resizeMode: 'cover'}}
-                /> */}
-
                 <MaterialCommunityIcons
                   style={{marginTop: hp(0.5)}}
                   name={'account-circle'}
-                  size={28}
+                  size={30}
                   color={'#FACA4E'}
                 />
               </View>
@@ -2270,24 +2348,27 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
               <View style={{marginLeft: wp(1)}}>
                 <Approved />
               </View>
-            </View>
+            </View> */}
 
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                height: hp(7),
-                width: wp(35),
-              }}>
-              <Text
+              <View
                 style={{
-                  fontSize: hp(1.5),
-                  marginLeft: wp(2.5),
-                  fontFamily: 'Inter-Regular',
-                  color: '#000000',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  height: hp(7),
+                  width: wp(35),
                 }}>
-                Explore the intricate web of global politics in this thought-
-              </Text>
+                <Text
+                  style={{
+                    fontSize: hp(1.5),
+                    marginLeft: wp(2.5),
+                    fontFamily: 'Inter-Regular',
+                    color: '#000000',
+                  }}>
+                  {topNewsData === undefined || topNewsData.length === 0
+                    ? 'Does not contain any top news'
+                    : topNewsData?.description}
+                </Text>
+              </View>
             </View>
           </View>
         </View>
@@ -2471,15 +2552,107 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
     return (
       <View style={{flex: 1}}>
         <View
-          style={{
-            height: hp(21),
-            alignItems: 'flex-start',
-            justifyContent: 'center',
-          }}>
-          <Image
-            source={appImages.openLettersFirst}
-            style={{resizeMode: 'contain', width: wp(55)}}
-          />
+          style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(18)}}>
+          {topNewsData === undefined || topNewsData.length === 0 ? (
+            <View
+              //onPress={() => navigation.navigate('News')}
+              style={{width: wp(35), height: '100%', borderRadius: wp(5)}}>
+              <Image
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  zIndex: 1, // Ensure it's on top of other elements
+                  //flex: 1,
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: wp(3),
+                  resizeMode: 'cover',
+                }}
+                source={appImages.galleryPlaceHolder}
+              />
+            </View>
+          ) : (
+            <View
+              //onPress={() => navigation.navigate('News')}
+              style={{width: wp(35), height: '100%', borderRadius: wp(5)}}>
+              <Image
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+
+                  zIndex: 1, // Ensure it's on top of other elements
+                  //flex: 1,
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: wp(3),
+                  resizeMode: 'cover',
+                }}
+                source={appImages.galleryPlaceHolder}
+              />
+            </View>
+          )}
+
+          <View style={{justifyContent: 'center', flex: 1}}>
+            {/*   <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                height: hp(7),
+                width: wp(40),
+              }}>
+              <View
+                style={{
+                  width: wp(10),
+                  marginLeft: wp(3),
+                  height: wp(10),
+                  borderRadius: wp(10) / 2,
+                }}>
+                <MaterialCommunityIcons
+                  style={{marginTop: hp(0.5)}}
+                  name={'account-circle'}
+                  size={30}
+                  color={'#FACA4E'}
+                />
+              </View>
+
+              <Text
+                style={{
+                  fontSize: hp(1.6),
+                  marginLeft: wp(2),
+                  color: '#000000',
+                  fontWeight: 'bold',
+                  fontFamily: 'Inter',
+                }}>
+                Usama
+              </Text>
+
+              <View style={{marginLeft: wp(1)}}>
+                <Approved />
+              </View>
+            </View> */}
+
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                height: hp(7),
+                width: wp(35),
+              }}>
+              <Text
+                style={{
+                  fontSize: hp(1.5),
+                  marginLeft: wp(2.5),
+                  fontFamily: 'Inter-Regular',
+                  color: '#000000',
+                }}>
+                {topNewsData === undefined || topNewsData.length === 0
+                  ? 'Does not contain any top news'
+                  : topNewsData?.description}
+              </Text>
+            </View>
+          </View>
         </View>
 
         <View style={{height: hp(21)}}>
@@ -2565,8 +2738,6 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
       </View>
     );
   };
-
-
 
   //---------------------------------------------------------\\
 
@@ -2726,8 +2897,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
   };
 
   const fetchTopPics = async () => {
-
-    console.log("Category Top Videos", selectedItemPicsId )
+    console.log('Category Top Videos', selectedItemPicsId);
     const token = authToken;
 
     try {
@@ -2748,7 +2918,6 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
       console.error('Error:', error);
     }
   };
-
 
   const fetchMostCommentedPics = async () => {
     console.log('selected most commented videos', authTokenPics);
@@ -2803,8 +2972,6 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
     );
   };
 
-  
-
   const renderAvailableAppsPics = item => {
     console.log('Items of Pics', item);
     return (
@@ -2812,7 +2979,9 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
         onPress={() => navigation.navigate('PicDetails', {picData: item})}
         style={{width: wp(27), margin: 5}}>
         <View>
-          {!item.image || item.image === 'undefined'  || item.image.startsWith('/') ? (
+          {!item.image ||
+          item.image === 'undefined' ||
+          item.image.startsWith('/') ? (
             <Image
               style={{
                 position: 'absolute',
@@ -2893,7 +3062,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
         if (!response.didCancel) {
           if (response.assets && response.assets.length > 0) {
             setLoadingPics(true);
-             setImagePicInfo(response.assets[0]);
+            setImagePicInfo(response.assets[0]);
             ref_RBSheetCameraPics.current.close();
             setLoadingPics(false);
 
@@ -2938,7 +3107,6 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
 
   //------------------------------------------------------------\\
 
-
   //--------------------- MARKET ZONE ----------------------------\\
 
   const [selectedItemIdMarket, setSelectedItemIdMarket] = useState(null);
@@ -2956,16 +3124,10 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
   const [loadingMarket, setLoadingMarket] = useState(false);
 
   const [categoriesSelectMarket, setCategorySelectMarket] = useState([]);
-  
+
   const [dataTopVideosMarket, setDataTopVideosMarket] = useState([]);
 
-  const RegionArea = [
-    'Africa',
-    'Europe',
-    'Americas',
-    'Asia',
-    'Middle East',
-  ];
+  const RegionArea = ['Africa', 'Europe', 'Americas', 'Asia', 'Middle East'];
 
   useEffect(() => {
     // Make the API request and update the 'data' state
@@ -3190,7 +3352,6 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
     }
   };
 
-
   const searchesMarket = [
     {id: 1, title: 'Africa'},
     {id: 2, title: 'Europe'},
@@ -3200,10 +3361,6 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
     {id: 6, title: 'Middle East'},
     {id: 7, title: 'Carribean'},
   ];
-
-  
-
-  
 
   const renderAvailableAppsMarket = item => {
     console.log('Items of market zone', item?.images[0]?.image);
@@ -3276,7 +3433,6 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
     );
   };
 
-
   const renderSearchesMarket = item => {
     console.log('Regions', item);
     const isSelected = selectedItemIdMarket === item;
@@ -3305,7 +3461,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
   };
 
   //----------------------------------------------------------------\\
-  
+
   return (
     <View style={styles.container}>
       <StatusBar
@@ -3314,11 +3470,11 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
         barStyle="dark-content" // You can set the StatusBar text color to dark or light
       />
 
-      <View style={{marginTop: hp(5), width:'100%'}}>
+      <View style={{marginTop: hp(5), width: '100%'}}>
         <Headers
           showListings={true}
           showLogo={true}
-          onPressListings={()=>navigation.openDrawer()}
+          onPressListings={() => navigation.openDrawer()}
           onPressProfile={() => navigation.navigate('ViewProfile')}
           showProfileImage={true}
         />
@@ -3327,8 +3483,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={{flex: 1, marginHorizontal: wp(5)}}>
-            
-           {/*  <View style={styles.searchBar}>
+        {/*  <View style={styles.searchBar}>
       
           <Fontiso
             name={'search'}
@@ -3341,173 +3496,166 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
             placeholder="Search here"
           />
         </View> */}
-      
-       {/* //-------------- Category ---------------------\\ */}
-    
-       <Modal
-        transparent={true}
-        animationType="fade"
-        visible={isLongPress}
-        onRequestClose={() => setIsLongPress(false)}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity
-              onPress={() => {
-                if (favouriteItem) {
-                  const isItemInFavourites = favouriteData.some(
-                    item => item.bundle === favouriteItem.bundle,
-                  );
 
-                  if (isItemInFavourites) {
-                    console.log('Item is already in favourites');
-                  } else {
-                    setFavouriteData(prevData => [...prevData, favouriteItem]);
-                    console.log(
-                      'Add to Favorites pressed for:',
-                      favouriteItem.label,
+        {/* //-------------- Category ---------------------\\ */}
+
+        <Modal
+          transparent={true}
+          animationType="fade"
+          visible={isLongPress}
+          onRequestClose={() => setIsLongPress(false)}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <TouchableOpacity
+                onPress={() => {
+                  if (favouriteItem) {
+                    const isItemInFavourites = favouriteData.some(
+                      item => item.bundle === favouriteItem.bundle,
                     );
+
+                    if (isItemInFavourites) {
+                      console.log('Item is already in favourites');
+                    } else {
+                      setFavouriteData(prevData => [
+                        ...prevData,
+                        favouriteItem,
+                      ]);
+                      console.log(
+                        'Add to Favorites pressed for:',
+                        favouriteItem.label,
+                      );
+                    }
+
+                    setIsLongPress(false);
                   }
-
-                  setIsLongPress(false);
-                }
-              }}
-              style={styles.overlayButton}>
-              <Text style={{color: 'white'}}>Add to Favorites</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                if (favouriteItem) {
-                  const updatedInstallData = dataApps.filter(
-                    item => item.bundle !== favouriteItem.bundle,
-                  );
-                  setData(updatedInstallData);
-                  setIsCancelModalVisible(false);
-                  setIsLongPress(false);
-                }
-              }}
-              style={styles.overlayButton}>
-              <Text style={{color: 'white'}}>
-                Remove From Wotcha Gotcha App
-              </Text>
-            </TouchableOpacity>
+                }}
+                style={styles.overlayButton}>
+                <Text style={{color: 'white'}}>Add to Favorites</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  if (favouriteItem) {
+                    const updatedInstallData = dataApps.filter(
+                      item => item.bundle !== favouriteItem.bundle,
+                    );
+                    setData(updatedInstallData);
+                    setIsCancelModalVisible(false);
+                    setIsLongPress(false);
+                  }
+                }}
+                style={styles.overlayButton}>
+                <Text style={{color: 'white'}}>
+                  Remove From Wotcha Gotcha App
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-        {isCancelModalVisible && (
-          <TouchableOpacity
-            onPress={() => closeRequestModal()}
-            style={styles.modalContentCross}>
-            <Entypo name={'cross'} size={18} color={'black'} />
-          </TouchableOpacity>
-        )}
-      </Modal>
+          {isCancelModalVisible && (
+            <TouchableOpacity
+              onPress={() => closeRequestModal()}
+              style={styles.modalContentCross}>
+              <Entypo name={'cross'} size={18} color={'black'} />
+            </TouchableOpacity>
+          )}
+        </Modal>
 
-      {/* Modal Of Cross Button */}
-      {/*  <Modal
+        {/* Modal Of Cross Button */}
+        {/*  <Modal
         transparent={true}
         animationType="slide"
         visible={isCancelModalVisible}
         onRequestClose={() => closeRequestModal()}> */}
 
-      <Modal
-        transparent={true}
-        animationType="fade"
-        visible={isLongPressRemove}
-        onRequestClose={() => setIsLongPressRemove(false)}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity
-              onPress={() => {
-                // Handle your overlay button action (e.g., add to favorites)
+        <Modal
+          transparent={true}
+          animationType="fade"
+          visible={isLongPressRemove}
+          onRequestClose={() => setIsLongPressRemove(false)}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <TouchableOpacity
+                onPress={() => {
+                  // Handle your overlay button action (e.g., add to favorites)
 
-                /*  if (favouriteItem) {
+                  /*  if (favouriteItem) {
                   setFavouriteData((prevData) => [...prevData, favouriteItem]);
                   console.log('Add to Favorites pressed for:');
                   setIsLongPress(false);
                 } */
 
-                if (removeFavouriteItem) {
-                  // Check if the item already exists in favouriteData
-                  const isItemInFavourites = favouriteData.some(
-                    item => item.bundle === removeFavouriteItem.bundle,
-                  );
+                  if (removeFavouriteItem) {
+                    // Check if the item already exists in favouriteData
+                    const isItemInFavourites = favouriteData.some(
+                      item => item.bundle === removeFavouriteItem.bundle,
+                    );
 
-                  console.log('Favourite Item', isItemInFavourites);
+                    console.log('Favourite Item', isItemInFavourites);
 
-                  if (isItemInFavourites) {
-                    // Item already exists, remove it from favouriteData
-                    const updatedFavouriteData = favouriteData.filter(
+                    if (isItemInFavourites) {
+                      // Item already exists, remove it from favouriteData
+                      const updatedFavouriteData = favouriteData.filter(
+                        item => item.bundle !== removeFavouriteItem.bundle,
+                      );
+                      setFavouriteData(updatedFavouriteData);
+
+                      console.log('Item removed from favourites');
+                    } else {
+                      // Item doesn't exist, add it to favouriteData
+                      setFavouriteData(prevData => [
+                        ...prevData,
+                        favouriteItem,
+                      ]);
+                      console.log('Add to Favorites pressed for:');
+                    }
+
+                    setIsLongPressRemove(false);
+                  }
+                }}
+                style={styles.overlayButton}>
+                <Text style={{color: 'white'}}>Remove Favorites</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => {
+                  if (removeFavouriteItem) {
+                    const updatedInstallData = dataApps.filter(
                       item => item.bundle !== removeFavouriteItem.bundle,
                     );
-                    setFavouriteData(updatedFavouriteData);
-
-                    console.log('Item removed from favourites');
+                    setData(updatedInstallData);
+                    setIsCancelModalVisible(false);
+                    setIsLongPressRemove(false);
                   } else {
-                    // Item doesn't exist, add it to favouriteData
-                    setFavouriteData(prevData => [...prevData, favouriteItem]);
-                    console.log('Add to Favorites pressed for:');
+                    setIsCancelModalVisible(false);
+                    setIsLongPressRemove(false);
                   }
-
-                  setIsLongPressRemove(false);
-                }
-              }}
-              style={styles.overlayButton}>
-              <Text style={{color: 'white'}}>Remove Favorites</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => {
-                if (removeFavouriteItem) {
-                  const updatedInstallData = dataApps.filter(
-                    item => item.bundle !== removeFavouriteItem.bundle,
-                  );
-                  setData(updatedInstallData);
-                  setIsCancelModalVisible(false);
-                  setIsLongPressRemove(false);
-                } else {
-                  setIsCancelModalVisible(false);
-                  setIsLongPressRemove(false);
-                }
-              }}
-              style={styles.overlayButton}>
-              <Text style={{color: 'white'}}>
-                Remove From Wotcha Gotcha App
-              </Text>
-            </TouchableOpacity>
+                }}
+                style={styles.overlayButton}>
+                <Text style={{color: 'white'}}>
+                  Remove From Wotcha Gotcha App
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-        {isCancelRemoveModalVisible && (
-          <TouchableOpacity
-            onPress={() => closeRequestRemoveModal()}
-            style={styles.modalContentCross}>
-            <Entypo name={'cross'} size={18} color={'black'} />
-          </TouchableOpacity>
-        )}
-      </Modal>
+          {isCancelRemoveModalVisible && (
+            <TouchableOpacity
+              onPress={() => closeRequestRemoveModal()}
+              style={styles.modalContentCross}>
+              <Entypo name={'cross'} size={18} color={'black'} />
+            </TouchableOpacity>
+          )}
+        </Modal>
 
-      {/*  </Modal> */}
+        {/*  </Modal> */}
 
-      {/* //------------------------\\ */}
+        {/* //------------------------\\ */}
 
-      <StatusBar
-        translucent={true}
-        backgroundColor="transparent"
-        barStyle="dark-content" // You can set the StatusBar text color to dark or light
-      />
+        <StatusBar
+          translucent={true}
+          backgroundColor="transparent"
+          barStyle="dark-content" // You can set the StatusBar text color to dark or light
+        />
 
-      <View style={{marginTop: hp(5)}}>
-      </View>
-        <View
-          style={{
-            height: hp(18),
-            marginTop: hp(-1.3),
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <Image
-            style={{width: wp(60), resizeMode: 'contain'}}
-            source={appImages.bannerAds}
-          />
-        </View>
+        <View style={{marginTop: hp(5)}}></View>
 
         <Text
           style={{
@@ -3539,7 +3687,6 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
             height: hp(20),
             width: wp(53),
           }}>
-            
           <FlatList
             style={{margin: 8, flex: 1}}
             //contentContainerStyle={{marginBottom:hp(5)}}
@@ -3733,7 +3880,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
           )}
         </View> */}
 
-        <View style={{marginTop: hp(1), height: hp(20)}}>
+        <View style={{marginTop: hp(1), height: hp(28)}}>
           <Text
             style={{
               fontSize: hp(2.3),
@@ -3758,20 +3905,52 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
               <ActivityIndicator size="large" color="#FACA4E" />
             </View>
           ) : (
-            <FlatList
-              data={favouriteData}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              //keyExtractor={(item, itemIndex) => `${itemIndex}`}
-              renderItem={({item}) => renderFavouritesApps(item)}
-              contentContainerStyle={{
-                borderWidth: 1,
-                marginRight: wp(2.3),
-                marginTop: hp(3),
-                borderColor: '#00000017',
-                borderRadius: wp(3),
-              }}
-            />
+            <>
+              {favouriteData?.length === 0 ? (
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                    No Favourite Apps
+                  </Text>
+                </View>
+              ) : (
+                <FlatList
+                  data={favouriteData.slice(
+                    0,
+                    Math.ceil(favouriteData.length / 2),
+                  )}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  keyExtractor={(item, itemIndex) => `${itemIndex}`}
+                  renderItem={({item}) => renderFavouritesApps(item)}
+                  contentContainerStyle={{
+                    borderWidth: 1,
+                    marginRight: wp(2.3),
+                    marginTop: hp(3),
+                    borderColor: '#00000017',
+                    borderRadius: wp(3),
+                  }}
+                />
+              )}
+              <FlatList
+                data={favouriteData.slice(Math.ceil(favouriteData.length / 2))}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item, itemIndex) => `${itemIndex}`}
+                renderItem={({item}) => renderFavouritesApps(item)}
+                contentContainerStyle={{
+                  borderWidth: 1,
+                  marginRight: wp(2.3),
+                  marginTop: hp(3),
+                  borderColor: '#00000017',
+                  borderRadius: wp(3),
+                }}
+              />
+            </>
           )}
         </View>
 
@@ -3802,35 +3981,35 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
             </View>
           ) : (
             <View style={{flex: 1}}>
-               <FlatList
-              data={dataApps.slice(0, Math.ceil(dataApps.length / 2))}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={(item, itemIndex) => `${itemIndex}`}
-              renderItem={({item}) => renderApps(item)}
-              contentContainerStyle={{
-                borderWidth: 1,
-                marginRight: wp(2.3),
-                marginTop: hp(3),
-                borderColor: '#00000017',
-                borderRadius: wp(3),
-              }}
-            />
-        
-            <FlatList
-              data={dataApps.slice(Math.ceil(dataApps.length / 2))}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={(item, itemIndex) => `${itemIndex}`}
-              renderItem={({item}) => renderApps(item)}
-              contentContainerStyle={{
-                borderWidth: 1,
-                marginRight: wp(2.3),
-                marginTop: hp(3),
-                borderColor: '#00000017',
-                borderRadius: wp(3),
-              }}
-            /> 
+              <FlatList
+                data={dataApps.slice(0, Math.ceil(dataApps.length / 2))}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item, itemIndex) => `${itemIndex}`}
+                renderItem={({item}) => renderApps(item)}
+                contentContainerStyle={{
+                  borderWidth: 1,
+                  marginRight: wp(2.3),
+                  marginTop: hp(3),
+                  borderColor: '#00000017',
+                  borderRadius: wp(3),
+                }}
+              />
+
+              <FlatList
+                data={dataApps.slice(Math.ceil(dataApps.length / 2))}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item, itemIndex) => `${itemIndex}`}
+                renderItem={({item}) => renderApps(item)}
+                contentContainerStyle={{
+                  borderWidth: 1,
+                  marginRight: wp(2.3),
+                  marginTop: hp(3),
+                  borderColor: '#00000017',
+                  borderRadius: wp(3),
+                }}
+              />
             </View>
           )}
 
@@ -3860,19 +4039,13 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
               </DraxView>
             </View> */}
         </View>
-      
-
-       
 
         {/* //-----------------------------------------------\\ */}
 
-
-
-        {/* //------------------- VIDEO ---------------------------\\ */}
-        
         <View
           style={{
             height: hp(18),
+            marginTop: hp(-1.3),
             justifyContent: 'center',
             alignItems: 'center',
           }}>
@@ -3881,6 +4054,8 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
             source={appImages.bannerAds}
           />
         </View>
+
+        {/* //------------------- VIDEO ---------------------------\\ */}
 
         <View style={styles.latestSearchListVideo}>
           <Text
@@ -4001,9 +4176,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 }}>
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
-            ) : 
-
-            (
+            ) : (
               <>
                 {data?.length === 0 ? (
                   <View
@@ -4016,17 +4189,16 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                       No data available
                     </Text>
                   </View>
-                ) :
-            (
-              <FlatList
-                style={{flex: 1}}
-                showsHorizontalScrollIndicator={false}
-                data={data}
-                horizontal
-                //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableAppsVideo(item)}
-              />
-            )}
+                ) : (
+                  <FlatList
+                    style={{flex: 1}}
+                    showsHorizontalScrollIndicator={false}
+                    data={data}
+                    horizontal
+                    //keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableAppsVideo(item)}
+                  />
+                )}
               </>
             )}
           </View>
@@ -4058,8 +4230,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 }}>
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
-            ) :
-            (
+            ) : (
               <>
                 {dataLatestVideos?.length === 0 ? (
                   <View
@@ -4073,16 +4244,16 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                     </Text>
                   </View>
                 ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsHorizontalScrollIndicator={false}
-                data={dataLatestVideos}
-                horizontal
-                // keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableAppsVideo(item)}
-              />
-            )}
-            </>
+                  <FlatList
+                    style={{flex: 1}}
+                    showsHorizontalScrollIndicator={false}
+                    data={dataLatestVideos}
+                    horizontal
+                    // keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableAppsVideo(item)}
+                  />
+                )}
+              </>
             )}
           </View>
         </View>
@@ -4113,8 +4284,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 }}>
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
-            )  :
-            (
+            ) : (
               <>
                 {dataMostViewedVideos?.length === 0 ? (
                   <View
@@ -4128,15 +4298,15 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                     </Text>
                   </View>
                 ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsHorizontalScrollIndicator={false}
-                data={dataMostViewedVideos}
-                horizontal
-                //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableAppsVideo(item)}
-              />
-              )}
+                  <FlatList
+                    style={{flex: 1}}
+                    showsHorizontalScrollIndicator={false}
+                    data={dataMostViewedVideos}
+                    horizontal
+                    //keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableAppsVideo(item)}
+                  />
+                )}
               </>
             )}
           </View>
@@ -4168,8 +4338,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 }}>
                 <ActivityIndicator size="large" color="#FACA4E" />
               </View>
-            ):
-            (
+            ) : (
               <>
                 {dataMostCommentedVideos?.length === 0 ? (
                   <View
@@ -4183,59 +4352,60 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                     </Text>
                   </View>
                 ) : (
-              <FlatList
-                style={{flex: 1}}
-                showsHorizontalScrollIndicator={false}
-                data={dataMostCommentedVideos}
-                horizontal
-                //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableAppsVideo(item)}
-              />
-            )}
-            </>
+                  <FlatList
+                    style={{flex: 1}}
+                    showsHorizontalScrollIndicator={false}
+                    data={dataMostCommentedVideos}
+                    horizontal
+                    //keyExtractor={item => item.id.toString()}
+                    renderItem={({item}) => renderAvailableAppsVideo(item)}
+                  />
+                )}
+              </>
             )}
           </View>
         </View>
 
-
-
         {/* //-------------------------------------------------------------\\ */}
 
-        {/* Disc */}
         <View
-        style={{
-          height: hp(18),
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <Image
-          style={{width: wp(60), resizeMode: 'contain'}}
-          source={appImages.bannerAds}
-        />
-      </View>
+          style={{
+            height: hp(18),
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Image
+            style={{width: wp(60), resizeMode: 'contain'}}
+            source={appImages.bannerAds}
+          />
+        </View>
 
-      <View style={{marginTop: hp(1), marginHorizontal: wp(8)}}>
-        <Text style={{color: '#FACA4E', fontWeight: 'bold', fontSize: hp(2.3)}}>
-          DISC
-        </Text>
-      </View>
+        {/* Disc */}
 
-      <View style={styles.latestSearchListDisc}>
-        <Text style={{color: '#232323', fontWeight: 'bold', fontSize: hp(2.1)}}>
-          Top
-        </Text>
-        <FlatList
-          style={{flex: 1}}
-          contentContainerStyle={{alignItems: 'center'}}
-          showsHorizontalScrollIndicator={false}
-          horizontal
-          data={searchesDisc}
-          keyExtractor={item => item.id.toString()}
-          renderItem={({item}) => renderDiscSearches(item)}
-        />
-      </View>
+        <View style={{marginTop: hp(1), marginHorizontal: wp(8)}}>
+          <Text
+            style={{color: '#FACA4E', fontWeight: 'bold', fontSize: hp(2.3)}}>
+            DISC
+          </Text>
+        </View>
 
-      {selectedItemDiscId === 1 ? (
+        <View style={styles.latestSearchListDisc}>
+          <Text
+            style={{color: '#232323', fontWeight: 'bold', fontSize: hp(2.1)}}>
+            Top
+          </Text>
+          <FlatList
+            style={{flex: 1}}
+            contentContainerStyle={{alignItems: 'center'}}
+            showsHorizontalScrollIndicator={false}
+            horizontal
+            data={searchesDisc}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({item}) => renderDiscSearches(item)}
+          />
+        </View>
+
+        {selectedItemDiscId === 1 ? (
           <DiscScreen />
         ) : selectedItemDiscId === 2 ? (
           <OpenLetters />
@@ -4246,7 +4416,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
         ) : null}
 
         {/* Pic Tours */}
-        
+
         <View
           style={{
             height: hp(18),
@@ -4329,7 +4499,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                   color: '#FFFFFF',
                   fontWeight: '700',
                 }}>
-                 {dataToppics?.pic_category_name}
+                {dataToppics?.pic_category_name}
               </Text>
             </View>
           </TouchableOpacity>
@@ -4340,13 +4510,14 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 fontSize: hp(1.6),
                 marginLeft: wp(1),
                 lineHeight: 15.5,
-                marginTop:hp(5),
+                marginTop: hp(5),
                 fontFamily: 'Inter-Regular',
                 color: '#000000',
                 //fontWeight: '700',
               }}>
-                
-                {dataToppics.length===0? "No Top Pic Shown": dataToppics?.description} 
+              {dataToppics.length === 0
+                ? 'No Top Pic Shown'
+                : dataToppics?.description}
             </Text>
           </View>
         </View>
@@ -4509,8 +4680,6 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
 
         {/* //-------------\\ */}
 
-        {/* Market Zone */}     
-
         <View
           style={{
             height: hp(18),
@@ -4522,6 +4691,8 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
             source={appImages.bannerAds}
           />
         </View>
+
+        {/* Market Zone */}
 
         <View style={{marginTop: hp(1), marginLeft: wp(5)}}>
           <Text
@@ -4602,7 +4773,8 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
               thought-provoking video as we delve into the ever-shifting
               landscape of international diplomacy...... */}
 
-              { dataTopVideosMarket === undefined || dataTopVideosMarket.length === 0 
+              {dataTopVideosMarket === undefined ||
+              dataTopVideosMarket.length === 0
                 ? 'No Top Pic Shown'
                 : dataTopVideosMarket?.description}
             </Text>
@@ -4823,11 +4995,23 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
               </>
             )}
           </View>
-        </View>  
+        </View>
 
         {/* //---------------------\\ */}
 
         {/* //------------\\ */}
+
+        <View
+          style={{
+            height: hp(18),
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Image
+            style={{width: wp(60), resizeMode: 'contain'}}
+            source={appImages.bannerAds}
+          />
+        </View>
       </ScrollView>
 
       <RBSheet
@@ -4907,9 +5091,6 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
           </TouchableOpacity>
         </View>
       </RBSheet>
-
-
-      
     </View>
   );
 }
@@ -4965,7 +5146,7 @@ const styles = StyleSheet.create({
     marginLeft: wp(3),
     alignItems: 'center',
     justifyContent: 'center',
-    padding:10,
+    padding: 10,
     backgroundColor: '#F2F2F2',
     borderRadius: wp(5),
   },
@@ -5165,8 +5346,6 @@ const styles = StyleSheet.create({
     //borderWidth: 3,
   },
 
-
-
   //----------------\\
   //Market Zone
 
@@ -5177,6 +5356,5 @@ const styles = StyleSheet.create({
     height: hp(7),
     marginLeft: wp(5),
     //borderWidth: 3,
-  }
-
+  },
 });

@@ -140,29 +140,31 @@ export default function PostLetterInfo({navigation}) {
       if (result !== null) {
         setUserId(result);
         console.log('user id retrieved:', result);
+
+        userToken(result)
       }
 
-      const result3 = await AsyncStorage.getItem('authToken ');
+     /*  const result3 = await AsyncStorage.getItem('authToken ');
       if (result3 !== null) {
         setAuthToken(result3);
         await fetchCategory(result3);
 
         console.log('user id retrieved:', result);
-      }
+      } */
 
-      const  userImage = await AsyncStorage.getItem('userImage');
+      /* const  userImage = await AsyncStorage.getItem('userImage');
       if (result3 !== null) {
         setAuthToken(result3);
         await fetchCategory(result3);
 
         console.log('user id retrieved:', result);
-      }
+      } */
     } catch (error) {
       // Handle errors here
       console.error('Error retrieving user ID:', error);
     }
 
-    try {
+   /*  try {
       const result = await AsyncStorage.getItem('userName');
       if (result !== null) {
         setName(result);
@@ -171,22 +173,34 @@ export default function PostLetterInfo({navigation}) {
     } catch (error) {
       // Handle errors here
       console.error('Error retrieving user ID:', error);
-    }
+    } */
 
-    await authTokenAndId()
+    //await authTokenAndId()
   };
 
   //--------------------------------\\
 
-  const authTokenAndId = async () => {
-    if (userId !== '' && authToken !== '') {
-      console.log('USER ID', userId);
-      console.log('AUTH TOKEN ', authToken);
-      fetchUser(userId, authToken);
-    }else{
-      console.log("AUTH JJBJBJBSV");
+  const userToken= async(id)=>{
+    try {
+      const result3 = await AsyncStorage.getItem('authToken ');
+      if (result3 !== null) {
+        setAuthToken(result3);
+        //await fetchCategory(result3, id);
+        authTokenAndId(id, result3)
 
+      } 
+
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
     }
+
+  }
+
+  const authTokenAndId = async (id, token) => {
+   
+      fetchUser(id,token);
+   
   };
 
   const fetchUser = async (id, tokens) => {
@@ -211,13 +225,12 @@ export default function PostLetterInfo({navigation}) {
 
         // Use the data from the API to set the categories
         setUserImage(data.user.image);
-        //await fetchCategory(id, tokens);
+        await fetchCategory(id, tokens);
       } else {
         console.error(
           'Failed to fetch user:',
           response.status,
           response.statusText,
-          await fetchCategory(id, tokens),
         );
       }
     } catch (error) {
@@ -230,8 +243,8 @@ export default function PostLetterInfo({navigation}) {
 
   //----------------------------------\\
 
-  const fetchCategory = async (id) => {
-    const token = id;
+  const fetchCategory = async (id, tokens) => {
+    const token = tokens;
 
     try {
       const response = await fetch(
@@ -429,7 +442,7 @@ export default function PostLetterInfo({navigation}) {
             marginTop: hp(3),
             height: hp(8),
           }}>
-          <View
+        { userImage!==''?  <View
             style={{
               width: wp(12),
               marginLeft: wp(0.5),
@@ -438,9 +451,24 @@ export default function PostLetterInfo({navigation}) {
             }}>
             <Image
               source={{uri:userImage}}
-              style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+              style={{width: '100%', height: '100%', resizeMode: 'cover', borderRadius: wp(12) / 2 }}
             />
-          </View>
+          </View>: 
+           <View
+           style={{
+             width: wp(10),
+             marginLeft: wp(3),
+             height: wp(10),
+             overflow: 'hidden',
+             borderRadius: wp(10) / 2,
+           }}>
+           <MaterialCommunityIcons
+             style={{marginTop: hp(0.5)}}
+             name={'account-circle'}
+             size={35}
+             color={'#FACA4E'}
+           />
+         </View>}
 
           <TouchableOpacity
             onPress={() => ref_RBSheetCamera.current.open()}

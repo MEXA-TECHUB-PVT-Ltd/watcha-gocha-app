@@ -371,7 +371,9 @@ export default function Sell({navigation}) {
           const newImageUri = response.assets
             ? response.assets[0]
             : response.uri;
-          updateImageUris(newImageUri);
+          //updateImageUris(newImageUri);
+          console.log("IMAGE URI", newImageUri )
+          updateImageUrisCamera(newImageUri)
         }
         ref_RBSheetCamera.current.close();
       },
@@ -391,6 +393,18 @@ export default function Sell({navigation}) {
       }
       ref_RBSheetCamera.current.close();
     });
+  };
+
+  const updateImageUrisCamera = newImageUri => {
+    console.log('RESPONSE', imageUris.length);
+
+    if (imageUris.length < 10) {
+      setImageUris(prevImageUris => [...prevImageUris, newImageUri]);
+    } else {
+      // Handle the case when the limit exceeds (e.g., show a message)
+      //console.log('Image limit exceeded');
+      handleUpdatePasswordExceeded();
+    }
   };
 
   const updateImageUris = newImageUri => {
@@ -456,10 +470,10 @@ export default function Sell({navigation}) {
       categoryId !== '' &&
       condition !== '' &&
       description !== '' &&
-      price !== '' &&
-      locationName !== '' &&
-      region !== '' &&
-      regionArea !== ''
+      price !== '' 
+      //locationName !== '' &&
+      //region !== '' &&
+      //regionArea !== ''
     ) {
       handleUploadImages(imageUris);
       //console.log('All');
@@ -655,6 +669,15 @@ export default function Sell({navigation}) {
 
   //------------------------\\
 
+  const handleRemoveImage = index => {
+    const newImageUris = [...imageUris];
+    newImageUris.splice(index, 1);
+    setImageUris(newImageUris);
+  };
+  
+
+  
+
   return (
     <KeyboardAvoidingView
       style={{flex: 1, backgroundColor: 'white'}}
@@ -713,9 +736,14 @@ export default function Sell({navigation}) {
           data={imageUris}
           keyExtractor={(item, index) => index.toString()}
           numColumns={3} // Set the number of columns to 3
-          renderItem={({item}) => (
+          renderItem={({item, index}) => (
             <View style={styles.imageContainer}>
               <Image source={{uri: item.uri}} style={styles.image} />
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => handleRemoveImage(index)}>
+                <Text style={styles.closeButtonText}>X</Text>
+              </TouchableOpacity>
             </View>
           )}
         />
@@ -776,7 +804,7 @@ export default function Sell({navigation}) {
 
         <TextInput
           mode="outlined"
-          label="Price"
+          label="$ Price"
           onChangeText={text => setPrice(text)}
           keyboardType="number-pad"
           style={styles.ti}
@@ -1357,5 +1385,19 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 100,
     aspectRatio: 1, // Maintain the aspect ratio of the image
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 1,
+    //right: -7,
+    backgroundColor: 'black',
+    justifyContent: 'center',
+    alignItems:'center',
+    borderRadius: wp(8),
+    height:wp(8),
+    width:wp(8),
+  },
+  closeButtonText: {
+    color: 'white',
   },
 });

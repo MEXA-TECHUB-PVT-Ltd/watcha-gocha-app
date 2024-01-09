@@ -80,7 +80,7 @@ export default function PostLetterSignature({navigation, route}) {
   const [snackbarVisibleExceedsALert, setsnackbarVisibleExceedsALert] =
     useState(false);
 
-    const [snackbarVisibleLimitALert, setsnackbarVisibleLimitALert] =
+  const [snackbarVisibleLimitALert, setsnackbarVisibleLimitALert] =
     useState(false);
 
   const ref_RBSendOffer = useRef(null);
@@ -105,7 +105,7 @@ export default function PostLetterSignature({navigation, route}) {
 
   const [imageUri, setImageUri] = useState(null);
   const [videoUri, setVideoUri] = useState(null);
-
+  const [userImage, setUserImage] = useState();
   const [imageUris, setImageUris] = useState([]);
 
   useEffect(() => {
@@ -123,7 +123,8 @@ export default function PostLetterSignature({navigation, route}) {
     setLoading(false);
   };
 
-  const getUserID = async () => {
+  /* const getUserID = async () => {
+
     console.log("Id's");
     try {
       const result = await AsyncStorage.getItem('userId ');
@@ -151,7 +152,111 @@ export default function PostLetterSignature({navigation, route}) {
       // Handle errors here
       console.error('Error retrieving user ID:', error);
     }
+  }; */
+
+  //---------------------------------------------------\\
+
+  const getUserID = async () => {
+    console.log("Id's");
+    try {
+      const result = await AsyncStorage.getItem('userId ');
+      if (result !== null) {
+        setUserId(result);
+        console.log('user id retrieved:', result);
+
+        userToken(result);
+      }
+
+      /*  const result3 = await AsyncStorage.getItem('authToken ');
+      if (result3 !== null) {
+        setAuthToken(result3);
+        await fetchCategory(result3);
+
+        console.log('user id retrieved:', result);
+      } */
+
+      /* const  userImage = await AsyncStorage.getItem('userImage');
+      if (result3 !== null) {
+        setAuthToken(result3);
+        await fetchCategory(result3);
+
+        console.log('user id retrieved:', result);
+      } */
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+
+    /*  try {
+      const result = await AsyncStorage.getItem('userName');
+      if (result !== null) {
+        setName(result);
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    } */
+
+    //await authTokenAndId()
   };
+
+  //--------------------------------\\
+
+  const userToken = async id => {
+    try {
+      const result3 = await AsyncStorage.getItem('authToken ');
+      if (result3 !== null) {
+        setAuthToken(result3);
+        //await fetchCategory(result3, id);
+        authTokenAndId(id, result3);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
+
+  const authTokenAndId = async (id, token) => {
+    fetchUser(id, token);
+  };
+
+  const fetchUser = async (id, tokens) => {
+    console.log('USER', id);
+    console.log('TOKEN', tokens);
+    const token = tokens;
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/user/getUser/${id}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('IMAGE', data.user.image);
+
+        // Use the data from the API to set the categories
+        setUserImage(data.user.image);
+      } else {
+        console.error(
+          'Failed to fetch user:',
+          response.status,
+          response.statusText,
+        );
+      }
+    } catch (error) {
+      //await fetchCategory(id, tokens);
+      console.error('Errors:', error);
+    }
+  };
+
+  //-------------------------------------------------------\\
 
   const receivedDataName = route.params?.name;
   const receivedDatAddress = route.params?.address;
@@ -310,12 +415,12 @@ export default function PostLetterSignature({navigation, route}) {
   const checkUpload = () => {
     if (imageUris.length === 0 && videoInfo === null) {
       handleUpdatePasswordAlert();
-    } else if(imageUris.length!==0 && videoInfo!==null) {
+    } else if (imageUris.length !== 0 && videoInfo !== null) {
       handleUpdatePasswordLimitAlert();
-    }else if(imageUris.length>0){
+    } else if (imageUris.length > 0) {
       handleUploadImages(imageUris);
-    }else if(videoInfo!==null){
-      handleUploadVideo()
+    } else if (videoInfo !== null) {
+      handleUploadVideo();
     }
   };
 
@@ -368,7 +473,7 @@ export default function PostLetterSignature({navigation, route}) {
       const imageUrls = await Promise.all(uploadPromises);
       console.log('All images uploaded successfully:', imageUrls);
 
-      createLetterImage(imageUrls)
+      createLetterImage(imageUrls);
 
       //sellItem(imageUrls);
 
@@ -418,8 +523,8 @@ export default function PostLetterSignature({navigation, route}) {
         setLoading(false);
       });
   };
-  
-  const createLetterImage = async (image) => {
+
+  const createLetterImage = async image => {
     // console.log('Image Uri of encoded', data);
     // console.log('image', image);
     // console.log('video', video);
@@ -501,7 +606,7 @@ export default function PostLetterSignature({navigation, route}) {
     }
   };
 
-  const createLetterVideo = async (video) => {
+  const createLetterVideo = async video => {
     // console.log('Image Uri of encoded', data);
     // console.log('image', image);
     // console.log('video', video);
@@ -527,7 +632,7 @@ export default function PostLetterSignature({navigation, route}) {
     const apiUrl = 'https://watch-gotcha-be.mtechub.com/letter/createLetter';
 
     const requestData = {
-      image: "", //you can send maximum 5 images
+      image: '', //you can send maximum 5 images
       video: video, // you can send one video maximum
       user_id: userId,
       post_type: 'public',
@@ -550,7 +655,7 @@ export default function PostLetterSignature({navigation, route}) {
     };
 
     try {
-      console.log("Video Request data",requestData);
+      console.log('Video Request data', requestData);
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -635,7 +740,6 @@ export default function PostLetterSignature({navigation, route}) {
     setsnackbarVisibleExceedsALert(false);
   };
 
-
   const handleUpdatePasswordLimitAlert = async () => {
     // Perform the password update logic here
     // For example, you can make an API request to update the password
@@ -654,14 +758,14 @@ export default function PostLetterSignature({navigation, route}) {
     setsnackbarVisibleLimitALert(false);
   };
 
-  const limitAlert=()=>{
+  const limitAlert = () => {
     setImageInfo(null);
     setVideoUrl(false);
     setImageUris([]);
     setImageUri(null);
     setVideoUri(null);
     setVideoInfo(null);
-  }
+  };
 
   const searches = [
     {id: 1, title: 'Subject'},
@@ -736,18 +840,41 @@ export default function PostLetterSignature({navigation, route}) {
           marginTop: hp(3),
           height: hp(8),
         }}>
-        <View
-          style={{
-            width: wp(12),
-            marginLeft: wp(0.5),
-            height: wp(12),
-            borderRadius: wp(12) / 2,
-          }}>
-          <Image
-            source={appImages.profileImg}
-            style={{width: '100%', height: '100%', resizeMode: 'cover'}}
-          />
-        </View>
+        {userImage !== '' ? (
+          <View
+            style={{
+              width: wp(12),
+              marginLeft: wp(0.5),
+              height: wp(12),
+              borderRadius: wp(12) / 2,
+            }}>
+            <Image
+              source={{uri: userImage}}
+              style={{
+                width: '100%',
+                height: '100%',
+                resizeMode: 'cover',
+                borderRadius: wp(12) / 2,
+              }}
+            />
+          </View>
+        ) : (
+          <View
+            style={{
+              width: wp(10),
+              marginLeft: wp(3),
+              height: wp(10),
+              overflow: 'hidden',
+              borderRadius: wp(10) / 2,
+            }}>
+            <MaterialCommunityIcons
+              style={{marginTop: hp(0.5)}}
+              name={'account-circle'}
+              size={35}
+              color={'#FACA4E'}
+            />
+          </View>
+        )}
 
         <TouchableOpacity
           onPress={() => ref_RBSheetCamera.current.open()}

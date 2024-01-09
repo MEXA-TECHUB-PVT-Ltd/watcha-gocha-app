@@ -36,7 +36,7 @@ import Download from '../../../assets/svg/Download.svg';
 import CustomButton from '../../../assets/Custom/Custom_Button';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
+import {useIsFocused} from '@react-navigation/native';
 import Share from 'react-native-share';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -66,7 +66,6 @@ export default function ViewProfile({navigation}) {
 
   const [image, setImage] = useState('');
 
-
   const [email, setEmail] = useState('');
 
   const [loading, setLoading] = useState(false);
@@ -94,10 +93,12 @@ export default function ViewProfile({navigation}) {
 
   const [totalGEBC, setTotalGEBC] = useState(null);
 
+  const isFocused = useIsFocused();
+
   useEffect(() => {
     // Make the API request and update the 'data' state
     fetchVideos();
-  }, []);
+  }, [isFocused]);
 
   const fetchVideos = async () => {
     // Simulate loading
@@ -437,7 +438,9 @@ export default function ViewProfile({navigation}) {
     console.log(imageUri);
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate('ProductDetailsProfile', {ProductDetails:item})}
+        onPress={() =>
+          navigation.navigate('ProductDetailsProfile', {ProductDetails: item})
+        }
         style={{width: wp(35), margin: 5}}>
         <View>
           {imageUri === null ? (
@@ -504,15 +507,18 @@ export default function ViewProfile({navigation}) {
 
   const renderAvailableAppsPic = item => {
     console.log('Items Pics', item);
-    
-    const imageUrl = item.image && item.image
-    ? (item.image.startsWith('/fileUpload')
-        ? `https://watch-gotcha-be.mtechub.com${item.image}`
-        : item.image)
-    : null;
+
+    const imageUrl =
+      item.image && item.image
+        ? item.image.startsWith('/fileUpload')
+          ? `https://watch-gotcha-be.mtechub.com${item.image}`
+          : item.image
+        : null;
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate('ViewVideoPicProfile', {picData:item})}
+        onPress={() =>
+          navigation.navigate('ViewVideoPicProfile', {picData: item})
+        }
         style={{width: wp(28), margin: 5}}>
         <View>
           <Image
@@ -528,7 +534,7 @@ export default function ViewProfile({navigation}) {
               borderRadius: wp(2.1),
               resizeMode: 'cover',
             }}
-            source={{uri:imageUrl}}
+            source={{uri: imageUrl}}
           />
         </View>
         <View
@@ -539,6 +545,8 @@ export default function ViewProfile({navigation}) {
             marginTop: hp(12.5),
           }}>
           <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
             style={{
               fontSize: hp(1.5),
               color: '#000000',
@@ -557,7 +565,9 @@ export default function ViewProfile({navigation}) {
     console.log('Video Items', item);
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate('ViewVideoProfile', {videoData : item} )}
+        onPress={() =>
+          navigation.navigate('ViewVideoProfile', {videoData: item})
+        }
         style={{width: wp(28), margin: 5}}>
         <View>
           <Image
@@ -584,6 +594,8 @@ export default function ViewProfile({navigation}) {
             marginTop: hp(12.5),
           }}>
           <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
             style={{
               fontSize: hp(1.5),
               color: '#000000',
@@ -646,8 +658,8 @@ export default function ViewProfile({navigation}) {
   const GEBCCOMP = () => {
     return (
       <View style={{flex: 1}}>
-        <View style={{ height: hp(15)}}>
-          <View style={{ height: '100%'}}>
+        <View style={{height: hp(15)}}>
+          <View style={{height: '100%'}}>
             {loading === true ? (
               <View
                 style={{
@@ -806,9 +818,8 @@ export default function ViewProfile({navigation}) {
     console.log(imageUri);
     return (
       <TouchableOpacity
-      onPress={() => navigation.navigate('ViewUpdateGEBC',{details:item})}
-
-        style={{width: wp(35), marginLeft:wp(3)}}>
+        onPress={() => navigation.navigate('ViewUpdateGEBC', {details: item})}
+        style={{width: wp(35), marginLeft: wp(3)}}>
         <View>
           {imageUri === null ? (
             <Image
@@ -884,8 +895,8 @@ export default function ViewProfile({navigation}) {
     console.log(imageUri);
     return (
       <TouchableOpacity
-      onPress={() => navigation.navigate('ViewUpdateQAFI',{details:item})}
-        style={{width: wp(35), marginLeft:wp(3)}}>
+        onPress={() => navigation.navigate('ViewUpdateQAFI', {details: item})}
+        style={{width: wp(35), marginLeft: wp(3)}}>
         <View>
           {imageUri === null ? (
             <Image
@@ -961,8 +972,8 @@ export default function ViewProfile({navigation}) {
     console.log(imageUri);
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate('ViewUpdateNews',{details:item})}
-        style={{width: wp(35), marginLeft:wp(3)}}>
+        onPress={() => navigation.navigate('ViewUpdateNews', {details: item})}
+        style={{width: wp(35), marginLeft: wp(3)}}>
         <View>
           {imageUri === null ? (
             <Image
@@ -1064,7 +1075,7 @@ export default function ViewProfile({navigation}) {
               borderRadius: wp(20) / 2,
             }}>
             <Image
-              source={{uri:image}}
+              source={{uri: image}}
               style={{width: '100%', height: '100%', resizeMode: 'contain'}}
             />
           </View>
@@ -1236,7 +1247,7 @@ export default function ViewProfile({navigation}) {
               //fontWeight: 'bold',
               fontFamily: 'Inter-Bold',
             }}>
-            My Pi/3.14 Videos
+            My Video Mania
           </Text>
 
           <View style={{marginTop: hp(1), height: '100%'}}>
@@ -1272,7 +1283,6 @@ export default function ViewProfile({navigation}) {
                     showsHorizontalScrollIndicator={false}
                     data={videos}
                     horizontal
-
                     //keyExtractor={item => item.id.toString()}
                     renderItem={({item}) => renderAvailableAppsVideo(item)}
                   />

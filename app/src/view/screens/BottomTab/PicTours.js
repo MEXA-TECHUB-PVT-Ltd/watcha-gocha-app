@@ -593,7 +593,7 @@ export default function PicTours({navigation}) {
                 style={{
                   fontSize: hp(1.6),
                   fontFamily: 'Inter',
-                  color: '#FFFFFF',
+                  color: 'black',
                   fontWeight: '700',
                 }}>
                  {dataTopVideos?.pic_category_name}

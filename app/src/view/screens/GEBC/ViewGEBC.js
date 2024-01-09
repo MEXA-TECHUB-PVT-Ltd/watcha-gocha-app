@@ -46,6 +46,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import IonIcons from 'react-native-vector-icons/Ionicons';
 
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import Headers from '../../../assets/Custom/Headers';
 
 export default function ViewGEBC({navigation, route}) {
   const [showFullContent, setShowFullContent] = useState(false);
@@ -706,59 +707,74 @@ export default function ViewGEBC({navigation, route}) {
 
   return (
     <GestureHandlerRootView style={{flex: 1}}>
-      <View style={{flex: 1, backgroundColor: '#4A4A4A'}}>
+      <View style={{flex: 1, backgroundColor: 'white'}}>
         <StatusBar
           translucent={true}
           backgroundColor="transparent"
           barStyle="dark-content" // You can set the StatusBar text color to dark or light
         />
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <IonIcons name={'chevron-back'} color={'white'} size={25} />
-          </TouchableOpacity>
-
+        <View style={{marginTop: hp(5)}}>
+          <Headers
+            showBackIcon={true}
+            showText={true}
+            text={'QAFI Details'}
+            onPress={() => navigation.goBack()}
+          />
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            height: hp(6.5),
+            marginTop: hp(5),
+            marginLeft: wp(8),
+          }}>
           <View
             style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              height: hp(6.5),
-              marginLeft: hp(10),
+              height: wp(10),
+              alignSelf: 'center',
+              overflow: 'hidden',
+              width: wp(10),
+              borderRadius: wp(10) / 2,
             }}>
-            <View
-              style={{
-                height: wp(10),
-                alignSelf: 'center',
-                overflow: 'hidden',
-                width: wp(10),
-                borderRadius: wp(10) / 2,
-              }}>
-              {receivedData?.userimage === null ? (
-                <Image
-                  style={{
-                    width: '100%',
-                    borderRadius: wp(10) / 2,
-                    height: '100%',
-                  }}
-                  source={appImages.profileImg}
-                />
-              ) : (
-                <Image
-                  style={{
-                    width: '100%',
-                    borderRadius: wp(10) / 2,
-                    height: '100%',
-                  }}
-                  source={{uri: receivedData?.userimage}}
-                />
-              )}
-            </View>
-
-            <Text style={styles.textProfileName}>{receivedData?.username}</Text>
+            {receivedData?.userimage === null ? (
+              <MaterialCommunityIcons
+                name={'account-circle'}
+                size={35}
+                color={'#FACA4E'}
+              />
+            ) : (
+              <Image
+                style={{
+                  width: '100%',
+                  borderRadius: wp(10) / 2,
+                  height: '100%',
+                }}
+                source={{uri: receivedData?.userimage}}
+              />
+            )}
           </View>
+
+          <Text style={styles.textProfileName}>{receivedData?.username}</Text>
         </View>
 
-        <View style={{flex: 1, alignItems:'center', justifyContent: 'flex-end'}}>
-        <Text style={{fontSize:hp(10)}}>
+
+
+        <View
+          style={{
+            marginHorizontal: wp(8),
+            overflow: 'hidden',
+            marginTop: hp(3),
+            flex: 1,
+            justifyContent:'center',
+            alignItems: 'center',
+            borderWidth:0.5,
+            borderRadius: wp(5),
+            borderColor: 'grey'
+           // borderWidth: 3,
+            //borderColor: 'blue',
+          }}>
+         <Text style={{fontSize:hp(10)}}>
               {receivedData?.image}
             </Text>
         </View>
@@ -778,7 +794,7 @@ export default function ViewGEBC({navigation, route}) {
                   fontFamily: 'Inter',
                   fontSize: hp(1.8),
                   lineHeight: hp(2.1),
-                  color: '#FFFFFF',
+                  color: 'black',
                 }}>
                 {showFullContent
                   ? details
@@ -811,7 +827,7 @@ export default function ViewGEBC({navigation, route}) {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 height: hp(8),
-                marginHorizontal: wp(8),
+                marginHorizontal: wp(12),
               }}>
               <View
                 style={{
@@ -823,9 +839,17 @@ export default function ViewGEBC({navigation, route}) {
                 }}>
                 <TouchableOpacity onPress={toggleContentLike}>
                   {showLikes ? (
-                    <Like height={21} width={21} />
+                   <MaterialCommunityIcons
+                   color={'#FACA4E'}
+                   name={'cards-heart'}
+                   size={25}
+                 />
                   ) : (
-                    <UnLike height={21} width={21} />
+                    <MaterialCommunityIcons
+                      color={'#FACA4E'}
+                      name={'cards-heart-outline'}
+                      size={25}
+                    />
                   )}
                 </TouchableOpacity>
 
@@ -833,7 +857,7 @@ export default function ViewGEBC({navigation, route}) {
                   style={{
                     fontFamily: 'Inter',
                     fontSize: hp(1.5),
-                    color: '#FFFFFF',
+                    color: 'black',
                   }}>
                   {likes}
                 </Text>
@@ -851,14 +875,18 @@ export default function ViewGEBC({navigation, route}) {
                   onPress={() =>
                     setIsBottomSheetExpanded(!isBottomSheetExpanded)
                   }>
-                  <Comment height={21} width={21} />
+                 <MaterialCommunityIcons
+                    color={'#FACA4E'}
+                    name={'comment-processing-outline'}
+                    size={25}
+                  />
                 </TouchableOpacity>
 
                 <Text
                   style={{
                     fontFamily: 'Inter',
                     fontSize: hp(1.5),
-                    color: '#FFFFFF',
+                    color: 'black',
                   }}>
                   {commentsCount}
                 </Text>
@@ -873,7 +901,11 @@ export default function ViewGEBC({navigation, route}) {
                   height: hp(5),
                 }}>
                 <TouchableOpacity onPress={() => shareViaWhatsApp()}>
-                  <Send height={21} width={21} />
+                <MaterialCommunityIcons
+                    color={'#FACA4E'}
+                    name={'share-variant'}
+                    size={25}
+                  />
                 </TouchableOpacity>
               </View>
 
@@ -886,7 +918,11 @@ export default function ViewGEBC({navigation, route}) {
                   height: hp(5),
                 }}>
                 <TouchableOpacity onPress={() => handleUpdatePassword()}>
-                  <Download height={21} width={21} />
+                <MaterialCommunityIcons
+                    color={'#FACA4E'}
+                    name={'download'}
+                    size={25}
+                  />
                 </TouchableOpacity>
               </View>
             </View>
@@ -1125,11 +1161,12 @@ const styles = StyleSheet.create({
   },
   bottomView: {
     flex: 1,
-    justifyContent: 'flex-end',
+    marginTop:hp(3)
+    //justifyContent: 'flex-end',
     // You can add padding or content to this view as needed.
   },
   textProfileName: {
-    color: '#FFFFFF',
+    color: 'black',
     fontSize: hp(2),
     marginLeft: wp(3),
     fontFamily: 'Inter',

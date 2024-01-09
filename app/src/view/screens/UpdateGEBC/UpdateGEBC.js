@@ -473,7 +473,7 @@ export default function UpdateGEBC({navigation, route}) {
           }}>
           <CPaperInput
             multiline={true}
-            placeholder={'Add a comment'}
+            placeholder={'Add GEBC'}
             placeholderTextColor="#B0B0B0"
             value={comment}
             onChangeText={text => setComment(text)}

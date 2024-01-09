@@ -3,6 +3,7 @@ import {
   FlatList,
   Text,
   Image,
+  ActivityIndicator,
   KeyboardAvoidingView,
   ScrollView,
   StatusBar,
@@ -10,8 +11,9 @@ import {
   View,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import RBSheet from 'react-native-raw-bottom-sheet';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {Button, Divider, TextInput} from 'react-native-paper';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -50,12 +52,129 @@ import Headers from '../../../assets/Custom/Headers';
 
 import Add from '../../../assets/svg/AddMainScreen.svg';
 
-
 export default function ViewBanners({navigation}) {
+  const [authToken, setAuthToken] = useState('');
 
-    const goToScreen=()=>{
-        navigation.navigate("AddBanner");
+  const [userId, setUserId] = useState('');
+
+  const [loading, setLoading] = useState(false);
+
+  const [allBanners, setAllBanners] = useState(false);
+
+
+
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchVideos();
+  }, []);
+
+  const fetchVideos = async () => {
+    // Simulate loading
+    setLoading(true);
+
+    await getUserID();
+    // Fetch data one by one
+    // Once all data is fetched, set loading to false
+    setLoading(false);
+  };
+
+  const getUserID = async () => {
+    console.log("Id's");
+    try {
+      const result = await AsyncStorage.getItem('userId ');
+      if (result !== null) {
+        setUserId(result);
+        console.log('user id retrieved:', result);
+
+        userToken(result);
+      }
+
+      /*  const result3 = await AsyncStorage.getItem('authToken ');
+      if (result3 !== null) {
+        setAuthToken(result3);
+        await fetchCategory(result3);
+
+        console.log('user id retrieved:', result);
+      } */
+
+      /* const  userImage = await AsyncStorage.getItem('userImage');
+      if (result3 !== null) {
+        setAuthToken(result3);
+        await fetchCategory(result3);
+
+        console.log('user id retrieved:', result);
+      } */
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
     }
+
+    /*  try {
+      const result = await AsyncStorage.getItem('userName');
+      if (result !== null) {
+        setName(result);
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    } */
+
+    //await authTokenAndId()
+  };
+
+  //--------------------------------\\
+
+  const userToken = async id => {
+    try {
+      const result3 = await AsyncStorage.getItem('authToken ');
+      if (result3 !== null) {
+        setAuthToken(result3);
+        //await fetchCategory(result3, id);
+        fetchBanners(id, result3);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
+
+
+  const fetchBanners = async (id,resultId) => {
+    const token = resultId
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/banner/getAllBannersByUser/${id}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+
+        // Use the data from the API to set the categories
+        console.log("BANNER DETAILS", data.AllBanners)
+        setAllBanners(data.AllBanners)
+      } else {
+        console.error(
+          'Failed to fetch categories:',
+          response.status,
+          response.statusText,
+        );
+      }
+    } catch (error) {
+      console.error('Errors:', error);
+    }
+  };
+
+  const goToScreen = () => {
+    navigation.navigate('AddBanner');
+  };
   const chats = [
     {
       id: 1,
@@ -98,7 +217,7 @@ export default function ViewBanners({navigation}) {
   const renderBlogs = item => {
     console.log('Items', item);
     return (
-      <TouchableOpacity onPress={()=>navigation.navigate("BannerDetails")}>
+      <TouchableOpacity onPress={() => navigation.navigate('BannerDetails', {item:item})}>
         <View
           style={{
             flexDirection: 'row',
@@ -118,7 +237,7 @@ export default function ViewBanners({navigation}) {
             }}>
             <Image
               style={{width: '100%', borderRadius: wp(2.1), height: '100%'}}
-              source={appImages.bannerAds}
+              source={{uri:item?.image}}
             />
           </View>
 
@@ -150,7 +269,7 @@ export default function ViewBanners({navigation}) {
                     fontSize: hp(1.8),
                     fontFamily: 'Inter-Regular',
                   }}>
-                  09/12/2023
+                 { item?.startdate}
                 </Text>
               </View>
 
@@ -175,7 +294,7 @@ export default function ViewBanners({navigation}) {
                     fontSize: hp(1.8),
                     fontFamily: 'Inter-Regular',
                   }}>
-                  09/12/2023
+                  {item?.enddate}
                 </Text>
               </View>
             </View>
@@ -196,7 +315,9 @@ export default function ViewBanners({navigation}) {
                   fontSize: hp(1.5),
                   fontFamily: 'Inter-Regular',
                 }}>
-                http:/?www.sample.org?head
+                {/* http:/?www.sample.org?head */}
+
+                {item?.banner_link}
               </Text>
             </View>
           </View>
@@ -206,12 +327,9 @@ export default function ViewBanners({navigation}) {
           style={{
             height: hp(0.1),
             width: '100%',
-            marginTop:hp(1),
+            marginTop: hp(1),
             backgroundColor: '#00000021',
-          }}>
-
-
-          </View>
+          }}></View>
       </TouchableOpacity>
     );
   };
@@ -220,25 +338,35 @@ export default function ViewBanners({navigation}) {
     <View style={styles.container}>
       <StatusBar barStyle={'dark-content'} backgroundColor={'#FFFFFF'} />
 
-      <View style={{marginTop:hp(5)}}>
-
-      <Headers
-        showBackIcon={true}
-        onPress={()=>navigation.goBack()}
-        showText={true}
-        text={'Banner Advertisement'}
-      />
-
+      <View style={{marginTop: hp(5)}}>
+        <Headers
+          showBackIcon={true}
+          onPress={() => navigation.goBack()}
+          showText={true}
+          text={'Banner Advertisement'}
+        />
       </View>
 
-      <View style={{marginTop: hp(1),flex:1}}>
+      <View style={{marginTop: hp(1), flex: 1}}>
         <FlatList
-          style={{flexGrow:1}}
+          style={{flexGrow: 1}}
           showsVerticalScrollIndicator={false}
-          data={chats}
+          data={allBanners}
           keyExtractor={item => item.id.toString()}
           renderItem={({item}) => renderBlogs(item)}
         />
+      </View>
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {loading && <ActivityIndicator size="large" color="#FACA4E" />}
       </View>
 
       <TouchableOpacity

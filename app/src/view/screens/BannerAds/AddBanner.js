@@ -1,6 +1,7 @@
 import {
   StyleSheet,
   FlatList,
+  ActivityIndicator,
   Text,
   Image,
   KeyboardAvoidingView,
@@ -10,7 +11,7 @@ import {
   View,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 import {Button, Divider, TextInput} from 'react-native-paper';
@@ -34,7 +35,6 @@ import Share from 'react-native-share';
 import Blogss from '../../../assets/images/logo.png';
 import Link from '../../../assets/svg/Link.svg';
 
-
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP,
@@ -42,6 +42,7 @@ import {
 } from 'react-native-responsive-screen';
 
 import Fontiso from 'react-native-vector-icons/Fontisto';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {SelectCountry, Dropdown} from 'react-native-element-dropdown';
 import CPaperInput from '../../../assets/Custom/CPaperInput';
@@ -57,6 +58,11 @@ export default function AddBanner({navigation}) {
 
   const [snackBarVisible, setSnackbarVisible] = useState(false);
 
+  const [snackBarVisibleAlert, setSnackbarVisibleAlert] = useState(false);
+
+  const [loading, setIsLoading] = useState(false);
+
+  const [imageInfo, setImageInfo] = useState(null);
 
   const [addBannerLink, setAddBannerLink] = useState('');
 
@@ -72,28 +78,115 @@ export default function AddBanner({navigation}) {
 
   const [imageUri, setImageUri] = useState(null);
 
+  const [authToken, setAuthToken] = useState([]);
+
+  const [userId, setUserId] = useState('');
+
   const ref_RBSheetCamera = useRef(null);
+
+  //----------------------------\\
+
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchVideos();
+  }, []);
+
+  const fetchVideos = async () => {
+    // Simulate loading
+    setIsLoading(true);
+
+    await getUserID();
+    // Fetch data one by one
+    // Once all data is fetched, set loading to false
+    setIsLoading(false);
+  };
+
+  const getUserID = async () => {
+    console.log("Id's");
+    try {
+      const result = await AsyncStorage.getItem('userId ');
+      if (result !== null) {
+        setUserId(result);
+        console.log('user id retrieved:', result);
+
+        userToken(result);
+      }
+
+      /*  const result3 = await AsyncStorage.getItem('authToken ');
+      if (result3 !== null) {
+        setAuthToken(result3);
+        await fetchCategory(result3);
+
+        console.log('user id retrieved:', result);
+      } */
+
+      /* const  userImage = await AsyncStorage.getItem('userImage');
+      if (result3 !== null) {
+        setAuthToken(result3);
+        await fetchCategory(result3);
+
+        console.log('user id retrieved:', result);
+      } */
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+
+    /*  try {
+      const result = await AsyncStorage.getItem('userName');
+      if (result !== null) {
+        setName(result);
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    } */
+
+    //await authTokenAndId()
+  };
+
+  //--------------------------------\\
+
+  const userToken = async id => {
+    try {
+      const result3 = await AsyncStorage.getItem('authToken ');
+      if (result3 !== null) {
+        setAuthToken(result3);
+        //await fetchCategory(result3, id);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
+
+  //-----------------------------\\
 
   const takePhotoFromCamera = async value => {
     setSelectedItem(value);
     launchCamera(
       {
         mediaType: 'photo',
-        // videoQuality: 'medium',
+        //videoQuality: 'medium',
       },
       response => {
         console.log('image here', response);
+
         if (!response.didCancel) {
+          ref_RBSheetCamera.current.close();
           if (response.assets && response.assets.length > 0) {
             setImageUri(response.assets[0].uri);
             console.log('response', response.assets[0].uri);
+            setImageInfo(response.assets[0]);
+            ref_RBSheetCamera.current.close();
           } else if (response.uri) {
             // Handle the case when no assets are present (e.g., for videos)
             setImageUri(response.uri);
-            console.log('response', response.uri);
+            console.log('response null', response.uri);
+            ref_RBSheetCamera.current.close();
           }
         }
-        ref_RBSheetCamera.current.close();
       },
     );
   };
@@ -103,11 +196,14 @@ export default function AddBanner({navigation}) {
     launchImageLibrary({mediaType: 'photo'}, response => {
       console.log('image here', response);
       if (!response.didCancel && response.assets.length > 0) {
+        console.log('Response', response.assets[0]);
         setImageUri(response.assets[0].uri);
+        setImageInfo(response.assets[0]);
+        ref_RBSheetCamera.current.close();
       }
-      console.log('response', imageUri);
-
       ref_RBSheetCamera.current.close();
+
+      console.log('response', imageInfo);
     });
   };
 
@@ -145,12 +241,43 @@ export default function AddBanner({navigation}) {
     // Automatically hide the Snackbar after 3 seconds
     setTimeout(() => {
       setSnackbarVisible(false);
-      navigation.navigate("BottomTabNavigation")
+      navigation.navigate('BottomTabNavigation');
     }, 3000);
   };
 
   const dismissSnackbar = () => {
     setSnackbarVisible(true);
+  };
+
+  const handleUpdatePasswordAlert = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setSnackbarVisibleAlert(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setSnackbarVisibleAlert(false);
+    }, 3000);
+  };
+
+  const dismissSnackbarAlert = () => {
+    setSnackbarVisibleAlert(true);
+  };
+
+  const upload = async () => {
+    if (
+      imageUri !== null &&
+      addBannerLink !== '' &&
+      startDate !== '' &&
+      endDate !== ''
+    ) {
+      handleUploadImage();
+      //uploadVideo();
+    } else {
+      handleUpdatePasswordAlert();
+    }
   };
 
   const chats = [
@@ -310,20 +437,145 @@ export default function AddBanner({navigation}) {
     );
   };
 
+  const handleUploadImage = data => {
+    setIsLoading(true);
+    const uri = imageInfo.uri;
+    const type = imageInfo.type;
+    const name = imageInfo.fileName;
+    const sourceImage = {uri, type, name};
+    console.log('Source Image', sourceImage);
+    const dataImage = new FormData();
+    dataImage.append('file', sourceImage);
+    dataImage.append('upload_preset', 'e6zfilan'); // Use your Cloudinary upload preset
+    dataImage.append('cloud_name', 'dxfdrtxi3'); // Use your Cloudinary cloud name
+
+    fetch('https://api.cloudinary.com/v1_1/dxfdrtxi3/image/upload', {
+      method: 'POST',
+      body: dataImage,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        //setImageUrl(data.url); // Store the Cloudinary video URL in your state
+        //uploadVideo(data.url)
+        //uploadXpiVideo(data.url);
+        console.log('Image Url', data);
+        //uploadXpiVideo(data.url,data)
+        handleSendCode(data.url);
+      })
+      .catch(err => {
+        setIsLoading(false);
+        console.log('Error While Uploading Video', err);
+      });
+  };
+
+  const forgetPasswordEndpoint =
+    'https://watch-gotcha-be.mtechub.com/banner/createBanner'; // Replace with your actual API endpoint
+
+  /* const handleSendCode = async datas => {
+    console.log('DATA IMAGE', datas);
+    setIsLoading(true);
+    try {
+      const response = await fetch(forgetPasswordEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          banner_link: addBannerLink,
+          price: '100',
+          image: datas,
+          user_id: userId,
+          startDate: startDate,
+          endDate: endDate,
+        }),
+      });
+
+      const data = await response.json();
+
+      //console.log('error data sign in', data);
+
+      if (data.statusCode === 200) {
+        setIsLoading(false);
+        console.log('Email', data);
+        handleUpdatePassword();
+        // Assuming there's at least one result
+      } else {
+        setIsLoading(false);
+        console.log('ERROR', data);
+        console.error('No results found.', data.response.result);
+      }
+
+      setIsLoading(false);
+      // Reset the input fields
+      // navigation.navigate('SelectGender');
+    } catch (error) {
+      //console.error('Error:');
+      //showAlert();
+      setIsLoading(false);
+    }
+  }; */
+
+  const handleSendCode = async datas => {
+    console.log('DATA IMAGE', datas);
+    setIsLoading(true);
+
+    try {
+      const token = authToken; // Replace this with your actual function to get the bearer token
+
+      const response = await fetch(forgetPasswordEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          banner_link: addBannerLink,
+          price: 100,
+          image: datas,
+          user_id: userId,
+          startDate: startDate,
+          endDate: endDate,
+          paid_status:true
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.statusCode === 201) {
+        setIsLoading(false);
+        console.log('Email', data);
+        handleUpdatePassword();
+        // Assuming there's at least one result
+      } else {
+        setIsLoading(false);
+        console.log('ERROR', data);
+        //console.error('No results found.', data.response.result);
+      }
+
+      // Reset the input fields
+      // navigation.navigate('SelectGender');
+    } catch (error) {
+      console.error('Error:', error);
+      //showAlert();
+      setIsLoading(false);
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       <StatusBar barStyle={'dark-content'} backgroundColor={'#FFFFFF'} />
 
-
-      <View style={{marginTop:hp(5)}}>
-
-      <Headers
-        showBackIcon={true}
-        onPress={() => navigation.goBack()}
-        showText={true}
-        text={'Add Banner'}
-      />
-
+      <View style={{marginTop: hp(5)}}>
+        <Headers
+          showBackIcon={true}
+          onPress={() => navigation.goBack()}
+          showText={true}
+          text={'Add Banner'}
+        />
       </View>
 
       <TouchableOpacity
@@ -355,10 +607,51 @@ export default function AddBanner({navigation}) {
         </Text>
       </TouchableOpacity>
 
+      {imageUri !== null ? (
+        <View
+          style={{
+            marginTop: hp(5),
+            height: hp(27),
+            borderRadius: wp(3),
+            marginHorizontal: wp(20),
+          }}>
+          {imageUri !== null && (
+            <Image
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                zIndex: 1, // Ensure it's on top of other elements
+                flex: 1,
+                width: '100%',
+                height: '100%',
+                borderRadius: wp(3),
+                resizeMode: 'contain',
+              }}
+              source={{uri: imageUri}}
+            />
+          )}
+          {imageUri == null && (
+            <Image
+              style={{
+                flex: 1,
+                width: '100%',
+                height: '100%',
+                borderRadius: wp(3),
+                resizeMode: 'stretch',
+                zIndex: 0, // Ensure it's below other elements when no image
+              }}
+              source={appImages.updatePics}
+            />
+          )}
+        </View>
+      ) : null}
+
       <View style={{alignSelf: 'center'}}>
         <TextInput
           mode="outlined"
           label="Add Banner link"
+          value={addBannerLink}
           onChangeText={text => setAddBannerLink(text)}
           //multiline={true} // Enable multiline input
           //numberOfLines={3} // Set the initial number of lines
@@ -389,7 +682,6 @@ export default function AddBanner({navigation}) {
         />
       </View>
 
-      
       <View style={{alignSelf: 'center'}}>
         <TextInput
           mode="outlined"
@@ -407,26 +699,24 @@ export default function AddBanner({navigation}) {
         />
       </View>
 
-      <View style={{flex:1, marginTop:hp(21), alignSelf:'center', justifyContent:'flex-end'}}>
-      <CustomButton
-            title={'Add'}
-            load={false}
-            // checkdisable={inn == '' && cm == '' ? true : false}
-            customClick={() => {
-
-                handleUpdatePassword()
-              //navigation.navigate('Profile_image');
-            }}
-          />
+      <View
+        style={{
+          flex: 1,
+          marginTop: hp(21),
+          alignSelf: 'center',
+          justifyContent: 'flex-end',
+        }}>
+        <CustomButton
+          title={'Add'}
+          load={false}
+          // checkdisable={inn == '' && cm == '' ? true : false}
+          customClick={() => {
+            upload();
+            //handleUpdatePassword();
+            //navigation.navigate('Profile_image');
+          }}
+        />
       </View>
-
-      <CustomSnackbar
-        message={'Success'}
-        messageDescription={'Banner Added Successfully'}
-        onDismiss={dismissSnackbar} // Make sure this function is defined
-        visible={snackBarVisible}
-      />
-      
 
       <RBSheet
         ref={ref_RBSheetCamera}
@@ -505,6 +795,33 @@ export default function AddBanner({navigation}) {
           </TouchableOpacity>
         </View>
       </RBSheet>
+
+      <CustomSnackbar
+        message={'Success'}
+        messageDescription={'Banner Posted SuccessFully'}
+        onDismiss={dismissSnackbar} // Make sure this function is defined
+        visible={snackBarVisible}
+      />
+
+      <CustomSnackbar
+        message={'Alert!'}
+        messageDescription={'Kindly Fill All Fields'}
+        onDismiss={dismissSnackbarAlert} // Make sure this function is defined
+        visible={snackBarVisibleAlert}
+      />
+
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {loading && <ActivityIndicator size="large" color="#FACA4E" />}
+      </View>
     </ScrollView>
   );
 }

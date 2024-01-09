@@ -473,7 +473,7 @@ export default function UpdateQAFI({navigation, route}) {
           }}>
           <CPaperInput
             multiline={true}
-            placeholder={'Add a comment'}
+            placeholder={'Add QAFI'}
             placeholderTextColor="#B0B0B0"
             value={comment}
             onChangeText={text => setComment(text)}

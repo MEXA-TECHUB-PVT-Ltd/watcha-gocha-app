@@ -10,7 +10,7 @@ import {
   View,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -36,6 +36,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import PublicLetter from '../../../assets/svg/PublicLetter.svg';
 import PrivateLetter from '../../../assets/svg/PrivateLetter.svg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Share from 'react-native-share';
 
@@ -65,12 +66,138 @@ export default function PostLetter({navigation, route}) {
 
   const [greetings, setGreetings] = useState('');
 
+  const [userImage, setUserImage] = useState();
 
   const [letterType, setLetterTypes] = useState('Public');
 
   const ref_RBSendOffer = useRef(null);
 
   const [snackbarVisible, setSnackbarVisible] = useState(false);
+
+  const [authToken, setAuthToken] = useState('');
+
+  const [loading, setLoading] = useState(false);
+
+  const [userId, setUserId] = useState('');
+
+  //-------------------------------------\\
+
+  useEffect(() => {
+    // Make the API request and update the 'data' state
+    fetchVideos();
+  }, []);
+
+  const fetchVideos = async () => {
+    // Simulate loading
+    setLoading(true);
+
+    await getUserID();
+    // Fetch data one by one
+    // Once all data is fetched, set loading to false
+    setLoading(false);
+  };
+
+  const getUserID = async () => {
+    console.log("Id's");
+    try {
+      const result = await AsyncStorage.getItem('userId ');
+      if (result !== null) {
+        setUserId(result);
+        console.log('user id retrieved:', result);
+
+        userToken(result);
+      }
+
+      /*  const result3 = await AsyncStorage.getItem('authToken ');
+      if (result3 !== null) {
+        setAuthToken(result3);
+        await fetchCategory(result3);
+
+        console.log('user id retrieved:', result);
+      } */
+
+      /* const  userImage = await AsyncStorage.getItem('userImage');
+      if (result3 !== null) {
+        setAuthToken(result3);
+        await fetchCategory(result3);
+
+        console.log('user id retrieved:', result);
+      } */
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+
+    /*  try {
+      const result = await AsyncStorage.getItem('userName');
+      if (result !== null) {
+        setName(result);
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    } */
+
+    //await authTokenAndId()
+  };
+
+  //--------------------------------\\
+
+  const userToken = async id => {
+    try {
+      const result3 = await AsyncStorage.getItem('authToken ');
+      if (result3 !== null) {
+        setAuthToken(result3);
+        //await fetchCategory(result3, id);
+        authTokenAndId(id, result3);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
+
+  const authTokenAndId = async (id, token) => {
+    fetchUser(id, token);
+  };
+
+  const fetchUser = async (id, tokens) => {
+    console.log('USER', id);
+    console.log('TOKEN', tokens);
+    const token = tokens;
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/user/getUser/${id}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('IMAGE', data.user.image);
+
+        // Use the data from the API to set the categories
+        setUserImage(data.user.image);
+      } else {
+        console.error(
+          'Failed to fetch user:',
+          response.status,
+          response.statusText,
+        );
+      }
+    } catch (error) {
+      //await fetchCategory(id, tokens);
+      console.error('Errors:', error);
+    }
+  };
+
+  //---------------------------------------\\
 
   const receivedDataName = route.params?.name;
   const receivedDatAddress = route.params?.address;
@@ -94,28 +221,28 @@ export default function PostLetter({navigation, route}) {
     {id: 4, title: 'Greetings'},
   ];
   const onFocusChangeSubject = (id, title, text) => {
-    console.log("Came to here")
+    console.log('Came to here');
     setSelectedItemId(id);
     setGreetingsTitle(title);
     setSubjectOfLetter(text);
   };
 
   const onFocusChangeIntroduction = (id, title, text) => {
-    console.log("Came to here")
+    console.log('Came to here');
     setSelectedItemId(id);
     setGreetingsTitle(title);
     setIntroductionOfLetter(text);
   };
 
   const onFocusChangeBody = (id, title, text) => {
-    console.log("Came to here")
+    console.log('Came to here');
     setSelectedItemId(id);
     setGreetingsTitle(title);
     setPostLetter(text);
   };
 
   const onFocusChangeGreetings = (id, title, text) => {
-    console.log("Came to here")
+    console.log('Came to here');
     setSelectedItemId(id);
     setGreetingsTitle(title);
     setGreetings(text);
@@ -168,7 +295,8 @@ export default function PostLetter({navigation, route}) {
           setSelectedItemId(item.id);
           setGreetingsTitle(item.title);
           console.log('Selected item:', item.title);
-        }} */>
+        }} */
+      >
         <Text
           style={[
             styles.textSearchDetails,
@@ -204,18 +332,41 @@ export default function PostLetter({navigation, route}) {
           marginTop: hp(3),
           height: hp(8),
         }}>
-        <View
-          style={{
-            width: wp(12),
-            marginLeft: wp(0.5),
-            height: wp(12),
-            borderRadius: wp(12) / 2,
-          }}>
-          <Image
-            source={appImages.profileImg}
-            style={{width: '100%', height: '100%', resizeMode: 'cover'}}
-          />
-        </View>
+        {userImage !== '' ? (
+          <View
+            style={{
+              width: wp(12),
+              marginLeft: wp(0.5),
+              height: wp(12),
+              borderRadius: wp(12) / 2,
+            }}>
+            <Image
+              source={{uri: userImage}}
+              style={{
+                width: '100%',
+                height: '100%',
+                resizeMode: 'cover',
+                borderRadius: wp(12) / 2,
+              }}
+            />
+          </View>
+        ) : (
+          <View
+            style={{
+              width: wp(10),
+              marginLeft: wp(3),
+              height: wp(10),
+              overflow: 'hidden',
+              borderRadius: wp(10) / 2,
+            }}>
+            <MaterialCommunityIcons
+              style={{marginTop: hp(0.5)}}
+              name={'account-circle'}
+              size={35}
+              color={'#FACA4E'}
+            />
+          </View>
+        )}
 
         <TouchableOpacity
           onPress={() => ref_RBSheetCamera.current.open()}
@@ -238,7 +389,6 @@ export default function PostLetter({navigation, route}) {
         </TouchableOpacity>
       </View>
 
-     
       <View
         style={{
           height: hp(8),
@@ -260,92 +410,92 @@ export default function PostLetter({navigation, route}) {
         />
       </View>
 
-      <ScrollView style={{flex:1}}>
+      <ScrollView style={{flex: 1}}>
+        <View style={{marginLeft: wp(8), marginTop: hp(3)}}>
+          <CPaperInput
+            //multiline={true}
+            placeholder={'Subject Of Letter'}
+            //heading={'Title'}
+            placeholderTextColor="#121420"
+            value={subjectOfLetter}
+            onChangeText={text => onFocusChangeSubject(1, 'Subject', text)}
 
-      <View style={{marginLeft: wp(8), marginTop: hp(3)}}>
-        <CPaperInput
-          //multiline={true}
-          placeholder={'Subject Of Letter'}
-          //heading={'Title'}
-          placeholderTextColor="#121420"
-          value={subjectOfLetter}
-          onChangeText={text => onFocusChangeSubject(1,'Subject',text)}
+            //onFocus={ console.log('CPaperInput focused')} // Log a message when CPaperInput receives focus
 
-          //onFocus={ console.log('CPaperInput focused')} // Log a message when CPaperInput receives focus
+            //height={hp(55)}
+          />
+        </View>
 
-          //height={hp(55)}
-        />
-      </View>
-
-      <View style={{marginLeft: wp(8), marginTop: hp(1)}}>
-        <CPaperInput
-          //multiline={true}
-          placeholder={'Introduction Of Letter'}
-          //heading={'Title'}
-          placeholderTextColor="#121420"
-          value={introductionOfLetter}
-          onChangeText={text => onFocusChangeIntroduction(2,'Introduction',text)}
-          //height={hp(55)}
-        />
-      </View>
-
-      <View style={{marginLeft: wp(8), marginTop: hp(3)}}>
-        <CPaperInput
-          multiline={true}
-          placeholder={'Type Here'}
-          //heading={'Title'}
-          placeholderTextColor="#121420"
-          value={postLetter}
-          onChangeText={text => onFocusChangeBody(3,'Body', text)}
-          height={hp(55)}
-        />
-      </View>
-
-      <View style={{marginLeft: wp(8), marginTop: hp(1)}}>
-        <CPaperInput
-          multiline={true}
-          placeholder={'Greetings'}
-          //heading={'Title'}
-          placeholderTextColor="#121420"
-          value={greetings}
-          onChangeText={text => onFocusChangeGreetings(4,'Greetings', text)}
-          height={hp(15)}
-        />
-      </View>
-
-      <View style={{marginTop: hp(1), marginHorizontal: wp(8)}}>
-        <CustomButton
-          title={'Next'}
-          load={false}
-          // checkdisable={inn == '' && cm == '' ? true : false}
-          customClick={() => {
-            if (
-              greetings !== '' &&
-              subjectOfLetter !== '' &&
-              introductionOfLetter !== '' &&
-              postLetter !== ''
-            ) {
-              navigation.navigate('PostLetterEditSignature', {
-                greetingsTitle: greetings,
-                subjectOfLetter: subjectOfLetter,
-                introductionOfLetter: introductionOfLetter,
-                postLetter: postLetter,
-                name: receivedDataName,
-                address: receivedDatAddress,
-                contactNumber: receivedDataContactNumber,
-                email: receivedDataEmail,
-                category_id: receivedDataCategoryId,
-                letterType: receivedDataLetterType,
-                formOfApeal: 'My appeal',
-              });
-            } else {
-              console.log('Going to else');
-              handleUpdatePassword();
+        <View style={{marginLeft: wp(8), marginTop: hp(1)}}>
+          <CPaperInput
+            //multiline={true}
+            placeholder={'Introduction Of Letter'}
+            //heading={'Title'}
+            placeholderTextColor="#121420"
+            value={introductionOfLetter}
+            onChangeText={text =>
+              onFocusChangeIntroduction(2, 'Introduction', text)
             }
-          }}
-        />
-      </View>
+            //height={hp(55)}
+          />
+        </View>
 
+        <View style={{marginLeft: wp(8), marginTop: hp(3)}}>
+          <CPaperInput
+            multiline={true}
+            placeholder={'Type Here'}
+            //heading={'Title'}
+            placeholderTextColor="#121420"
+            value={postLetter}
+            onChangeText={text => onFocusChangeBody(3, 'Body', text)}
+            height={hp(55)}
+          />
+        </View>
+
+        <View style={{marginLeft: wp(8), marginTop: hp(1)}}>
+          <CPaperInput
+            multiline={true}
+            placeholder={'Greetings'}
+            //heading={'Title'}
+            placeholderTextColor="#121420"
+            value={greetings}
+            onChangeText={text => onFocusChangeGreetings(4, 'Greetings', text)}
+            height={hp(15)}
+          />
+        </View>
+
+        <View style={{marginTop: hp(1), marginHorizontal: wp(8)}}>
+          <CustomButton
+            title={'Next'}
+            load={false}
+            // checkdisable={inn == '' && cm == '' ? true : false}
+            customClick={() => {
+              if (
+                greetings !== '' &&
+                subjectOfLetter !== '' &&
+                introductionOfLetter !== '' &&
+                postLetter !== ''
+              ) {
+                navigation.navigate('PostLetterEditSignature', {
+                  greetingsTitle: greetings,
+                  subjectOfLetter: subjectOfLetter,
+                  introductionOfLetter: introductionOfLetter,
+                  postLetter: postLetter,
+                  name: receivedDataName,
+                  address: receivedDatAddress,
+                  contactNumber: receivedDataContactNumber,
+                  email: receivedDataEmail,
+                  category_id: receivedDataCategoryId,
+                  letterType: receivedDataLetterType,
+                  formOfApeal: 'My appeal',
+                });
+              } else {
+                console.log('Going to else');
+                handleUpdatePassword();
+              }
+            }}
+          />
+        </View>
       </ScrollView>
 
       <RBSheet
