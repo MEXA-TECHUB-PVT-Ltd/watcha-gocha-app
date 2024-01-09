@@ -81,7 +81,6 @@ export default function Video({navigation}) {
 
     // Fetch data one by one
     await getUserID();
-    await fetchTopVideos();
     await fetchLatestVideos();
     await fetchMostViewedVideos();
     await fetchMostCommentedVideos();
@@ -125,6 +124,8 @@ export default function Video({navigation}) {
       const result = await response.json();
       console.log('Resultings', result.Videos);
       setData(result.Videos); // Update the state with the fetched data
+
+      await fetchTopVideos();
     } catch (error) {
       console.error('Error Trending:', error);
     }
@@ -152,27 +153,7 @@ export default function Video({navigation}) {
     }
   };
 
-  const fetchTopVideos = async () => {
-    const token = authToken;
-
-    try {
-      const response = await fetch(
-        `https://watch-gotcha-be.mtechub.com/top/app/top_tour/${selectedItemId}`,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      const result = await response.json();
-      console.log('Resultings of Top Videossss', result.topVideo[0]);
-      setDataTopVideos(result.topVideo[0]); // Update the state with the fetched data
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
+ 
 
   const fetchMostViewedVideos = async () => {
     const token = authToken;
@@ -238,6 +219,29 @@ export default function Video({navigation}) {
       setSearches(result.AllCategories.reverse()); // Update the state with the fetched data
 
       await fetchTrendingVideos(result);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const fetchTopVideos = async () => {
+    console.log("TOP VIDEO CALLED----???---", authToken)
+    const token = authToken;
+
+    try {
+      const response = await fetch(
+        `https://watch-gotcha-be.mtechub.com/top/getAllTopVideosByCategory/${selectedItemId}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const result = await response.json();
+      console.log('Resultings of Top Videossss????????', result.AllVideos[0]);
+      setDataTopVideos(result.AllVideos[0]); // Update the state with the fetched data
     } catch (error) {
       console.error('Error:', error);
     }
@@ -646,12 +650,12 @@ export default function Video({navigation}) {
                 borderRadius: wp(3),
                 resizeMode: 'cover',
               }}
-              source={appImages.galleryPlaceHolder}
+              source={appImages?.videoPlaceHolder}
             />
             <View
               style={{
                 position: 'absolute',
-                top: hp(10),
+                top: hp(12),
                 left: 7,
                 //height: hp(3),
                 //width: wp(21),
@@ -663,9 +667,9 @@ export default function Video({navigation}) {
               }}>
               <Text
                 style={{
-                  fontSize: hp(2.1),
+                  fontSize: hp(1.5),
                   fontFamily: 'Inter',
-                  color: '#FFFFFF',
+                  color: 'black',
                   fontWeight: '700',
                 }}>
                 {dataTopVideos?.name}

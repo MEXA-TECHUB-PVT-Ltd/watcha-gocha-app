@@ -42,6 +42,7 @@ const appImages = {
   LogoBlack: require(IMAGES_DIR + 'LogoBlack.png'),
   galleryPlaceHolder:require(IMAGES_DIR + 'galleryPlaceHolder.png'),
   newsPlaceHolder:require(IMAGES_DIR + 'placeholderNews.jpg'),
+  videoPlaceHolder:require(IMAGES_DIR + 'playerIcon.jpg'),
   LogOut:require(IMAGES_DIR + 'Logout.png')
 };
 export { appImages };

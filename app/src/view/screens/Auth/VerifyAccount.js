@@ -70,6 +70,44 @@ export default function VerifyAccount({navigation, route}) {
     setValue,
   }); */
   const [isFocused, setIsFocused] = useState(false);
+
+  const [resendTimer, setResendTimer] = useState(45);
+
+  const resendTimerRef = useRef(45);
+
+  //---------------------------\\
+
+  useEffect(() => {
+    let interval;
+
+    if (resendTimerRef.current > 0) {
+      interval = setInterval(() => {
+        resendTimerRef.current -= 1;
+        setResendTimer(resendTimerRef.current); // Update state for rendering
+      }, 1000);
+    }
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [resendTimerRef.current]);
+
+  const resendText =
+    resendTimerRef.current > 0 ? `Resend in 00:${resendTimerRef.current}` : 'Resend';
+
+  const handleResend = () => {
+    // Implement the logic to resend the verification code here
+    if (resendTimerRef.current === 0) {
+      resendTimerRef.current = 45; // Reset the timer to 45 seconds
+      setResendTimer(resendTimerRef.current); // Update state for rendering
+    }
+  };
+
+
+  //---------------------------\\
+  
+
+
   
   const email = route.params?.email; // Use optional chaining
 
@@ -263,6 +301,8 @@ export default function VerifyAccount({navigation, route}) {
             }}>
             Did'nt recieve the code?
           </Text>
+          
+          <TouchableOpacity onPress={()=>handleResend()}>
 
           <Text
             style={{
@@ -271,8 +311,9 @@ export default function VerifyAccount({navigation, route}) {
               fontSize: hp(2.1),
               fontFamily: 'Inter',
             }}>
-            {} Resend in 00:45
+            {}  {resendText}
           </Text>
+          </TouchableOpacity>
         </View>
 
         <View style={{marginTop: '15%', alignSelf: 'center'}}>
