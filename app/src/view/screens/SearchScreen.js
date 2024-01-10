@@ -267,6 +267,8 @@ export default function SearchScreen({navigation}) {
             zIndex: 2, // Ensure it's on top
           }}>
           <Text
+          numberOfLines={1}
+          ellipsizeMode='tail'
             style={{
               fontSize: hp(1.9),
               fontFamily: 'Inter-Medium',

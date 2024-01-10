@@ -442,7 +442,7 @@ export default function PostLetterInfo({navigation}) {
             marginTop: hp(3),
             height: hp(8),
           }}>
-        { userImage!==''?  <View
+        { userImage!==undefined?  <View
             style={{
               width: wp(12),
               marginLeft: wp(0.5),

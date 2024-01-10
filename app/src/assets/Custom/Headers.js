@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import React, {useState, useEffect} from 'react';
 import {
   widthPercentageToDP as wp,
@@ -22,7 +23,6 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import Feater from 'react-native-vector-icons/Feather';
 import Entypo from 'react-native-vector-icons/Entypo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 
 const Headers = ({
   showBackIcon,
@@ -53,17 +53,11 @@ const Headers = ({
   isFavorite,
   navigation,
 }) => {
-
-
   const [image, setImage] = useState('');
-
 
   const [userId, setUserId] = useState('');
 
-
-
   const [authToken, setAuthToken] = useState([]);
-
 
   useEffect(() => {
     // Make the API request and update the 'data' state
@@ -134,7 +128,6 @@ const Headers = ({
     }
   };
 
-    
   return (
     <View style={styles.header}>
       {showBackIcon && (
@@ -160,19 +153,27 @@ const Headers = ({
       )}
 
       {showProfileImage && (
-
-        <TouchableOpacity onPress={onPressProfile} style={{
-         
-          marginTop: hp(-2),
-          position: 'absolute',
-          right: -18
-        }}>
-
-          <Image
-            source={{uri:image}}
-            style={styles.profileImgs}
-            resizeMode="contain"
-          />
+        <TouchableOpacity
+          onPress={onPressProfile}
+          style={{
+            marginTop: hp(-2),
+            position: 'absolute',
+            right: wp(1),
+          }}>
+          {image!==null ? (
+            <Image
+              source={{uri: image}}
+              style={styles.profileImgs}
+              resizeMode="contain"
+            />
+          ) : (
+            <MaterialCommunityIcons
+           style={{marginTop: hp(0.5)}}
+           name={'account-circle'}
+           size={35}
+           color={'#FACA4E'}
+         />
+          )}
         </TouchableOpacity>
       )}
       {showHeart && (
@@ -189,28 +190,19 @@ const Headers = ({
         <TouchableOpacity onPress={onPressSearch} style={styles.heartIcon}>
           <Feater name="search" size={20} color="#FACA4E" />
         </TouchableOpacity>
-      )} 
+      )}
 
-       {showMenu && (
+      {showMenu && (
         <TouchableOpacity onPress={onPressMenu} style={styles.heartIcon}>
-
-        <Entypo name={'dots-three-vertical'} size={18} color={'#4A4A4A'} />
-
+          <Entypo name={'dots-three-vertical'} size={18} color={'#4A4A4A'} />
         </TouchableOpacity>
-      )}    
+      )}
 
       {showMenuWhite && (
         <TouchableOpacity onPress={onPressMenuWhite} style={styles.heartIcon}>
-  
-        <Entypo name={'dots-three-vertical'} size={18} color={'#ffffff'} />
-
+          <Entypo name={'dots-three-vertical'} size={18} color={'#ffffff'} />
         </TouchableOpacity>
-      )}        
-      
-      
-      
-      
-
+      )}
 
       {showSettings && (
         <TouchableOpacity onPress={onPressSettings} style={styles.heartIcon}>
@@ -272,7 +264,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15, // Add padding to increase the touchable area
     paddingRight: 10, // Add some space on the right side if needed
   },
-  listingsMenu:{
+  listingsMenu: {
     position: 'absolute',
     left: 20,
     justifyContent: 'center',
@@ -283,12 +275,10 @@ const styles = StyleSheet.create({
     right: 15,
   },
   profileImgs: {
-    resizeMode: 'contain',
-    //marginTop: hp(-2),
-    //position: 'absolute',
-    //right: -10,
-    width: wp(30),
-    height: 30,
+    width: wp(10),
+    height: wp(10),
+    borderRadius: wp(10) / 2, // Assuming the image has dimensions 30x30
+    overflow: 'hidden', // Ensure the content is clipped to the border radius
   },
   imgAdd: {
     resizeMode: 'contain',

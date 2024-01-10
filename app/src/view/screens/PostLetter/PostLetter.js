@@ -332,7 +332,7 @@ export default function PostLetter({navigation, route}) {
           marginTop: hp(3),
           height: hp(8),
         }}>
-        {userImage !== '' ? (
+        {userImage !== undefined ? (
           <View
             style={{
               width: wp(12),

@@ -840,7 +840,7 @@ export default function PostLetterSignature({navigation, route}) {
           marginTop: hp(3),
           height: hp(8),
         }}>
-        {userImage !== '' ? (
+        {userImage !== undefined ? (
           <View
             style={{
               width: wp(12),
@@ -897,7 +897,7 @@ export default function PostLetterSignature({navigation, route}) {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity
+     { videoInfo==null? <TouchableOpacity
         onPress={() => ref_RBSheetCameraCanvas.current.open()}
         style={{
           borderRadius: wp(3),
@@ -922,7 +922,7 @@ export default function PostLetterSignature({navigation, route}) {
           }}>
           You can maximum 3 images or videos
         </Text>
-      </TouchableOpacity>
+      </TouchableOpacity> : null}
 
       {imageUri !== null ? (
         <View
@@ -979,7 +979,7 @@ export default function PostLetterSignature({navigation, route}) {
         />
       </View>
 
-      <TouchableOpacity
+     { imageUris.length===0 ? <TouchableOpacity
         onPress={() => ref_RBSheetVideo.current.open()}
         style={{
           borderRadius: wp(3),
@@ -1004,13 +1004,14 @@ export default function PostLetterSignature({navigation, route}) {
           }}>
           You can maximum upload 1 video
         </Text>
-      </TouchableOpacity>
+      </TouchableOpacity>: null}
 
       {videoUri !== null && (
         <View
           style={{
             height: hp(7),
             marginTop: hp(5),
+            marginHorizontal:wp(10),
             alignItems: 'center',
             justifyContent: 'center',
           }}>
@@ -1421,7 +1422,7 @@ export default function PostLetterSignature({navigation, route}) {
 
       <CustomSnackbar
         message={'Alert!'}
-        messageDescription={'Please Fill All Fields '}
+        messageDescription={'You can maximum upload 3 images or a video'}
         onDismiss={dismissSnackbarAlert} // Make sure this function is defined
         visible={snackbarVisibleALert}
       />

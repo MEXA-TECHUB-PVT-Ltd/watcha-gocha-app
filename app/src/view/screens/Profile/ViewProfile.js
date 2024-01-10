@@ -1067,7 +1067,7 @@ export default function ViewProfile({navigation}) {
             marginTop: hp(3),
             height: hp(21),
           }}>
-          <View
+          {image!==null?<View
             style={{
               width: wp(20),
               marginLeft: wp(0.5),
@@ -1078,7 +1078,15 @@ export default function ViewProfile({navigation}) {
               source={{uri: image}}
               style={{width: '100%', height: '100%', resizeMode: 'contain'}}
             />
-          </View>
+          </View>:
+         
+          <MaterialCommunityIcons
+           style={{marginTop: hp(0.5)}}
+           name={'account-circle'}
+           size={55}
+           color={'#FACA4E'}
+         />
+          }
 
           <Text
             style={{
@@ -1139,7 +1147,7 @@ export default function ViewProfile({navigation}) {
                 //fontWeight: 'bold',
                 fontFamily: 'Inter-Regular',
               }}>
-              Xpi/3.14 Videos
+              Video Mania
             </Text>
           </View>
 

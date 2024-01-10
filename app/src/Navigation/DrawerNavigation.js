@@ -20,6 +20,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import PrivacyPolicyActiveActive from '../assets/svg/PrivacyPolicyActive.svg';
 import TermsAndconditionActive from '../assets/svg/TermsAndConditionActive.svg';
 import ContactUsActive from '../assets/svg/ContactUsActive.svg';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 import {appImages} from '../assets/utilities';
@@ -227,7 +229,11 @@ const DrawerNavigation = ({navigation}) => {
                   fontFamily: 'Inter-Medium',
                 }}
                 onPress={() => navigation.navigate('Notification')}
-                icon={focused => <ContactUsActive />}
+                icon={focused =>  <MaterialIcons
+                  color={'#FACA4E'}
+                  name="notifications-on"
+                  size={25}
+                />}
               />
 
               <DrawerItem

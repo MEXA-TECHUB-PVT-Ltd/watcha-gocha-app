@@ -295,7 +295,7 @@ export default function Disc({navigation, route}) {
       );
 
       const result = await response.json();
-      console.log('Resultings of News', result.AllLetter);
+      console.log('Resultings of News Celebrity Data', result.AllLetter);
       //Alert.alert(result)
 
       setOpensLettersPublicCelebrityData(result.AllLetter); // Update the state with the fetched data
@@ -364,7 +364,7 @@ export default function Disc({navigation, route}) {
   //DISC
 
   const renderPublicGeneral = item => {
-    console.log('Item of general public', item);
+    console.log('Item of general public authorities', item);
     const imageUrl =
       item.images && item.images[0]
         ? item.images[0].startsWith('/fileUpload')

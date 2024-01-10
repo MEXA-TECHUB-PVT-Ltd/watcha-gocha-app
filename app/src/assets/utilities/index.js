@@ -5,7 +5,7 @@
 const IMAGES_DIR = '../images/';
 const appImages = {
   logo: require(IMAGES_DIR + 'LogoOfWG.jpg'),
-  logoTransparent: require(IMAGES_DIR + 'logoTransparent.png'),
+  logoTransparent: require(IMAGES_DIR + 'logoNewTransparent.png'),
   forget: require(IMAGES_DIR + 'forget.png'),
   model_verify: require(IMAGES_DIR + 'model_verify.png'),
   snapchat: require(IMAGES_DIR + 'SnapChat.png'),

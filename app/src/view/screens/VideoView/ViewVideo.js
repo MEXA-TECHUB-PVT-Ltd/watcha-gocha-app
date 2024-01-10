@@ -857,12 +857,12 @@ export default function ViewVideo({navigation, route}) {
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <IonIcons name={'chevron-back'} color={'white'} size={25} />
           </TouchableOpacity>
-
+          
           <Image
             source={appImages.logoTransparent}
-            style={{width: wp(39), marginLeft: wp(18)}}
+            style={{height:hp(15), width:wp(35), marginLeft: wp(23)}}
             resizeMode="contain"
-          />
+          /> 
 
           {showMenu && (
             <TouchableOpacity style={{marginLeft: wp(18), marginTop: hp(1)}}>
@@ -1397,8 +1397,8 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    height: hp(6.2),
-    marginTop: hp(8),
+    height: hp(15),
+    marginTop: hp(3),
     alignItems: 'center',
     marginHorizontal: wp(8)
   },
