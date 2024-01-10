@@ -97,10 +97,42 @@ const App = ({navigation}) => {
 
   const [snackbarVisible, setSnackbarVisible] = useState(false);
 
+  const [token, setToken] = useState('');
+
+
+  const [snackbarVisibleChecked, setSnackbarVisibleChecked] = useState(false);
+
+
   const [snackbarCorrectVisible, setSnackbarCorrectVisible] = useState(false);
+
+
+  useEffect(() => {
+
+    getUserID()
+
+  }, []);
+
+  const getUserID = async () => {
+    try {
+      const result = await AsyncStorage.getItem('UserToken');
+      if (result !== null) {
+        setToken(result);
+        console.log("Token", result);
+
+        console.log('user id retrieved:', result);
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error retrieving user ID:', error);
+    }
+  };
 
   const dismissSnackbar = () => {
     setSnackbarVisible(false);
+  };
+
+  const dismissSnackbarChecked = () => {
+    setSnackbarVisibleChecked(false);
   };
 
   const dismissCorrectSnackbar = () => {
@@ -109,6 +141,19 @@ const App = ({navigation}) => {
 
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
+  };
+
+  const handleUpdatePasswordChecked = async () => {
+    // Perform the password update logic here
+    // For example, you can make an API request to update the password
+
+    // Assuming the update was successful
+    setSnackbarVisibleChecked(true);
+
+    // Automatically hide the Snackbar after 3 seconds
+    setTimeout(() => {
+      setSnackbarVisibleChecked(false);
+    }, 3000);
   };
 
   const handleUpdatePassword = async () => {
@@ -236,7 +281,12 @@ const App = ({navigation}) => {
     //   setSignUpConfirmPasswordError(true);
     // }
     else {
-      handleSignup();
+      if (isChecked === true) {
+        handleSignup();
+      } else {
+        console.log("NICED")
+        handleUpdatePasswordChecked()
+      }
       //navigation.navigate('Profile_image');
       //   setIsLoading(true);
       //   setTimeout(() => {
@@ -362,6 +412,7 @@ const App = ({navigation}) => {
           username: username,
           password: signup_pass,
           confirmPassword: signup_cpass,
+          device_id:token,
           role: 'user',
         }),
       });
@@ -602,6 +653,27 @@ const App = ({navigation}) => {
 
   return (
     <ScrollView style={styles.bg} contentContainerStyle={{flexGrow: 1}}>
+
+<CustomSnackbar
+        message={'Alert!'}
+        messageDescription={'This Email Is Already In Use'}
+        onDismiss={dismissSnackbar} // Make sure this function is defined
+        visible={snackbarVisible}
+      />
+
+      <CustomSnackbar
+        message={'Alert!'}
+        messageDescription={'Please Agree With Terms & Condition'}
+        onDismiss={dismissSnackbarChecked} // Make sure this function is defined
+        visible={snackbarVisibleChecked}
+      />
+
+      <CustomSnackbar
+        message={'Alert!'}
+        messageDescription={'Wrong Email Or Password'}
+        onDismiss={dismissCorrectSnackbar} // Make sure this function is defined
+        visible={snackbarCorrectVisible}
+      />
       <StatusBar barStyle={'dark-content'} backgroundColor={'#FACA4E'} />
       <View style={styles.mainv}>
         <Image
@@ -1027,8 +1099,9 @@ const App = ({navigation}) => {
               ) : null}
             </View>
 
-            <TouchableOpacity
-              onPress={() => handleCheckboxChange()}
+            <View></View>
+
+            <View
               style={{
                 flexDirection: 'row',
                 marginLeft: widthPercentageToDP(7),
@@ -1057,7 +1130,69 @@ const App = ({navigation}) => {
 
                 {/* )} */}
               </TouchableOpacity>
-            </TouchableOpacity>
+
+              <Text style={{marginLeft: wp(3)}}>Please check if you agree the following terms</Text>
+            </View>
+
+            <View
+              style={{
+                marginTop: heightPercentageToDP(5),
+                height: heightPercentageToDP(30),
+                marginHorizontal: widthPercentageToDP(1),
+              }}>
+              <ScrollView
+                nestedScrollEnabled={true}
+                scrollToOverflowEnabled={true}
+                scrollEnabled={true}
+                showsVerticalScrollIndicator={false} // Hide vertical scroll indicator
+                style={{flexGrow: 1}}
+                contentContainerStyle={{
+                  verticalLine: false,
+                  marginHorizontal: widthPercentageToDP(8),
+                }}>
+                <Text
+                  style={{
+                    marginTop: heightPercentageToDP(1),
+                    fontFamily: 'Inter',
+                    fontSize: heightPercentageToDP(1.8),
+                    lineHeight: heightPercentageToDP(2.1),
+                    color: 'black',
+                  }}>
+                  1. "Wotcha Gotcha" is a cutting-edge and highly integrated
+                  network attracting millions of users worldwide. Users,
+                  referred to as WotchaGotchers, hereby gain access to a range
+                  of features designed to enhance their mobile experience.{' '}
+                  {'\n\n'}
+                  2.WotchaGotchers can optimize their phone screen space by
+                  consolidating all other apps into the "Mass Apps" category
+                  within the Wotcha Gotcha app.
+                  {'\n\n'}
+                  3.Users have the flexibility to position the Wotcha Gotcha
+                  icon/app on the right or left upper corner, right or left
+                  lower corner, or at the center of their phone screen,
+                  providing a customizable and user-centric experience.
+                  {'\n\n'}
+                  4.Wotcha Gotchers can seamlessly use their favorite apps,
+                  including YouTube, WhatsApp, Meta, X, Instagram, Threads,
+                  Telegram, TikTok, and more, through the Wotcha Gotcha app
+                  without any disruption to their usual functionality.
+                  {'\n\n'}
+                  5.Users can explore captivating content across various
+                  categories such as Mass Apps, Video Mania, On News, Pic-Tour,
+                  Market Zone, and many others to come, ensuring a diverse and
+                  engaging experience.
+                  {'\n\n'}
+                  6.Wotcha Gotchers have the ability to rearrange the positions
+                  of Wotcha Gotcha categories, moving them top/down or
+                  vice-versa, allowing for personalized and intuitive
+                  navigation.
+                  {'\n\n'}
+                  7.The app is designed to accommodate user preferences,
+                  offering flexibility and control over the arrangement and
+                  usage of features to enhance the overall user experience.
+                </Text>
+              </ScrollView>
+            </View>
 
             <View style={{marginTop: '25%', alignSelf: 'center'}}>
               <CustomButton
@@ -1088,19 +1223,7 @@ const App = ({navigation}) => {
         </View>
       )}
 
-      <CustomSnackbar
-        message={'Alert!'}
-        messageDescription={'This Email Is Already In Use'}
-        onDismiss={dismissSnackbar} // Make sure this function is defined
-        visible={snackbarVisible}
-      />
-
-      <CustomSnackbar
-        message={'Alert!'}
-        messageDescription={'Wrong Email Or Password'}
-        onDismiss={dismissCorrectSnackbar} // Make sure this function is defined
-        visible={snackbarCorrectVisible}
-      />
+      
     </ScrollView>
   );
 };

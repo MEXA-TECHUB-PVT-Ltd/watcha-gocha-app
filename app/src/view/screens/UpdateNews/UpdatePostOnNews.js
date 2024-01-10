@@ -471,7 +471,7 @@ export default function UpdatePostOnNews({navigation, route}) {
           }}>
           <CPaperInput
             multiline={true}
-            placeholder={'Add a comment'}
+            placeholder={'Add Post News'}
             placeholderTextColor="#B0B0B0"
             value={comment}
             onChangeText={text => setComment(text)}

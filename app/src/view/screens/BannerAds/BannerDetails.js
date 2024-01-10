@@ -50,7 +50,12 @@ import Headers from '../../../assets/Custom/Headers';
 
 import Add from '../../../assets/svg/AddMainScreen.svg';
 
-export default function BannerDetails({navigation}) {
+export default function BannerDetails({navigation, route}) {
+
+  const receivedData = route.params?.item;
+
+  console.log('Data Recieved on pics', receivedData);
+
   const chats = [
     {
       id: 1,
@@ -229,7 +234,7 @@ export default function BannerDetails({navigation}) {
         }}>
         <Image
           style={{width: '100%', borderRadius: wp(2.1), height: '100%'}}
-          source={appImages.bannerAds}
+          source={{uri:receivedData?.image}}
         />
       </View>
 
@@ -239,7 +244,7 @@ export default function BannerDetails({navigation}) {
        </Text>
 
        <Text style={{color:'#646464',fontFamily:'Inter-Medium',fontSize:hp(1.5)}}>
-       09/12/2023
+       {receivedData?.startdate}
        </Text>
       </View>
 
@@ -249,7 +254,7 @@ export default function BannerDetails({navigation}) {
        </Text>
 
        <Text style={{color:'#646464',fontFamily:'Inter-Medium',fontSize:hp(1.5)}}>
-       09/12/2023
+        {receivedData?.enddate}
        </Text>
       </View>
 
@@ -258,7 +263,9 @@ export default function BannerDetails({navigation}) {
        <Link/>
 
        <Text style={{ marginLeft:wp(2.5),color:'#646464',fontFamily:'Inter-Regular',fontSize:hp(1.6)}}>
-       http:/?www.sample.org?head http:/?www.sample{'\n'}.org?head
+      {/*  http:/?www.sample.org?head http:/?www.sample{'\n'}.org?head */}
+
+      {receivedData?.banner_link}
        </Text>
       </View>
 

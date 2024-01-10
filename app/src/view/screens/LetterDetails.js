@@ -15,7 +15,6 @@ import React, {useState, useRef, useEffect} from 'react';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import Entypo from 'react-native-vector-icons/Entypo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import {Button, Divider, TextInput} from 'react-native-paper';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import PlusPost from '../../assets/svg/PlusPost.svg';
@@ -296,7 +295,7 @@ export default function LetterDetails({navigation, route}) {
             height: hp(10),
             //borderWidth: 3,
           }}>
-          <View
+         { receivedData?.userimage!==null || receivedData?.userimage!==undefined ?  <View
             style={{
               //borderWidth: 3,
               height: hp(8),
@@ -304,7 +303,7 @@ export default function LetterDetails({navigation, route}) {
               borderRadius: wp(3),
             }}>
             <Image
-              source={appImages.topSearches1}
+              source={{uri:receivedData?.userimage}}
               style={{
                 width: '100%',
                 height: '100%',
@@ -312,7 +311,14 @@ export default function LetterDetails({navigation, route}) {
                 resizeMode: 'cover',
               }}
             />
-          </View>
+          </View>:
+           <MaterialCommunityIcons
+           style={{marginTop: hp(0.5)}}
+           name={'account-circle'}
+           size={35}
+           color={'#FACA4E'}
+         />
+          }
 
           <View style={{marginLeft: wp(2.5)}}>
             <Approved width={20} height={20} />
