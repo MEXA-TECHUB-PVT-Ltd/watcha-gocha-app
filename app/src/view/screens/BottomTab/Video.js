@@ -704,7 +704,7 @@ export default function Video({navigation}) {
           </View>
         </View>
 
-        <TouchableOpacity
+        <View
           onPress={() => navigation.navigate('ViewVideo')}
           style={{marginTop: hp(1.5), height: hp(23)}}>
           <Text
@@ -761,7 +761,7 @@ export default function Video({navigation}) {
               </>
             )}
           </View>
-        </TouchableOpacity>
+        </View>
 
         <View style={{marginTop: hp(2.1), height: hp(23)}}>
           <Text

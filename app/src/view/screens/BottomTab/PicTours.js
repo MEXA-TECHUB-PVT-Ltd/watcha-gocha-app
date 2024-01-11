@@ -554,8 +554,8 @@ export default function PicTours({navigation}) {
         </View>
         <View
           style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(18)}}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('PicDetails')}
+          <View
+            onPress={() => console.log("TOP DETAILS", dataTopVideos)}
             style={{
               width: wp(35),
               marginLeft: wp(2.5),
@@ -593,14 +593,14 @@ export default function PicTours({navigation}) {
                 style={{
                   fontSize: hp(1.6),
                   fontFamily: 'Inter',
-                  color: 'black',
+                  color: '#FACA4E',
                   fontWeight: '700',
                 }}>
                  {dataTopVideos?.pic_category_name}
               </Text>
             </View>
-          </TouchableOpacity>
-
+          </View>
+          
           <View style={{marginTop: hp(0.8), marginLeft: wp(3), width: '35%'}}>
             
             <Text

@@ -374,6 +374,18 @@ export default function ViewBanners({navigation}) {
         style={{position: 'absolute', bottom: 1, right: 25}}>
         <Add />
       </TouchableOpacity>
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {loading && <ActivityIndicator size="large" color="#FACA4E" />}
+      </View>
     </View>
   );
 }

@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import React, {useState, useRef, useMemo, useCallback, useEffect} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import Back from '../../assets/svg/back.svg';
 
@@ -307,18 +308,26 @@ export default function Conversation({navigation, route}) {
             justifyContent: 'space-between',
             alignSelf: 'center',
           }}>
-          <TouchableOpacity style={{}}>
+         { receivedData?.userimage!==null? <TouchableOpacity style={{}}>
             <Image
-              source={appImages.profileImg}
+              source={{uri:receivedData?.userimage}}
               style={styles.profileImgs}
               resizeMode="contain"
             />
-          </TouchableOpacity>
+          </TouchableOpacity>: 
+          <TouchableOpacity style={{}}>
+         <MaterialCommunityIcons
+           style={{marginTop: hp(0.5)}}
+           name={'account-circle'}
+           size={35}
+           color={'#FACA4E'}
+         />
+        </TouchableOpacity>}
 
           <Text
             style={{
               color: '#1E2022',
-              marginLeft: wp(1),
+              marginLeft: wp(-10),
               fontFamily: 'Inter-Bold',
               fontSize: hp(2.1),
             }}>
@@ -386,7 +395,7 @@ export default function Conversation({navigation, route}) {
           alignItems: 'center',
           height: hp(8),
         }}>
-        <TouchableOpacity
+      {/*   <TouchableOpacity
           style={{
             height: hp(8),
             justifyContent: 'center',
@@ -394,7 +403,7 @@ export default function Conversation({navigation, route}) {
             width: wp(14),
           }}>
           <SmileEmoji />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <TextInput
           placeholderTextColor={'#848484'}

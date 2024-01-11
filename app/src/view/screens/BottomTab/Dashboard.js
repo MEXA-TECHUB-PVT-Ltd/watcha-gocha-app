@@ -93,6 +93,25 @@ export default function Dashboard({navigation, route}) {
 
   const [isLoading, setIsLoading] = useState(true);
 
+  const [aLoader, setAloader] = useState(true);
+
+  //-----------------------------------------------\\
+
+  useEffect(() => {
+    // Set loading to false after 50 seconds
+    const loaderTimeout = setTimeout(() => {
+      setAloader(false);
+    }, 35000);
+
+    // Clear the loader timeout when component unmounts
+    return () => clearTimeout(loaderTimeout);
+  }, []); // Empty dependency array ensures this effect runs once on mount
+
+
+
+  //--------------------------------------------------\\
+
+
   const [flatListKey, setFlatListKey] = useState(Date.now()); // Add a key for the FlatList
 
   useEffect(() => {
@@ -115,6 +134,27 @@ export default function Dashboard({navigation, route}) {
   }, []);
 
   //-------------- Use Effect-------------------\\
+
+  useEffect(() => {
+    const topSixItems = dataApps.slice(0, 6);
+    console.log('APPS CALLED');    
+    // Save topSixItems directly to AsyncStorage whenever it changes
+    const saveTopData = async () => {
+      try {
+        const updatedTopData = topSixItems.map(item => ({
+          ...item,
+          count: 2, // Set count to 2 for each item
+        }));
+        await AsyncStorage.setItem('topData', JSON.stringify(updatedTopData));
+        setTopData(updatedTopData); // Update the state with updatedTopData
+      } catch (error) {
+        console.error('Error saving top data to AsyncStorage:', error);
+      }
+    };
+    saveTopData();
+  }, [dataApps]); // Run this effect whenever dataApps changes
+  
+
 
   useEffect(() => {
     if (isFocused) {
@@ -597,7 +637,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
     // Render the item only if count is equal to 2
     if (item.count >= 2) {
       return (
-        <View style={{height: hp(6.5)}}>
+        <View style={{height: hp(6.5), padding:5}}>
           <Image
             style={{width: wp(10), height: hp(5)}}
             resizeMode="contain"
@@ -2743,7 +2783,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
 
   //--------------------PIC TOURS ----------------------------\\
 
-  const [selectedItemPicsId, setSelectedItemPicsId] = useState(9);
+  const [selectedItemPicsId, setSelectedItemPicsId] = useState(5);
 
   const [imagePicInfo, setImagePicInfo] = useState(null);
 
@@ -3463,7 +3503,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
   //----------------------------------------------------------------\\
 
   return (
-    <View style={styles.container}>
+    <View  pointerEvents="auto"  style={aLoader?styles.containerBlur:styles.container}>
       <StatusBar
         translucent={true}
         backgroundColor="transparent"
@@ -4113,7 +4153,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 style={{
                   fontSize: hp(2.1),
                   fontFamily: 'Inter',
-                  color: '#FFFFFF',
+                  color: '#FACA4E',
                   fontWeight: '700',
                 }}>
                 {dataTopVideos?.name}
@@ -4457,8 +4497,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
         </View>
         <View
           style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(18)}}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('PicDetails')}
+          <View
             style={{
               width: wp(35),
               marginLeft: wp(2.5),
@@ -4502,7 +4541,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 {dataToppics?.pic_category_name}
               </Text>
             </View>
-          </TouchableOpacity>
+          </View>
 
           <View style={{marginTop: hp(0.8), marginLeft: wp(3), width: '35%'}}>
             <Text
@@ -5012,6 +5051,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
             source={appImages.bannerAds}
           />
         </View>
+      
       </ScrollView>
 
       <RBSheet
@@ -5091,6 +5131,19 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
           </TouchableOpacity>
         </View>
       </RBSheet>
+
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {aLoader && <ActivityIndicator size="large" color="#FACA4E" />}
+      </View>
     </View>
   );
 }
@@ -5100,6 +5153,10 @@ const styles = StyleSheet.create({
     flex: 1,
     //marginHorizontal: wp(3),
     backgroundColor: 'white',
+  },
+  containerBlur:{
+    flex: 1,
+    backgroundColor: 'rgba(234,233,238)',
   },
   searchBar: {
     height: hp(5.9),

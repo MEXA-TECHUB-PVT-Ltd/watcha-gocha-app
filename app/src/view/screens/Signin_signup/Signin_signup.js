@@ -3,8 +3,10 @@ import {
   SafeAreaView,
   StyleSheet,
   Dimensions,
+  Platform,
   ScrollView,
   View,
+  KeyboardAvoidingView,
   FlatList,
   Image,
   Text,
@@ -99,17 +101,12 @@ const App = ({navigation}) => {
 
   const [token, setToken] = useState('');
 
-
   const [snackbarVisibleChecked, setSnackbarVisibleChecked] = useState(false);
-
 
   const [snackbarCorrectVisible, setSnackbarCorrectVisible] = useState(false);
 
-
   useEffect(() => {
-
-    getUserID()
-
+    getUserID();
   }, []);
 
   const getUserID = async () => {
@@ -117,7 +114,7 @@ const App = ({navigation}) => {
       const result = await AsyncStorage.getItem('UserToken');
       if (result !== null) {
         setToken(result);
-        console.log("Token", result);
+        console.log('Token', result);
 
         console.log('user id retrieved:', result);
       }
@@ -284,8 +281,8 @@ const App = ({navigation}) => {
       if (isChecked === true) {
         handleSignup();
       } else {
-        console.log("NICED")
-        handleUpdatePasswordChecked()
+        console.log('NICED');
+        handleUpdatePasswordChecked();
       }
       //navigation.navigate('Profile_image');
       //   setIsLoading(true);
@@ -412,7 +409,7 @@ const App = ({navigation}) => {
           username: username,
           password: signup_pass,
           confirmPassword: signup_cpass,
-          device_id:token,
+          device_id: token,
           role: 'user',
         }),
       });
@@ -467,9 +464,9 @@ const App = ({navigation}) => {
       setsignup_cpass('');
       setusername('');
 
-      //navigation.navigate("Profile_image");
+      navigation.navigate('Profile_image');
 
-      navigation.navigate('BottomTabNavigation');
+      //navigation.navigate('BottomTabNavigation');
 
       // navigation.navigate('SelectGender');
     } catch (error) {
@@ -650,217 +647,207 @@ const App = ({navigation}) => {
       navigation.navigate('BottomTabNavigation');
     }, 2000);
   };
-
+  const keyboardVerticalOffset = Platform.OS === 'ios' ? 40 : 0;
   return (
-    <ScrollView style={styles.bg} contentContainerStyle={{flexGrow: 1}}>
-
-<CustomSnackbar
-        message={'Alert!'}
-        messageDescription={'This Email Is Already In Use'}
-        onDismiss={dismissSnackbar} // Make sure this function is defined
-        visible={snackbarVisible}
-      />
-
-      <CustomSnackbar
-        message={'Alert!'}
-        messageDescription={'Please Agree With Terms & Condition'}
-        onDismiss={dismissSnackbarChecked} // Make sure this function is defined
-        visible={snackbarVisibleChecked}
-      />
-
-      <CustomSnackbar
-        message={'Alert!'}
-        messageDescription={'Wrong Email Or Password'}
-        onDismiss={dismissCorrectSnackbar} // Make sure this function is defined
-        visible={snackbarCorrectVisible}
-      />
-      <StatusBar barStyle={'dark-content'} backgroundColor={'#FACA4E'} />
-      <View style={styles.mainv}>
-        <Image
-          source={appImages.logo}
-          style={{width: 280, height: 80, marginTop: '5%'}}
-          resizeMode="contain"
-        />
-
-        <SwitchSelector
-          options={options}
-          initial={0}
-          hasPadding
-          textColor={'#232323'}
-          textStyle={{
-            fontSize: 14,
-            fontWeight: 'bold',
-          }}
-          buttonStyle={{
-            height: 120, // Adjust the height of the switch button as needed
-            borderRadius: 20, // Match the borderRadius with the container's borderRadius
-          }}
-          style={{
-            marginTop: '8%',
-            width: '90%',
-            borderRadius: 20,
-            fontWeight: 'bold',
-          }} // Adjust the height value as needed
-          selectedColor={'#333333'}
-          buttonColor={'#FFFFFF'}
-          backgroundColor={'#FACA4E'}
-          borderColor={'#EEF1F6'}
-          bold={true}
-          height={50}
-          valuePadding={5}
-          onPress={value => {
-            setcheck(value);
-          }}
-        />
-        {check == 0 ? (
-          <Text
-            style={{
-              color: '#9597A6',
-              fontSize: wp(4),
-              marginVertical: '5%',
-              fontFamily: 'Inter-Medium',
-            }}>
-            Please sign in to access your account.
-          </Text>
-        ) : (
-          <Text
-            style={{
-              color: '#9597A6',
-              fontSize: wp(4),
-              marginVertical: '5%',
-              fontFamily: 'Inter-Medium',
-            }}>
-            Let's begin by creating your account.
-          </Text>
-        )}
-
-        {check == 0 ? (
-          <View style={styles.v1}>
-            <TextInput
-              mode="outlined"
-              label="Email Address"
-              onChangeText={text => setsignin_email(text)}
-              style={styles.ti}
-              outlineColor="#0000001F"
-              placeholderTextColor={'#646464'}
-              activeOutlineColor="#FACA4E"
-              autoCapitalize="none"
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              left={
-                <TextInput.Icon
-                  icon={() => (
-                    <MaterialCommunityIcons
-                      name={'email-outline'}
-                      size={23}
-                      color={
-                        isTextInputActive == true ? '#FACA4E' : '#64646485'
-                      }
-                    />
-                  )}
-                />
-              }
-              // left={isTextInputActive ? <Oemail /> : <Gemail />}
+    <>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{flex: 1}}>
+        <ScrollView
+          style={styles.bg}
+          contentContainerStyle={{flexGrow: 1, justifyContent: 'flex-end'}}>
+          <StatusBar barStyle={'dark-content'} backgroundColor={'#FACA4E'} />
+          <View style={styles.mainv}>
+            <Image
+              source={appImages.logo}
+              style={{width: 280, height: 80, marginTop: '5%'}}
+              resizeMode="contain"
             />
-            {emailSignInError === true ? (
+
+            <SwitchSelector
+              options={options}
+              initial={0}
+              hasPadding
+              textColor={'#232323'}
+              textStyle={{
+                fontSize: 14,
+                fontWeight: 'bold',
+              }}
+              buttonStyle={{
+                height: 120, // Adjust the height of the switch button as needed
+                borderRadius: 20, // Match the borderRadius with the container's borderRadius
+              }}
+              style={{
+                marginTop: '8%',
+                width: '90%',
+                borderRadius: 20,
+                fontWeight: 'bold',
+              }} // Adjust the height value as needed
+              selectedColor={'#333333'}
+              buttonColor={'#FFFFFF'}
+              backgroundColor={'#FACA4E'}
+              borderColor={'#EEF1F6'}
+              bold={true}
+              height={50}
+              valuePadding={5}
+              onPress={value => {
+                setcheck(value);
+              }}
+            />
+
+            {check == 0 ? (
               <Text
                 style={{
-                  color: 'red',
-                  marginLeft: widthPercentageToDP(10),
-                  marginTop: heightPercentageToDP(1.8),
-                  fontSize: heightPercentageToDP(1.8),
-                }}>
-                Please Enter Your Email!
-              </Text>
-            ) : null}
-
-            {emailNotCorrect === true ? (
-              <Text
-                style={{
-                  color: 'red',
-                  marginLeft: widthPercentageToDP(10),
-                  marginTop: heightPercentageToDP(1.8),
-                  fontSize: heightPercentageToDP(1.8),
-                }}>
-                Please Enter Correct Email!
-              </Text>
-            ) : null}
-
-            <View>
-              <TextInput
-                mode="outlined"
-                label="Password"
-                onChangeText={text => setsignin_pass(text)}
-                style={styles.ti}
-                placeholderTextColor={'#646464'}
-                outlineColor="#0000001F"
-                activeOutlineColor="#FACA4E"
-                secureTextEntry={signin_ShowPassword}
-                onFocus={handleFocus1}
-                onBlur={handleBlur1}
-                left={
-                  <TextInput.Icon
-                    icon={() => (
-                      <MaterialCommunityIcons
-                        name={'lock-outline'}
-                        size={23}
-                        color={
-                          isTextInputActive1 == true ? '#FACA4E' : '#64646485'
-                        }
-                      />
-                    )}
-                  />
-                }
-              />
-              <TouchableOpacity
-                onPress={handleTogglePasswordVisibility}
-                style={[
-                  styles.hs,
-                  {
-                    borderColor: signin_ShowPassword ? '#646464' : '#FACA4E',
-                    backgroundColor: signin_ShowPassword
-                      ? '#64646412'
-                      : '#FF660012',
-                  },
-                ]}>
-                <Text
-                  style={[
-                    styles.txt,
-                    {color: signin_ShowPassword ? '#646464' : '#FACA4E'},
-                  ]}>
-                  {signin_ShowPassword ? 'Show' : 'Hide'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {passwordSignInError === true ? (
-              <Text
-                style={{
-                  color: 'red',
-                  marginLeft: widthPercentageToDP(10),
-                  marginTop: heightPercentageToDP(1.8),
-                  fontSize: heightPercentageToDP(1.8),
-                }}>
-                Please Enter Your Password!
-              </Text>
-            ) : null}
-
-            <TouchableOpacity
-              onPress={() => navigation.navigate('ForgetPassword')}>
-              <Text
-                style={{
-                  color: '#FACA4E',
+                  color: '#9597A6',
                   fontSize: wp(4),
-                  fontFamily: 'Inter-Bold',
-                  marginRight: '5%',
-                  alignSelf: 'flex-end',
-                  marginTop: '10%',
+                  marginVertical: '5%',
+                  fontFamily: 'Inter-Medium',
                 }}>
-                Forgot Password?
+                Please sign in to access your account.
               </Text>
-            </TouchableOpacity>
+            ) : (
+              <Text
+                style={{
+                  color: '#9597A6',
+                  fontSize: wp(4),
+                  marginVertical: '5%',
+                  fontFamily: 'Inter-Medium',
+                }}>
+                Let's begin by creating your account.
+              </Text>
+            )}
 
-            {/*   <TouchableOpacity onPress={() => handleSignInSkipForNow()}>
+            {check == 0 ? (
+              <View style={styles.v1}>
+                <TextInput
+                  mode="outlined"
+                  label="Email Address"
+                  onChangeText={text => setsignin_email(text)}
+                  style={styles.ti}
+                  outlineColor="#0000001F"
+                  placeholderTextColor={'#646464'}
+                  activeOutlineColor="#FACA4E"
+                  autoCapitalize="none"
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
+                  left={
+                    <TextInput.Icon
+                      icon={() => (
+                        <MaterialCommunityIcons
+                          name={'email-outline'}
+                          size={23}
+                          color={
+                            isTextInputActive == true ? '#FACA4E' : '#64646485'
+                          }
+                        />
+                      )}
+                    />
+                  }
+                  // left={isTextInputActive ? <Oemail /> : <Gemail />}
+                />
+                {emailSignInError === true ? (
+                  <Text
+                    style={{
+                      color: 'red',
+                      marginLeft: widthPercentageToDP(10),
+                      marginTop: heightPercentageToDP(1.8),
+                      fontSize: heightPercentageToDP(1.8),
+                    }}>
+                    Please Enter Your Email!
+                  </Text>
+                ) : null}
+
+                {emailNotCorrect === true ? (
+                  <Text
+                    style={{
+                      color: 'red',
+                      marginLeft: widthPercentageToDP(10),
+                      marginTop: heightPercentageToDP(1.8),
+                      fontSize: heightPercentageToDP(1.8),
+                    }}>
+                    Please Enter Correct Email!
+                  </Text>
+                ) : null}
+
+                <View>
+                  <TextInput
+                    mode="outlined"
+                    label="Password"
+                    onChangeText={text => setsignin_pass(text)}
+                    style={styles.ti}
+                    placeholderTextColor={'#646464'}
+                    outlineColor="#0000001F"
+                    activeOutlineColor="#FACA4E"
+                    secureTextEntry={signin_ShowPassword}
+                    onFocus={handleFocus1}
+                    onBlur={handleBlur1}
+                    left={
+                      <TextInput.Icon
+                        icon={() => (
+                          <MaterialCommunityIcons
+                            name={'lock-outline'}
+                            size={23}
+                            color={
+                              isTextInputActive1 == true
+                                ? '#FACA4E'
+                                : '#64646485'
+                            }
+                          />
+                        )}
+                      />
+                    }
+                  />
+                  <TouchableOpacity
+                    onPress={handleTogglePasswordVisibility}
+                    style={[
+                      styles.hs,
+                      {
+                        borderColor: signin_ShowPassword
+                          ? '#646464'
+                          : '#FACA4E',
+                        backgroundColor: signin_ShowPassword
+                          ? '#64646412'
+                          : '#FF660012',
+                      },
+                    ]}>
+                    <Text
+                      style={[
+                        styles.txt,
+                        {color: signin_ShowPassword ? '#646464' : '#FACA4E'},
+                      ]}>
+                      {signin_ShowPassword ? 'Show' : 'Hide'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                {passwordSignInError === true ? (
+                  <Text
+                    style={{
+                      color: 'red',
+                      marginLeft: widthPercentageToDP(10),
+                      marginTop: heightPercentageToDP(1.8),
+                      fontSize: heightPercentageToDP(1.8),
+                    }}>
+                    Please Enter Your Password!
+                  </Text>
+                ) : null}
+
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('ForgetPassword')}>
+                  <Text
+                    style={{
+                      color: '#FACA4E',
+                      fontSize: wp(4),
+                      fontFamily: 'Inter-Bold',
+                      marginRight: '5%',
+                      alignSelf: 'flex-end',
+                      marginTop: '10%',
+                    }}>
+                    Forgot Password?
+                  </Text>
+                </TouchableOpacity>
+
+                {/*   <TouchableOpacity onPress={() => handleSignInSkipForNow()}>
               <Text
                 style={{
                   color: '#FACA4E',
@@ -875,272 +862,285 @@ const App = ({navigation}) => {
               </Text>
             </TouchableOpacity> */}
 
-            <View style={{marginTop: '25%', alignSelf: 'center'}}>
-              <CustomButton
-                title="Sign In"
-                load={false}
-                // checkdisable={inn == '' && cm == '' ? true : false}
-                customClick={() => {
-                  goTOScreen();
+                <View style={{marginTop: '25%', alignSelf: 'center'}}>
+                  <CustomButton
+                    title="Sign In"
+                    load={false}
+                    // checkdisable={inn == '' && cm == '' ? true : false}
+                    customClick={() => {
+                      goTOScreen();
 
-                  //navigation.navigate('BottomTabNavigation')
-                }}
-              />
-            </View>
-          </View>
-        ) : (
-          <View style={styles.v1}>
-            <TextInput
-              mode="outlined"
-              label="Username"
-              onChangeText={text => setusername(text)}
-              value={username}
-              style={styles.ti}
-              outlineColor="#0000001F"
-              placeholderTextColor={'#646464'}
-              activeOutlineColor="#FACA4E"
-              autoCapitalize="none"
-              onFocus={handleFocus2}
-              onBlur={handleBlur2}
-              left={
-                <TextInput.Icon
-                  icon={() => (
-                    <MaterialCommunityIcons
-                      name={'account-outline'}
-                      size={23}
-                      color={
-                        isTextInputActive2 == true ? '#FACA4E' : '#64646485'
-                      }
-                    />
-                  )}
-                />
-              }
-            />
-
-            {signUpUserNameError === true ? (
-              <Text
-                style={{
-                  color: 'red',
-                  marginLeft: widthPercentageToDP(10),
-                  marginTop: heightPercentageToDP(1.8),
-                  fontSize: heightPercentageToDP(1.8),
-                }}>
-                Please Enter Your User name!
-              </Text>
-            ) : null}
-
-            <TextInput
-              mode="outlined"
-              label="Email Address"
-              onChangeText={text => setsignup_email(text)}
-              style={styles.ti}
-              outlineColor="#0000001F"
-              placeholderTextColor={'#646464'}
-              activeOutlineColor="#FACA4E"
-              autoCapitalize="none"
-              onFocus={handleFocus3}
-              onBlur={handleBlur3}
-              left={
-                <TextInput.Icon
-                  icon={() => (
-                    <MaterialCommunityIcons
-                      name={'email-outline'}
-                      size={23}
-                      color={
-                        isTextInputActive3 == true ? '#FACA4E' : '#64646485'
-                      }
-                    />
-                  )}
-                />
-              }
-              // left={isTextInputActive ? <Oemail /> : <Gemail />}
-            />
-
-            {signUpEmailError === true ? (
-              <Text
-                style={{
-                  color: 'red',
-                  marginLeft: widthPercentageToDP(10),
-                  marginTop: heightPercentageToDP(1.8),
-                  fontSize: heightPercentageToDP(1.8),
-                }}>
-                Please Enter Your Email Address!
-              </Text>
-            ) : null}
-
-            {emailNotCorrectSignUp === true ? (
-              <Text
-                style={{
-                  color: 'red',
-                  marginLeft: widthPercentageToDP(10),
-                  marginTop: heightPercentageToDP(1.8),
-                  fontSize: heightPercentageToDP(1.8),
-                }}>
-                Please Enter Correct Email!
-              </Text>
-            ) : null}
-
-            <View>
-              <TextInput
-                mode="outlined"
-                label="Password"
-                onChangeText={text => setsignup_pass(text)}
-                style={styles.ti}
-                placeholderTextColor={'#646464'}
-                outlineColor="#0000001F"
-                activeOutlineColor="#FACA4E"
-                secureTextEntry={signin_ShowPassword1}
-                onFocus={handleFocus4}
-                onBlur={handleBlur4}
-                left={
-                  <TextInput.Icon
-                    icon={() => (
-                      <MaterialCommunityIcons
-                        name={'lock-outline'}
-                        size={23}
-                        color={
-                          isTextInputActive4 == true ? '#FACA4E' : '#64646485'
-                        }
-                      />
-                    )}
+                      //navigation.navigate('BottomTabNavigation')
+                    }}
                   />
-                }
-              />
+                </View>
+              </View>
+            ) : (
+              <View style={styles.v1}>
+                <TextInput
+                  mode="outlined"
+                  label="Username"
+                  onChangeText={text => setusername(text)}
+                  value={username}
+                  style={styles.ti}
+                  outlineColor="#0000001F"
+                  placeholderTextColor={'#646464'}
+                  activeOutlineColor="#FACA4E"
+                  autoCapitalize="none"
+                  onFocus={handleFocus2}
+                  onBlur={handleBlur2}
+                  left={
+                    <TextInput.Icon
+                      icon={() => (
+                        <MaterialCommunityIcons
+                          name={'account-outline'}
+                          size={23}
+                          color={
+                            isTextInputActive2 == true ? '#FACA4E' : '#64646485'
+                          }
+                        />
+                      )}
+                    />
+                  }
+                />
 
-              {signUpPasswordError === true ? (
-                <Text
-                  style={{
-                    color: 'red',
-                    marginLeft: widthPercentageToDP(10),
-                    marginTop: heightPercentageToDP(1.8),
-                    fontSize: heightPercentageToDP(1.8),
-                  }}>
-                  Please Enter Your Password
-                </Text>
-              ) : null}
+                {signUpUserNameError === true ? (
+                  <Text
+                    style={{
+                      color: 'red',
+                      marginLeft: widthPercentageToDP(10),
+                      marginTop: heightPercentageToDP(1.8),
+                      fontSize: heightPercentageToDP(1.8),
+                    }}>
+                    Please Enter Your User name!
+                  </Text>
+                ) : null}
 
-              <TouchableOpacity
-                onPress={handleTogglePasswordVisibility1}
-                style={[
-                  styles.hs,
-                  {
-                    borderColor: signin_ShowPassword1 ? '#646464' : '#FACA4E',
-                    backgroundColor: signin_ShowPassword1
-                      ? '#64646412'
-                      : '#FF660012',
-                  },
-                ]}>
-                <Text
-                  style={[
-                    styles.txt,
-                    {color: signin_ShowPassword1 ? '#646464' : '#FACA4E'},
-                  ]}>
-                  {signin_ShowPassword1 ? 'Show' : 'Hide'}
-                </Text>
-              </TouchableOpacity>
-            </View>
+                <TextInput
+                  mode="outlined"
+                  label="Email Address"
+                  onChangeText={text => setsignup_email(text)}
+                  style={styles.ti}
+                  outlineColor="#0000001F"
+                  placeholderTextColor={'#646464'}
+                  activeOutlineColor="#FACA4E"
+                  autoCapitalize="none"
+                  onFocus={handleFocus3}
+                  onBlur={handleBlur3}
+                  left={
+                    <TextInput.Icon
+                      icon={() => (
+                        <MaterialCommunityIcons
+                          name={'email-outline'}
+                          size={23}
+                          color={
+                            isTextInputActive3 == true ? '#FACA4E' : '#64646485'
+                          }
+                        />
+                      )}
+                    />
+                  }
+                  // left={isTextInputActive ? <Oemail /> : <Gemail />}
+                />
 
-            <View>
-              <TextInput
-                mode="outlined"
-                label="Confirm Password"
-                onChangeText={text => setsignup_cpass(text)}
-                style={styles.ti}
-                placeholderTextColor={'#646464'}
-                outlineColor="#0000001F"
-                activeOutlineColor="#FACA4E"
-                secureTextEntry={signin_ShowPassword2}
-                onFocus={handleFocus5}
-                onBlur={handleBlur5}
-                left={
-                  <TextInput.Icon
-                    icon={() => (
-                      <MaterialCommunityIcons
-                        name={'lock-outline'}
-                        size={23}
-                        color={
-                          isTextInputActive5 == true ? '#FACA4E' : '#64646485'
-                        }
+                {signUpEmailError === true ? (
+                  <Text
+                    style={{
+                      color: 'red',
+                      marginLeft: widthPercentageToDP(10),
+                      marginTop: heightPercentageToDP(1.8),
+                      fontSize: heightPercentageToDP(1.8),
+                    }}>
+                    Please Enter Your Email Address!
+                  </Text>
+                ) : null}
+
+                {emailNotCorrectSignUp === true ? (
+                  <Text
+                    style={{
+                      color: 'red',
+                      marginLeft: widthPercentageToDP(10),
+                      marginTop: heightPercentageToDP(1.8),
+                      fontSize: heightPercentageToDP(1.8),
+                    }}>
+                    Please Enter Correct Email!
+                  </Text>
+                ) : null}
+
+                <View>
+                  <TextInput
+                    mode="outlined"
+                    label="Password"
+                    onChangeText={text => setsignup_pass(text)}
+                    style={styles.ti}
+                    placeholderTextColor={'#646464'}
+                    outlineColor="#0000001F"
+                    activeOutlineColor="#FACA4E"
+                    secureTextEntry={signin_ShowPassword1}
+                    onFocus={handleFocus4}
+                    onBlur={handleBlur4}
+                    left={
+                      <TextInput.Icon
+                        icon={() => (
+                          <MaterialCommunityIcons
+                            name={'lock-outline'}
+                            size={23}
+                            color={
+                              isTextInputActive4 == true
+                                ? '#FACA4E'
+                                : '#64646485'
+                            }
+                          />
+                        )}
                       />
-                    )}
+                    }
                   />
-                }
-              />
-              <TouchableOpacity
-                onPress={handleTogglePasswordVisibility2}
-                style={[
-                  styles.hs,
-                  {
-                    borderColor: signin_ShowPassword2 ? '#646464' : '#FACA4E',
-                    backgroundColor: signin_ShowPassword2
-                      ? '#64646412'
-                      : '#FF660012',
-                  },
-                ]}>
-                <Text
-                  style={[
-                    styles.txt,
-                    {color: signin_ShowPassword2 ? '#646464' : '#FACA4E'},
-                  ]}>
-                  {signin_ShowPassword2 ? 'Show' : 'Hide'}
-                </Text>
-              </TouchableOpacity>
 
-              {signUpConfirmPasswordError === true ? (
-                <Text
+                  {signUpPasswordError === true ? (
+                    <Text
+                      style={{
+                        color: 'red',
+                        marginLeft: widthPercentageToDP(10),
+                        marginTop: heightPercentageToDP(1.8),
+                        fontSize: heightPercentageToDP(1.8),
+                      }}>
+                      Please Enter Your Password
+                    </Text>
+                  ) : null}
+
+                  <TouchableOpacity
+                    onPress={handleTogglePasswordVisibility1}
+                    style={[
+                      styles.hs,
+                      {
+                        borderColor: signin_ShowPassword1
+                          ? '#646464'
+                          : '#FACA4E',
+                        backgroundColor: signin_ShowPassword1
+                          ? '#64646412'
+                          : '#FF660012',
+                      },
+                    ]}>
+                    <Text
+                      style={[
+                        styles.txt,
+                        {color: signin_ShowPassword1 ? '#646464' : '#FACA4E'},
+                      ]}>
+                      {signin_ShowPassword1 ? 'Show' : 'Hide'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View>
+                  <TextInput
+                    mode="outlined"
+                    label="Confirm Password"
+                    onChangeText={text => setsignup_cpass(text)}
+                    style={styles.ti}
+                    placeholderTextColor={'#646464'}
+                    outlineColor="#0000001F"
+                    activeOutlineColor="#FACA4E"
+                    secureTextEntry={signin_ShowPassword2}
+                    onFocus={handleFocus5}
+                    onBlur={handleBlur5}
+                    left={
+                      <TextInput.Icon
+                        icon={() => (
+                          <MaterialCommunityIcons
+                            name={'lock-outline'}
+                            size={23}
+                            color={
+                              isTextInputActive5 == true
+                                ? '#FACA4E'
+                                : '#64646485'
+                            }
+                          />
+                        )}
+                      />
+                    }
+                  />
+                  <TouchableOpacity
+                    onPress={handleTogglePasswordVisibility2}
+                    style={[
+                      styles.hs,
+                      {
+                        borderColor: signin_ShowPassword2
+                          ? '#646464'
+                          : '#FACA4E',
+                        backgroundColor: signin_ShowPassword2
+                          ? '#64646412'
+                          : '#FF660012',
+                      },
+                    ]}>
+                    <Text
+                      style={[
+                        styles.txt,
+                        {color: signin_ShowPassword2 ? '#646464' : '#FACA4E'},
+                      ]}>
+                      {signin_ShowPassword2 ? 'Show' : 'Hide'}
+                    </Text>
+                  </TouchableOpacity>
+
+                  {signUpConfirmPasswordError === true ? (
+                    <Text
+                      style={{
+                        color: 'red',
+                        marginLeft: widthPercentageToDP(10),
+                        marginTop: heightPercentageToDP(1.8),
+                        fontSize: heightPercentageToDP(1.8),
+                      }}>
+                      Please Enter Your Confirm Password
+                    </Text>
+                  ) : null}
+                </View>
+
+                <View></View>
+
+                <View
                   style={{
-                    color: 'red',
-                    marginLeft: widthPercentageToDP(10),
-                    marginTop: heightPercentageToDP(1.8),
-                    fontSize: heightPercentageToDP(1.8),
+                    flexDirection: 'row',
+                    marginLeft: widthPercentageToDP(7),
+                    marginTop: heightPercentageToDP(3),
+                    width: '100%',
                   }}>
-                  Please Enter Your Confirm Password
-                </Text>
-              ) : null}
-            </View>
+                  <TouchableOpacity
+                    style={
+                      isChecked
+                        ? styles.selectCheckBox
+                        : styles.unSelectCheckBox
+                    }
+                    onPress={
+                      () => handleCheckboxChange()
+                      // setChecked(!checked);
+                    }>
+                    {isChecked && (
+                      <Entypo name={'check'} size={15} color={'#FACA4E'} />
+                    )}
 
-            <View></View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                marginLeft: widthPercentageToDP(7),
-                marginTop: heightPercentageToDP(3),
-                width: '100%',
-              }}>
-              <TouchableOpacity
-                style={
-                  isChecked ? styles.selectCheckBox : styles.unSelectCheckBox
-                }
-                onPress={
-                  () => handleCheckboxChange()
-                  // setChecked(!checked);
-                }>
-                {isChecked && (
-                  <Entypo name={'check'} size={15} color={'#FACA4E'} />
-                )}
-
-                {/* {checked ? ( */}
-                {/* <Icon
+                    {/* {checked ? ( */}
+                    {/* <Icon
                   name="checkmark"
                   size={28}
                   color={AppColors.buttonColor}
                 /> */}
-                {/* ) : ( */}
+                    {/* ) : ( */}
 
-                {/* )} */}
-              </TouchableOpacity>
+                    {/* )} */}
+                  </TouchableOpacity>
 
-              <Text style={{marginLeft: wp(3)}}>Please check if you agree the following terms</Text>
-            </View>
+                  <Text style={{marginLeft: wp(3)}}>
+                    Please check if you agree the following terms
+                  </Text>
+                </View>
 
-            <View
-              style={{
-                marginTop: heightPercentageToDP(5),
-                height: heightPercentageToDP(30),
-                marginHorizontal: widthPercentageToDP(1),
-              }}>
-              <ScrollView
+                <View
+                  style={{
+                    marginTop: heightPercentageToDP(5),
+                    height: heightPercentageToDP(78),
+                    marginBottom: heightPercentageToDP(10),
+                    marginHorizontal: widthPercentageToDP(8),
+                  }}>
+                  {/*   <ScrollView
                 nestedScrollEnabled={true}
                 scrollToOverflowEnabled={true}
                 scrollEnabled={true}
@@ -1149,82 +1149,105 @@ const App = ({navigation}) => {
                 contentContainerStyle={{
                   verticalLine: false,
                   marginHorizontal: widthPercentageToDP(8),
-                }}>
-                <Text
-                  style={{
-                    marginTop: heightPercentageToDP(1),
-                    fontFamily: 'Inter',
-                    fontSize: heightPercentageToDP(1.8),
-                    lineHeight: heightPercentageToDP(2.1),
-                    color: 'black',
-                  }}>
-                  1. "Wotcha Gotcha" is a cutting-edge and highly integrated
-                  network attracting millions of users worldwide. Users,
-                  referred to as WotchaGotchers, hereby gain access to a range
-                  of features designed to enhance their mobile experience.{' '}
-                  {'\n\n'}
-                  2.WotchaGotchers can optimize their phone screen space by
-                  consolidating all other apps into the "Mass Apps" category
-                  within the Wotcha Gotcha app.
-                  {'\n\n'}
-                  3.Users have the flexibility to position the Wotcha Gotcha
-                  icon/app on the right or left upper corner, right or left
-                  lower corner, or at the center of their phone screen,
-                  providing a customizable and user-centric experience.
-                  {'\n\n'}
-                  4.Wotcha Gotchers can seamlessly use their favorite apps,
-                  including YouTube, WhatsApp, Meta, X, Instagram, Threads,
-                  Telegram, TikTok, and more, through the Wotcha Gotcha app
-                  without any disruption to their usual functionality.
-                  {'\n\n'}
-                  5.Users can explore captivating content across various
-                  categories such as Mass Apps, Video Mania, On News, Pic-Tour,
-                  Market Zone, and many others to come, ensuring a diverse and
-                  engaging experience.
-                  {'\n\n'}
-                  6.Wotcha Gotchers have the ability to rearrange the positions
-                  of Wotcha Gotcha categories, moving them top/down or
-                  vice-versa, allowing for personalized and intuitive
-                  navigation.
-                  {'\n\n'}
-                  7.The app is designed to accommodate user preferences,
-                  offering flexibility and control over the arrangement and
-                  usage of features to enhance the overall user experience.
-                </Text>
-              </ScrollView>
-            </View>
-
-            <View style={{marginTop: '25%', alignSelf: 'center'}}>
-              <CustomButton
-                title="Sign Up"
-                load={false}
-                // checkdisable={inn == '' && cm == '' ? true : false}
-                customClick={() => {
-                  goToScreen2();
-                }}
-              />
-            </View>
+                }}> */}
+                  <Text
+                    style={{
+                      marginTop: heightPercentageToDP(1),
+                      fontFamily: 'Inter',
+                      fontSize: heightPercentageToDP(1.8),
+                      lineHeight: heightPercentageToDP(2.1),
+                      color: 'black',
+                    }}>
+                    1. "Wotcha Gotcha" is a cutting-edge and highly integrated
+                    network attracting millions of users worldwide. Users,
+                    referred to as WotchaGotchers, hereby gain access to a range
+                    of features designed to enhance their mobile experience.{' '}
+                    {'\n\n'}
+                    2.WotchaGotchers can optimize their phone screen space by
+                    consolidating all other apps into the "Mass Apps" category
+                    within the Wotcha Gotcha app.
+                    {'\n\n'}
+                    3.Users have the flexibility to position the Wotcha Gotcha
+                    icon/app on the right or left upper corner, right or left
+                    lower corner, or at the center of their phone screen,
+                    providing a customizable and user-centric experience.
+                    {'\n\n'}
+                    4.Wotcha Gotchers can seamlessly use their favorite apps,
+                    including YouTube, WhatsApp, Meta, X, Instagram, Threads,
+                    Telegram, TikTok, and more, through the Wotcha Gotcha app
+                    without any disruption to their usual functionality.
+                    {'\n\n'}
+                    5.Users can explore captivating content across various
+                    categories such as Mass Apps, Video Mania, On News,
+                    Pic-Tour, Market Zone, and many others to come, ensuring a
+                    diverse and engaging experience.
+                    {'\n\n'}
+                    6.Wotcha Gotchers have the ability to rearrange the
+                    positions of Wotcha Gotcha categories, moving them top/down
+                    or vice-versa, allowing for personalized and intuitive
+                    navigation.
+                    {'\n\n'}
+                    7.The app is designed to accommodate user preferences,
+                    offering flexibility and control over the arrangement and
+                    usage of features to enhance the overall user experience.
+                  </Text>
+                  {/* </ScrollView> */}
+                </View>
+              </View>
+            )}
           </View>
-        )}
-      </View>
 
-      {isLoading && (
-        <View
-          style={{
-            position: 'absolute',
-            top: 0,
-            bottom: 0,
-            left: 0,
-            right: 0,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <ActivityIndicator size="large" color="#FACA4E" />
-        </View>
-      )}
+          {isLoading && (
+            <View
+              style={{
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <ActivityIndicator size="large" color="#FACA4E" />
+            </View>
+          )}
+        </ScrollView>
+        {check === 1 ? (
+          <View style={{position: 'absolute', bottom: 0, alignSelf: 'center'}}>
+            <CustomButton
+              title="Sign Up"
+              load={false}
+              customClick={() => {
+                goToScreen2();
+              }}
+            />
+          </View>
+        ) : null}
 
-      
-    </ScrollView>
+        <CustomSnackbar
+          message={'Alert!'}
+          messageDescription={
+            'Password is not matching or email is already in use!'
+          }
+          onDismiss={dismissSnackbar} // Make sure this function is defined
+          visible={snackbarVisible}
+        />
+
+        <CustomSnackbar
+          message={'Alert!'}
+          messageDescription={'Please Agree With Terms & Condition'}
+          onDismiss={dismissSnackbarChecked} // Make sure this function is defined
+          visible={snackbarVisibleChecked}
+        />
+
+        <CustomSnackbar
+          message={'Alert!'}
+          messageDescription={'Wrong Email Or Password'}
+          onDismiss={dismissCorrectSnackbar} // Make sure this function is defined
+          visible={snackbarCorrectVisible}
+        />
+      </KeyboardAvoidingView>
+    </>
   );
 };
 

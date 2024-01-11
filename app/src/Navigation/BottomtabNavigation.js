@@ -82,7 +82,7 @@ const BottomtabNavigation = () => {
         options={({focused}) => ({
           tabBarIcon: ({focused}) =>
             focused ? (
-              <CategoryActive />
+              <CategoryActive width={23} height={23} />
             ) : (
               <CategoryInActive width={23} height={23} />
             ),

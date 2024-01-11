@@ -83,17 +83,6 @@ export default function Categories({navigation}) {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    const copyTopData=()=>{
-      const topSixItems = dataApps.slice(0, 6);
-      console.log("APPS CALLED")
-      setTopData(topSixItems);
-    }
-
-    copyTopData()
-  }, [dataApps]);
-
- 
 
   //-------------- Use Effect-------------------\\
 
@@ -177,6 +166,32 @@ export default function Categories({navigation}) {
   }, [topData]); // Run this effect whenever topData changes
 
   //---------------------------------------------\\
+
+  //----------------NEW FUNCTION ------------------\\
+
+  useEffect(() => {
+    const topSixItems = dataApps.slice(0, 6);
+    console.log('APPS CALLED');    
+    // Save topSixItems directly to AsyncStorage whenever it changes
+    const saveTopData = async () => {
+      try {
+        const updatedTopData = topSixItems.map(item => ({
+          ...item,
+          count: 2, // Set count to 2 for each item
+        }));
+        await AsyncStorage.setItem('topData', JSON.stringify(updatedTopData));
+        setTopData(updatedTopData); // Update the state with updatedTopData
+      } catch (error) {
+        console.error('Error saving top data to AsyncStorage:', error);
+      }
+    };
+  
+    saveTopData();
+  }, [dataApps]); // Run this effect whenever dataApps changes
+  
+
+
+  //-----------------------------------------------\\
 
   //------------------Use Effect Filtered Apps----------------\\
 
@@ -579,7 +594,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
     // Render the item only if count is equal to 2
     if (item.count >= 2) {
       return (
-        <View style={{height: hp(6.5)}}>
+        <View style={{height: hp(6.5), padding:5}}>
           <Image
             style={{width: wp(10), height: hp(5)}}
             resizeMode="contain"
@@ -865,7 +880,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
             marginTop: hp(2),
             marginLeft: wp(3),
             height: hp(20),
-            width: wp(53),
+            width: wp(60),
           }}>
           {isLoading === true ? (
             <View

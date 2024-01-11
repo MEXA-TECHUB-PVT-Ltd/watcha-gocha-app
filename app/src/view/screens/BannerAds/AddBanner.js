@@ -822,6 +822,8 @@ export default function AddBanner({navigation}) {
         }}>
         {loading && <ActivityIndicator size="large" color="#FACA4E" />}
       </View>
+
+      
     </ScrollView>
   );
 }
