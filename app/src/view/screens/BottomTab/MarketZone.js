@@ -601,7 +601,7 @@ export default function MarketZone({navigation}) {
         <View
           style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(16)}}>
           <View style={{width: wp(43), height: '100%', borderRadius: wp(5)}}>
-            <Image
+            {dataTopVideos.length===0?(<Image
               style={{
                 position: 'absolute',
                 top: 0,
@@ -614,21 +614,40 @@ export default function MarketZone({navigation}) {
                 resizeMode: 'cover',
               }}
               source={appImages.galleryPlaceHolder}
+
+            />):(
+              <Image
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                zIndex: 1, // Ensure it's on top of other elements
+                //flex: 1,
+                width: '100%',
+                height: '100%',
+                borderRadius: wp(3),
+                resizeMode: 'cover',
+              }}
+              source={{uri:dataTopVideos?.images[0]?.image}}
+
             />
+            )}
             <View
               style={{
                 position: 'absolute',
-                top: hp(14),
+                top: hp(12),
                 left: 7,
                 //height: hp(3),
                 //width: wp(21),
                 //borderRadius: wp(3),
-                //backgroundColor: '#FACA4E',
+                //backgroundColor: '',
                 justifyContent: 'center',
                 alignItems: 'center',
                 zIndex: 2, // Ensure it's on top
               }}>
               <Text
+              ellipsizeMode='tail'
+              numberOfLines={1}
                 style={{
                   fontSize: hp(2.5),
                   fontFamily: 'Inter-Medium',

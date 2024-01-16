@@ -85,24 +85,26 @@ export default function ProfileSettings({navigation}) {
     logOut();
   }
 
-  const logOut = async  () => {
+  
+  const logOut = async () => {
     ref_RBSheetLogout.current.close();
+
+    console.log("KEYS CALLED");
     try {
-      // Get the 'UserToken' key
-      const userTokenKey = 'UserToken';
-      const userToken = await AsyncStorage.getItem(userTokenKey);
+      // Keys to exclude from removal
+      const keysToExclude = ['UserToken', 'favouriteData'];
   
       // Get all keys in AsyncStorage
       const keys = await AsyncStorage.getAllKeys();
   
-      // Remove all items corresponding to the retrieved keys, except 'UserToken'
-      const filteredKeys = keys.filter(key => key !== userTokenKey);
+      // Remove all items corresponding to the retrieved keys, except excluded keys
+      const filteredKeys = keys.filter(key => !keysToExclude.includes(key));
       await AsyncStorage.multiRemove(filteredKeys);
   
       // Check if keys are deleted
       const remainingKeys = await AsyncStorage.getAllKeys();
   
-      if (remainingKeys.length === 1 && remainingKeys.includes(userTokenKey)) {
+      if (remainingKeys.length === keysToExclude.length) {
         // Optionally, you can perform additional actions after clearing AsyncStorage
         // For example, display a success message
         // Move to the next page (replace 'NextScreen' with your actual screen name)
@@ -121,7 +123,6 @@ export default function ProfileSettings({navigation}) {
     }
     navigation.navigate('Signin_signup');
   };
-
   const deleteAccount=()=>{
     ref_RBSheetDelete.current.close()
     deleteUser()

@@ -596,7 +596,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
       return (
         <View style={{height: hp(6.5), padding:5}}>
           <Image
-            style={{width: wp(10), height: hp(5)}}
+            style={{width: 43, height:43}}
             resizeMode="contain"
             source={{uri: `data:image/png;base64,${item?.image}`}}
           />

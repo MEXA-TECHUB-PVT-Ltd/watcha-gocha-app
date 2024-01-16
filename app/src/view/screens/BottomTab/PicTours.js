@@ -562,6 +562,23 @@ export default function PicTours({navigation}) {
               height: '100%',
               borderRadius: wp(5),
             }}>
+
+{!dataTopVideos?.image || dataTopVideos?.image === 'undefined'  || dataTopVideos?.image.startsWith('/') ? (
+            <Image
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              zIndex: 1, // Ensure it's on top of other elements
+              //flex: 1,
+              width: '100%',
+              height: '100%',
+              borderRadius: wp(3),
+              resizeMode: 'cover',
+            }}
+            source={appImages?.galleryPlaceHolder}
+          />
+          ) : (
             <Image
               style={{
                 position: 'absolute',
@@ -574,12 +591,13 @@ export default function PicTours({navigation}) {
                 borderRadius: wp(3),
                 resizeMode: 'cover',
               }}
-              source={appImages.galleryPlaceHolder}
-            />
+              source={{uri:dataTopVideos?.image}}
+            />)
+}
             <View
               style={{
                 position: 'absolute',
-                top: hp(10),
+                top: hp(14),
                 left: 7,
                 //height: hp(3),
                 //width: wp(21),
@@ -593,7 +611,7 @@ export default function PicTours({navigation}) {
                 style={{
                   fontSize: hp(1.6),
                   fontFamily: 'Inter',
-                  color: '#FACA4E',
+                  color: 'black',
                   fontWeight: '700',
                 }}>
                  {dataTopVideos?.pic_category_name}
