@@ -189,7 +189,7 @@ export default function Disc({navigation, route}) {
       );
 
       const result = await response.json();
-      console.log('Resultings of QAFI', result);
+      console.log('Resultings of TopNews', result.AllQAFI[0] );
       //Alert.alert(result)
 
       setTopNewsData(result.AllQAFI[0]); // Update the state with the fetched data
@@ -309,7 +309,7 @@ export default function Disc({navigation, route}) {
 
   const fetchLetterPrivateFriends = async () => {
     const token = authToken;
-
+    
     try {
       const response = await fetch(
         `https://watch-gotcha-be.mtechub.com/letter/private_friends_by_category/3/?page=1&limit=5`,
@@ -817,7 +817,7 @@ export default function Disc({navigation, route}) {
                   borderRadius: wp(3),
                   resizeMode: 'cover',
                 }}
-                source={appImages.galleryPlaceHolder}
+                source={{uri:topNewsData.image}}
               />
             </View>
           )}
@@ -1057,7 +1057,8 @@ export default function Disc({navigation, route}) {
                     borderRadius: wp(3),
                     resizeMode: 'cover',
                   }}
-                  source={appImages.galleryPlaceHolder}
+                  source={{uri:topNewsData.image}}
+
                 />
               </View>
             )}
@@ -1344,7 +1345,8 @@ export default function Disc({navigation, route}) {
                     borderRadius: wp(3),
                     resizeMode: 'cover',
                   }}
-                  source={appImages.galleryPlaceHolder}
+                  source={{uri:topNewsData.image}}
+
                 />
               </View>
             )}

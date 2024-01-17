@@ -146,7 +146,7 @@ const Headers = ({
 
       {showLogo && (
         <Image
-          source={appImages.logo}
+          source={appImages.logoTransparent}
           style={styles.logoImage}
           resizeMode="contain"
         />
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     resizeMode: 'contain',
     marginTop: hp(-2.4),
-    width: wp(80),
+    width: wp(39),
     height: hp(8),
   },
   backArrow: {

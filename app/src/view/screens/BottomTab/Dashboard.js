@@ -639,7 +639,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
       return (
         <View style={{height: hp(6.5), padding:5}}>
           <Image
-            style={{width: wp(10), height: hp(5)}}
+            style={{width: 43, height:43}}
             resizeMode="contain"
             source={{uri: `data:image/png;base64,${item?.image}`}}
           />
@@ -1823,7 +1823,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                     borderRadius: wp(3),
                     resizeMode: 'cover',
                   }}
-                  source={appImages.galleryPlaceHolder}
+                  source={{uri:topNewsData?.image}}
                 />
               </View>
             )}
@@ -2062,7 +2062,8 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                   borderRadius: wp(3),
                   resizeMode: 'cover',
                 }}
-                source={appImages.galleryPlaceHolder}
+                source={{uri:topNewsData?.image}}
+
               />
             </View>
           )}
@@ -2346,7 +2347,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                     borderRadius: wp(3),
                     resizeMode: 'cover',
                   }}
-                  source={appImages.galleryPlaceHolder}
+                  source={{uri:topNewsData?.image}}
                 />
               </View>
             )}
@@ -2937,12 +2938,12 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
   };
 
   const fetchTopPics = async () => {
-    console.log('Category Top Videos', selectedItemPicsId);
+    console.log('Category Top pics', selectedItemPicsId);
     const token = authToken;
 
     try {
       const response = await fetch(
-        `https://watch-gotcha-be.mtechub.com/top/getSpecificTopTourByCategory/${selectedItemPicsId}`,
+        `https://watch-gotcha-be.mtechub.com/top/app/top_tour/${selectedItemPicsId}`,
         {
           method: 'GET',
           headers: {
@@ -2952,8 +2953,8 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
       );
 
       const result = await response.json();
-      console.log('Resultings of Top Videossss', result.topTour[0]);
-      setDataTopPics(result.topVideo[0]); // Update the state with the fetched data
+      console.log('Resultings of Top Pics', result.topTour[0]);
+      setDataTopPics(result.topTour[0]); // Update the state with the fetched data
     } catch (error) {
       console.error('Error:', error);
     }
@@ -4134,13 +4135,13 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 borderRadius: wp(3),
                 resizeMode: 'cover',
               }}
-              source={appImages.galleryPlaceHolder}
+              source={appImages.videoPlaceHolder}
             />
             <View
               style={{
                 position: 'absolute',
                 top: hp(10),
-                left: 7,
+                left: 10,
                 //height: hp(3),
                 //width: wp(21),
                 //borderRadius: wp(3),
@@ -4150,10 +4151,12 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 zIndex: 2, // Ensure it's on top
               }}>
               <Text
+              numberOfLines={1}
+              ellipsizeMode='tail'
                 style={{
                   fontSize: hp(2.1),
                   fontFamily: 'Inter',
-                  color: '#FACA4E',
+                  color: 'black',
                   fontWeight: '700',
                 }}>
                 {dataTopVideos?.name}
@@ -4504,6 +4507,23 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
               height: '100%',
               borderRadius: wp(5),
             }}>
+            
+{!dataToppics?.image || dataToppics?.image === 'undefined'  || dataToppics?.image.startsWith('/') ? (
+            <Image
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              zIndex: 1, // Ensure it's on top of other elements
+              //flex: 1,
+              width: '100%',
+              height: '100%',
+              borderRadius: wp(3),
+              resizeMode: 'cover',
+            }}
+            source={appImages?.galleryPlaceHolder}
+          />
+          ) : (
             <Image
               style={{
                 position: 'absolute',
@@ -4516,8 +4536,9 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 borderRadius: wp(3),
                 resizeMode: 'cover',
               }}
-              source={appImages.galleryPlaceHolder}
-            />
+              source={{uri:dataToppics?.image}}
+            />)
+}
             <View
               style={{
                 position: 'absolute',
@@ -4759,7 +4780,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
         <View
           style={{marginTop: hp(1.5), flexDirection: 'row', height: hp(16)}}>
           <View style={{width: wp(43), height: '100%', borderRadius: wp(5)}}>
-            <Image
+          {dataTopVideosMarket.length===0?(<Image
               style={{
                 position: 'absolute',
                 top: 0,
@@ -4772,21 +4793,40 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 resizeMode: 'cover',
               }}
               source={appImages.galleryPlaceHolder}
+
+            />):(
+              <Image
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                zIndex: 1, // Ensure it's on top of other elements
+                //flex: 1,
+                width: '100%',
+                height: '100%',
+                borderRadius: wp(3),
+                resizeMode: 'cover',
+              }}
+              source={{uri:dataTopVideosMarket?.images[0]?.image}}
+
             />
+            )}
             <View
               style={{
                 position: 'absolute',
-                top: hp(14),
+                top: hp(12),
                 left: 7,
                 //height: hp(3),
                 //width: wp(21),
                 //borderRadius: wp(3),
-                //backgroundColor: '#FACA4E',
+                //backgroundColor: '',
                 justifyContent: 'center',
                 alignItems: 'center',
                 zIndex: 2, // Ensure it's on top
               }}>
               <Text
+              ellipsizeMode='tail'
+              numberOfLines={1}
                 style={{
                   fontSize: hp(2.5),
                   fontFamily: 'Inter-Medium',
@@ -4796,9 +4836,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 {dataTopVideosMarket?.item_name}
               </Text>
             </View>
-          </View>
-
-          <View style={{justifyContent: 'flex-end', width: '50%'}}>
+            <View style={{justifyContent: 'flex-end', width: '50%'}}>
             <Text
               style={{
                 fontSize: hp(1.5),
@@ -4812,11 +4850,11 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
               thought-provoking video as we delve into the ever-shifting
               landscape of international diplomacy...... */}
 
-              {dataTopVideosMarket === undefined ||
-              dataTopVideosMarket.length === 0
+              {dataTopVideosMarket === undefined || dataTopVideosMarket.length === 0
                 ? 'No Top Pic Shown'
                 : dataTopVideosMarket?.description}
             </Text>
+          </View>
           </View>
         </View>
 
@@ -5157,6 +5195,7 @@ const styles = StyleSheet.create({
   containerBlur:{
     flex: 1,
     backgroundColor: 'rgba(234,233,238)',
+    //backgroundColor: 'white'
   },
   searchBar: {
     height: hp(5.9),
