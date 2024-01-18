@@ -411,7 +411,9 @@ export default function ViewQAFI({navigation, route}) {
     console.log('Items of comments', item);
     return (
       <View>
-        <View
+        <TouchableOpacity
+                onPress={()=>navigation.navigate("ViewElseProfile",{id:item?.userid})}
+
           style={{
             height: hp(10),
             //borderWidth:3,
@@ -517,7 +519,7 @@ export default function ViewQAFI({navigation, route}) {
               </TouchableOpacity>
             )}
           </View>
-        </View>
+        </TouchableOpacity>
 
         {showReply && (
           <View
@@ -730,7 +732,9 @@ export default function ViewQAFI({navigation, route}) {
             marginTop: hp(5),
             marginLeft: wp(8),
           }}>
-          <View
+          <TouchableOpacity
+          onPress={()=>navigation.navigate("ViewElseProfile",{id:receivedData?.user_id})}
+
             style={{
               height: wp(10),
               alignSelf: 'center',
@@ -754,30 +758,13 @@ export default function ViewQAFI({navigation, route}) {
                 source={{uri: receivedData?.userimage}}
               />
             )}
-          </View>
+          </TouchableOpacity>
 
           <Text style={styles.textProfileName}>{receivedData?.username}</Text>
         </View>
 
-        <View
-          style={{
-            marginHorizontal: wp(8),
-            overflow: 'hidden',
-            marginTop: hp(3),
-            flex: 1,
-            borderRadius: wp(5),
-            // borderWidth: 3,
-            //borderColor: 'blue',
-          }}>
-          <Image
-            source={{uri: receivedData?.image}}
-            style={{width: '100%', height: '100%'}}
-          />
-        </View>
-
-        <View style={styles.bottomView}>
-          <View style={{height: hp(20)}}>
-            <ScrollView
+        <View style={{height:hp(5)}}>
+        <ScrollView
               showsVerticalScrollIndicator={false} // Hide vertical scroll indicator
               style={{flex: 1}}
               contentContainerStyle={{
@@ -814,6 +801,27 @@ export default function ViewQAFI({navigation, route}) {
                 </Text>
               </TouchableOpacity>
             </ScrollView>
+        </View>
+
+        <View
+          style={{
+            marginHorizontal: wp(8),
+            overflow: 'hidden',
+            marginTop: hp(3),
+            flex: 1,
+            borderRadius: wp(5),
+            // borderWidth: 3,
+            //borderColor: 'blue',
+          }}>
+          <Image
+            source={{uri: receivedData?.image}}
+            style={{width: '100%', height: '100%'}}
+          />
+        </View>
+
+        <View style={styles.bottomView}>
+          <View style={{height: hp(20)}}>
+            
 
             {/* <View style={{height: 1, backgroundColor: '#FFFFFF52'}}></View> */}
 

@@ -412,7 +412,10 @@ export default function ViewNews({navigation, route}) {
     console.log('Items of comments', item);
     return (
       <View>
-        <View
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate('ViewElseProfile', {id: receivedData?.user_id})
+          }
           style={{
             height: hp(10),
             //borderWidth:3,
@@ -518,7 +521,7 @@ export default function ViewNews({navigation, route}) {
               </TouchableOpacity>
             )}
           </View>
-        </View>
+        </TouchableOpacity>
 
         {showReply && (
           <View
@@ -718,7 +721,7 @@ export default function ViewNews({navigation, route}) {
           <Headers
             showBackIcon={true}
             showText={true}
-            text={'ON News Details'}
+            text={'On News Details'}
             onPress={() => navigation.goBack()}
           />
         </View>
@@ -731,7 +734,12 @@ export default function ViewNews({navigation, route}) {
             marginTop: hp(5),
             marginLeft: wp(8),
           }}>
-          <View
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('ViewElseProfile', {
+                id: receivedData?.user_id,
+              })
+            }
             style={{
               height: wp(10),
               alignSelf: 'center',
@@ -755,7 +763,7 @@ export default function ViewNews({navigation, route}) {
                 source={{uri: receivedData?.userimage}}
               />
             )}
-          </View>
+          </TouchableOpacity>
 
           <Text style={styles.textProfileName}>{receivedData?.username}</Text>
         </View>
@@ -802,6 +810,46 @@ export default function ViewNews({navigation, route}) {
           </View>
         </View> */}
 
+        <View style={{height: hp(5)}}>
+          <ScrollView
+            showsVerticalScrollIndicator={false} // Hide vertical scroll indicator
+            style={{flex: 1}}
+            contentContainerStyle={{
+              verticalLine: false,
+              marginHorizontal: wp(8),
+            }}>
+            <Text
+              style={{
+                marginTop: hp(1),
+                fontFamily: 'Inter',
+                fontSize: hp(1.8),
+                lineHeight: hp(2.1),
+                color: 'black',
+              }}>
+              {showFullContent
+                ? details
+                : details.length > 90
+                ? details.substring(0, 90) + '...'
+                : details.slice(0)}
+            </Text>
+
+            <TouchableOpacity onPress={toggleContent}>
+              <Text
+                style={{
+                  fontFamily: 'Inter',
+                  fontSize: hp(1.8),
+                  color: '#FACA4E',
+                }}>
+                {details.length > 90
+                  ? showFullContent
+                    ? 'See Less'
+                    : 'See More'
+                  : null}
+              </Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+
         <View
           style={{
             marginHorizontal: wp(8),
@@ -809,7 +857,7 @@ export default function ViewNews({navigation, route}) {
             marginTop: hp(3),
             flex: 1,
             borderRadius: wp(5),
-           // borderWidth: 3,
+            // borderWidth: 3,
             //borderColor: 'blue',
           }}>
           <Image
@@ -820,44 +868,6 @@ export default function ViewNews({navigation, route}) {
 
         <View style={styles.bottomView}>
           <View style={{height: hp(20)}}>
-            <ScrollView
-              showsVerticalScrollIndicator={false} // Hide vertical scroll indicator
-              style={{flex: 1}}
-              contentContainerStyle={{
-                verticalLine: false,
-                marginHorizontal: wp(8),
-              }}>
-              <Text
-                style={{
-                  marginTop: hp(1),
-                  fontFamily: 'Inter',
-                  fontSize: hp(1.8),
-                  lineHeight: hp(2.1),
-                  color: 'black',
-                }}>
-                {showFullContent
-                  ? details
-                  : details.length > 90
-                  ? details.substring(0, 90) + '...'
-                  : details.slice(0)}
-              </Text>
-
-              <TouchableOpacity onPress={toggleContent}>
-                <Text
-                  style={{
-                    fontFamily: 'Inter',
-                    fontSize: hp(1.8),
-                    color: '#FACA4E',
-                  }}>
-                  {details.length > 90
-                    ? showFullContent
-                      ? 'See Less'
-                      : 'See More'
-                    : null}
-                </Text>
-              </TouchableOpacity>
-            </ScrollView>
-
             {/*  <View style={{height: 1, backgroundColor: '#FFFFFF52'}}></View> */}
 
             <View

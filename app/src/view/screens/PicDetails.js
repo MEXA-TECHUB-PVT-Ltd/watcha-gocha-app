@@ -397,7 +397,8 @@ export default function ViewVideo({navigation, route}) {
     //console.log('Items of comments', item);
     return (
       <View>
-        <View
+        <TouchableOpacity
+        onPress={()=>navigation.navigate("ViewElseProfile",{id:item?.userid})}
           style={{
             height: hp(10),
             //borderWidth:3,
@@ -486,7 +487,7 @@ export default function ViewVideo({navigation, route}) {
               </TouchableOpacity>
             )}
           </View>
-        </View>
+        </TouchableOpacity>
 
         {showReply && (
           <View

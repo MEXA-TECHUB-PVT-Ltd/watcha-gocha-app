@@ -135,6 +135,26 @@ export default function Dashboard({navigation, route}) {
 
   //-------------- Use Effect-------------------\\
 
+   //----------------NEW FUNCTION FAVOURITE ------------------\\
+
+  /*  useEffect(() => {
+    const topSixItems = dataApps.slice(0, 10);
+    console.log('FAVOURITE CALLED');    
+    // Save topSixItems directly to AsyncStorage whenever it changes
+    const saveFavouriteData = async () => {
+      try {
+        await AsyncStorage.setItem('favouriteData', JSON.stringify(topSixItems));
+        setFavouriteData(topSixItems); // Update the state with updatedTopData
+      } catch (error) {
+        console.error('Error saving top data to AsyncStorage:', error);
+      }
+    };
+    saveFavouriteData();
+  }, [dataApps]); // Run this effect whenever dataApps changes */
+  
+  
+  //-----------------------------------------------\\
+
   useEffect(() => {
     const topSixItems = dataApps.slice(0, 6);
     console.log('APPS CALLED');    
@@ -154,8 +174,6 @@ export default function Dashboard({navigation, route}) {
     saveTopData();
   }, [dataApps]); // Run this effect whenever dataApps changes
   
-
-
   useEffect(() => {
     if (isFocused) {
       // Load favouriteData from AsyncStorage when the component mounts
@@ -164,7 +182,8 @@ export default function Dashboard({navigation, route}) {
           const storedData = await AsyncStorage.getItem('favouriteData');
           if (storedData) {
             const parsedData = JSON.parse(storedData);
-            setFavouriteData(parsedData);
+            setFavouriteData([...parsedData, ...dataApps.slice(0, 5)]);
+
           }
         } catch (error) {
           console.error(
@@ -179,7 +198,7 @@ export default function Dashboard({navigation, route}) {
   }, [isFocused]); // Run this effect only once when the component mounts
 
   useEffect(() => {
-    if (isFocused) {
+    //if (isFocused) {
       // Save favouriteData to AsyncStorage whenever it changes
       const saveFavouriteData = async () => {
         try {
@@ -193,7 +212,7 @@ export default function Dashboard({navigation, route}) {
       };
       saveFavouriteData();
       // AsyncStorage.removeItem('topData');
-    }
+    //}
   }, [favouriteData, isFocused]); // Run this effect whenever favouriteData changes
 
   //------------------------------------\\
@@ -381,12 +400,9 @@ export default function Dashboard({navigation, route}) {
     //console.log('item at first', item);
     const openApp = async items => {
       try {
-        // Launch the application
-        //await RNLauncherKitHelper.launchApplication(item.bundle);
-
         // Check if the app is already in the topData array
         const appIndex = topData.findIndex(app => app.bundle === item.bundle);
-
+    
         if (appIndex !== -1) {
           // If the app is already in the array, update the count
           const updatedTopData = [...topData];
@@ -394,125 +410,37 @@ export default function Dashboard({navigation, route}) {
             ...updatedTopData[appIndex],
             count: updatedTopData[appIndex].count + 1,
           };
-
+    
           setTopData(updatedTopData);
-
-          //----------------------\\
-
-          /* const lastUsageDate = new Date().toISOString();
-
-          // Fetch existing data from AsyncStorage
-          const existingDataString = await AsyncStorage.getItem(
-            'comparisonDate',
-          );
-          const existingData = existingDataString
-            ? JSON.parse(existingDataString)
-            : [];
-
-          // Find the index of the object with matching bundle
-          const indexToUpdate = existingData.findIndex(
-            entry => entry.bundle === item.bundle,
-          );
-
-          // Update the existing data with the new date value for the matching object
-          const updatedData = [
-            ...existingData.slice(0, indexToUpdate), // items before the matched item
-            {
-              ...existingData[indexToUpdate],
-              date: lastUsageDate,
-            },
-            ...existingData.slice(indexToUpdate + 1), // items after the matched item
-          ];
-
-          // Save the updated data back in AsyncStorage
-          await AsyncStorage.setItem(
-            'comparisonDate',
-            JSON.stringify(updatedData),
-          );
- */
-
+    
           await RNLauncherKitHelper.launchApplication(item.bundle);
-          //---------------------\\
+    
+          //----------------------\\
+          // Your additional logic here
+          //----------------------\\
         } else {
           // If the app is not in the array, add it with count 1
-          const newTopData = [
-            ...topData.slice(0, 5), // Keep the first 5 items
-            {
-              label: item.label,
-              bundle: item.bundle,
-              image: item.image,
-              count: 1,
-            },
-          ];
-
-          setTopData(newTopData);
-
-          /* const lastUsageDate = new Date().toISOString();
-
-          // Fetch existing data from AsyncStorage
-          const existingDataString = await AsyncStorage.getItem(
-            'comparisonDate',
-          );
-          const existingData = existingDataString
-            ? JSON.parse(existingDataString)
-            : [];
-
-          // Find the index of the object with matching bundle
-          const indexToUpdate = existingData.findIndex(
-            entry => entry.bundle === item.bundle,
-          );
-
-          // Update the existing data with the new date value for the matching object
-          const updatedData = [
-            ...existingData.slice(0, indexToUpdate), // items before the matched item
-            {
-              ...existingData[indexToUpdate],
-              date: lastUsageDate,
-            },
-            ...existingData.slice(indexToUpdate + 1), // items after the matched item
-          ];
-
-          // Save the updated data back in AsyncStorage
-          await AsyncStorage.setItem(
-            'comparisonDate',
-            JSON.stringify(updatedData),
-          ); */
-
+          const randomIndex = Math.floor(Math.random() * 6); // Random index between 0 and 5
+          const updatedTopData = [...topData];
+          updatedTopData[randomIndex] = {
+            label: item.label,
+            bundle: item.bundle,
+            image: item.image,
+            count: 1,
+          };
+    
+          setTopData(updatedTopData);
+    
           await RNLauncherKitHelper.launchApplication(item.bundle);
+    
+          //----------------------\\
+          // Your additional logic here
+          //----------------------\\
         }
       } catch (error) {
         console.error('Error opening the app:', error);
-
-        /* const lastUsageDate = new Date().toISOString();
-
-        // Fetch existing data from AsyncStorage
-        const existingDataString = await AsyncStorage.getItem('comparisonDate');
-        const existingData = existingDataString
-          ? JSON.parse(existingDataString)
-          : [];
-
-        // Find the index of the object with matching bundle
-        const indexToUpdate = existingData.findIndex(
-          entry => entry.bundle === item.bundle,
-        );
-
-        // Update the existing data with the new date value for the matching object
-        const updatedData = [
-          ...existingData.slice(0, indexToUpdate), // items before the matched item
-          {
-            ...existingData[indexToUpdate],
-            date: lastUsageDate,
-          },
-          ...existingData.slice(indexToUpdate + 1), // items after the matched item
-        ];
-
-        // Save the updated data back in AsyncStorage
-        await AsyncStorage.setItem(
-          'comparisonDate',
-          JSON.stringify(updatedData),
-        ); */
         await RNLauncherKitHelper.launchApplication(item.bundle);
-        //await RNLauncherKitHelper.launchApplication(items); // Assuming 'item.label' is the package name
+        // Your additional error handling logic here
       }
     };
 
@@ -637,9 +565,9 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
     // Render the item only if count is equal to 2
     if (item.count >= 2) {
       return (
-        <View style={{height: hp(6.5), padding:5}}>
+        <View style={{height: hp(8), padding:5}}>
           <Image
-            style={{width: 43, height:43}}
+            style={{width: wp(12), height:wp(12)}}
             resizeMode="contain"
             source={{uri: `data:image/png;base64,${item?.image}`}}
           />
@@ -647,7 +575,15 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
       );
     } else {
       // Return null or an empty view if count is not equal to 2
-      return null;
+      return (
+        <View style={{height: hp(8), padding:5}}>
+          <Image
+            style={{width: wp(12), height:wp(12)}}
+            resizeMode="contain"
+            source={appImages.logoTransparent}
+          />
+        </View>
+      );
     }
 
     /* draggingStyle={{opacity: 0.5}}
@@ -3724,9 +3660,9 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
         <View
           style={{
             marginTop: hp(2),
-            marginLeft: wp(3),
-            height: hp(20),
-            width: wp(53),
+            marginLeft: wp(-1),
+            height: hp(23),
+            width: wp(60),
           }}>
           <FlatList
             style={{margin: 8, flex: 1}}
