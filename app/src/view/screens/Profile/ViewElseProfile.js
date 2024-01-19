@@ -55,7 +55,7 @@ import {SelectCountry, Dropdown} from 'react-native-element-dropdown';
 import CPaperInput from '../../../assets/Custom/CPaperInput';
 import Headers from '../../../assets/Custom/Headers';
 
-export default function ViewElseProfile({navigation,route}) {
+export default function ViewElseProfile({navigation, route}) {
   const [authToken, setAuthToken] = useState(null);
 
   const [selectedItemId, setSelectedItemId] = useState(1);
@@ -441,10 +441,10 @@ export default function ViewElseProfile({navigation,route}) {
     const imageUri = item.images[0]?.image;
     console.log(imageUri);
     return (
-      <View
-       /*  onPress={() =>
-          navigation.navigate('ProductDetailsProfile', {ProductDetails: item})
-        } */
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate('ProductDetails', {ProductDetails: item})
+        }
         style={{width: wp(35), margin: 5}}>
         <View>
           {imageUri === null ? (
@@ -505,7 +505,7 @@ export default function ViewElseProfile({navigation,route}) {
             {item.description}
           </Text>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -519,7 +519,8 @@ export default function ViewElseProfile({navigation,route}) {
           : item.image
         : null;
     return (
-      <View
+      <TouchableOpacity
+        onPress={() => navigation.navigate('PicDetails', {picData: item})}
         /* onPress={() =>
           navigation.navigate('ViewVideoPicProfile', {picData: item})
         } */
@@ -561,14 +562,15 @@ export default function ViewElseProfile({navigation,route}) {
           </Text>
           <Entypo name={'dots-three-vertical'} size={14} color={'#4A4A4A'} />
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
   const renderAvailableAppsVideo = item => {
     console.log('Video Items', item);
     return (
-      <View
+      <TouchableOpacity
+        onPress={() => navigation.navigate('ViewVideo', {videoData: item})}
         /* onPress={() =>
           navigation.navigate('ViewVideoProfile', {videoData: item})
         } */
@@ -611,7 +613,7 @@ export default function ViewElseProfile({navigation,route}) {
 
           <Entypo name={'dots-three-vertical'} size={14} color={'#4A4A4A'} />
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -822,8 +824,8 @@ export default function ViewElseProfile({navigation,route}) {
     console.log(imageUri);
     return (
       <View
-/*         onPress={() => navigation.navigate('ViewUpdateGEBC', {details: item})}
- */        style={{width: wp(35), marginLeft: wp(3)}}>
+        /*         onPress={() => navigation.navigate('ViewUpdateGEBC', {details: item})}
+         */ style={{width: wp(35), marginLeft: wp(3)}}>
         <View>
           {imageUri === null ? (
             <Image
@@ -898,9 +900,10 @@ export default function ViewElseProfile({navigation,route}) {
     const imageUri = item?.image;
     console.log(imageUri);
     return (
-      <View
-/*         onPress={() => navigation.navigate('ViewUpdateQAFI', {details: item})}
- */        style={{width: wp(35), marginLeft: wp(3)}}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate('ViewQAFI', {picData: item})}
+        /*         onPress={() => navigation.navigate('ViewUpdateQAFI', {details: item})}
+         */ style={{width: wp(35), marginLeft: wp(3)}}>
         <View>
           {imageUri === null ? (
             <Image
@@ -962,7 +965,7 @@ export default function ViewElseProfile({navigation,route}) {
             {item.description}
           </Text>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -975,9 +978,10 @@ export default function ViewElseProfile({navigation,route}) {
     const imageUri = item?.image;
     console.log(imageUri);
     return (
-      <View
-/*         onPress={() => navigation.navigate('ViewUpdateNews', {details: item})}
- */        style={{width: wp(35), marginLeft: wp(3)}}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate('ViewNews', {picData: item})}
+        /*         onPress={() => navigation.navigate('ViewUpdateNews', {details: item})}
+         */ style={{width: wp(35), marginLeft: wp(3)}}>
         <View>
           {imageUri === null ? (
             <Image
@@ -1039,7 +1043,7 @@ export default function ViewElseProfile({navigation,route}) {
             {item.description}
           </Text>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -1071,26 +1075,27 @@ export default function ViewElseProfile({navigation,route}) {
             marginTop: hp(3),
             height: hp(21),
           }}>
-          {image!==null?<View
-            style={{
-              width: wp(20),
-              marginLeft: wp(0.5),
-              height: wp(20),
-              borderRadius: wp(20) / 2,
-            }}>
-            <Image
-              source={{uri: image}}
-              style={{width: '100%', height: '100%', resizeMode: 'contain'}}
+          {image !== null ? (
+            <View
+              style={{
+                width: wp(20),
+                marginLeft: wp(0.5),
+                height: wp(20),
+                borderRadius: wp(20) / 2,
+              }}>
+              <Image
+                source={{uri: image}}
+                style={{width: '100%', height: '100%', resizeMode: 'contain'}}
+              />
+            </View>
+          ) : (
+            <MaterialCommunityIcons
+              style={{marginTop: hp(0.5)}}
+              name={'account-circle'}
+              size={55}
+              color={'#FACA4E'}
             />
-          </View>:
-         
-          <MaterialCommunityIcons
-           style={{marginTop: hp(0.5)}}
-           name={'account-circle'}
-           size={55}
-           color={'#FACA4E'}
-         />
-          }
+          )}
 
           <Text
             style={{
@@ -1259,7 +1264,7 @@ export default function ViewElseProfile({navigation,route}) {
               //fontWeight: 'bold',
               fontFamily: 'Inter-Bold',
             }}>
-            My Video Mania
+            Video Mania
           </Text>
 
           <View style={{marginTop: hp(1), height: '100%'}}>
@@ -1314,7 +1319,7 @@ export default function ViewElseProfile({navigation,route}) {
               //fontWeight: 'bold',
               fontFamily: 'Inter-Bold',
             }}>
-            My Pic Tour
+            Pic Tour
           </Text>
 
           <View style={{marginTop: hp(1), height: '100%'}}>
@@ -1370,7 +1375,7 @@ export default function ViewElseProfile({navigation,route}) {
               //fontWeight: 'bold',
               fontFamily: 'Inter-Bold',
             }}>
-            My Disc
+            Disc
           </Text>
 
           <FlatList
@@ -1428,7 +1433,7 @@ export default function ViewElseProfile({navigation,route}) {
               //fontWeight: 'bold',
               fontFamily: 'Inter-Bold',
             }}>
-            My Market Zone
+            Market Zone
           </Text>
 
           {loading === true ? (

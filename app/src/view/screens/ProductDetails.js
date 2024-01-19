@@ -817,7 +817,7 @@ export default function ProductDetails({navigation, route}) {
               justifyContent: 'space-between',
             }}>
             <View style={{flexDirection: 'row', width: wp(60)}}>
-              <TouchableOpacity style={styles.circleBox}>
+              <TouchableOpacity  onPress={()=>navigation.navigate("ViewElseProfile",{id:receivedData?.user_id})} style={styles.circleBox}>
                 {receivedData.image == null ? (
                   <MaterialCommunityIcons
                     style={{marginTop: hp(0.5)}}
