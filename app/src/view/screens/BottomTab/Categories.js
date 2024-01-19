@@ -62,7 +62,6 @@ export default function Categories({navigation}) {
 
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
-
   const [flatListKey, setFlatListKey] = useState(Date.now()); // Add a key for the FlatList
 
   useEffect(() => {
@@ -80,15 +79,24 @@ export default function Categories({navigation}) {
       setData(packageDataArray);
       setIsLoading(false);
 
-     
+      /* if(packageDataArray.length>0){
+        saveTofavourites()
+
+      }else{
+        console.log("LENGTH IS NULL")
+      } */
     };
 
     fetchData();
+
+    {/* <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
+                    No Favourite Apps
+                  </Text> */}
   }, []);
 
   //----------------NEW FUNCTION FAVOURITE ------------------\\
 
-/*   useEffect(() => {
+  /*   useEffect(() => {
     const topSixItems = dataApps.slice(0, 10);
     console.log('FAVOURITE CALLED');    
     // Save topSixItems directly to AsyncStorage whenever it changes
@@ -102,26 +110,57 @@ export default function Categories({navigation}) {
     };
     saveFavouriteData();
   }, [dataApps]); // Run this effect whenever dataApps changes */
-  
-  
 
+  /*  const saveTofavourites=async ()=>{
+    //console.log("Came to save favourites", dataApps.slice((0, 4)))
+
+    const saveFavourite = await AsyncStorage.getItem('saveFavourites');
+
+    if(saveFavourite===null){
+      console.log("----------------------SAVE FAVOURITE DATA IS NULL---------------------------------")
+      await AsyncStorage.setItem(
+        'favouriteData',
+        JSON.stringify(dataApps.slice((0, 4))),
+      );
+
+      await AsyncStorage.setItem(
+        'saveFavourites',
+        JSON.stringify("RIDES"),
+      );
+    }else{
+      console.log("----------------------SAVE FAVOURITE DATA IS NOT NULL---------------------------------")
+    }
+  
+  } */
 
   //-----------------------------------------------\\
 
-
-
   //-------------- Use Effect-------------------\\
 
-  
-useEffect(() => {
+   useEffect(() => {
     if (isFocused) {
       // Load favouriteData from AsyncStorage when the component mounts
       const loadFavouriteData = async () => {
         try {
           const storedData = await AsyncStorage.getItem('favouriteData');
-          if (storedData) {
-            const parsedData = JSON.parse(storedData);
-            setFavouriteData([...parsedData, ...dataApps.slice(0, 5)]);
+          console.log('IS FOCUSED OF FAVOURITE DATA IS CALLED', typeof storedData);
+          console.log(
+            'IS FOCUSED OF FAVOURITE DATA IS CALLED LENGTH',
+            storedData.length,
+          );
+            // it is conisdering empty array as 2 length thats why i a have added it
+          if (storedData.length === 2) {
+            console.log('FAVOURITE IS NULLl');
+            const initialFavouriteData = dataApps.slice(0, 4);
+            await AsyncStorage.setItem(
+              'favouriteData',
+              JSON.stringify(initialFavouriteData),
+            );
+            setFavouriteData(initialFavouriteData);
+          } else {
+            const parsedData = JSON.parse(storedData);          
+            setFavouriteData(parsedData);
+            console.log('FAVOURITE IS NOT NULL');
           }
         } catch (error) {
           console.error(
@@ -133,34 +172,52 @@ useEffect(() => {
 
       loadFavouriteData();
     }
-  }, [isFocused]); // Run this effect only once when the component mounts
+  }, [isFocused]); // Run this effect only once when the component mounts 
 
+  // Run this effect only once when the component mounts
 
-
-
-
-
-  
-  
-
- // Run this effect only once when the component mounts
-
-  useEffect(() => {
+ /*  useEffect(() => {
     if (isFocused) {
-      // Save favouriteData to AsyncStorage whenever it changes
-      const saveFavouriteData = async () => {
+      // Load favouriteData from AsyncStorage when the component mounts
+      const loadFavouriteData = async () => {
         try {
-          await AsyncStorage.setItem(
-            'favouriteData',
-            JSON.stringify(favouriteData),
-          );
+          const storedData = await AsyncStorage.getItem('favouriteData');
+          if (storedData) {
+            const parsedData = JSON.parse(storedData);
+            setFavouriteData(parsedData);
+          }
         } catch (error) {
-          console.error('Error saving favourite data to AsyncStorage:', error);
+          console.error(
+            'Error loading favourite data from AsyncStorage:',
+            error,
+          );
         }
       };
-      saveFavouriteData();
-      // AsyncStorage.removeItem('topData');
+
+      loadFavouriteData();
     }
+  }, [isFocused]); // Run this effect only once when the component mounts */
+
+
+
+
+  useEffect(() => {
+    if(isFocused){
+    // Save favouriteData to AsyncStorage whenever it changes
+    const saveFavouriteData = async () => {
+      console.log("FAVOURITE DATA IS CALLED")
+      try {
+        await AsyncStorage.setItem(
+          'favouriteData',
+          JSON.stringify(favouriteData),
+        );
+      } catch (error) {
+        console.error('Error saving favourite data to AsyncStorage:', error);
+      }
+    };
+    saveFavouriteData();
+    // AsyncStorage.removeItem('topData');
+  }
   }, [favouriteData, isFocused]); // Run this effect whenever favouriteData changes
 
   //------------------------------------\\
@@ -208,7 +265,7 @@ useEffect(() => {
 
   useEffect(() => {
     const topSixItems = dataApps.slice(0, 6);
-    console.log('APPS CALLED');    
+    console.log('APPS CALLED');
     // Save topSixItems directly to AsyncStorage whenever it changes
     const saveTopData = async () => {
       try {
@@ -222,16 +279,11 @@ useEffect(() => {
         console.error('Error saving top data to AsyncStorage:', error);
       }
     };
-  
+
     saveTopData();
   }, [dataApps]); // Run this effect whenever dataApps changes
-  
-  
-
 
   //-----------------------------------------------\\
-
-
 
   //------------------Use Effect Filtered Apps----------------\\
 
@@ -375,52 +427,51 @@ useEffect(() => {
 
   const renderApps = item => {
     //console.log('item at first', item);
-   const openApp = async items => {
-  try {
-    // Check if the app is already in the topData array
-    const appIndex = topData.findIndex(app => app.bundle === item.bundle);
+    const openApp = async items => {
+      try {
+        // Check if the app is already in the topData array
+        const appIndex = topData.findIndex(app => app.bundle === item.bundle);
 
-    if (appIndex !== -1) {
-      // If the app is already in the array, update the count
-      const updatedTopData = [...topData];
-      updatedTopData[appIndex] = {
-        ...updatedTopData[appIndex],
-        count: updatedTopData[appIndex].count + 1,
-      };
+        if (appIndex !== -1) {
+          // If the app is already in the array, update the count
+          const updatedTopData = [...topData];
+          updatedTopData[appIndex] = {
+            ...updatedTopData[appIndex],
+            count: updatedTopData[appIndex].count + 1,
+          };
 
-      setTopData(updatedTopData);
+          setTopData(updatedTopData);
 
-      await RNLauncherKitHelper.launchApplication(item.bundle);
+          await RNLauncherKitHelper.launchApplication(item.bundle);
 
-      //----------------------\\
-      // Your additional logic here
-      //----------------------\\
-    } else {
-      // If the app is not in the array, add it with count 1
-      const randomIndex = Math.floor(Math.random() * 6); // Random index between 0 and 5
-      const updatedTopData = [...topData];
-      updatedTopData[randomIndex] = {
-        label: item.label,
-        bundle: item.bundle,
-        image: item.image,
-        count: 1,
-      };
+          //----------------------\\
+          // Your additional logic here
+          //----------------------\\
+        } else {
+          // If the app is not in the array, add it with count 1
+          const randomIndex = Math.floor(Math.random() * 6); // Random index between 0 and 5
+          const updatedTopData = [...topData];
+          updatedTopData[randomIndex] = {
+            label: item.label,
+            bundle: item.bundle,
+            image: item.image,
+            count: 1,
+          };
 
-      setTopData(updatedTopData);
+          setTopData(updatedTopData);
 
-      await RNLauncherKitHelper.launchApplication(item.bundle);
+          await RNLauncherKitHelper.launchApplication(item.bundle);
 
-      //----------------------\\
-      // Your additional logic here
-      //----------------------\\
-    }
-  } catch (error) {
-    console.error('Error opening the app:', error);
-    await RNLauncherKitHelper.launchApplication(item.bundle);
-    // Your additional error handling logic here
-  }
-};
-
+          //----------------------\\
+          // Your additional logic here
+          //----------------------\\
+        }
+      } catch (error) {
+        console.error('Error opening the app:', error);
+        await RNLauncherKitHelper.launchApplication(item.bundle);
+        // Your additional error handling logic here
+      }
+    };
 
     return (
       <TouchableOpacity
@@ -543,9 +594,9 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
     // Render the item only if count is equal to 2
     if (item.count >= 2) {
       return (
-        <View style={{height: hp(8), padding:5}}>
+        <View style={{height: hp(8), padding: 5}}>
           <Image
-            style={{width: wp(12), height:wp(12)}}
+            style={{width: wp(12), height: wp(12)}}
             resizeMode="contain"
             source={{uri: `data:image/png;base64,${item?.image}`}}
           />
@@ -554,9 +605,9 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
     } else {
       // Return null or an empty view if count is not equal to 2
       return (
-        <View style={{height: hp(8), padding:5}}>
+        <View style={{height: hp(8), padding: 5}}>
           <Image
-            style={{width: wp(12), height:wp(12)}}
+            style={{width: wp(12), height: wp(12)}}
             resizeMode="contain"
             source={appImages.logoTransparent}
           />
@@ -1095,9 +1146,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                     justifyContent: 'center',
                     alignItems: 'center',
                   }}>
-                  <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
-                    No Favourite Apps
-                  </Text>
+                  
                 </View>
               ) : (
                 <FlatList

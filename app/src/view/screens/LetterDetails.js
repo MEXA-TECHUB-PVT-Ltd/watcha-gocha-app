@@ -256,7 +256,6 @@ export default function LetterDetails({navigation, route}) {
             {item?.title}
           </Text>
 
-          <Entypo name={'dots-three-vertical'} size={14} color={'#4A4A4A'} />
         </View>
       </View>
     );
@@ -286,7 +285,8 @@ export default function LetterDetails({navigation, route}) {
             backgroundColor: '#77BDF2',
           }}></View>
 
-        <View
+        <TouchableOpacity
+        onPress={()=>navigation.navigate("ViewElseProfile",{id:receivedData?.user_id})}
           style={{
             flexDirection: 'row',
             marginHorizontal: wp(8),
@@ -323,7 +323,7 @@ export default function LetterDetails({navigation, route}) {
           <View style={{marginLeft: wp(2.5)}}>
             <Approved width={20} height={20} />
           </View>
-        </View>
+        </TouchableOpacity>
 
         <View
           style={{

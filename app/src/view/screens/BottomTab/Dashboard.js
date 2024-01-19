@@ -174,7 +174,7 @@ export default function Dashboard({navigation, route}) {
     saveTopData();
   }, [dataApps]); // Run this effect whenever dataApps changes
   
-  useEffect(() => {
+  /* useEffect(() => {
     if (isFocused) {
       // Load favouriteData from AsyncStorage when the component mounts
       const loadFavouriteData = async () => {
@@ -182,7 +182,7 @@ export default function Dashboard({navigation, route}) {
           const storedData = await AsyncStorage.getItem('favouriteData');
           if (storedData) {
             const parsedData = JSON.parse(storedData);
-            setFavouriteData([...parsedData, ...dataApps.slice(0, 5)]);
+            setFavouriteData(parsedData);
 
           }
         } catch (error) {
@@ -195,10 +195,86 @@ export default function Dashboard({navigation, route}) {
 
       loadFavouriteData();
     }
-  }, [isFocused]); // Run this effect only once when the component mounts
+  }, [isFocused]); // Run this effect only once when the component mounts */
+
+  /* useEffect(() => {
+    if (isFocused) {
+      // Load favouriteData from AsyncStorage when the component mounts
+      const loadFavouriteData = async () => {
+        try {
+          const storedData = await AsyncStorage.getItem('favouriteData');
+          console.log('IS FOCUSED OF FAVOURITE DATA IS CALLED', storedData);
+          console.log(
+            'IS FOCUSED OF FAVOURITE DATA IS CALLED LENGTH',
+            storedData.length,
+          );
+            // it is conisdering empty array as 2 length thats why i a have added it 
+          if (storedData.length === 2) {
+            console.log('FAVOURITE IS NULL');
+            const initialFavouriteData = dataApps.slice(0, 4);
+            await AsyncStorage.setItem(
+              'favouriteData',
+              JSON.stringify(initialFavouriteData),
+            );
+            setFavouriteData(initialFavouriteData);
+          } else {
+           // const storedData = await AsyncStorage.getItem('favouriteData');
+             const parsedData = JSON.parse(storedData);
+            setFavouriteData(parsedData);
+            console.log('FAVOURITE IS NOT NULL', parsedData);
+          }
+        } catch (error) {
+          console.error(
+            'Error loading favourite data from AsyncStorage:',
+            error,
+          );
+        }
+      };
+
+      loadFavouriteData();
+    }
+  }, [isFocused]); */
 
   useEffect(() => {
-    //if (isFocused) {
+    if (isFocused) {
+      // Load favouriteData from AsyncStorage when the component mounts
+      const loadFavouriteData = async () => {
+        try {
+          const storedData = await AsyncStorage.getItem('favouriteData');
+          console.log('IS FOCUSED OF FAVOURITE DATA IS CALLED', typeof storedData);
+          console.log(
+            'IS FOCUSED OF FAVOURITE DATA IS CALLED LENGTH',
+            storedData.length,
+          );
+            // it is conisdering empty array as 2 length thats why i a have added it
+          if (storedData.length === 2) {
+            console.log('FAVOURITE IS NULLl');
+            const initialFavouriteData = dataApps.slice(0, 4);
+            await AsyncStorage.setItem(
+              'favouriteData',
+              JSON.stringify(initialFavouriteData),
+            );
+            setFavouriteData(initialFavouriteData);
+          } else {
+            const parsedData = JSON.parse(storedData);          
+            setFavouriteData(parsedData);
+            console.log('FAVOURITE IS NOT NULL');
+          }
+        } catch (error) {
+          console.error(
+            'Error loading favourite data from AsyncStorage:',
+            error,
+          );
+        }
+      };
+
+      loadFavouriteData();
+    }
+  }, [isFocused]); // Run this effect only once when the component mounts 
+
+
+  useEffect(() => {
+    if (isFocused) {
       // Save favouriteData to AsyncStorage whenever it changes
       const saveFavouriteData = async () => {
         try {
@@ -212,7 +288,7 @@ export default function Dashboard({navigation, route}) {
       };
       saveFavouriteData();
       // AsyncStorage.removeItem('topData');
-    //}
+    }
   }, [favouriteData, isFocused]); // Run this effect whenever favouriteData changes
 
   //------------------------------------\\
@@ -1891,7 +1967,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 data={newsData}
                 horizontal
                 //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableApps(item)}
+                renderItem={({item}) => renderAvailableDiscApps(item)}
               />
             )}
           </View>
@@ -1919,7 +1995,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 data={newsData}
                 horizontal
                 //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableApps(item)}
+                renderItem={({item}) => renderAvailableDiscApps(item)}
               />
             )}
           </View>
@@ -1947,7 +2023,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                 data={newsData}
                 horizontal
                 //keyExtractor={item => item.id.toString()}
-                renderItem={({item}) => renderAvailableApps(item)}
+                renderItem={({item}) => renderAvailableDiscApps(item)}
               />
             )}
           </View>
@@ -3890,9 +3966,6 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
                     justifyContent: 'center',
                     alignItems: 'center',
                   }}>
-                  <Text style={{fontWeight: 'bold', fontSize: hp(2.1)}}>
-                    No Favourite Apps
-                  </Text>
                 </View>
               ) : (
                 <FlatList
@@ -4127,7 +4200,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
           </View>
         </View>
 
-        <TouchableOpacity
+        <View
           onPress={() => navigation.navigate('ViewVideo')}
           style={{marginTop: hp(1.5), height: hp(23)}}>
           <Text
@@ -4181,7 +4254,7 @@ onDragEnd={({dragged: data}) => onDragEnd(data, favouriteApps)} */
               </>
             )}
           </View>
-        </TouchableOpacity>
+        </View>
 
         <View style={{marginTop: hp(2.1), height: hp(23)}}>
           <Text

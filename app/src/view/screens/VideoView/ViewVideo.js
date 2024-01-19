@@ -880,7 +880,8 @@ export default function ViewVideo({navigation, route}) {
                 alignItems: 'center',
                 height: hp(5),
               }}>
-              <View
+              <TouchableOpacity
+              onPress={()=>navigation.navigate("ViewElseProfile",{id:receivedData?.user_id})}
                 style={{
                   height: hp(10),
                   width: wp(10),
@@ -906,7 +907,7 @@ export default function ViewVideo({navigation, route}) {
                   }}
                   source={appImages.profileImg}
                 /> */}
-              </View>
+              </TouchableOpacity>
 
               <Text style={styles.textProfileName}>
                 {receivedData.username}

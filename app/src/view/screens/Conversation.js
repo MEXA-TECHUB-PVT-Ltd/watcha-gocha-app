@@ -308,14 +308,14 @@ export default function Conversation({navigation, route}) {
             justifyContent: 'space-between',
             alignSelf: 'center',
           }}>
-         { receivedData?.userimage!==null? <TouchableOpacity style={{}}>
+         { receivedData?.userimage!==null? <TouchableOpacity  onPress={()=>navigation.navigate("ViewElseProfile",{id:receivedData?.user_id})} style={{}}>
             <Image
               source={{uri:receivedData?.userimage}}
               style={styles.profileImgs}
               resizeMode="contain"
             />
           </TouchableOpacity>: 
-          <TouchableOpacity style={{}}>
+          <TouchableOpacity  onPress={()=>navigation.navigate("ViewElseProfile",{id:receivedData?.user_id})} style={{}}>
          <MaterialCommunityIcons
            style={{marginTop: hp(0.5)}}
            name={'account-circle'}
