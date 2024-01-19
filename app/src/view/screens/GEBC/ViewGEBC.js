@@ -412,7 +412,8 @@ export default function ViewGEBC({navigation, route}) {
     console.log('Items of comments', item);
     return (
       <View>
-        <View
+        <TouchableOpacity
+         onPress={()=>navigation.navigate("ViewElseProfile",{id:item?.userid})}
           style={{
             height: hp(10),
             //borderWidth:3,
@@ -518,7 +519,7 @@ export default function ViewGEBC({navigation, route}) {
               </TouchableOpacity>
             )}
           </View>
-        </View>
+        </TouchableOpacity>
 
         {showReply && (
           <View
@@ -717,7 +718,7 @@ export default function ViewGEBC({navigation, route}) {
           <Headers
             showBackIcon={true}
             showText={true}
-            text={'QAFI Details'}
+            text={'GEBC Details'}
             onPress={() => navigation.goBack()}
           />
         </View>
@@ -729,7 +730,9 @@ export default function ViewGEBC({navigation, route}) {
             marginTop: hp(5),
             marginLeft: wp(8),
           }}>
-          <View
+          <TouchableOpacity
+          onPress={()=>navigation.navigate("ViewElseProfile",{id:receivedData?.user_id})}
+
             style={{
               height: wp(10),
               alignSelf: 'center',
@@ -753,12 +756,50 @@ export default function ViewGEBC({navigation, route}) {
                 source={{uri: receivedData?.userimage}}
               />
             )}
-          </View>
+          </TouchableOpacity>
 
           <Text style={styles.textProfileName}>{receivedData?.username}</Text>
         </View>
 
+        <View style={{height: hp(5)}}>
+          <ScrollView
+            showsVerticalScrollIndicator={false} // Hide vertical scroll indicator
+            style={{flex: 1}}
+            contentContainerStyle={{
+              verticalLine: false,
+              marginHorizontal: wp(8),
+            }}>
+            <Text
+              style={{
+                marginTop: hp(1),
+                fontFamily: 'Inter',
+                fontSize: hp(1.8),
+                lineHeight: hp(2.1),
+                color: 'black',
+              }}>
+              {showFullContent
+                ? details
+                : details.length > 90
+                ? details.substring(0, 90) + '...'
+                : details.slice(0)}
+            </Text>
 
+            <TouchableOpacity onPress={toggleContent}>
+              <Text
+                style={{
+                  fontFamily: 'Inter',
+                  fontSize: hp(1.8),
+                  color: '#FACA4E',
+                }}>
+                {details.length > 90
+                  ? showFullContent
+                    ? 'See Less'
+                    : 'See More'
+                  : null}
+              </Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
 
         <View
           style={{
@@ -766,59 +807,19 @@ export default function ViewGEBC({navigation, route}) {
             overflow: 'hidden',
             marginTop: hp(3),
             flex: 1,
-            justifyContent:'center',
+            justifyContent: 'center',
             alignItems: 'center',
-            borderWidth:0.5,
+            borderWidth: 0.5,
             borderRadius: wp(5),
-            borderColor: 'grey'
-           // borderWidth: 3,
+            borderColor: 'grey',
+            // borderWidth: 3,
             //borderColor: 'blue',
           }}>
-         <Text style={{fontSize:hp(10)}}>
-              {receivedData?.image}
-            </Text>
+          <Text style={{fontSize: hp(10)}}>{receivedData?.image}</Text>
         </View>
 
         <View style={styles.bottomView}>
           <View style={{height: hp(20)}}>
-            <ScrollView
-              showsVerticalScrollIndicator={false} // Hide vertical scroll indicator
-              style={{flex: 1}}
-              contentContainerStyle={{
-                verticalLine: false,
-                marginHorizontal: wp(8),
-              }}>
-              <Text
-                style={{
-                  marginTop: hp(1),
-                  fontFamily: 'Inter',
-                  fontSize: hp(1.8),
-                  lineHeight: hp(2.1),
-                  color: 'black',
-                }}>
-                {showFullContent
-                  ? details
-                  : details.length > 90
-                  ? details.substring(0, 90) + '...'
-                  : details.slice(0)}
-              </Text>
-
-              <TouchableOpacity onPress={toggleContent}>
-                <Text
-                  style={{
-                    fontFamily: 'Inter',
-                    fontSize: hp(1.8),
-                    color: '#FACA4E',
-                  }}>
-                  {details.length > 90
-                    ? showFullContent
-                      ? 'See Less'
-                      : 'See More'
-                    : null}
-                </Text>
-              </TouchableOpacity>
-            </ScrollView>
-
             <View style={{height: 1, backgroundColor: '#FFFFFF52'}}></View>
 
             <View
@@ -839,11 +840,11 @@ export default function ViewGEBC({navigation, route}) {
                 }}>
                 <TouchableOpacity onPress={toggleContentLike}>
                   {showLikes ? (
-                   <MaterialCommunityIcons
-                   color={'#FACA4E'}
-                   name={'cards-heart'}
-                   size={25}
-                 />
+                    <MaterialCommunityIcons
+                      color={'#FACA4E'}
+                      name={'cards-heart'}
+                      size={25}
+                    />
                   ) : (
                     <MaterialCommunityIcons
                       color={'#FACA4E'}
@@ -875,7 +876,7 @@ export default function ViewGEBC({navigation, route}) {
                   onPress={() =>
                     setIsBottomSheetExpanded(!isBottomSheetExpanded)
                   }>
-                 <MaterialCommunityIcons
+                  <MaterialCommunityIcons
                     color={'#FACA4E'}
                     name={'comment-processing-outline'}
                     size={25}
@@ -901,7 +902,7 @@ export default function ViewGEBC({navigation, route}) {
                   height: hp(5),
                 }}>
                 <TouchableOpacity onPress={() => shareViaWhatsApp()}>
-                <MaterialCommunityIcons
+                  <MaterialCommunityIcons
                     color={'#FACA4E'}
                     name={'share-variant'}
                     size={25}
@@ -918,7 +919,7 @@ export default function ViewGEBC({navigation, route}) {
                   height: hp(5),
                 }}>
                 <TouchableOpacity onPress={() => handleUpdatePassword()}>
-                <MaterialCommunityIcons
+                  <MaterialCommunityIcons
                     color={'#FACA4E'}
                     name={'download'}
                     size={25}
@@ -1161,7 +1162,7 @@ const styles = StyleSheet.create({
   },
   bottomView: {
     flex: 1,
-    marginTop:hp(3)
+    marginTop: hp(3),
     //justifyContent: 'flex-end',
     // You can add padding or content to this view as needed.
   },

@@ -114,6 +114,7 @@ import ViewUpdateQAFI from './app/src/view/screens/UpdateQAFI/ViewUpdateQAFI';
 import ViewGEBC from './app/src/view/screens/GEBC/ViewGEBC';
 import ViewNews from './app/src/view/screens/ViewNews/ViewNews';
 import ViewQAFI from './app/src/view/screens/QAFI/ViewQAFI';
+import ViewElseProfile from './app/src/view/screens/Profile/ViewElseProfile';
 
 //------------------\\
 
@@ -257,6 +258,12 @@ const App = () => {
         <Stack.Screen
           name="Notification"
           component={Notification}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="ViewElseProfile"
+          component={ViewElseProfile}
           options={{headerShown: false}}
         />
 
